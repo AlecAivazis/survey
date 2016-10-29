@@ -17,6 +17,8 @@ type CursorCoordinate struct {
 	row int
 }
 
+// CursorLocation returns the location (col, row) of the cursor in the current terminal
+// session.
 func CursorLocation() (*CursorCoordinate, error) {
 
 	// Set the terminal to raw mode (to be undone with `-raw`)
@@ -62,8 +64,8 @@ func CursorLocation() (*CursorCoordinate, error) {
 		if err != nil {
 			return nil, err
 		}
-		return &CursorCoordinate{x - 1, y}, nil
+		return &CursorCoordinate{x, y}, nil
 	} else {
-		return nil, errors.New("it does not work. womp womp.")
+		return nil, errors.New("Could not find current location.")
 	}
 }
