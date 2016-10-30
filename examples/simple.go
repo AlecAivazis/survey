@@ -21,5 +21,5 @@ var qs = []*probe.Question{
 
 func main() {
 	answers := probe.Ask(qs)
-	fmt.Println(answers)
+	fmt.Printf("%s chose %s.\n", answers["name"], answers["color"])
 }
