@@ -1,4 +1,4 @@
-package main
+package probe
 
 import (
 // "fmt"
@@ -12,7 +12,6 @@ type Question struct {
 
 type Prompt interface {
 	Prompt() (string, error)
-	AskQuestion()
 }
 
 func Ask(qs []*Question) map[string]string {
@@ -20,8 +19,6 @@ func Ask(qs []*Question) map[string]string {
 	res := make(map[string]string)
 	// go over every question
 	for _, q := range qs {
-		// print the question
-		q.Prompt.AskQuestion()
 		// grab the user input and save it
 		ans, err := q.Prompt.Prompt()
 		// if something went wrong

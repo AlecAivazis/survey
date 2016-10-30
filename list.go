@@ -1,4 +1,4 @@
-package main
+package probe
 
 // get the current location of the cursor
 // loc, err := CursorLocation()
