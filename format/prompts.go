@@ -7,14 +7,14 @@ import (
 // FormatChoiceOption prepares the string to be printed like an option in a
 // choice list.
 func ChoiceOption(opt string, selected bool) string {
-	// the tab to use depends on wether the option is selected
-	var tab string
+	// if we are rendering the selected option
 	if selected {
-		tab = ChoiceSelected
+		// paint the line blue
+		return fmt.Sprint(SelectedColor, ChoiceSelected, opt, ResetColor)
 	} else {
-		tab = ChoiceNotSelected
+		// if its not selected, treat it like normal
+		return fmt.Sprint(ChoiceNotSelected, opt)
 	}
-	return fmt.Sprintf("%s%s", tab, opt)
 }
 
 // FormatAsk prepares a string to be printed like the first line
