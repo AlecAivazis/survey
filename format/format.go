@@ -7,6 +7,7 @@ var (
 	Question          = " ? "
 	ChoiceSelected    = " > "
 	ChoiceNotSelected = TabEmpty
-	SelectedColor     = chalk.Blue
-	ResetColor        = chalk.Reset
+	SelectedColor     = chalk.Cyan
+	ResetFormat       = chalk.Reset
+	QuestionColor     = chalk.Green
 )

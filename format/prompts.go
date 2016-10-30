@@ -2,6 +2,7 @@ package format
 
 import (
 	"fmt"
+	"github.com/ttacon/chalk"
 )
 
 // FormatChoiceOption prepares the string to be printed like an option in a
@@ -10,7 +11,7 @@ func ChoiceOption(opt string, selected bool) string {
 	// if we are rendering the selected option
 	if selected {
 		// paint the line blue
-		return fmt.Sprint(SelectedColor, ChoiceSelected, opt, ResetColor)
+		return fmt.Sprint(SelectedColor, ChoiceSelected, opt, ResetFormat)
 	} else {
 		// if its not selected, treat it like normal
 		return fmt.Sprint(ChoiceNotSelected, opt)
@@ -20,5 +21,5 @@ func ChoiceOption(opt string, selected bool) string {
 // FormatAsk prepares a string to be printed like the first line
 // of a prompt
 func Ask(q string) string {
-	return fmt.Sprintf("%s%v", Question, q)
+	return chalk.Bold.TextStyle(fmt.Sprint(QuestionColor, Question, ResetFormat, q))
 }
