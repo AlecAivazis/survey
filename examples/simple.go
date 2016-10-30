@@ -6,7 +6,7 @@ import (
 )
 
 // the questions to ask
-var qs = []*probe.Question{
+var simpleQs = []*probe.Question{
 	{
 		Name:   "name",
 		Prompt: &probe.Input{"What is your name?"},
@@ -22,7 +22,7 @@ var qs = []*probe.Question{
 
 func main() {
 
-	answers, err := probe.Ask(qs)
+	answers, err := probe.Ask(simpleQs)
 
 	if err != nil {
 		fmt.Println("\n", err.Error())

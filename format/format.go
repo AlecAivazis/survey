@@ -3,11 +3,12 @@ package format
 import "github.com/ttacon/chalk"
 
 var (
-	TabEmpty          = "   "
+	Tab               = "   "
 	Question          = " ? "
 	ChoiceSelected    = " > "
-	ChoiceNotSelected = TabEmpty
+	ChoiceNotSelected = Tab
 	SelectedColor     = chalk.Cyan
 	ResetFormat       = chalk.Reset
 	QuestionColor     = chalk.Green
+	Error             = chalk.Red
 )

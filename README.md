@@ -14,6 +14,7 @@ var qs = []*probe.Question{
     {
         Name:   "name",
         Prompt: &probe.Input{"What is your name?"},
+        Validate: probe.NonNull,
     },
     {
         Name: "color",
