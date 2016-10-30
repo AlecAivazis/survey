@@ -34,14 +34,14 @@ func (prompt *Choice) Prompt() (string, error) {
 	// the starting point of the list depends on wether or not we
 	// are at the bottom of the current terminal session
 	var initialLocation int
-	// if we are at the bottom
-	if loc.col == tm.Height() {
-		// the we have to start
-		initialLocation = loc.col - height
-		// otherwise we are not at the bottom of the terminal
-	} else {
+	// if the options would fit cleanly
+	if loc.col+height < tm.Height() {
 		// start at the current location
 		initialLocation = loc.col
+		// otherwise we will be placed at the bottom of the terminal after this print
+	} else {
+		// the we have to start printing so that we just fit
+		initialLocation = tm.Height() - height
 	}
 
 	// start off with the first option selected
