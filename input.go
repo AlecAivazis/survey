@@ -2,6 +2,8 @@ package probe
 
 import (
 	"fmt"
+
+	"github.com/alecaivazis/probe/format"
 )
 
 type Input struct {
@@ -12,7 +14,7 @@ type Input struct {
 // by a newline or carriage return.
 func (input *Input) Prompt() (string, error) {
 	// print the question we were given to kick off the prompt
-	fmt.Print(FormatAsk(fmt.Sprintf("%v ", input.Question)))
+	fmt.Print(format.FormatAsk(fmt.Sprintf("%v ", input.Question)))
 
 	// a string to hold the user's input
 	var res string

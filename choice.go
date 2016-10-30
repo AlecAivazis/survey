@@ -5,6 +5,8 @@ import (
 	"fmt"
 	tm "github.com/buger/goterm"
 	"time"
+
+	"github.com/alecaivazis/probe/format"
 )
 
 // Choice is a prompt that presents a
@@ -15,7 +17,7 @@ type Choice struct {
 
 func (prompt *Choice) Prompt() (string, error) {
 	// ask the question
-	fmt.Println(FormatAsk(prompt.Question))
+	fmt.Println(format.FormatAsk(prompt.Question))
 
 	// get the current location of the cursor
 	loc, err := CursorLocation()
@@ -27,7 +29,7 @@ func (prompt *Choice) Prompt() (string, error) {
 	}
 
 	// the height of the prompt's output
-	height := 3
+	height := len(prompt.Choices)
 
 	// the starting point of the list depends on wether or not we
 	// are at the bottom of the current terminal session
@@ -41,6 +43,9 @@ func (prompt *Choice) Prompt() (string, error) {
 		// start at the current location
 		initialLocation = loc.col
 	}
+
+	// start off with the first option selected
+	// sel := 0
 
 	for {
 		// wait for an input from the user
@@ -57,6 +62,8 @@ func (prompt *Choice) Prompt() (string, error) {
 			return "", errors.New("Goodbye.")
 		}
 
+		// we need to render the options
+
 		tm.Print(ascii, keyCode, err, "\n")
 		tm.Print("Current Time: ", time.Now().Format(time.RFC1123))
 		tm.Print("\nHello")
@@ -68,4 +75,8 @@ func (prompt *Choice) Prompt() (string, error) {
 	}
 
 	return "hello", nil
+}
+
+func renderOptions(opts []string, selected bool) string {
+	return ""
 }
