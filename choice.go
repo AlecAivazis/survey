@@ -59,21 +59,27 @@ func (prompt *Choice) Prompt() (string, error) {
 			return "", err
 		}
 
-		// if the user sends SIGTERM (3) or presses esc (27)
+		// if the user sends SIGTERM (ascii 3) or presses esc (ascii 27)
 		if ascii == 3 || ascii == 27 {
 			// hard close
 			return "", errors.New("Goodbye.")
 		}
 
-		// if the user pressed the up arrow and we can decrement sel
+		// if the user pressed the up arrow (keycode 38) and we can decrement sel
 		if keycode == 38 && sel > 0 {
 			// decrement the selected index
 			sel--
 		}
-		// if the user pressed the up arrow and we can decrement sel
+		// if the user pressed the down arrow (keycode 40)  and we can decrement sel
 		if keycode == 40 && sel < len(prompt.Choices)-1 {
 			// decrement the selected index
 			sel++
+		}
+
+		// if the user presses enter (ascii 13)
+		if ascii == 13 {
+			// we're done with the rendering loop (the current value is good)
+			break
 		}
 
 		// print the options
