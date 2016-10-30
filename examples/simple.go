@@ -20,6 +20,11 @@ var qs = []*probe.Question{
 }
 
 func main() {
-	answers := probe.Ask(qs)
+	answers, err := probe.Ask(qs)
+	if err != nil {
+		fmt.Println("\n", err.Error())
+		return
+	}
+
 	fmt.Printf("%s chose %s.\n", answers["name"], answers["color"])
 }

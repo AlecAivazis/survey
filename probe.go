@@ -14,7 +14,7 @@ type Prompt interface {
 	Prompt() (string, error)
 }
 
-func Ask(qs []*Question) map[string]string {
+func Ask(qs []*Question) (map[string]string, error) {
 	// the response map
 	res := make(map[string]string)
 	// go over every question
@@ -23,11 +23,12 @@ func Ask(qs []*Question) map[string]string {
 		ans, err := q.Prompt.Prompt()
 		// if something went wrong
 		if err != nil {
-			panic(err)
+			// stop listening
+			return nil, err
 		}
 		// add it to the map
 		res[q.Name] = ans
 	}
 	// return the response
-	return res
+	return res, nil
 }
