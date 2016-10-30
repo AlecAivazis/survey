@@ -5,6 +5,7 @@ import (
 	"github.com/alecaivazis/probe"
 )
 
+// the questions to ask
 var qs = []*probe.Question{
 	{
 		Name:   "name",
@@ -20,7 +21,9 @@ var qs = []*probe.Question{
 }
 
 func main() {
+
 	answers, err := probe.Ask(qs)
+
 	if err != nil {
 		fmt.Println("\n", err.Error())
 		return

@@ -16,10 +16,10 @@ var qs = []*probe.Question{
         Prompt: &probe.Input{"What is your name?"},
     },
     {
-        Name:   "color",
+        Name: "color",
         Prompt: &probe.Choice{
             Question: "Choose a color:",
-            Choices: []string{"red", "blue", "green"},
+            Choices:  []string{"red", "blue", "green"},
         },
     },
 }
@@ -27,6 +27,12 @@ var qs = []*probe.Question{
 func main() {
     answers := probe.Ask(qs)
 
-    fmt.Println(answers)
+    if err != nil {
+        fmt.Println("\n", err.Error())
+        return
+    }
+
+    fmt.Printf("%s chose %s.", answers["name"], answers["color"])
 }
+
 ```
