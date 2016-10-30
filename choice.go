@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	tm "github.com/buger/goterm"
-	"time"
+	"strings"
 
 	"github.com/alecaivazis/probe/format"
 )
@@ -17,7 +17,7 @@ type Choice struct {
 
 func (prompt *Choice) Prompt() (string, error) {
 	// ask the question
-	fmt.Println(format.FormatAsk(prompt.Question))
+	fmt.Println(format.Ask(prompt.Question))
 
 	// get the current location of the cursor
 	loc, err := CursorLocation()
@@ -45,11 +45,14 @@ func (prompt *Choice) Prompt() (string, error) {
 	}
 
 	// start off with the first option selected
-	// sel := 0
+	sel := 0
+
+	// print the options to start
+	refreshOptions(prompt.Choices, sel, initialLocation)
 
 	for {
 		// wait for an input from the user
-		ascii, keyCode, err := getChar()
+		ascii, keycode, err := getChar()
 		// if there is an error
 		if err != nil {
 			// bubble up
@@ -62,21 +65,50 @@ func (prompt *Choice) Prompt() (string, error) {
 			return "", errors.New("Goodbye.")
 		}
 
-		// we need to render the options
+		// if the user pressed the up arrow and we can decrement sel
+		if keycode == 38 && sel > 0 {
+			// decrement the selected index
+			sel--
+		}
+		// if the user pressed the up arrow and we can decrement sel
+		if keycode == 40 && sel < len(prompt.Choices)-1 {
+			// decrement the selected index
+			sel++
+		}
 
-		tm.Print(ascii, keyCode, err, "\n")
-		tm.Print("Current Time: ", time.Now().Format(time.RFC1123))
-		tm.Print("\nHello")
-
-		tm.Flush() // Call it every time at the end of rendering
-
-		// make sure we overwrite the first line next time we print
-		tm.MoveCursor(initialLocation, 1)
+		// print the options
+		refreshOptions(prompt.Choices, sel, initialLocation)
 	}
 
-	return "hello", nil
+	// return the selected choice
+	return prompt.Choices[sel], nil
 }
 
-func renderOptions(opts []string, selected bool) string {
-	return ""
+func refreshOptions(opts []string, sel int, initLoc int) {
+	// we need to render the options
+	tm.Print(formatChoiceOptions(opts, sel))
+	tm.Flush()
+	// make sure we overwrite the first line next time we print
+	tm.MoveCursor(initLoc, 1)
+}
+
+func formatChoiceOptions(opts []string, selected int) string {
+	// a string to acc
+	acc := []string{}
+	// format each option
+	for i, opt := range opts {
+		// by default, the option is not selected
+		isSel := false
+		// if this option is at the same index as the selected value
+		if i == selected {
+			// then the option should show a selection indicator
+			isSel = true
+		}
+
+		// add the formatted option
+		acc = append(acc, format.ChoiceOption(opt, isSel))
+	}
+
+	// show each option on its own line
+	return strings.Join(acc, "\n")
 }
