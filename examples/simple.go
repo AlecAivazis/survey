@@ -12,7 +12,14 @@ var qs = []*probe.Question{
 	},
 	{
 		Name:   "birthday",
-		Prompt: &probe.Input{"Wh en is your birthday?"},
+		Prompt: &probe.Input{"When is your birthday?"},
+	},
+	{
+		Name: "gender",
+		Prompt: &probe.Choice{
+			Question: "Are you male or female?",
+			Choices:  []string{"male", "female"},
+		},
 	},
 }
 

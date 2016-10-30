@@ -12,14 +12,14 @@ import (
 	"strings"
 )
 
-type CursorCoordinate struct {
+type cursorCoordinate struct {
 	col int
 	row int
 }
 
 // CursorLocation returns the location (col, row) of the cursor in the current terminal
 // session.
-func CursorLocation() (*CursorCoordinate, error) {
+func CursorLocation() (*cursorCoordinate, error) {
 
 	// Set the terminal to raw mode (to be undone with `-raw`)
 	rawMode := exec.Command("/bin/stty", "raw")
@@ -64,7 +64,11 @@ func CursorLocation() (*CursorCoordinate, error) {
 		if err != nil {
 			return nil, err
 		}
-		return &CursorCoordinate{x, y}, nil
+		// go up one line to cover our tracks
+		fmt.Print("\033[F")
+
+		// return the internal data structure with the location
+		return &cursorCoordinate{x, y}, nil
 	} else {
 		return nil, errors.New("Could not find current location.")
 	}
