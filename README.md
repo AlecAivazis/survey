@@ -16,8 +16,11 @@ var qs = []*probe.Question{
         Prompt: &probe.Input{"What is your name?"},
     },
     {
-        Name:   "birthday",
-        Prompt: &probe.Input{"When is your birthday?"},
+        Name:   "color",
+        Prompt: &probe.Choice{
+            Question: "Choose a color:",
+            Choices: []string{"red", "blue", "green"},
+        },
     },
 }
 
