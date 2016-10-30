@@ -4,11 +4,11 @@ import (
 	"errors"
 )
 
-func NonNull(str string) error {
+func Required(str string) error {
 	// if the string is empty
 	if str == "" {
 		// return the error
-		return errors.New("Empty values not accepted.")
+		return errors.New("Value is required.")
 	}
 	// nothing was wrong
 	return nil
