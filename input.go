@@ -12,7 +12,7 @@ type Input struct {
 // by a newline or carriage return.
 func (input *Input) Prompt() (string, error) {
 	// print the question we were given to kick off the prompt
-	fmt.Print(fmt.Sprintf("%v ", input.Question))
+	fmt.Print(FormatAsk(fmt.Sprintf("%v ", input.Question)))
 
 	// a string to hold the user's input
 	var res string
