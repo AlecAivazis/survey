@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"github.com/alecaivazis/probe"
 )
@@ -12,6 +13,18 @@ var validationQs = []*probe.Question{
 		Prompt:   &probe.Input{"What is your name?"},
 		Validate: probe.NonNull,
 	},
+	{
+		Name:   "name",
+		Prompt: &probe.Input{"Enter 'foo':"},
+		Validate: func(str string) error {
+			// if the input matches the expectation
+			if str != "foo" {
+				return errors.New(fmt.Sprintf("You entered %s, not 'foo'.", str))
+			}
+			// nothing was wrong
+			return nil
+		},
+	},
 }
 
 func main() {
@@ -20,8 +33,5 @@ func main() {
 
 	if err != nil {
 		fmt.Println("\n", err.Error())
-		return
 	}
-
-	fmt.Printf("%s chose %s.\n", answers["name"], answers["color"])
 }
