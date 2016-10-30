@@ -12,15 +12,15 @@ import (
 // the questions to ask
 var qs = []*probe.Question{
     {
-        Name:   "name",
-        Prompt: &probe.Input{"What is your name?"},
-        Validate: probe.NonNull,
+        Name:     "name",
+        Prompt:   &probe.Input{"What is your name?"},
+        Validate: probe.Required,
     },
     {
         Name: "color",
         Prompt: &probe.Choice{
             Message: "Choose a color:",
-            Choices:  []string{"red", "blue", "green"},
+            Choices: []string{"red", "blue", "green"},
         },
     },
 }
