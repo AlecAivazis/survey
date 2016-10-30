@@ -14,7 +14,7 @@ var validationQs = []*probe.Question{
 		Validate: probe.NonNull,
 	},
 	{
-		Name:   "name",
+		Name:   "valid",
 		Prompt: &probe.Input{"Enter 'foo':"},
 		Validate: func(str string) error {
 			// if the input matches the expectation
