@@ -11,13 +11,13 @@ import (
 
 // Choice is a prompt that presents a
 type Choice struct {
-	Question string
-	Choices  []string
+	Message string
+	Choices []string
 }
 
 func (prompt *Choice) Prompt() (string, error) {
 	// ask the question
-	fmt.Println(format.Ask(prompt.Question))
+	fmt.Println(format.Ask(prompt.Message))
 
 	// get the current location of the cursor
 	loc, err := CursorLocation()

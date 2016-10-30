@@ -14,8 +14,8 @@ var qs = []*probe.Question{
 	{
 		Name: "color",
 		Prompt: &probe.Choice{
-			Question: "Choose a color:",
-			Choices:  []string{"red", "blue", "green"},
+			Message: "Choose a color:",
+			Choices: []string{"red", "blue", "green"},
 		},
 	},
 }
