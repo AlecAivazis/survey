@@ -1,7 +1,7 @@
 # Probe
 A library for building interactive prompts. Heavily inspired by the great [inquirer.js](https://github.com/SBoudrias/Inquirer.js/).
 
-```golang
+```go
 package main
 
 import (
