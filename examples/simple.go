@@ -18,8 +18,8 @@ var simpleQs = []*survey.Question{
 		Name: "color",
 		Prompt: &survey.Choice{
 			Message: "Choose a color:",
-			Choices: []string{"red", "blue", "green"},
-			Default: "blue",
+			Choices: []string{"red", "blue", "green", "yellow"},
+			Default: "yellow",
 		},
 	},
 }
@@ -29,7 +29,7 @@ func main() {
 	answers, err := survey.Ask(simpleQs)
 
 	if err != nil {
-		fmt.Println("\n", err.Error())
+		fmt.Println(err.Error())
 		return
 	}
 

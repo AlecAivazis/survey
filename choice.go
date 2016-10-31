@@ -24,9 +24,8 @@ func (prompt *Choice) Prompt() (string, error) {
 	loc, err := CursorLocation()
 	// if something went wrong
 	if err != nil {
-		// TODO: don't panic but quit better
-		// yell loudly
-		panic(err)
+		// bubble up
+		return "", err
 	}
 
 	// the height of the prompt's output
@@ -102,6 +101,55 @@ func (prompt *Choice) Prompt() (string, error) {
 
 	// return the selected choice
 	return prompt.Choices[sel], nil
+}
+
+// Cleanup removes the choices section, and renders the ask like a normal question.
+func (prompt *Choice) Cleanup(val string) error {
+
+	// the height of the prompt's output
+	height := len(prompt.Choices)
+
+	// get the current location of the cursor
+	loc, err := CursorLocation()
+	// if something went wrong
+	if err != nil {
+		// yell loudly
+		return err
+	}
+
+	var initLoc int
+	// if the options would fit cleanly
+	if loc.col+height-2 <= tm.Height() {
+		// start at the current location
+		initLoc = loc.col - height - 1
+		// otherwise we will be placed at the bottom of the terminal after this print
+	} else {
+
+		// the we have to start printing so that we just fit
+		initLoc = loc.col - height - 2
+	}
+
+	// find the index of the selected choice
+
+	// start where we were told
+	tm.MoveCursor(initLoc, 1)
+	tm.Print(format.Response(prompt.Message, val), "\x1b[0K")
+	// for each choice
+	for range prompt.Choices {
+		// add an empty line
+		tm.Print(format.AnsiClearLine)
+		// print the output
+		tm.Flush()
+	}
+	// add an empty line
+	tm.Print(format.AnsiClearLine)
+	// print the output
+	tm.Flush()
+	tm.MoveCursor(initLoc, 1)
+	tm.Flush()
+
+	// nothing went wrong
+	return nil
 }
 
 func refreshOptions(opts []string, sel int, initLoc int) {

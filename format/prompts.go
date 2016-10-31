@@ -34,3 +34,8 @@ func Ask(q string, def string) string {
 	// return the combination of the two message
 	return fmt.Sprintf("%s%s", msg, defMsg)
 }
+
+// Response represents the answer to a question a
+func Response(q string, ans string) string {
+	return fmt.Sprint(Ask(q, ""), SelectedColor, " ", ans, ResetFormat)
+}

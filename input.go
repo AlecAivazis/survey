@@ -43,8 +43,16 @@ func (input *Input) Cleanup(val string) error {
 		return err
 	}
 
+	var initLoc int
+	// if we are printing at the end of the console
+	if loc.col == tm.Height() {
+		initLoc = loc.col - 2
+	} else {
+		initLoc = loc.col - 1
+	}
+
 	// move to the beginning of the current line
-	tm.MoveCursor(loc.col-1, 1)
+	tm.MoveCursor(initLoc, 1)
 
 	tm.Print(format.Response(input.Message, val), "\x1b[0K")
 	tm.Flush()

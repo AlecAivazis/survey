@@ -10,7 +10,7 @@ import (
 var validationQs = []*survey.Question{
 	{
 		Name:     "name",
-		Prompt:   &survey.Input{"What is your name?"},
+		Prompt:   &survey.Input{"What is your name?", nil},
 		Validate: survey.Required,
 	},
 	{
