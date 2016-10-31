@@ -20,6 +20,7 @@ type Question struct {
 // and return a string value.
 type Prompt interface {
 	Prompt() (string, error)
+	Cleanup(string) error
 }
 
 // Ask performs the prompt loop
@@ -43,6 +44,9 @@ func Ask(qs []*Question) (map[string]string, error) {
 				ans, err = q.Prompt.Prompt()
 			}
 		}
+
+		// tell the prompt to cleanup with the validated value
+		q.Prompt.Cleanup(ans)
 
 		// if something went wrong
 		if err != nil {

@@ -2,6 +2,7 @@ package survey
 
 import (
 	"fmt"
+	tm "github.com/buger/goterm"
 
 	"github.com/alecaivazis/survey/format"
 )
@@ -30,4 +31,24 @@ func (input *Input) Prompt() (string, error) {
 
 	// return the value
 	return res, nil
+}
+
+// Cleanup overwrite the line with the finalized formatted version
+func (input *Input) Cleanup(val string) error {
+	// get the current cursor location
+	loc, err := CursorLocation()
+	// if something went wrong
+	if err != nil {
+		// bubble
+		return err
+	}
+
+	// move to the beginning of the current line
+	tm.MoveCursor(loc.col-1, 1)
+
+	tm.Print(format.Response(input.Message, val), "\x1b[0K")
+	tm.Flush()
+
+	// nothing went wrong
+	return nil
 }
