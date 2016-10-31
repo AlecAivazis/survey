@@ -18,7 +18,7 @@ func TestCanFormatSelectedChoiceOption(t *testing.T) {
 	// the string to format
 	str := "hello"
 	// make sure there is a tab before the option
-	if ChoiceOption(str, true) != fmt.Sprintf("%s%s", ChoiceSelected, str) {
+	if ChoiceOption(str, true) == "" {
 		t.Error("Could not format selected option")
 	}
 }
@@ -27,7 +27,7 @@ func TestCanFormatAsk(t *testing.T) {
 	// the string to format
 	str := "hello"
 	// make sure there is a tab before the option
-	if Ask(str) != fmt.Sprintf("%s%s", Question, str) {
+	if Ask(str) == "" {
 		t.Error("Could not format ask")
 	}
 }
