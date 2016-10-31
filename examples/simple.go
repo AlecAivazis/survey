@@ -8,14 +8,18 @@ import (
 // the questions to ask
 var simpleQs = []*survey.Question{
 	{
-		Name:   "name",
-		Prompt: &survey.Input{"What is your name?"},
+		Name: "name",
+		Prompt: &survey.Input{
+			Message: "What is your name?",
+			Default: "Johnny Appleseed",
+		},
 	},
 	{
 		Name: "color",
 		Prompt: &survey.Choice{
 			Message: "Choose a color:",
 			Choices: []string{"red", "blue", "green"},
+			Default: "red",
 		},
 	},
 }

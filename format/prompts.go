@@ -20,6 +20,17 @@ func ChoiceOption(opt string, selected bool) string {
 
 // FormatAsk prepares a string to be printed like the first line
 // of a prompt
-func Ask(q string) string {
-	return chalk.Bold.TextStyle(fmt.Sprint(QuestionColor, Question, ResetFormat, q))
+func Ask(q string, def string) string {
+	// get the message for the question
+	msg := chalk.Bold.TextStyle(fmt.Sprint(QuestionColor, Question, ResetFormat, q))
+	// the default default message is empty
+	defMsg := ""
+	// if the user passed a default value
+	if def != "" {
+		// the default message
+		defMsg = fmt.Sprint(DefaultColor, "(", def, ") ", ResetFormat)
+	}
+
+	// return the combination of the two message
+	return fmt.Sprintf("%s%s", msg, defMsg)
 }

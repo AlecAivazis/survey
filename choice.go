@@ -13,11 +13,12 @@ import (
 type Choice struct {
 	Message string
 	Choices []string
+	Default string
 }
 
 func (prompt *Choice) Prompt() (string, error) {
 	// ask the question
-	fmt.Println(format.Ask(prompt.Message))
+	fmt.Println(format.Ask(prompt.Message, ""))
 
 	// get the current location of the cursor
 	loc, err := CursorLocation()
