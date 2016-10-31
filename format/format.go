@@ -3,9 +3,9 @@ package format
 import "github.com/ttacon/chalk"
 
 var (
-	Tab               = "   "
-	Question          = " ? "
-	ChoiceSelected    = " > "
+	Tab               = "  "
+	Question          = "? "
+	ChoiceSelected    = "> "
 	ChoiceNotSelected = Tab
 	SelectedColor     = chalk.Cyan
 	ResetFormat       = chalk.Reset
