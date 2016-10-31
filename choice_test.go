@@ -1,10 +1,10 @@
-package probe
+package survey
 
 import (
 	"strings"
 	"testing"
 
-	"github.com/alecaivazis/probe/format"
+	"github.com/alecaivazis/survey/format"
 )
 
 func TestCanFormatChoiceOptions(t *testing.T) {

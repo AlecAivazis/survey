@@ -1,4 +1,4 @@
-package probe
+package survey
 
 import (
 	"errors"
@@ -6,7 +6,7 @@ import (
 	tm "github.com/buger/goterm"
 	"strings"
 
-	"github.com/alecaivazis/probe/format"
+	"github.com/alecaivazis/survey/format"
 )
 
 // Choice is a prompt that presents a

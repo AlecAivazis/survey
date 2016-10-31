@@ -1,15 +1,15 @@
-package probe
+package survey
 
 import (
 	"fmt"
 	// tm "github.com/buger/goterm"
-	"github.com/alecaivazis/probe/format"
+	"github.com/alecaivazis/survey/format"
 )
 
 // Validator is a function passed to a Question in order to redefine
 type Validator func(string) error
 
-// Question is the core data structure for a probe questionnaire.
+// Question is the core data structure for a survey questionnaire.
 type Question struct {
 	Name     string
 	Prompt   Prompt

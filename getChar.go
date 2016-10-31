@@ -1,4 +1,4 @@
-package probe
+package survey
 
 import "github.com/pkg/term"
 

@@ -1,9 +1,9 @@
-package probe
+package survey
 
 import (
 	"fmt"
 
-	"github.com/alecaivazis/probe/format"
+	"github.com/alecaivazis/survey/format"
 )
 
 type Input struct {

@@ -6,19 +6,19 @@ package main
 
 import (
     "fmt"
-    "github.com/alecaivazis/probe"
+    "github.com/alecaivazis/survey"
 )
 
 // the questions to ask
-var qs = []*probe.Question{
+var qs = []*survey.Question{
     {
         Name:     "name",
-        Prompt:   &probe.Input{"What is your name?"},
-        Validate: probe.Required,
+        Prompt:   &survey.Input{"What is your name?"},
+        Validate: survey.Required,
     },
     {
         Name: "color",
-        Prompt: &probe.Choice{
+        Prompt: &survey.Choice{
             Message: "Choose a color:",
             Choices: []string{"red", "blue", "green"},
         },
@@ -26,7 +26,7 @@ var qs = []*probe.Question{
 }
 
 func main() {
-    answers, err := probe.Ask(qs)
+    answers, err := survey.Ask(qs)
 
     if err != nil {
         fmt.Println("\n", err.Error())
