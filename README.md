@@ -13,7 +13,7 @@ import (
 var qs = []*survey.Question{
     {
         Name:     "name",
-        Prompt:   &survey.Input{"What is your name?"},
+        Prompt:   &survey.Input{"What is your name?", nil},
         Validate: survey.Required,
     },
     {
@@ -21,6 +21,7 @@ var qs = []*survey.Question{
         Prompt: &survey.Choice{
             Message: "Choose a color:",
             Choices: []string{"red", "blue", "green"},
+            Default: "red",
         },
     },
 }
