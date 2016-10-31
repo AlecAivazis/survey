@@ -19,7 +19,7 @@ var simpleQs = []*survey.Question{
 		Prompt: &survey.Choice{
 			Message: "Choose a color:",
 			Choices: []string{"red", "blue", "green"},
-			Default: "red",
+			Default: "blue",
 		},
 	},
 }

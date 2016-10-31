@@ -47,6 +47,19 @@ func (prompt *Choice) Prompt() (string, error) {
 
 	// start off with the first option selected
 	sel := 0
+	// if there is a default
+	if prompt.Default != "" {
+		// find the choice
+		for i, opt := range prompt.Choices {
+			// if the option correponds to the default
+			if opt == prompt.Default {
+				// we found our initial value
+				sel = i
+				// stop looking
+				break
+			}
+		}
+	}
 
 	// print the options to start
 	refreshOptions(prompt.Choices, sel, initialLocation)
