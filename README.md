@@ -2,8 +2,7 @@
 A library for building interactive prompts. Heavily inspired by the great [inquirer.js](https://github.com/SBoudrias/Inquirer.js/).
 
 
-<img src="https://thumbs.gfycat.com/DisastrousDescriptiveGrunion-size_restricted.gif" width="550px"></img>
-
+![](https://zippy.gfycat.com/AmusingBossyArrowworm.gif)
 
 ```go
 package main
