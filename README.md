@@ -2,7 +2,7 @@
 A library for building interactive prompts. Heavily inspired by the great [inquirer.js](https://github.com/SBoudrias/Inquirer.js/).
 
 
-![survey](https://zippy.gfycat.com/PerfectHelpfulClumber.gif "survey")
+![survey](https://zippy.gfycat.com/DisastrousDescriptiveGrunion.gif "survey")
 
 
 ```go
