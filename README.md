@@ -16,7 +16,7 @@ import (
 var qs = []*survey.Question{
     {
         Name:     "name",
-        Prompt:   &survey.Input{"What is your name?", nil},
+        Prompt:   &survey.Input{"What is your name?", ""},
         Validate: survey.Required,
     },
     {
