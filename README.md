@@ -1,6 +1,9 @@
 # Survey
 A library for building interactive prompts. Heavily inspired by the great [inquirer.js](https://github.com/SBoudrias/Inquirer.js/).
 
+
+![](https://zippy.gfycat.com/AmusingBossyArrowworm.gif)
+
 ```go
 package main
 
@@ -13,7 +16,7 @@ import (
 var qs = []*survey.Question{
     {
         Name:     "name",
-        Prompt:   &survey.Input{"What is your name?", nil},
+        Prompt:   &survey.Input{"What is your name?", ""},
         Validate: survey.Required,
     },
     {
