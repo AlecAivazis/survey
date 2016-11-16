@@ -39,7 +39,7 @@ func Ask(qs []*Question) (map[string]string, error) {
 				// the error message
 				msg := "Sorry, your reply was invalid: "
 				// send the message to the user
-				fmt.Println(format.Error, "!", msg, invalid.Error(), format.ResetFormat)
+				fmt.Print(format.ErrorColor, format.Error, msg, invalid.Error(), format.ResetFormat, "\n")
 				// ask for more input
 				ans, err = q.Prompt.Prompt()
 			}
