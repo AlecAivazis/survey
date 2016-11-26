@@ -2,6 +2,7 @@ package survey
 
 import (
 	"fmt"
+	"os"
 	// tm "github.com/buger/goterm"
 	"github.com/alecaivazis/survey/format"
 )
@@ -39,6 +40,13 @@ func AskOneValidate(p Prompt, v Validator) (string, error) {
 	return answers["q1"], err
 }
 
+func handleError(err error) {
+	// tell the user what happened
+	fmt.Println(err.Error())
+	// quit the survey
+	os.Exit(1)
+}
+
 // Ask performs the prompt loop
 func Ask(qs []*Question) (map[string]string, error) {
 	// the response map
@@ -47,6 +55,10 @@ func Ask(qs []*Question) (map[string]string, error) {
 	for _, q := range qs {
 		// grab the user input and save it
 		ans, err := q.Prompt.Prompt()
+		// if there was a problem
+		if err != nil {
+			handleError(err)
+		}
 
 		// if there is a validate handler for this question
 		if q.Validate != nil {
@@ -58,6 +70,10 @@ func Ask(qs []*Question) (map[string]string, error) {
 				fmt.Print(format.ErrorColor, format.Error, msg, invalid.Error(), format.ResetFormat, "\n")
 				// ask for more input
 				ans, err = q.Prompt.Prompt()
+				// if there was a problem
+				if err != nil {
+					handleError(err)
+				}
 			}
 		}
 
