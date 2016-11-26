@@ -10,12 +10,12 @@ import (
 var validationQs = []*survey.Question{
 	{
 		Name:     "name",
-		Prompt:   &survey.Input{"What is your name?", nil},
+		Prompt:   &survey.Input{"What is your name?", ""},
 		Validate: survey.Required,
 	},
 	{
 		Name:   "valid",
-		Prompt: &survey.Input{"Enter 'foo':"},
+		Prompt: &survey.Input{"Enter 'foo':", "not foo"},
 		Validate: func(str string) error {
 			// if the input matches the expectation
 			if str != "foo" {
@@ -29,7 +29,7 @@ var validationQs = []*survey.Question{
 
 func main() {
 
-	answers, err := survey.Ask(validationQs)
+	_, err := survey.Ask(validationQs)
 
 	if err != nil {
 		fmt.Println("\n", err.Error())
