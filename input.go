@@ -1,8 +1,11 @@
 package survey
 
 import (
+	"bufio"
+	"errors"
 	"fmt"
 	tm "github.com/buger/goterm"
+	"os"
 
 	"github.com/alecaivazis/survey/format"
 )
@@ -18,19 +21,23 @@ func (input *Input) Prompt() (string, error) {
 	// print the question we were given to kick off the prompt
 	fmt.Print(format.Ask(fmt.Sprintf("%v ", input.Message), input.Default))
 
-	// a string to hold the user's input
-	var res string
-	// wait for a newline or carriage return
-	fmt.Scanln(&res)
+	// a scanner to look at the input from stdin
+	scanner := bufio.NewScanner(os.Stdin)
+	// wait for a response
+	for scanner.Scan() {
+		// get the availible text in the scanner
+		res := scanner.Text()
+		// if there is no answer
+		if res == "" {
+			// use the default
+			res = input.Default
+		}
 
-	// if there is no answer
-	if res == "" {
-		// use the default
-		res = input.Default
+		// return the value
+		return res, nil
 	}
 
-	// return the value
-	return res, nil
+	return "", errors.New("Did not get input.")
 }
 
 // Cleanup overwrite the line with the finalized formatted version
