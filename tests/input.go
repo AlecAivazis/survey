@@ -7,25 +7,10 @@ import (
 
 var table = []TestUtil.TestTableEntry{
 	{
-		"standard", &survey.Choice{
-			Message: "Choose a color:",
-			Choices: []string{"red", "blue", "green"},
-			Default: "red",
-		},
+		"no default", &survey.Input{"Hello world", ""},
 	},
 	{
-		"short", &survey.Choice{
-			Message: "Choose a color:",
-			Choices: []string{"red", "blue"},
-			Default: "red",
-		},
-	},
-	{
-		"default", &survey.Choice{
-			Message: "Choose a color (should default blue):",
-			Choices: []string{"red", "blue", "green"},
-			Default: "blue",
-		},
+		"default", &survey.Input{"Hello world", "default"},
 	},
 }
 

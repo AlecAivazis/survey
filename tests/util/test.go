@@ -8,7 +8,7 @@ import (
 
 type TestTableEntry struct {
 	Name   string
-	Prompt *survey.Choice
+	Prompt survey.Prompt
 }
 
 func RunTable(table []TestTableEntry) {
