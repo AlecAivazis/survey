@@ -37,7 +37,7 @@ func main() {
 	fmt.Printf("%s chose %s.\n", answers["name"], answers["color"])
 
 	fmt.Println("Asking one.")
-	answer, err := survey.AskOne(simpleQs[0])
+	answer, err := survey.AskOne(simpleQs[0].Prompt)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
@@ -45,7 +45,7 @@ func main() {
 	fmt.Printf("Answered with %v.\n", answer)
 
 	fmt.Println("Asking one with validation.")
-	answer, err := survey.AskOneValidate(simpleQs[0], survey.Required)
+	answer, err := survey.AskOneValidate(simpleQs[0].Prompt, survey.Required)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
