@@ -10,6 +10,8 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/alecaivazis/survey/format"
 )
 
 type cursorCoordinate struct {
@@ -27,14 +29,13 @@ func CursorLocation() (*cursorCoordinate, error) {
 	_ = rawMode.Run()
 	rawMode.Wait()
 
-	//
-	// same as $ echo -e "\033[6n"
-	cmd := exec.Command("echo", fmt.Sprintf("%c[6n", 27))
+	// look for the cursor position in a sub process
+	cmd := exec.Command("echo", format.AnsiPosition)
 	randomBytes := &bytes.Buffer{}
 	cmd.Stdout = randomBytes
 
 	// Start command asynchronously
-	_ = cmd.Start()
+	cmd.Start()
 
 	// capture keyboard output from echo command
 	reader := bufio.NewReader(os.Stdin)
@@ -65,7 +66,7 @@ func CursorLocation() (*cursorCoordinate, error) {
 			return nil, err
 		}
 		// go up one line to cover our tracks
-		fmt.Print("\033[F")
+		fmt.Print(format.AnsiCursorUp)
 
 		// return the internal data structure with the location
 		return &cursorCoordinate{x, y}, nil
