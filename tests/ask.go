@@ -45,7 +45,7 @@ func main() {
 	fmt.Printf("Answered with %v.\n", answer)
 
 	fmt.Println("Asking one with validation.")
-	answer, err := survey.AskOneValidate(simpleQs[0].Prompt, survey.Required)
+	answer, err = survey.AskOneValidate(&survey.Input{"What is your name?", ""}, survey.Required)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
