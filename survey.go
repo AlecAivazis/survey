@@ -25,13 +25,12 @@ type Prompt interface {
 }
 
 // AskOne asks a single question without performing validation on the answer.
-// If an error occurs, an empty string is returned.
-func AskOne(p Prompt) string {
+func AskOne(p Prompt) (string, error) {
 	answers, err := Ask([]*Question{{Name: "q1", Prompt: p}})
 	if err != nil {
-		return ""
+		return "", err
 	}
-	return answers["q1"]
+	return answers["q1"], nil
 }
 
 // AskOneValidate asks a single question and validates the answer with v.
