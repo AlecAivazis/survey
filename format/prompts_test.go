@@ -27,7 +27,7 @@ func TestCanFormatAsk(t *testing.T) {
 	// the string to format
 	str := "hello"
 	// make sure there is a tab before the option
-	if Ask(str) == "" {
+	if Ask(str, "") == "" {
 		t.Error("Could not format ask")
 	}
 }

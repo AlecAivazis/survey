@@ -21,6 +21,7 @@ var simpleQs = []*survey.Question{
 			Choices: []string{"red", "blue", "green", "yellow"},
 			Default: "yellow",
 		},
+		Validate: survey.Required,
 	},
 }
 
