@@ -1,7 +1,7 @@
 language: go
 
 install:
-  - go get -t ./...
+  - go get -t . ./format/...
 
 script:
   - bash <(curl -s https://raw.githubusercontent.com/codecov/example-go/master/go.test.sh)
