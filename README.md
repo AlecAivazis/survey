@@ -1,6 +1,8 @@
 # Survey
 A library for building interactive prompts. Heavily inspired by the great [inquirer.js](https://github.com/SBoudrias/Inquirer.js/).
 
+[![GoDoc](http://img.shields.io/badge/godoc-reference-5272B4.svg)](https://godoc.org/github.com/alecaivazis/survey)
+
 
 ![](https://zippy.gfycat.com/AmusingBossyArrowworm.gif)
 
