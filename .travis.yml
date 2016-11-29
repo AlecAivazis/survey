@@ -1,0 +1,7 @@
+language: go
+
+install:
+  - go get -t . ./format/...
+
+script:
+  - go test -v . ./format/...
