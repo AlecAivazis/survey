@@ -9,13 +9,15 @@ import (
 	"github.com/alecaivazis/survey/format"
 )
 
-// Choice is a prompt that presents a
+// Choice is a prompt that presents a list of various options to the user
+// for them to select using the arrow keys and enter.
 type Choice struct {
 	Message string
 	Choices []string
 	Default string
 }
 
+// Prompt shows the list, and listens for input from the user using /dev/tty.
 func (prompt *Choice) Prompt() (string, error) {
 	// ask the question
 	fmt.Println(format.Ask(prompt.Message, ""))
