@@ -119,7 +119,7 @@ func (prompt *Choice) Cleanup(val string) error {
 
 	var initLoc int
 	// if the options would fit cleanly
-	if loc.col+height-2 <= tm.Height() {
+	if loc.col+height <= tm.Height() {
 		// start at the current location
 		initLoc = loc.col - height - 1
 		// otherwise we will be placed at the bottom of the terminal after this print
