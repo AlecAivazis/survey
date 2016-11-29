@@ -1,0 +1,7 @@
+language: go
+
+install:
+  - go get -t ./...
+
+script:
+  - bash <(curl -s https://raw.githubusercontent.com/codecov/example-go/master/go.test.sh)
