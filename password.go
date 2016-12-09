@@ -26,21 +26,15 @@ func (prompt *Password) Prompt() (string, error) {
 	// until we're intterupted
 	for {
 		// wait for an input from the user
-		ascii, _, err := getChar()
+		value, keyCode, err := GetChar()
 		// if there is an error
 		if err != nil {
 			// bubble up
 			return "", err
 		}
 
-		// if the user sends SIGTERM (ascii 3) or presses esc (ascii 27)
-		if ascii == 3 || ascii == 27 {
-			// hard close
-			return "", fmt.Errorf("\nGoodbye.")
-		}
-
-		// if the user presses enter (ascii 13)
-		if ascii == 13 {
+		// if the user presses enter
+		if keyCode == KeyEnter {
 			// we're done with the rendering loop (the current value is good)
 			break
 		}
@@ -49,7 +43,7 @@ func (prompt *Password) Prompt() (string, error) {
 
 		// add the character to the running total
 		fmt.Print(hideChar)
-		input += string(ascii)
+		input += value
 	}
 	fmt.Print("\n")
 
