@@ -74,18 +74,18 @@ func (prompt *Choice) Prompt() (string, error) {
 			return "", err
 		}
 
-		// if the user pressed the up arrow (keycode 38) and we can decrement sel
+		// if the user pressed the up arrow and we can decrement sel
 		if keycode == KeyArrowUp && sel > 0 {
 			// decrement the selected index
 			sel--
 		}
-		// if the user pressed the down arrow (keycode 40)  and we can decrement sel
+		// if the user pressed the down arrow and we can decrement sel
 		if keycode == KeyArrowDown && sel < len(prompt.Choices)-1 {
 			// decrement the selected index
 			sel++
 		}
 
-		// // if the user presses enter (ascii 13)
+		// // if the user presses enter
 		if keycode == KeyEnter {
 			// we're done with the rendering loop (the current value is good)
 			break
