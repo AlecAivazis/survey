@@ -27,20 +27,20 @@ func GetChar() (val string, keyCode int, err error) {
 	if err != nil {
 		return
 	}
+
+	// handle arrow-keys (three-character control sequence, beginning with "ESC-[")
 	if numRead == 3 && bytes[0] == 27 && bytes[1] == 91 {
-		// Three-character control sequence, beginning with "ESC-[".
-		// Since there are no ASCII codes for arrow keys, we use
-		// Javascript key codes.
-		if bytes[2] == 65 {
+		switch bytes[2] {
+		case 65:
 			// Up
 			keyCode = KeyArrowUp
-		} else if bytes[2] == 66 {
+		case 66:
 			// Down
 			keyCode = KeyArrowDown
-		} else if bytes[2] == 67 {
+		case 67:
 			// Right
 			keyCode = KeyArrowRight
-		} else if bytes[2] == 68 {
+		case 68:
 			// Left
 			keyCode = KeyArrowLeft
 		}
