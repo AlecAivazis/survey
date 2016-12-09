@@ -2,6 +2,17 @@ package survey
 
 import "github.com/pkg/term"
 
+// key codes for the common keys
+const (
+	KeyArrowUp = iota
+	KeyArrowDown
+	KeyArrowLeft
+	KeySIGTERM // this must be 3
+	KeyArrowRight
+	KeyEsc
+	KeyEnter = iota / 6 * 13 // this must be 13 (iota counter is at 6 now)
+)
+
 // Returns either an ascii code, or (if input is an arrow) a Javascript key code.
 func getChar() (ascii int, keyCode int, err error) {
 	t, _ := term.Open("/dev/tty")
@@ -15,21 +26,20 @@ func getChar() (ascii int, keyCode int, err error) {
 	}
 	if numRead == 3 && bytes[0] == 27 && bytes[1] == 91 {
 		// Three-character control sequence, beginning with "ESC-[".
-
 		// Since there are no ASCII codes for arrow keys, we use
 		// Javascript key codes.
 		if bytes[2] == 65 {
 			// Up
-			keyCode = 38
+			keyCode = KeyArrowUp
 		} else if bytes[2] == 66 {
 			// Down
-			keyCode = 40
+			keyCode = KeyArrowDown
 		} else if bytes[2] == 67 {
 			// Right
-			keyCode = 39
+			keyCode = KeyArrowRight
 		} else if bytes[2] == 68 {
 			// Left
-			keyCode = 37
+			keyCode = KeyArrowLeft
 		}
 	} else if numRead == 1 {
 		ascii = int(bytes[0])
