@@ -13,8 +13,9 @@ const (
 	KeyEnter = iota / 6 * 13 // this must be 13 (iota counter is at 6 now)
 )
 
-// Returns either an ascii code, or (if input is an arrow) a Javascript key code.
-func getChar() (ascii int, keyCode int, err error) {
+// GetChar listens for input from the keyboard and returns the key value as a string
+// or one of the Key* enum values.
+func GetChar() (ascii int, keyCode int, err error) {
 	t, _ := term.Open("/dev/tty")
 	term.RawMode(t)
 	bytes := make([]byte, 3)
