@@ -1,21 +1,23 @@
 package survey
 
-import "github.com/pkg/term"
+import (
+	"errors"
+	"github.com/pkg/term"
+)
 
 // key codes for the common keys
 const (
 	KeyArrowUp = iota
 	KeyArrowDown
 	KeyArrowLeft
-	KeySIGTERM // this must be 3
 	KeyArrowRight
 	KeyEsc
-	KeyEnter = iota / 6 * 13 // this must be 13 (iota counter is at 6 now)
+	KeyEnter
 )
 
 // GetChar listens for input from the keyboard and returns the key value as a string
 // or one of the Key* enum values.
-func GetChar() (ascii int, keyCode int, err error) {
+func GetChar() (val string, keyCode int, err error) {
 	t, _ := term.Open("/dev/tty")
 	term.RawMode(t)
 	bytes := make([]byte, 3)
@@ -43,7 +45,20 @@ func GetChar() (ascii int, keyCode int, err error) {
 			keyCode = KeyArrowLeft
 		}
 	} else if numRead == 1 {
-		ascii = int(bytes[0])
+		ascii := int(bytes[0])
+
+		// if the user sends SIGTERM (ascii 3) or presses esc (ascii 27)
+		if ascii == 3 || ascii == 27 {
+			// hard close
+			err = errors.New("Goodbye.")
+		}
+
+		// handle the enter key
+		if ascii == 13 {
+			keyCode = KeyEnter
+		}
+
+		val = string(ascii)
 	} else {
 		// Two characters read??
 	}

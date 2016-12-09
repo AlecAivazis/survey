@@ -1,7 +1,7 @@
 package survey
 
 import (
-	"errors"
+	// "errors"
 	"fmt"
 	tm "github.com/buger/goterm"
 	"strings"
@@ -67,17 +67,11 @@ func (prompt *Choice) Prompt() (string, error) {
 
 	for {
 		// wait for an input from the user
-		ascii, keycode, err := GetChar()
+		_, keycode, err := GetChar()
 		// if there is an error
 		if err != nil {
 			// bubble up
 			return "", err
-		}
-
-		// if the user sends SIGTERM (ascii 3) or presses esc (ascii 27)
-		if ascii == KeySIGTERM || ascii == KeyEsc {
-			// hard close
-			return "", errors.New("Goodbye.")
 		}
 
 		// if the user pressed the up arrow (keycode 38) and we can decrement sel
@@ -91,8 +85,8 @@ func (prompt *Choice) Prompt() (string, error) {
 			sel++
 		}
 
-		// if the user presses enter (ascii 13)
-		if ascii == KeyEnter {
+		// // if the user presses enter (ascii 13)
+		if keycode == KeyEnter {
 			// we're done with the rendering loop (the current value is good)
 			break
 		}
