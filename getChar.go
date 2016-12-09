@@ -60,6 +60,8 @@ func GetChar() (val string, keyCode int, err error) {
 
 		val = string(ascii)
 	} else {
+		// fmt.Println(bytes)
+
 		// Two characters read??
 	}
 	t.Restore()

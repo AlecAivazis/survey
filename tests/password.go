@@ -7,7 +7,10 @@ import (
 
 var table = []TestUtil.TestTableEntry{
 	{
-		"standard", &survey.Password{"Please enter your password:"},
+		"standard", &survey.Password{"Please type your password:"},
+	},
+	{
+		"please make sure paste works", &survey.Password{"Please paste your password:"},
 	},
 }
 
