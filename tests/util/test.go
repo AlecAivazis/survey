@@ -24,5 +24,6 @@ func RunTable(table []TestTableEntry) {
 		}
 		// show the answer to the user
 		fmt.Printf("Answered %v.\n", answer)
+		fmt.Println("---------------------")
 	}
 }

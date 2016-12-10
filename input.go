@@ -10,13 +10,15 @@ import (
 	"github.com/alecaivazis/survey/format"
 )
 
+// Input is a regular text input that prints each character the user types on the screen
+// and accepts the input with the enter key.
 type Input struct {
 	Message string
 	Default string
 }
 
-// Inputs prompt the user with a simple text field and exepect a reply followed
-// by a newline or carriage return.
+// Prompt prompts the user with a simple text field and expects a reply followed
+// by a carriage return.
 func (input *Input) Prompt() (string, error) {
 	// print the question we were given to kick off the prompt
 	fmt.Print(format.Ask(fmt.Sprintf("%v ", input.Message), input.Default))
