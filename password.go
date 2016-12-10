@@ -34,7 +34,7 @@ func (prompt *Password) Prompt() (string, error) {
 	// a running total
 	value := ""
 
-	// listen for input (this will ignore crazy characters like arrow keys)
+	// combine input over crazy characters like arrow keys which interupt the character flow
 	for val, keyCode, err := GetInput(hideInput); true; value, keyCode, err = GetInput(hideInput) {
 		// if there is an error
 		if err != nil {
