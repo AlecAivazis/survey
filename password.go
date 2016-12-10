@@ -31,8 +31,10 @@ func (prompt *Password) Prompt() (string, error) {
 	// print the question we were given to kick off the prompt
 	fmt.Print(format.Ask(fmt.Sprintf("%v ", prompt.Message), ""))
 
+	// a running total
 	value := ""
 
+	// listen for input (this will ignore crazy characters like arrow keys)
 	for val, keyCode, err := GetInput(hideInput); true; value, keyCode, err = GetInput(hideInput) {
 		// if there is an error
 		if err != nil {
