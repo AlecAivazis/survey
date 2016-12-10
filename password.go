@@ -47,7 +47,7 @@ func (prompt *Password) Prompt() (string, error) {
 
 		if keyCode == KeyEnter {
 			fmt.Print("\n")
-			return value, err
+			return value, nil
 		}
 	}
 
