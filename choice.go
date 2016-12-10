@@ -67,7 +67,7 @@ func (prompt *Choice) Prompt() (string, error) {
 
 	for {
 		// wait for an input from the user
-		_, keycode, err := GetChar()
+		_, keycode, err := GetInput(nil)
 		// if there is an error
 		if err != nil {
 			// bubble up
