@@ -41,3 +41,20 @@ func MinLength(length int) Validator {
 		return nil
 	}
 }
+
+// ComposeValidators is a variadic function used to create one validator from many.
+func ComposeValidators(validators ...Validator) Validator {
+	// return a validator that calls each one sequentially
+	return func(str string) error {
+		// execute each validator
+		for _, validator := range validators {
+			// if the string is not valid
+			if err := validator(str); err != nil {
+				// return the error
+				return err
+			}
+		}
+		// we passed all validators, the string is valid
+		return nil
+	}
+}
