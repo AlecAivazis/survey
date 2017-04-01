@@ -14,8 +14,8 @@ func TestPasswordFormatQuestion(t *testing.T) {
 	}
 
 	actual, err := runTemplate(
-		InputQuestionTemplate,
-		InputTemplateData{Input: *prompt},
+		PasswordQuestionTemplate,
+		*prompt,
 	)
 	if err != nil {
 		t.Errorf("Failed to run template to format password question: %s", err)

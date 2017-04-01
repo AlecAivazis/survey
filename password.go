@@ -9,7 +9,7 @@ type Password struct {
 }
 
 // Templates with Color formatting. See Documentation: https://github.com/mgutz/ansi#style-format
-var PasswordMessageTemplate = `
+var PasswordQuestionTemplate = `
 {{- color "green+hb"}}? {{color "reset"}}
 {{- color "default+hb"}}{{ .Message }} {{color "reset"}}`
 
@@ -30,7 +30,7 @@ func hideInput(input string) string {
 // Prompt behaves like a normal int but hides the input.
 func (prompt *Password) Prompt() (string, error) {
 	out, err := runTemplate(
-		PasswordMessageTemplate,
+		PasswordQuestionTemplate,
 		*prompt,
 	)
 	if err != nil {
