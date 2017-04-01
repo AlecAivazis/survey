@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	// tm "github.com/buger/goterm"
-	"github.com/alecaivazis/survey/format"
 )
 
 // Validator is a function passed to a Question in order to redefine
@@ -23,6 +22,9 @@ type Prompt interface {
 	Prompt() (string, error)
 	Cleanup(string) error
 }
+
+var ErrorTemplate = `{{color "red"}}✘ Sorry, your reply was invalid: {{.Error}}{{color "reset"}}
+`
 
 // AskOne asks a single question without performing validation on the answer.
 func AskOne(p Prompt) (string, error) {
@@ -63,10 +65,12 @@ func Ask(qs []*Question) (map[string]string, error) {
 		if q.Validate != nil {
 			// wait for a valid response
 			for invalid := q.Validate(ans); invalid != nil; invalid = q.Validate(ans) {
-				// the error message
-				msg := "Sorry, your reply was invalid: "
+				out, err := runTemplate(ErrorTemplate, invalid)
+				if err != nil {
+					return nil, err
+				}
 				// send the message to the user
-				fmt.Print(format.ErrorColor, format.Error, msg, invalid.Error(), format.ResetFormat, "\n")
+				fmt.Print(out)
 				// ask for more input
 				ans, err = q.Prompt.Prompt()
 				// if there was a problem
