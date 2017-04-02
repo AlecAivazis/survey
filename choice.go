@@ -29,7 +29,7 @@ var ChoiceQuestionTemplate = `
 
 var ChoiceChoicesTemplate = `
 {{- range $ix, $choice := .Choices}}
-  {{- if eq $ix $.Selected}}{{color "cyan"}}> {{else}}{{color "default+hb"}}  {{end}}
+  {{- if eq $ix $.Selected}}{{color "cyan+b"}}> {{else}}{{color "default+hb"}}  {{end}}
   {{- $choice}}
   {{- color "reset"}}
 {{end}}`
