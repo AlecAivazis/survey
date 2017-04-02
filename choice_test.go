@@ -24,7 +24,7 @@ func TestCanFormatChoiceOptions(t *testing.T) {
 
 	expected := `  foo
   bar
-➤ baz
+> baz
   buz
 `
 
