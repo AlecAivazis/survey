@@ -46,28 +46,9 @@ func (prompt *Choice) Prompt() (string, error) {
 	// ask the question
 	fmt.Println(out)
 
-	// get the current location of the cursor
-	loc, err := CursorLocation()
-	// if something went wrong
+	initialLocation, err := InitialLocation(len(prompt.Choices))
 	if err != nil {
-		// bubble up
 		return "", err
-	}
-
-	// the height of the prompt's output
-	height := len(prompt.Choices)
-
-	// the starting point of the list depends on wether or not we
-	// are at the bottom of the current terminal session
-	var initialLocation int
-	// if the options would fit cleanly
-	if loc.col+height < tm.Height() {
-		// start at the current location
-		initialLocation = loc.col
-		// otherwise we will be placed at the bottom of the terminal after this print
-	} else {
-		// the we have to start printing so that we just fit
-		initialLocation = tm.Height() - height
 	}
 
 	// start off with the first option selected
@@ -87,7 +68,10 @@ func (prompt *Choice) Prompt() (string, error) {
 	}
 
 	// print the options to start
-	prompt.refreshOptions(sel, initialLocation)
+	err = prompt.refreshOptions(sel, initialLocation)
+	if err != nil {
+		return "", err
+	}
 
 	for {
 		// wait for an input from the user
@@ -115,7 +99,10 @@ func (prompt *Choice) Prompt() (string, error) {
 			break
 		}
 
-		prompt.refreshOptions(sel, initialLocation)
+		err = prompt.refreshOptions(sel, initialLocation)
+		if err != nil {
+			return "", err
+		}
 	}
 
 	// return the selected choice
@@ -124,59 +111,14 @@ func (prompt *Choice) Prompt() (string, error) {
 
 // Cleanup removes the choices section, and renders the ask like a normal question.
 func (prompt *Choice) Cleanup(val string) error {
-
-	// the height of the prompt's output
-	height := len(prompt.Choices)
-
-	// get the current location of the cursor
-	loc, err := CursorLocation()
-	// if something went wrong
-	if err != nil {
-		// yell loudly
-		return err
-	}
-
-	var initLoc int
-	// if the options would fit cleanly
-	if loc.col+height <= tm.Height() {
-		// start at the current location
-		initLoc = loc.col - height - 1
-		// otherwise we will be placed at the bottom of the terminal after this print
-	} else {
-
-		// the we have to start printing so that we just fit
-		initLoc = loc.col - height - 2
-	}
-
-	// find the index of the selected choice
-
-	// start where we were told
-	tm.MoveCursor(initLoc, 1)
-	out, err := runTemplate(
+	output, err := runTemplate(
 		ChoiceQuestionTemplate,
 		ChoiceTemplateData{Choice: *prompt, Answer: val},
 	)
 	if err != nil {
 		return err
 	}
-	// ask the question
-	tm.Print(out, AnsiClearLine)
-	// for each choice
-	for range prompt.Choices {
-		// add an empty line
-		tm.Print(AnsiClearLine)
-		// print the output
-		tm.Flush()
-	}
-	// add an empty line
-	tm.Print(AnsiClearLine)
-	// print the output
-	tm.Flush()
-	tm.MoveCursor(initLoc, 1)
-	tm.Flush()
-
-	// nothing went wrong
-	return nil
+	return cleanupMultiOptions(len(prompt.Choices), output)
 }
 
 func (prompt *Choice) refreshOptions(sel int, initLoc int) error {

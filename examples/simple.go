@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/alecaivazis/survey"
 )
 
@@ -23,6 +24,14 @@ var simpleQs = []*survey.Question{
 		},
 		Validate: survey.Required,
 	},
+	{
+		Name: "days",
+		Prompt: &survey.Checkbox{
+			Message:  "What days do you prefer:",
+			Options:  []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
+			Defaults: []string{"Saturday", "Sunday"},
+		},
+	},
 }
 
 func main() {
@@ -34,5 +43,5 @@ func main() {
 		return
 	}
 
-	fmt.Printf("%s chose %s.\n", answers["name"], answers["color"])
+	fmt.Printf("%s chose %s and prefers %s.\n", answers["name"], answers["color"], answers["days"])
 }
