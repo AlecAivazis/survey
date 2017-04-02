@@ -10,8 +10,6 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-
-	"github.com/alecaivazis/survey/format"
 )
 
 type cursorCoordinate struct {
@@ -30,7 +28,7 @@ func CursorLocation() (*cursorCoordinate, error) {
 	rawMode.Wait()
 
 	// look for the cursor position in a sub process
-	cmd := exec.Command("echo", format.AnsiPosition)
+	cmd := exec.Command("echo", AnsiPosition)
 	randomBytes := &bytes.Buffer{}
 	cmd.Stdout = randomBytes
 
@@ -66,7 +64,7 @@ func CursorLocation() (*cursorCoordinate, error) {
 			return nil, err
 		}
 		// go up one line to cover our tracks
-		fmt.Print(format.AnsiCursorUp)
+		fmt.Print(AnsiCursorUp)
 
 		// return the internal data structure with the location
 		return &cursorCoordinate{x, y}, nil

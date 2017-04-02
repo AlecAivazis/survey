@@ -1,12 +1,10 @@
 package survey
 
 import (
-	// "errors"
 	"fmt"
-	tm "github.com/buger/goterm"
 	"strings"
 
-	"github.com/alecaivazis/survey/format"
+	tm "github.com/buger/goterm"
 )
 
 // Choice is a prompt that presents a list of various options to the user
@@ -17,10 +15,36 @@ type Choice struct {
 	Default string
 }
 
+// data available to the templates when processing
+type ChoiceTemplateData struct {
+	Choice
+	Answer   string
+	Selected int
+}
+
+var ChoiceQuestionTemplate = `
+{{- color "green+hb"}}? {{color "reset"}}
+{{- color "default+hb"}}{{ .Message }} {{color "reset"}}
+{{- if .Answer}}{{color "cyan"}}{{.Answer}}{{color "reset"}}{{end}}`
+
+var ChoiceChoicesTemplate = `
+{{- range $ix, $choice := .Choices}}
+  {{- if eq $ix $.Selected}}{{color "cyan"}}➤ {{else}}{{color "default+hb"}}  {{end}}
+  {{- $choice}}
+  {{- color "reset"}}
+{{end}}`
+
 // Prompt shows the list, and listens for input from the user using /dev/tty.
 func (prompt *Choice) Prompt() (string, error) {
+	out, err := runTemplate(
+		ChoiceQuestionTemplate,
+		ChoiceTemplateData{Choice: *prompt},
+	)
+	if err != nil {
+		return "", err
+	}
 	// ask the question
-	fmt.Println(format.Ask(prompt.Message, ""))
+	fmt.Println(out)
 
 	// get the current location of the cursor
 	loc, err := CursorLocation()
@@ -63,7 +87,7 @@ func (prompt *Choice) Prompt() (string, error) {
 	}
 
 	// print the options to start
-	refreshOptions(prompt.Choices, sel, initialLocation)
+	prompt.refreshOptions(sel, initialLocation)
 
 	for {
 		// wait for an input from the user
@@ -91,8 +115,7 @@ func (prompt *Choice) Prompt() (string, error) {
 			break
 		}
 
-		// print the options
-		refreshOptions(prompt.Choices, sel, initialLocation)
+		prompt.refreshOptions(sel, initialLocation)
 	}
 
 	// return the selected choice
@@ -129,16 +152,24 @@ func (prompt *Choice) Cleanup(val string) error {
 
 	// start where we were told
 	tm.MoveCursor(initLoc, 1)
-	tm.Print(format.Response(prompt.Message, val), "\x1b[0K")
+	out, err := runTemplate(
+		ChoiceQuestionTemplate,
+		ChoiceTemplateData{Choice: *prompt, Answer: val},
+	)
+	if err != nil {
+		return err
+	}
+	// ask the question
+	tm.Print(out, AnsiClearLine)
 	// for each choice
 	for range prompt.Choices {
 		// add an empty line
-		tm.Print(format.AnsiClearLine)
+		tm.Print(AnsiClearLine)
 		// print the output
 		tm.Flush()
 	}
 	// add an empty line
-	tm.Print(format.AnsiClearLine)
+	tm.Print(AnsiClearLine)
 	// print the output
 	tm.Flush()
 	tm.MoveCursor(initLoc, 1)
@@ -148,31 +179,18 @@ func (prompt *Choice) Cleanup(val string) error {
 	return nil
 }
 
-func refreshOptions(opts []string, sel int, initLoc int) {
-	// we need to render the options
-	tm.Print(formatChoiceOptions(opts, sel))
+func (prompt *Choice) refreshOptions(sel int, initLoc int) error {
+	out, err := runTemplate(
+		ChoiceChoicesTemplate,
+		ChoiceTemplateData{Choice: *prompt, Selected: sel},
+	)
+	if err != nil {
+		return err
+	}
+	// ask the question
+	tm.Print(strings.TrimRight(out, "\n"))
 	tm.Flush()
 	// make sure we overwrite the first line next time we print
 	tm.MoveCursor(initLoc, 1)
-}
-
-func formatChoiceOptions(opts []string, selected int) string {
-	// a string to acc
-	acc := []string{}
-	// format each option
-	for i, opt := range opts {
-		// by default, the option is not selected
-		isSel := false
-		// if this option is at the same index as the selected value
-		if i == selected {
-			// then the option should show a selection indicator
-			isSel = true
-		}
-
-		// add the formatted option
-		acc = append(acc, format.ChoiceOption(opt, isSel))
-	}
-
-	// show each option on its own line
-	return strings.Join(acc, "\n")
+	return nil
 }

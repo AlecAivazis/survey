@@ -1,16 +1,17 @@
 package survey
 
-import (
-	"fmt"
-
-	"github.com/alecaivazis/survey/format"
-)
+import "fmt"
 
 // Password is like a normal Input but the text shows up as *'s and
 // there is no default.
 type Password struct {
 	Message string
 }
+
+// Templates with Color formatting. See Documentation: https://github.com/mgutz/ansi#style-format
+var PasswordQuestionTemplate = `
+{{- color "green+hb"}}? {{color "reset"}}
+{{- color "default+hb"}}{{ .Message }} {{color "reset"}}`
 
 // the character to use to hide the input
 var hideChar = "*"
@@ -28,8 +29,15 @@ func hideInput(input string) string {
 
 // Prompt behaves like a normal int but hides the input.
 func (prompt *Password) Prompt() (string, error) {
+	out, err := runTemplate(
+		PasswordQuestionTemplate,
+		*prompt,
+	)
+	if err != nil {
+		return "", err
+	}
 	// print the question we were given to kick off the prompt
-	fmt.Print(format.Ask(fmt.Sprintf("%v ", prompt.Message), ""))
+	fmt.Print(out)
 
 	// a running total
 	value := ""

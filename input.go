@@ -4,10 +4,9 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	tm "github.com/buger/goterm"
 	"os"
 
-	"github.com/alecaivazis/survey/format"
+	tm "github.com/buger/goterm"
 )
 
 // Input is a regular text input that prints each character the user types on the screen
@@ -17,11 +16,36 @@ type Input struct {
 	Default string
 }
 
+// data available to the templates when processing
+type InputTemplateData struct {
+	Input
+	Answer string
+}
+
+// Templates with Color formatting. See Documentation: https://github.com/mgutz/ansi#style-format
+var InputQuestionTemplate = `
+{{- color "green+hb"}}? {{color "reset"}}
+{{- color "default+hb"}}{{ .Message }} {{color "reset"}}
+{{- if .Answer}}
+  {{- color "cyan"}}{{.Answer}}{{color "reset"}}
+{{- else }}
+  {{- if .Default}}{{color "white"}}({{.Default}}) {{color "reset"}}{{end}}
+{{- end}}`
+
 // Prompt prompts the user with a simple text field and expects a reply followed
 // by a carriage return.
 func (input *Input) Prompt() (string, error) {
+
+	out, err := runTemplate(
+		InputQuestionTemplate,
+		InputTemplateData{Input: *input},
+	)
+	if err != nil {
+		return "", err
+	}
+
 	// print the question we were given to kick off the prompt
-	fmt.Print(format.Ask(fmt.Sprintf("%v ", input.Message), input.Default))
+	fmt.Print(out)
 
 	// a scanner to look at the input from stdin
 	scanner := bufio.NewScanner(os.Stdin)
@@ -63,7 +87,15 @@ func (input *Input) Cleanup(val string) error {
 	// move to the beginning of the current line
 	tm.MoveCursor(initLoc, 1)
 
-	tm.Print(format.Response(input.Message, val), "\x1b[0K")
+	out, err := runTemplate(
+		InputQuestionTemplate,
+		InputTemplateData{Input: *input, Answer: val},
+	)
+	if err != nil {
+		return err
+	}
+
+	tm.Print(out, AnsiClearLine)
 	tm.Flush()
 
 	// nothing went wrong
