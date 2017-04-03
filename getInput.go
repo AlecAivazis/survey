@@ -18,6 +18,7 @@ const (
 	KeyArrowRight
 	KeyEsc
 	KeyEnter
+	KeySpace
 	KeyNull
 )
 
@@ -72,6 +73,12 @@ InputLoop:
 			// handle the enter key
 			if ascii == 13 {
 				keyCode = KeyEnter
+				break InputLoop
+			}
+
+			// handle the space key
+			if ascii == 32 {
+				keyCode = KeySpace
 				break InputLoop
 			}
 		}

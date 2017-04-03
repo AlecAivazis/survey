@@ -10,6 +10,8 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/buger/goterm"
 )
 
 type cursorCoordinate struct {
@@ -71,4 +73,29 @@ func CursorLocation() (*cursorCoordinate, error) {
 	} else {
 		return nil, errors.New("Could not find current location.")
 	}
+}
+
+func InitialLocation(height int) (int, error) {
+	// get the current location of the cursor
+	loc, err := CursorLocation()
+	// if something went wrong
+	if err != nil {
+		// bubble up
+		return 0, err
+	}
+
+	// the starting point of the list depends on wether or not we
+	// are at the bottom of the current terminal session
+	var initialLocation int
+	// if the options would fit cleanly
+	if loc.col+height < goterm.Height() {
+		// start at the current location
+		initialLocation = loc.col
+		// otherwise we will be placed at the bottom of the terminal after this print
+	} else {
+		// the we have to start printing so that we just fit
+		initialLocation = goterm.Height() - height
+	}
+
+	return initialLocation, nil
 }
