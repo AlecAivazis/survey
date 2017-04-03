@@ -23,10 +23,10 @@ func TestCanFormatMultiChoiceOptions(t *testing.T) {
 		t.Errorf("Failed to run template to format checkbox options: %s", err)
 	}
 
-	expected := ` ◯ foo
- ◉ bar
-❯◯ baz
- ◉ buz
+	expected := `  ◯  foo
+  ◉  bar
+❯ ◯  baz
+  ◉  buz
 `
 
 	if actual != expected {
