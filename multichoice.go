@@ -33,9 +33,9 @@ var MultiChoiceQuestionTemplate = `
 var MultiChoiceOptionsTemplate = `
 {{- range $ix, $option := .Options}}
   {{- if eq $ix $.Selected}}{{color "cyan"}}❯{{color "reset"}}{{else}} {{end}}
-  {{- if index $.Checked $ix}}{{color "green"}}◉ {{else}}{{color "default+hb"}}◯ {{end}}
+  {{- if index $.Checked $ix}}{{color "green"}} ◉ {{else}}{{color "default+hb"}} ◯ {{end}}
   {{- color "reset"}}
-  {{- $option}}
+  {{- " "}}{{$option}}
 {{end}}`
 
 // Prompt shows the list, and listens for input from the user using /dev/tty.
