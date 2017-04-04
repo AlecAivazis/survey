@@ -42,6 +42,10 @@ func yesNo(t bool) string {
 // Prompt prompts the user with a simple text field and expects a reply followed
 // by a carriage return.
 func (confirm *Confirm) Prompt() (string, error) {
+	if confirm.Answer == nil {
+		answer = false
+		confirm.Answer = &answer
+	}
 	out, err := runTemplate(
 		ConfirmQuestionTemplate,
 		ConfirmTemplateData{Confirm: *confirm},
