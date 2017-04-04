@@ -43,7 +43,7 @@ func yesNo(t bool) string {
 // by a carriage return.
 func (confirm *Confirm) Prompt() (string, error) {
 	if confirm.Answer == nil {
-		answer = false
+		answer := false
 		confirm.Answer = &answer
 	}
 	out, err := runTemplate(
