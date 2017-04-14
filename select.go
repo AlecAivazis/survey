@@ -3,8 +3,8 @@ package survey
 import (
 	"strings"
 
-	tm "github.com/buger/goterm"
 	"github.com/chzyer/readline"
+	ansi "github.com/k0kubun/go-ansi"
 
 	"github.com/alecaivazis/survey/core"
 )
@@ -61,6 +61,7 @@ func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPo
 }
 
 func (s *Select) render() {
+
 	// the formatted response
 	out, err := core.RunTemplate(
 		selectChoicesTemplate,
@@ -71,13 +72,10 @@ func (s *Select) render() {
 	}
 
 	// ask the question
-	tm.Print(strings.TrimRight(out, "\n"))
-	tm.Flush()
+	ansi.Println(strings.TrimRight(out, "\n"))
 
 	// move up one line for each option
-	for range s.Options {
-		tm.Print(core.AnsiCursorUp)
-	}
+	ansi.CursorUp(len(s.Options))
 }
 
 func (s *Select) Prompt(rl *readline.Instance) (string, error) {
@@ -114,17 +112,23 @@ func (s *Select) Prompt(rl *readline.Instance) (string, error) {
 		return "", err
 	}
 
+	// hide the cursor
+	ansi.CursorHide()
 	// ask the question
-	tm.Println(out)
-
+	ansi.Println(out)
 	// start waiting for input
-	return rl.Readline()
+	val, err := rl.Readline()
+	// show the cursor when we're done
+	ansi.CursorShow()
+
+	// return rl.Readline()
+	return val, err
 }
 
 func (s *Select) Cleanup(rl *readline.Instance, val string) error {
 	// remove the original message we left behind
-	tm.Print(core.AnsiCursorUp)
-	tm.Print(core.AnsiClearLine)
+	ansi.CursorUp(1)
+	ansi.EraseInLine(0)
 
 	// execute the output summary template with the answer
 	output, err := core.RunTemplate(
@@ -135,8 +139,7 @@ func (s *Select) Cleanup(rl *readline.Instance, val string) error {
 		return err
 	}
 	// render the summary
-	tm.Print(output)
-	tm.Flush()
+	ansi.Println(output)
 
 	// nothing went wrong
 	return nil
