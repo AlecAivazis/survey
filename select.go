@@ -1,6 +1,7 @@
 package survey
 
 import (
+	"errors"
 	"strings"
 
 	"github.com/chzyer/readline"
@@ -60,7 +61,7 @@ func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPo
 	return []rune(s.Options[s.SelectedIndex]), 0, true
 }
 
-func (s *Select) render() {
+func (s *Select) render() error {
 	for range s.Options {
 		ansi.CursorPreviousLine(1)
 		ansi.EraseInLine(1)
@@ -72,11 +73,13 @@ func (s *Select) render() {
 		SelectTemplateData{Select: *s},
 	)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	// ask the question
 	ansi.Println(strings.TrimRight(out, "\n"))
+	// nothing went wrong
+	return nil
 }
 
 func (s *Select) Prompt(rl *readline.Instance) (string, error) {
@@ -85,6 +88,12 @@ func (s *Select) Prompt(rl *readline.Instance) (string, error) {
 		Stdout:   &core.DevNull{},
 	}
 	rl.SetConfig(config)
+
+	// if there are no options to render
+	if len(s.Options) == 0 {
+		// we failed
+		return "", errors.New("please provide options to select from")
+	}
 
 	// start off with the first option selected
 	sel := 0
@@ -124,6 +133,18 @@ func (s *Select) Prompt(rl *readline.Instance) (string, error) {
 	val, err := rl.Readline()
 	// show the cursor when we're done
 	ansi.CursorShow()
+
+	//  if the value is empty (not sure why)
+	if val == "" {
+		// if there is a default value
+		if s.Default != "" {
+			// use the default value
+			val = s.Default
+		} else {
+			// there is no default value so use the first
+			val = s.Options[0]
+		}
+	}
 
 	// return rl.Readline()
 	return val, err
