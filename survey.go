@@ -3,6 +3,9 @@ package survey
 import (
 	"fmt"
 	"os"
+
+	"github.com/alecaivazis/survey/core"
+	"github.com/chzyer/readline"
 	// tm "github.com/buger/goterm"
 )
 
@@ -19,11 +22,11 @@ type Question struct {
 // Prompt is the primary interface for the objects that can take user input
 // and return a string value.
 type Prompt interface {
-	Prompt() (string, error)
-	Cleanup(string) error
+	Prompt(*readline.Instance) (string, error)
+	Cleanup(*readline.Instance, string) error
 }
 
-var ErrorTemplate = `{{color "red"}}✘ Sorry, your reply was invalid: {{.Error}}{{color "reset"}}
+var errorTemplate = `{{color "red"}}✘ Sorry, your reply was invalid: {{.Error}}{{color "reset"}}
 `
 
 // AskOne asks a single question without performing validation on the answer.
@@ -50,12 +53,18 @@ func handleError(err error) {
 
 // Ask performs the prompt loop
 func Ask(qs []*Question) (map[string]string, error) {
+	// grab the readline instance
+	rl, err := core.GetReadline()
+	if err != nil {
+		handleError(err)
+	}
+
 	// the response map
 	res := make(map[string]string)
 	// go over every question
 	for _, q := range qs {
 		// grab the user input and save it
-		ans, err := q.Prompt.Prompt()
+		ans, err := q.Prompt.Prompt(rl)
 		// if there was a problem
 		if err != nil {
 			handleError(err)
@@ -65,14 +74,14 @@ func Ask(qs []*Question) (map[string]string, error) {
 		if q.Validate != nil {
 			// wait for a valid response
 			for invalid := q.Validate(ans); invalid != nil; invalid = q.Validate(ans) {
-				out, err := runTemplate(ErrorTemplate, invalid)
+				out, err := core.RunTemplate(errorTemplate, invalid)
 				if err != nil {
 					return nil, err
 				}
 				// send the message to the user
 				fmt.Print(out)
 				// ask for more input
-				ans, err = q.Prompt.Prompt()
+				ans, err = q.Prompt.Prompt(rl)
 				// if there was a problem
 				if err != nil {
 					handleError(err)
@@ -81,7 +90,7 @@ func Ask(qs []*Question) (map[string]string, error) {
 		}
 
 		// tell the prompt to cleanup with the validated value
-		q.Prompt.Cleanup(ans)
+		q.Prompt.Cleanup(rl, ans)
 
 		// if something went wrong
 		if err != nil {

@@ -1,64 +1,100 @@
 package survey
 
 import (
-	"fmt"
 	"strings"
 
 	tm "github.com/buger/goterm"
+	"github.com/chzyer/readline"
+
+	"github.com/alecaivazis/survey/core"
 )
 
-// Choice is a prompt that presents a list of various options to the user
+// Select is a prompt that presents a list of various options to the user
 // for them to select using the arrow keys and enter.
-type Choice struct {
-	Message string
-	Choices []string
-	Default string
+type Select struct {
+	Message       string
+	Options       []string
+	Default       string
+	SelectedIndex int
 }
 
-// data available to the templates when processing
-type ChoiceTemplateData struct {
-	Choice
-	Answer   string
-	Selected int
+// the data available to the templates when processing
+type SelectTemplateData struct {
+	Select
+	Answer string
 }
 
-var ChoiceQuestionTemplate = `
+const (
+	selectQuestionTemplate = `
 {{- color "green+hb"}}? {{color "reset"}}
 {{- color "default+hb"}}{{ .Message }} {{color "reset"}}
 {{- if .Answer}}{{color "cyan"}}{{.Answer}}{{color "reset"}}{{end}}`
-
-var ChoiceChoicesTemplate = `
-{{- range $ix, $choice := .Choices}}
-  {{- if eq $ix $.Selected}}{{color "cyan+b"}}> {{else}}{{color "default+hb"}}  {{end}}
+	// the template used to show the list of Selects
+	selectChoicesTemplate = `
+{{- range $ix, $choice := .Options}}
+  {{- if eq $ix $.Select.SelectedIndex}}{{color "cyan+b"}}> {{else}}{{color "default+hb"}}  {{end}}
   {{- $choice}}
   {{- color "reset"}}
 {{end}}`
+)
 
-// Prompt shows the list, and listens for input from the user using /dev/tty.
-func (prompt *Choice) Prompt() (string, error) {
-	out, err := runTemplate(
-		ChoiceQuestionTemplate,
-		ChoiceTemplateData{Choice: *prompt},
+// OnChange is called on every keypress.
+func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPos int, ok bool) {
+	// if the user pressed the enter key
+	if key == core.KeyEnter {
+		return []rune(s.Options[s.SelectedIndex]), 0, true
+		// if the user pressed the up arrow
+	} else if key == core.KeyArrowUp && s.SelectedIndex > 0 {
+		// decrement the selected index
+		s.SelectedIndex--
+		// if the user pressed down and there is room to move
+	} else if key == core.KeyArrowDown && s.SelectedIndex < len(s.Options)-1 {
+		// increment the selected index
+		s.SelectedIndex++
+	}
+
+	// render the options
+	s.render()
+
+	// if we are not pressing ent
+	return []rune(s.Options[s.SelectedIndex]), 0, true
+}
+
+func (s *Select) render() {
+	// the formatted response
+	out, err := core.RunTemplate(
+		selectChoicesTemplate,
+		SelectTemplateData{Select: *s},
 	)
 	if err != nil {
-		return "", err
+		panic(err)
 	}
-	// ask the question
-	fmt.Println(out)
 
-	initialLocation, err := InitialLocation(len(prompt.Choices))
-	if err != nil {
-		return "", err
+	// ask the question
+	tm.Print(strings.TrimRight(out, "\n"))
+	tm.Flush()
+
+	// move up one line for each option
+	for range s.Options {
+		tm.Print(core.AnsiCursorUp)
 	}
+}
+
+func (s *Select) Prompt(rl *readline.Instance) (string, error) {
+	config := &readline.Config{
+		Listener: s,
+		Stdout:   &core.DevNull{},
+	}
+	rl.SetConfig(config)
 
 	// start off with the first option selected
 	sel := 0
 	// if there is a default
-	if prompt.Default != "" {
+	if s.Default != "" {
 		// find the choice
-		for i, opt := range prompt.Choices {
+		for i, opt := range s.Options {
 			// if the option correponds to the default
-			if opt == prompt.Default {
+			if opt == s.Default {
 				// we found our initial value
 				sel = i
 				// stop looking
@@ -66,73 +102,42 @@ func (prompt *Choice) Prompt() (string, error) {
 			}
 		}
 	}
+	// save the selected index
+	s.SelectedIndex = sel
 
-	// print the options to start
-	err = prompt.refreshOptions(sel, initialLocation)
+	// render the initial question
+	out, err := core.RunTemplate(
+		selectQuestionTemplate,
+		SelectTemplateData{Select: *s},
+	)
 	if err != nil {
 		return "", err
 	}
 
-	for {
-		// wait for an input from the user
-		_, keycode, err := GetInput(nil)
-		// if there is an error
-		if err != nil {
-			// bubble up
-			return "", err
-		}
-
-		// if the user pressed the up arrow and we can decrement sel
-		if keycode == KeyArrowUp && sel > 0 {
-			// decrement the selected index
-			sel--
-		}
-		// if the user pressed the down arrow and we can decrement sel
-		if keycode == KeyArrowDown && sel < len(prompt.Choices)-1 {
-			// decrement the selected index
-			sel++
-		}
-
-		// // if the user presses enter
-		if keycode == KeyEnter {
-			// we're done with the rendering loop (the current value is good)
-			break
-		}
-
-		err = prompt.refreshOptions(sel, initialLocation)
-		if err != nil {
-			return "", err
-		}
-	}
-
-	// return the selected choice
-	return prompt.Choices[sel], nil
-}
-
-// Cleanup removes the choices section, and renders the ask like a normal question.
-func (prompt *Choice) Cleanup(val string) error {
-	output, err := runTemplate(
-		ChoiceQuestionTemplate,
-		ChoiceTemplateData{Choice: *prompt, Answer: val},
-	)
-	if err != nil {
-		return err
-	}
-	return cleanupMultiOptions(len(prompt.Choices), output)
-}
-
-func (prompt *Choice) refreshOptions(sel int, initLoc int) error {
-	out, err := runTemplate(
-		ChoiceChoicesTemplate,
-		ChoiceTemplateData{Choice: *prompt, Selected: sel},
-	)
-	if err != nil {
-		return err
-	}
 	// ask the question
-	tm.Print(strings.TrimRight(out, "\n"))
+	tm.Println(out)
+
+	// start waiting for input
+	return rl.Readline()
+}
+
+func (s *Select) Cleanup(rl *readline.Instance, val string) error {
+	// remove the original message we left behind
+	tm.Print(core.AnsiCursorUp)
+	tm.Print(core.AnsiClearLine)
+
+	// execute the output summary template with the answer
+	output, err := core.RunTemplate(
+		selectQuestionTemplate,
+		SelectTemplateData{Select: *s, Answer: val},
+	)
+	if err != nil {
+		return err
+	}
+	// render the summary
+	tm.Print(output)
 	tm.Flush()
-	// make sure we overwrite the first line next time we print
-	tm.MoveCursor(initLoc, 1)
+
+	// nothing went wrong
 	return nil
 }

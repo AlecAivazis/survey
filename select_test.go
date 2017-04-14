@@ -1,21 +1,28 @@
 package survey
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/alecaivazis/survey/core"
+)
 
 func init() {
 	// disable color output for all prompts to simplify testing
-	DisableColor = true
+	core.DisableColor = true
 }
 
-func TestCanFormatChoiceOptions(t *testing.T) {
+func TestCanFormatSelectOptions(t *testing.T) {
 
-	prompt := &Choice{
-		Choices: []string{"foo", "bar", "baz", "buz"},
+	prompt := &Select{
+		Options: []string{"foo", "bar", "baz", "buz"},
+		Default: "baz",
 	}
+	// TODO: figure out a way for the test to actually test this bit of code
+	prompt.SelectedIndex = 2
 
-	actual, err := runTemplate(
-		ChoiceChoicesTemplate,
-		ChoiceTemplateData{Choice: *prompt, Selected: 2},
+	actual, err := core.RunTemplate(
+		selectChoicesTemplate,
+		SelectTemplateData{Select: *prompt},
 	)
 
 	if err != nil {
@@ -33,48 +40,48 @@ func TestCanFormatChoiceOptions(t *testing.T) {
 	}
 }
 
-func TestChoiceFormatQuestion(t *testing.T) {
+func TestSelectFormatQuestion(t *testing.T) {
 
-	prompt := &Choice{
+	prompt := &Select{
 		Message: "Pick your word:",
-		Choices: []string{"foo", "bar", "baz", "buz"},
+		Options: []string{"foo", "bar", "baz", "buz"},
 		Default: "baz",
 	}
 
-	actual, err := runTemplate(
-		ChoiceQuestionTemplate,
-		ChoiceTemplateData{Choice: *prompt},
+	actual, err := core.RunTemplate(
+		selectQuestionTemplate,
+		SelectTemplateData{Select: *prompt},
 	)
 	if err != nil {
-		t.Errorf("Failed to run template to format choice question: %s", err)
+		t.Errorf("Failed to run template to format Select question: %s", err)
 	}
 
 	expected := `? Pick your word: `
 
 	if actual != expected {
-		t.Errorf("Formatted choice question was not formatted correctly. Found:\n%s\nExpected:\n%s", actual, expected)
+		t.Errorf("Formatted Select question was not formatted correctly. Found:\n%s\nExpected:\n%s", actual, expected)
 	}
 }
 
-func TestChoiceFormatAnswer(t *testing.T) {
+func TestSelectFormatAnswer(t *testing.T) {
 
-	prompt := &Choice{
+	prompt := &Select{
 		Message: "Pick your word:",
-		Choices: []string{"foo", "bar", "baz", "buz"},
+		Options: []string{"foo", "bar", "baz", "buz"},
 		Default: "baz",
 	}
 
-	actual, err := runTemplate(
-		ChoiceQuestionTemplate,
-		ChoiceTemplateData{Choice: *prompt, Answer: "buz"},
+	actual, err := core.RunTemplate(
+		selectQuestionTemplate,
+		SelectTemplateData{Select: *prompt, Answer: "buz"},
 	)
 	if err != nil {
-		t.Errorf("Failed to run template to format choice answer: %s", err)
+		t.Errorf("Failed to run template to format Select answer: %s", err)
 	}
 
 	expected := `? Pick your word: buz`
 
 	if actual != expected {
-		t.Errorf("Formatted choice answer was not formatted correctly. Found:\n%s\nExpected:\n%s", actual, expected)
+		t.Errorf("Formatted Select answer was not formatted correctly. Found:\n%s\nExpected:\n%s", actual, expected)
 	}
 }

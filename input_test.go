@@ -1,10 +1,14 @@
 package survey
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/alecaivazis/survey/core"
+)
 
 func init() {
 	// disable color output for all prompts to simplify testing
-	DisableColor = true
+	core.DisableColor = true
 }
 
 func TestInputFormatQuestion(t *testing.T) {
@@ -14,9 +18,9 @@ func TestInputFormatQuestion(t *testing.T) {
 		Default: "April",
 	}
 
-	actual, err := runTemplate(
-		InputQuestionTemplate,
-		InputTemplateData{Input: *prompt},
+	actual, err := core.RunTemplate(
+		inputQuestionTemplate,
+		inputTemplateData{Input: *prompt},
 	)
 	if err != nil {
 		t.Errorf("Failed to run template to format input question: %s", err)
@@ -36,9 +40,9 @@ func TestInputFormatAnswer(t *testing.T) {
 		Default: "April",
 	}
 
-	actual, err := runTemplate(
-		InputQuestionTemplate,
-		InputTemplateData{Input: *prompt, Answer: "October"},
+	actual, err := core.RunTemplate(
+		inputQuestionTemplate,
+		inputTemplateData{Input: *prompt, Answer: "October"},
 	)
 	if err != nil {
 		t.Errorf("Failed to run template to format input answer: %s", err)

@@ -1,10 +1,14 @@
 package survey
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/alecaivazis/survey/core"
+)
 
 func init() {
 	// disable color output for all prompts to simplify testing
-	DisableColor = true
+	core.DisableColor = true
 }
 
 func TestConfirmFormatQuestion(t *testing.T) {
@@ -14,7 +18,7 @@ func TestConfirmFormatQuestion(t *testing.T) {
 		Default: true,
 	}
 
-	actual, err := runTemplate(
+	actual, err := core.RunTemplate(
 		ConfirmQuestionTemplate,
 		ConfirmTemplateData{Confirm: *prompt},
 	)
@@ -36,7 +40,7 @@ func TestConfirmFormatQuestionDefaultFalse(t *testing.T) {
 		Default: false,
 	}
 
-	actual, err := runTemplate(
+	actual, err := core.RunTemplate(
 		ConfirmQuestionTemplate,
 		ConfirmTemplateData{Confirm: *prompt},
 	)
@@ -58,7 +62,7 @@ func TestConfirmFormatAnswer(t *testing.T) {
 		Message: "Is pizza your favorite food?",
 	}
 
-	actual, err := runTemplate(
+	actual, err := core.RunTemplate(
 		ConfirmQuestionTemplate,
 		ConfirmTemplateData{Confirm: *prompt, Answer: "Yes"},
 	)
