@@ -61,6 +61,10 @@ func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPo
 }
 
 func (s *Select) render() {
+	for range s.Options {
+		ansi.CursorPreviousLine(1)
+		ansi.EraseInLine(1)
+	}
 
 	// the formatted response
 	out, err := core.RunTemplate(
@@ -73,9 +77,6 @@ func (s *Select) render() {
 
 	// ask the question
 	ansi.Println(strings.TrimRight(out, "\n"))
-
-	// move up one line for each option
-	ansi.CursorUp(len(s.Options))
 }
 
 func (s *Select) Prompt(rl *readline.Instance) (string, error) {
@@ -116,6 +117,7 @@ func (s *Select) Prompt(rl *readline.Instance) (string, error) {
 	ansi.CursorHide()
 	// ask the question
 	ansi.Println(out)
+	ansi.CursorNextLine(len(s.Options))
 	// start waiting for input
 	val, err := rl.Readline()
 	// show the cursor when we're done
@@ -126,9 +128,12 @@ func (s *Select) Prompt(rl *readline.Instance) (string, error) {
 }
 
 func (s *Select) Cleanup(rl *readline.Instance, val string) error {
-	// remove the original message we left behind
-	ansi.CursorUp(1)
-	ansi.EraseInLine(0)
+	ansi.CursorPreviousLine(1)
+	ansi.EraseInLine(1)
+	for range s.Options {
+		ansi.CursorPreviousLine(1)
+		ansi.EraseInLine(1)
+	}
 
 	// execute the output summary template with the answer
 	output, err := core.RunTemplate(
@@ -139,7 +144,7 @@ func (s *Select) Cleanup(rl *readline.Instance, val string) error {
 		return err
 	}
 	// render the summary
-	ansi.Println(output)
+	ansi.Print(output)
 
 	// nothing went wrong
 	return nil
