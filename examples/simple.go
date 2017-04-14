@@ -2,23 +2,17 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/alecaivazis/survey"
 )
 
 // the questions to ask
 var simpleQs = []*survey.Question{
 	{
-		Name: "name",
-		Prompt: &survey.Input{
-			Message: "What is your name?",
-			Default: "Johnny Appleseed",
-		},
-	},
-	{
 		Name: "color",
-		Prompt: &survey.Choice{
+		Prompt: &survey.Select{
 			Message: "Choose a color:",
-			Choices: []string{"red", "blue", "green", "yellow"},
+			Options: []string{"red", "blue", "green", "yellow"},
 			Default: "yellow",
 		},
 		Validate: survey.Required,
