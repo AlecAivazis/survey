@@ -1,4 +1,4 @@
-package survey
+package core
 
 import (
 	"bytes"
@@ -35,7 +35,7 @@ func getTemplate(tmpl string) (*template.Template, error) {
 	return t, nil
 }
 
-func runTemplate(tmpl string, data interface{}) (string, error) {
+func RunTemplate(tmpl string, data interface{}) (string, error) {
 	t, err := getTemplate(tmpl)
 	if err != nil {
 		return "", err
