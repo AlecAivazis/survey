@@ -117,7 +117,9 @@ func (s *Select) Prompt(rl *readline.Instance) (string, error) {
 	ansi.CursorHide()
 	// ask the question
 	ansi.Println(out)
-	ansi.CursorNextLine(len(s.Options))
+	for range s.Options {
+		ansi.Println()
+	}
 	// start waiting for input
 	val, err := rl.Readline()
 	// show the cursor when we're done
@@ -144,7 +146,7 @@ func (s *Select) Cleanup(rl *readline.Instance, val string) error {
 		return err
 	}
 	// render the summary
-	ansi.Print(output)
+	ansi.Println(output)
 
 	// nothing went wrong
 	return nil
