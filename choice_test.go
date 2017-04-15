@@ -11,8 +11,8 @@ func init() {
 
 func TestCanFormatSelectOptions(t *testing.T) {
 
-	prompt := &Select{
-		Options: []string{"foo", "bar", "baz", "buz"},
+	prompt := &Choice{
+		Choices: []string{"foo", "bar", "baz", "buz"},
 		Default: "baz",
 	}
 	// TODO: figure out a way for the test to actually test this bit of code
@@ -24,7 +24,7 @@ func TestCanFormatSelectOptions(t *testing.T) {
 	)
 
 	if err != nil {
-		t.Errorf("Failed to run template to format choice options: %s", err)
+		t.Errorf("Failed to run template to format choice choices: %s", err)
 	}
 
 	expected := `  foo
@@ -40,9 +40,9 @@ func TestCanFormatSelectOptions(t *testing.T) {
 
 func TestSelectFormatQuestion(t *testing.T) {
 
-	prompt := &Select{
+	prompt := &Choice{
 		Message: "Pick your word:",
-		Options: []string{"foo", "bar", "baz", "buz"},
+		Choices: []string{"foo", "bar", "baz", "buz"},
 		Default: "baz",
 	}
 
@@ -63,9 +63,9 @@ func TestSelectFormatQuestion(t *testing.T) {
 
 func TestSelectFormatAnswer(t *testing.T) {
 
-	prompt := &Select{
+	prompt := &Choice{
 		Message: "Pick your word:",
-		Options: []string{"foo", "bar", "baz", "buz"},
+		Choices: []string{"foo", "bar", "baz", "buz"},
 		Default: "baz",
 	}
 

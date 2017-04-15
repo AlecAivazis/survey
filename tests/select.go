@@ -7,35 +7,35 @@ import (
 
 var goodTable = []TestUtil.TestTableEntry{
 	{
-		"standard", &survey.Select{
+		"standard", &survey.Choice{
 			Message: "Choose a color:",
-			Options: []string{"red", "blue", "green"},
+			Choices: []string{"red", "blue", "green"},
 		},
 	},
 	{
-		"short", &survey.Select{
+		"short", &survey.Choice{
 			Message: "Choose a color:",
-			Options: []string{"red", "blue"},
+			Choices: []string{"red", "blue"},
 		},
 	},
 	{
-		"default", &survey.Select{
+		"default", &survey.Choice{
 			Message: "Choose a color (should default blue):",
-			Options: []string{"red", "blue", "green"},
+			Choices: []string{"red", "blue", "green"},
 			Default: "blue",
 		},
 	},
 	{
-		"one", &survey.Select{
+		"one", &survey.Choice{
 			Message: "Choose one:",
-			Options: []string{"hello"},
+			Choices: []string{"hello"},
 		},
 	},
 }
 
 var badTable = []TestUtil.TestTableEntry{
 	{
-		"no options", &survey.Select{
+		"no Choices", &survey.Choice{
 			Message: "Choose one:",
 		},
 	},

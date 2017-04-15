@@ -26,9 +26,9 @@ var qs = []*survey.Question{
     },
     {
         Name: "color",
-        Prompt: &survey.Select{
+        Prompt: &survey.Choice{
             Message: "Choose a color:",
-            Options: []string{"red", "blue", "green"},
+            Choices: []string{"red", "blue", "green"},
             Default: "red",
         },
     },

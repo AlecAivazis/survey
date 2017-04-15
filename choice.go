@@ -9,29 +9,29 @@ import (
 	"github.com/chzyer/readline"
 )
 
-// Select is a prompt that presents a list of various options to the user
+// Choice is a prompt that presents a list of various options to the user
 // for them to select using the arrow keys and enter.
-type Select struct {
+type Choice struct {
 	Message       string
-	Options       []string
+	Choices       []string
 	Default       string
 	SelectedIndex int
 }
 
 // the data available to the templates when processing
 type SelectTemplateData struct {
-	Select
+	Select Choice
 	Answer string
 }
 
 const (
 	SelectQuestionTemplate = `
 {{- color "green+hb"}}? {{color "reset"}}
-{{- color "default+hb"}}{{ .Message }} {{color "reset"}}
+{{- color "default+hb"}}{{ $.Select.Message }} {{color "reset"}}
 {{- if .Answer}}{{color "cyan"}}{{.Answer}}{{color "reset"}}{{end}}`
 	// the template used to show the list of Selects
 	SelectChoicesTemplate = `
-{{- range $ix, $choice := .Options}}
+{{- range $ix, $choice := $.Select.Choices}}
   {{- if eq $ix $.Select.SelectedIndex}}{{color "cyan+b"}}> {{else}}{{color "default+hb"}}  {{end}}
   {{- $choice}}
   {{- color "reset"}}
@@ -39,16 +39,16 @@ const (
 )
 
 // OnChange is called on every keypress.
-func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPos int, ok bool) {
+func (s *Choice) OnChange(line []rune, pos int, key rune) (newLine []rune, newPos int, ok bool) {
 	// if the user pressed the enter key
 	if key == terminal.KeyEnter {
-		return []rune(s.Options[s.SelectedIndex]), 0, true
+		return []rune(s.Choices[s.SelectedIndex]), 0, true
 		// if the user pressed the up arrow
 	} else if key == terminal.KeyArrowUp && s.SelectedIndex > 0 {
 		// decrement the selected index
 		s.SelectedIndex--
 		// if the user pressed down and there is room to move
-	} else if key == terminal.KeyArrowDown && s.SelectedIndex < len(s.Options)-1 {
+	} else if key == terminal.KeyArrowDown && s.SelectedIndex < len(s.Choices)-1 {
 		// increment the selected index
 		s.SelectedIndex++
 	}
@@ -57,11 +57,11 @@ func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPo
 	s.render()
 
 	// if we are not pressing ent
-	return []rune(s.Options[s.SelectedIndex]), 0, true
+	return []rune(s.Choices[s.SelectedIndex]), 0, true
 }
 
-func (s *Select) render() error {
-	for range s.Options {
+func (s *Choice) render() error {
+	for range s.Choices {
 		terminal.CursorPreviousLine(1)
 		terminal.EraseInLine(1)
 	}
@@ -81,7 +81,7 @@ func (s *Select) render() error {
 	return nil
 }
 
-func (s *Select) Prompt(rl *readline.Instance) (string, error) {
+func (s *Choice) Prompt(rl *readline.Instance) (string, error) {
 	config := &readline.Config{
 		Listener: s,
 		Stdout:   ioutil.Discard,
@@ -89,7 +89,7 @@ func (s *Select) Prompt(rl *readline.Instance) (string, error) {
 	rl.SetConfig(config)
 
 	// if there are no options to render
-	if len(s.Options) == 0 {
+	if len(s.Choices) == 0 {
 		// we failed
 		return "", errors.New("please provide options to select from")
 	}
@@ -99,7 +99,7 @@ func (s *Select) Prompt(rl *readline.Instance) (string, error) {
 	// if there is a default
 	if s.Default != "" {
 		// find the choice
-		for i, opt := range s.Options {
+		for i, opt := range s.Choices {
 			// if the option correponds to the default
 			if opt == s.Default {
 				// we found our initial value
@@ -125,7 +125,7 @@ func (s *Select) Prompt(rl *readline.Instance) (string, error) {
 	terminal.CursorHide()
 	// ask the question
 	terminal.Println(out)
-	for range s.Options {
+	for range s.Choices {
 		terminal.Println()
 	}
 	// start waiting for input
@@ -141,7 +141,7 @@ func (s *Select) Prompt(rl *readline.Instance) (string, error) {
 			val = s.Default
 		} else {
 			// there is no default value so use the first
-			val = s.Options[0]
+			val = s.Choices[0]
 		}
 	}
 
@@ -149,10 +149,10 @@ func (s *Select) Prompt(rl *readline.Instance) (string, error) {
 	return val, err
 }
 
-func (s *Select) Cleanup(rl *readline.Instance, val string) error {
+func (s *Choice) Cleanup(rl *readline.Instance, val string) error {
 	terminal.CursorPreviousLine(1)
 	terminal.EraseInLine(1)
-	for range s.Options {
+	for range s.Choices {
 		terminal.CursorPreviousLine(1)
 		terminal.EraseInLine(1)
 	}
