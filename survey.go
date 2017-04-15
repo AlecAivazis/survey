@@ -3,8 +3,9 @@ package survey
 import (
 	"fmt"
 	"os"
-	// tm "github.com/buger/goterm"
-	"github.com/alecaivazis/survey/format"
+
+	"github.com/alecaivazis/survey/terminal"
+	"github.com/chzyer/readline"
 )
 
 // Validator is a function passed to a Question in order to redefine
@@ -20,9 +21,12 @@ type Question struct {
 // Prompt is the primary interface for the objects that can take user input
 // and return a string value.
 type Prompt interface {
-	Prompt() (string, error)
-	Cleanup(string) error
+	Prompt(*readline.Instance) (string, error)
+	Cleanup(*readline.Instance, string) error
 }
+
+var ErrorTemplate = `{{color "red"}}✘ Sorry, your reply was invalid: {{.Error}}{{color "reset"}}
+`
 
 // AskOne asks a single question without performing validation on the answer.
 func AskOne(p Prompt) (string, error) {
@@ -48,12 +52,18 @@ func handleError(err error) {
 
 // Ask performs the prompt loop
 func Ask(qs []*Question) (map[string]string, error) {
+	// grab the readline instance
+	rl, err := terminal.GetReadline()
+	if err != nil {
+		handleError(err)
+	}
+
 	// the response map
 	res := make(map[string]string)
 	// go over every question
 	for _, q := range qs {
 		// grab the user input and save it
-		ans, err := q.Prompt.Prompt()
+		ans, err := q.Prompt.Prompt(rl)
 		// if there was a problem
 		if err != nil {
 			handleError(err)
@@ -63,12 +73,14 @@ func Ask(qs []*Question) (map[string]string, error) {
 		if q.Validate != nil {
 			// wait for a valid response
 			for invalid := q.Validate(ans); invalid != nil; invalid = q.Validate(ans) {
-				// the error message
-				msg := "Sorry, your reply was invalid: "
+				out, err := RunTemplate(ErrorTemplate, invalid)
+				if err != nil {
+					return nil, err
+				}
 				// send the message to the user
-				fmt.Print(format.ErrorColor, format.Error, msg, invalid.Error(), format.ResetFormat, "\n")
+				fmt.Print(out)
 				// ask for more input
-				ans, err = q.Prompt.Prompt()
+				ans, err = q.Prompt.Prompt(rl)
 				// if there was a problem
 				if err != nil {
 					handleError(err)
@@ -77,7 +89,7 @@ func Ask(qs []*Question) (map[string]string, error) {
 		}
 
 		// tell the prompt to cleanup with the validated value
-		q.Prompt.Cleanup(ans)
+		q.Prompt.Cleanup(rl, ans)
 
 		// if something went wrong
 		if err != nil {

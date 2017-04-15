@@ -1,13 +1,10 @@
 package survey
 
 import (
-	"bufio"
-	"errors"
 	"fmt"
-	tm "github.com/buger/goterm"
-	"os"
 
-	"github.com/alecaivazis/survey/format"
+	"github.com/alecaivazis/survey/terminal"
+	"github.com/chzyer/readline"
 )
 
 // Input is a regular text input that prints each character the user types on the screen
@@ -17,55 +14,57 @@ type Input struct {
 	Default string
 }
 
-// Prompt prompts the user with a simple text field and expects a reply followed
-// by a carriage return.
-func (input *Input) Prompt() (string, error) {
-	// print the question we were given to kick off the prompt
-	fmt.Print(format.Ask(fmt.Sprintf("%v ", input.Message), input.Default))
-
-	// a scanner to look at the input from stdin
-	scanner := bufio.NewScanner(os.Stdin)
-	// wait for a response
-	for scanner.Scan() {
-		// get the availible text in the scanner
-		res := scanner.Text()
-		// if there is no answer
-		if res == "" {
-			// use the default
-			res = input.Default
-		}
-
-		// return the value
-		return res, nil
-	}
-
-	return "", errors.New("Did not get input.")
+// data available to the templates when processing
+type InputTemplateData struct {
+	Input
+	Answer string
 }
 
-// Cleanup overwrite the line with the finalized formatted version
-func (input *Input) Cleanup(val string) error {
-	// get the current cursor location
-	loc, err := CursorLocation()
-	// if something went wrong
+// Templates with Color formatting. See Documentation: https://github.com/mgutz/ansi#style-format
+var InputQuestionTemplate = `
+{{- color "green+hb"}}? {{color "reset"}}
+{{- color "default+hb"}}{{ .Message }} {{color "reset"}}
+{{- if .Answer}}
+  {{- color "cyan"}}{{.Answer}}{{color "reset"}}
+{{- else }}
+  {{- if .Default}}{{color "white"}}({{.Default}}) {{color "reset"}}{{end}}
+{{- end}}`
+
+func (i *Input) Prompt(rl *readline.Instance) (line string, err error) {
+	// render the template
+	out, err := RunTemplate(
+		InputQuestionTemplate,
+		InputTemplateData{Input: *i},
+	)
 	if err != nil {
-		// bubble
+		return "", err
+	}
+	// make sure the prompt matches the expectation
+	rl.SetPrompt(fmt.Sprintf(out))
+	// get the next line
+	line, err = rl.Readline()
+	// we're done
+	return line, err
+}
+
+func (i *Input) Cleanup(rl *readline.Instance, val string) error {
+	// go up one line
+	terminal.CursorPreviousLine(1)
+	// clear the line
+	terminal.EraseInLine(1)
+
+	// render the template
+	out, err := RunTemplate(
+		InputQuestionTemplate,
+		InputTemplateData{Input: *i, Answer: val},
+	)
+	if err != nil {
 		return err
 	}
 
-	var initLoc int
-	// if we are printing at the end of the console
-	if loc.col == tm.Height() {
-		initLoc = loc.col - 2
-	} else {
-		initLoc = loc.col - 1
-	}
+	// print the summary
+	terminal.Println(out)
 
-	// move to the beginning of the current line
-	tm.MoveCursor(initLoc, 1)
-
-	tm.Print(format.Response(input.Message, val), "\x1b[0K")
-	tm.Flush()
-
-	// nothing went wrong
-	return nil
+	// we're done
+	return err
 }
