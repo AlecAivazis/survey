@@ -14,7 +14,7 @@ package main
 
 import (
     "fmt"
-    "github.com/alecaivazis/survey"
+    "gopkg.in/alecaivazis/survey.v0"
 )
 
 // the questions to ask
