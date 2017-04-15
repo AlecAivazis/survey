@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"strings"
 
+	"github.com/alecaivazis/survey/core"
 	"github.com/alecaivazis/survey/terminal"
 	"github.com/chzyer/readline"
 )
@@ -67,7 +68,7 @@ func (s *Select) render() error {
 	}
 
 	// the formatted response
-	out, err := RunTemplate(
+	out, err := core.RunTemplate(
 		SelectChoicesTemplate,
 		SelectTemplateData{Select: *s},
 	)
@@ -113,7 +114,7 @@ func (s *Select) Prompt(rl *readline.Instance) (string, error) {
 	s.SelectedIndex = sel
 
 	// render the initial question
-	out, err := RunTemplate(
+	out, err := core.RunTemplate(
 		SelectQuestionTemplate,
 		SelectTemplateData{Select: *s},
 	)
@@ -158,7 +159,7 @@ func (s *Select) Cleanup(rl *readline.Instance, val string) error {
 	}
 
 	// execute the output summary template with the answer
-	output, err := RunTemplate(
+	output, err := core.RunTemplate(
 		SelectQuestionTemplate,
 		SelectTemplateData{Select: *s, Answer: val},
 	)

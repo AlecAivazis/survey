@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"strings"
 
+	"github.com/alecaivazis/survey/core"
 	"github.com/alecaivazis/survey/terminal"
 	"github.com/chzyer/readline"
 )
@@ -80,7 +81,7 @@ func (m *MultiChoice) render() error {
 	}
 
 	// render the template summarizing the current state
-	out, err := RunTemplate(
+	out, err := core.RunTemplate(
 		MultiChoiceOptionsTemplate,
 		MultiChoiceTemplateData{
 			MultiChoice:   *m,
@@ -137,7 +138,7 @@ func (m *MultiChoice) Prompt(rl *readline.Instance) (string, error) {
 		return "", errors.New("please provide options to select from")
 	}
 	// generate the template for the current state of the prompt
-	out, err := RunTemplate(
+	out, err := core.RunTemplate(
 		MultiChoiceQuestionTemplate,
 		MultiChoiceTemplateData{
 			MultiChoice:   *m,
@@ -206,7 +207,7 @@ func (m *MultiChoice) Cleanup(rl *readline.Instance, val string) error {
 	json.Unmarshal([]byte(val), &value)
 
 	// execute the output summary template with the answer
-	output, err := RunTemplate(
+	output, err := core.RunTemplate(
 		MultiChoiceQuestionTemplate,
 		MultiChoiceTemplateData{
 			MultiChoice:   *m,

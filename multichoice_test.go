@@ -1,10 +1,14 @@
 package survey
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/alecaivazis/survey/core"
+)
 
 func init() {
 	// disable color output for all prompts to simplify testing
-	DisableColor = true
+	core.DisableColor = true
 }
 
 func TestCanFormatMultiChoiceOptions(t *testing.T) {
@@ -14,7 +18,7 @@ func TestCanFormatMultiChoiceOptions(t *testing.T) {
 		Defaults: []string{"bar", "buz"},
 	}
 
-	actual, err := RunTemplate(
+	actual, err := core.RunTemplate(
 		MultiChoiceOptionsTemplate,
 		MultiChoiceTemplateData{
 			MultiChoice:   *prompt,
@@ -46,7 +50,7 @@ func TestMultiChoiceFormatQuestion(t *testing.T) {
 		Defaults: []string{"bar", "buz"},
 	}
 
-	actual, err := RunTemplate(
+	actual, err := core.RunTemplate(
 		MultiChoiceQuestionTemplate,
 		MultiChoiceTemplateData{MultiChoice: *prompt},
 	)
@@ -69,7 +73,7 @@ func TestMultiChoiceFormatAnswer(t *testing.T) {
 		Defaults: []string{"bar", "buz"},
 	}
 
-	actual, err := RunTemplate(
+	actual, err := core.RunTemplate(
 		MultiChoiceQuestionTemplate,
 		MultiChoiceTemplateData{MultiChoice: *prompt, Answer: []string{"foo", "buz"}},
 	)

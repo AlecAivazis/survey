@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"regexp"
 
+	"github.com/alecaivazis/survey/core"
 	"github.com/alecaivazis/survey/terminal"
 	"github.com/chzyer/readline"
 )
@@ -64,7 +65,7 @@ func (c *Confirm) getBool(rl *readline.Instance) (bool, error) {
 		answer = c.Default
 	default:
 		// we didnt get a valid answer, so print error and prompt again
-		out, err := RunTemplate(
+		out, err := core.RunTemplate(
 			ErrorTemplate, fmt.Errorf("%q is not a valid answer, please try again.", val),
 		)
 		// if something went wrong
@@ -97,7 +98,7 @@ func (c *Confirm) Prompt(rl *readline.Instance) (string, error) {
 	}
 
 	// render the question template
-	out, err := RunTemplate(
+	out, err := core.RunTemplate(
 		ConfirmQuestionTemplate,
 		ConfirmTemplateData{Confirm: *c},
 	)
@@ -131,7 +132,7 @@ func (c *Confirm) Cleanup(rl *readline.Instance, val string) error {
 	terminal.EraseInLine(1)
 
 	// render the template
-	out, err := RunTemplate(
+	out, err := core.RunTemplate(
 		ConfirmQuestionTemplate,
 		ConfirmTemplateData{Confirm: *c, Answer: val},
 	)

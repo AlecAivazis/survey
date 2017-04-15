@@ -2,6 +2,8 @@ package survey
 
 import (
 	"github.com/chzyer/readline"
+
+	"github.com/alecaivazis/survey/core"
 )
 
 // Password is like a normal Input but the text shows up as *'s and
@@ -17,7 +19,7 @@ var PasswordQuestionTemplate = `
 
 func (p *Password) Prompt(rl *readline.Instance) (line string, err error) {
 	// render the question template
-	out, err := RunTemplate(
+	out, err := core.RunTemplate(
 		PasswordQuestionTemplate,
 		*p,
 	)

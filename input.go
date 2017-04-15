@@ -3,6 +3,7 @@ package survey
 import (
 	"fmt"
 
+	"github.com/alecaivazis/survey/core"
 	"github.com/alecaivazis/survey/terminal"
 	"github.com/chzyer/readline"
 )
@@ -32,7 +33,7 @@ var InputQuestionTemplate = `
 
 func (i *Input) Prompt(rl *readline.Instance) (line string, err error) {
 	// render the template
-	out, err := RunTemplate(
+	out, err := core.RunTemplate(
 		InputQuestionTemplate,
 		InputTemplateData{Input: *i},
 	)
@@ -54,7 +55,7 @@ func (i *Input) Cleanup(rl *readline.Instance, val string) error {
 	terminal.EraseInLine(1)
 
 	// render the template
-	out, err := RunTemplate(
+	out, err := core.RunTemplate(
 		InputQuestionTemplate,
 		InputTemplateData{Input: *i, Answer: val},
 	)

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/alecaivazis/survey/core"
 	"github.com/alecaivazis/survey/terminal"
 	"github.com/chzyer/readline"
 )
@@ -73,7 +74,7 @@ func Ask(qs []*Question) (map[string]string, error) {
 		if q.Validate != nil {
 			// wait for a valid response
 			for invalid := q.Validate(ans); invalid != nil; invalid = q.Validate(ans) {
-				out, err := RunTemplate(ErrorTemplate, invalid)
+				out, err := core.RunTemplate(ErrorTemplate, invalid)
 				if err != nil {
 					return nil, err
 				}
