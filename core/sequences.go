@@ -5,5 +5,6 @@ const (
 	KeyArrowRight = '\x06'
 	KeyArrowUp    = '\x10'
 	KeyArrowDown  = '\x0e'
+	KeySpace      = ' '
 	KeyEnter      = '\r'
 )

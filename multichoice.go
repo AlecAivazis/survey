@@ -1,167 +1,196 @@
 package survey
 
-// import (
-// 	"encoding/json"
-// 	"fmt"
-// 	"strings"
+import (
+	"encoding/json"
+	"errors"
+	"strings"
 
-// 	"github.com/alecaivazis/survey/core"
-// 	tm "github.com/buger/goterm"
-// )
+	"github.com/alecaivazis/survey/core"
+	"github.com/chzyer/readline"
+	ansi "github.com/k0kubun/go-ansi"
+)
 
-// // MultiChoice is a prompt that presents a list of various options to the user
-// // for them to select using the arrow keys and enter.
-// type MultiChoice struct {
-// 	Message  string
-// 	Options  []string
-// 	Defaults []string
-// 	Answer   *[]string
-// }
+// MultiChoice is a prompt that presents a list of various options to the user
+// for them to select using the arrow keys and enter.
+type MultiChoice struct {
+	Message       string
+	Options       []string
+	Defaults      []string
+	Answer        *[]string
+	SelectedIndex int
+	Checked       map[int]bool
+}
 
-// // data available to the templates when processing
-// type MultiChoiceTemplateData struct {
-// 	MultiChoice
-// 	Answer   []string
-// 	Checked  map[int]bool
-// 	Selected int
-// }
+// data available to the templates when processing
+type multiChoiceTemplateData struct {
+	MultiChoice
+	Answer        []string
+	Checked       map[int]bool
+	SelectedIndex int
+}
 
-// var MultiChoiceQuestionTemplate = `
-// {{- color "green+hb"}}? {{color "reset"}}
-// {{- color "default+hb"}}{{ .Message }} {{color "reset"}}
-// {{- if .Answer}}{{color "cyan"}}{{.Answer | printf "%q"}}{{color "reset"}}{{end}}`
+var multiChoiceQuestionTemplate = `
+{{- color "green+hb"}}? {{color "reset"}}
+{{- color "default+hb"}}{{ .Message }} {{color "reset"}}
+{{- if .Answer}}{{color "cyan"}}{{.Answer | printf "%q"}}{{color "reset"}}{{end}}`
 
-// var MultiChoiceOptionsTemplate = `
-// {{- range $ix, $option := .Options}}
-//   {{- if eq $ix $.Selected}}{{color "cyan"}}❯{{color "reset"}}{{else}} {{end}}
-//   {{- if index $.Checked $ix}}{{color "green"}} ◉ {{else}}{{color "default+hb"}} ◯ {{end}}
-//   {{- color "reset"}}
-//   {{- " "}}{{$option}}
-// {{end}}`
+var multiChoiceOptionsTemplate = `
+{{- range $ix, $option := .Options}}
+  {{- if eq $ix $.MultiChoice.SelectedIndex}}{{color "cyan"}}❯{{color "reset"}}{{else}} {{end}}
+  {{- if index $.MultiChoice.Checked $ix}}{{color "green"}} ◉ {{else}}{{color "default+hb"}} ◯ {{end}}
+  {{- color "reset"}}
+  {{- " "}}{{$option}}
+{{end}}`
 
-// // Prompt shows the list, and listens for input from the user using /dev/tty.
-// func (prompt *MultiChoice) Prompt() (string, error) {
-// 	if prompt.Answer == nil {
-// 		answer := []string{}
-// 		prompt.Answer = &answer
-// 	}
-// 	out, err := core.RunTemplate(
-// 		MultiChoiceQuestionTemplate,
-// 		MultiChoiceTemplateData{MultiChoice: *prompt},
-// 	)
-// 	if err != nil {
-// 		return "", err
-// 	}
-// 	// ask the question
-// 	fmt.Println(out)
+// OnChange is called on every keypress.
+func (m *MultiChoice) OnChange(line []rune, pos int, key rune) (newLine []rune, newPos int, ok bool) {
+	if key == core.KeyEnter {
+		// just pass on the current value
+		return line, 0, true
+	} else if key == core.KeyArrowUp && m.SelectedIndex > 0 {
+		// decrement the selected index
+		m.SelectedIndex--
+	} else if key == core.KeyArrowDown && m.SelectedIndex < len(m.Options)-1 {
+		// if the user pressed down and there is room to move
+		// increment the selected index
+		m.SelectedIndex++
+	} else if key == core.KeySpace {
+		// otherwise just invert the current value
+		m.Checked[m.SelectedIndex] = true
+	}
 
-// 	initialLocation, err := InitialLocation(len(prompt.Options))
-// 	if err != nil {
-// 		return "", err
-// 	}
+	// print the template summarizing the current state of the selection
 
-// 	sel := 0
-// 	checked := map[int]bool{}
-// 	// if there is a default
-// 	if len(prompt.Defaults) > 0 {
-// 		for _, dflt := range prompt.Defaults {
-// 			for i, opt := range prompt.Options {
-// 				// if the option correponds to the default
-// 				if opt == dflt {
-// 					// we found our initial value
-// 					checked[i] = true
-// 					// stop looking
-// 					break
-// 				}
-// 			}
-// 		}
-// 	}
+	// render the options
+	// ansi.Print(m.SelectedIndex, m.Checked[m.SelectedIndex])
+	m.render()
 
-// 	// print the options to start
-// 	err = prompt.refreshOptions(checked, sel, initialLocation)
-// 	if err != nil {
-// 		return "", err
-// 	}
+	// if we are not pressing ent
+	return line, 0, true
+}
 
-// 	for {
-// 		// wait for an input from the user
-// 		_, keycode, err := GetInput(nil)
-// 		// if there is an error
-// 		if err != nil {
-// 			// bubble up
-// 			return "", err
-// 		}
+func (m *MultiChoice) render() error {
+	// clean up what we left behind last time
+	for range m.Options {
+		ansi.CursorPreviousLine(1)
+		ansi.EraseInLine(1)
+	}
 
-// 		// if the user pressed the up arrow and we can decrement sel
-// 		if keycode == KeyArrowUp && sel > 0 {
-// 			// decrement the selected index
-// 			sel--
-// 		}
-// 		// if the user pressed the down arrow and we can decrement sel
-// 		if keycode == KeyArrowDown && sel < len(prompt.Options)-1 {
-// 			// decrement the selected index
-// 			sel++
-// 		}
+	// render the template summarizing the current state
+	out, err := core.RunTemplate(
+		multiChoiceOptionsTemplate,
+		multiChoiceTemplateData{MultiChoice: *m},
+	)
+	if err != nil {
+		return err
+	}
 
-// 		if keycode == KeySpace {
-// 			if val, ok := checked[sel]; !ok {
-// 				checked[sel] = true
-// 			} else {
-// 				checked[sel] = !val
-// 			}
-// 		}
+	// print the summary
+	ansi.Println(strings.TrimRight(out, "\n"))
 
-// 		// // if the user presses enter
-// 		if keycode == KeyEnter {
-// 			// we're done with the rendering loop (the current value is good)
-// 			break
-// 		}
+	// nothing went wrong
+	return nil
+}
 
-// 		err = prompt.refreshOptions(checked, sel, initialLocation)
-// 		if err != nil {
-// 			return "", err
-// 		}
-// 	}
+func (m *MultiChoice) Prompt(rl *readline.Instance) (string, error) {
 
-// 	answers := []string{}
-// 	for ix, option := range prompt.Options {
-// 		if val, ok := checked[ix]; ok && val {
-// 			answers = append(answers, option)
-// 		}
-// 	}
-// 	*prompt.Answer = answers
-// 	// return the selected option
-// 	js, err := json.Marshal(answers)
-// 	if err != nil {
-// 		return "", err
-// 	}
-// 	return string(js), nil
-// }
+	// the readline config
+	config := &readline.Config{
+		Listener: m,
+		Stdout:   &core.DevNull{},
+	}
+	rl.SetConfig(config)
 
-// // Cleanup removes the options section, and renders the ask like a normal question.
-// func (prompt *MultiChoice) Cleanup(val string) error {
-// 	output, err := core.RunTemplate(
-// 		MultiChoiceQuestionTemplate,
-// 		MultiChoiceTemplateData{MultiChoice: *prompt, Answer: *prompt.Answer},
-// 	)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	return cleanupMultiOptions(len(prompt.Options), output)
-// }
+	// compute the default state
+	m.Checked = make(map[int]bool)
+	// if there is a default
+	if len(m.Defaults) > 0 {
+		for _, dflt := range m.Defaults {
+			for i, opt := range m.Options {
+				// if the option correponds to the default
+				if opt == dflt {
+					// we found our initial value
+					m.Checked[i] = true
+					// stop looking
+					break
+				}
+			}
+		}
+	}
 
-// func (prompt *MultiChoice) refreshOptions(checked map[int]bool, sel int, initLoc int) error {
-// 	out, err := core.RunTemplate(
-// 		MultiChoiceOptionsTemplate,
-// 		MultiChoiceTemplateData{MultiChoice: *prompt, Selected: sel, Checked: checked},
-// 	)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	// ask the question
-// 	tm.Print(strings.TrimRight(out, "\n"))
-// 	tm.Flush()
-// 	// make sure we overwrite the first line next time we print
-// 	tm.MoveCursor(initLoc, 1)
-// 	return nil
-// }
+	// if there are no options to render
+	if len(m.Options) == 0 {
+		// we failed
+		return "", errors.New("please provide options to select from")
+	}
+	// generate the template for the current state of the prompt
+	out, err := core.RunTemplate(
+		multiChoiceQuestionTemplate,
+		multiChoiceTemplateData{MultiChoice: *m},
+	)
+	if err != nil {
+		return "", err
+	}
+	// hide the cursor
+	ansi.CursorHide()
+	// ask the question
+	ansi.Println(out)
+	for range m.Options {
+		ansi.Println()
+	}
+
+	// start waiting for input
+	_, err = rl.Readline()
+	// if something went wrong
+	if err != nil {
+		return "", err
+	}
+	// show the cursor when we're done
+	ansi.CursorShow()
+
+	// nothing went wrong
+	return m.value()
+}
+
+func (m *MultiChoice) value() (string, error) {
+	answers := []string{}
+	for ix, option := range m.Options {
+		if val, ok := m.Checked[ix]; ok && val {
+			answers = append(answers, option)
+		}
+	}
+	// return the selected option
+	js, err := json.Marshal(answers)
+	if err != nil {
+		return "", err
+	}
+	return string(js), nil
+}
+
+// Cleanup removes the options section, and renders the ask like a normal question.
+func (m *MultiChoice) Cleanup(rl *readline.Instance, val string) error {
+	ansi.CursorPreviousLine(1)
+	ansi.EraseInLine(1)
+	for range m.Options {
+		ansi.CursorPreviousLine(1)
+		ansi.EraseInLine(1)
+	}
+
+	// parse the value into a list of strings
+	var value []string
+	json.Unmarshal([]byte(val), &value)
+
+	// execute the output summary template with the answer
+	output, err := core.RunTemplate(
+		multiChoiceQuestionTemplate,
+		multiChoiceTemplateData{MultiChoice: *m, Answer: value},
+	)
+	if err != nil {
+		return err
+	}
+	// render the summary
+	ansi.Println(output)
+
+	// nothing went wrong
+	return nil
+}
