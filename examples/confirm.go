@@ -7,11 +7,8 @@ import (
 )
 
 func main() {
-	var happy bool
 	prompt := &survey.Confirm{
 		Message: "Are you happy?",
-		Default: true,
-		Answer:  &happy,
 	}
 
 	answer, err := survey.AskOne(prompt)
@@ -22,5 +19,4 @@ func main() {
 	}
 
 	fmt.Printf("response string: %s\n", answer)
-	fmt.Printf("response happy: %t\n", happy)
 }
