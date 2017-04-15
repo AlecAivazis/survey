@@ -1,27 +1,33 @@
 package survey
 
-// func init() {
-// 	// disable color output for all prompts to simplify testing
-// 	core.DisableColor = true
-// }
+import (
+	"testing"
 
-// func TestPasswordFormatQuestion(t *testing.T) {
+	"github.com/alecaivazis/survey/core"
+)
 
-// 	prompt := &Input{
-// 		Message: "Tell me your secret:",
-// 	}
+func init() {
+	// disable color output for all prompts to simplify testing
+	core.DisableColor = true
+}
 
-// 	actual, err := core.RunTemplate(
-// 		PasswordQuestionTemplate,
-// 		*prompt,
-// 	)
-// 	if err != nil {
-// 		t.Errorf("Failed to run template to format password question: %s", err)
-// 	}
+func TestPasswordFormatQuestion(t *testing.T) {
 
-// 	expected := `? Tell me your secret: `
+	prompt := &Input{
+		Message: "Tell me your secret:",
+	}
 
-// 	if actual != expected {
-// 		t.Errorf("Formatted input question was not formatted correctly. Found:\n%s\nExpected:\n%s", actual, expected)
-// 	}
-// }
+	actual, err := core.RunTemplate(
+		passwordQuestionTemplate,
+		*prompt,
+	)
+	if err != nil {
+		t.Errorf("Failed to run template to format password question: %s", err)
+	}
+
+	expected := `? Tell me your secret: `
+
+	if actual != expected {
+		t.Errorf("Formatted input question was not formatted correctly. Found:\n%s\nExpected:\n%s", actual, expected)
+	}
+}

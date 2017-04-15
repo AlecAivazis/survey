@@ -5,6 +5,7 @@ import (
 
 	"github.com/alecaivazis/survey/core"
 	"github.com/chzyer/readline"
+	ansi "github.com/k0kubun/go-ansi"
 )
 
 // Input is a regular text input that prints each character the user types on the screen
@@ -44,5 +45,27 @@ func (i *Input) Prompt(rl *readline.Instance) (line string, err error) {
 	// get the next line
 	line, err = rl.Readline()
 	// we're done
-	return
+	return line, err
+}
+
+func (i *Input) Cleanup(rl *readline.Instance, val string) error {
+	// go up one line
+	ansi.CursorPreviousLine(1)
+	// clear the line
+	ansi.EraseInLine(1)
+
+	// render the template
+	out, err := core.RunTemplate(
+		inputQuestionTemplate,
+		inputTemplateData{Input: *i, Answer: val},
+	)
+	if err != nil {
+		return err
+	}
+
+	// print the summary
+	ansi.Println(out)
+
+	// we're done
+	return err
 }
