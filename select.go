@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"strings"
 
-	"github.com/alecaivazis/survey/core"
+	"github.com/alecaivazis/survey/terminal"
 	"github.com/chzyer/readline"
 )
 
@@ -41,14 +41,14 @@ const (
 // OnChange is called on every keypress.
 func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPos int, ok bool) {
 	// if the user pressed the enter key
-	if key == core.KeyEnter {
+	if key == terminal.KeyEnter {
 		return []rune(s.Options[s.SelectedIndex]), 0, true
 		// if the user pressed the up arrow
-	} else if key == core.KeyArrowUp && s.SelectedIndex > 0 {
+	} else if key == terminal.KeyArrowUp && s.SelectedIndex > 0 {
 		// decrement the selected index
 		s.SelectedIndex--
 		// if the user pressed down and there is room to move
-	} else if key == core.KeyArrowDown && s.SelectedIndex < len(s.Options)-1 {
+	} else if key == terminal.KeyArrowDown && s.SelectedIndex < len(s.Options)-1 {
 		// increment the selected index
 		s.SelectedIndex++
 	}
@@ -62,8 +62,8 @@ func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPo
 
 func (s *Select) render() error {
 	for range s.Options {
-		core.CursorPreviousLine(1)
-		core.EraseInLine(1)
+		terminal.CursorPreviousLine(1)
+		terminal.EraseInLine(1)
 	}
 
 	// the formatted response
@@ -76,7 +76,7 @@ func (s *Select) render() error {
 	}
 
 	// ask the question
-	core.Println(strings.TrimRight(out, "\n"))
+	terminal.Println(strings.TrimRight(out, "\n"))
 	// nothing went wrong
 	return nil
 }
@@ -122,16 +122,16 @@ func (s *Select) Prompt(rl *readline.Instance) (string, error) {
 	}
 
 	// hide the cursor
-	core.CursorHide()
+	terminal.CursorHide()
 	// ask the question
-	core.Println(out)
+	terminal.Println(out)
 	for range s.Options {
-		core.Println()
+		terminal.Println()
 	}
 	// start waiting for input
 	val, err := rl.Readline()
 	// show the cursor when we're done
-	core.CursorShow()
+	terminal.CursorShow()
 
 	//  if the value is empty (not sure why)
 	if val == "" {
@@ -150,11 +150,11 @@ func (s *Select) Prompt(rl *readline.Instance) (string, error) {
 }
 
 func (s *Select) Cleanup(rl *readline.Instance, val string) error {
-	core.CursorPreviousLine(1)
-	core.EraseInLine(1)
+	terminal.CursorPreviousLine(1)
+	terminal.EraseInLine(1)
 	for range s.Options {
-		core.CursorPreviousLine(1)
-		core.EraseInLine(1)
+		terminal.CursorPreviousLine(1)
+		terminal.EraseInLine(1)
 	}
 
 	// execute the output summary template with the answer
@@ -166,7 +166,7 @@ func (s *Select) Cleanup(rl *readline.Instance, val string) error {
 		return err
 	}
 	// render the summary
-	core.Println(output)
+	terminal.Println(output)
 
 	// nothing went wrong
 	return nil

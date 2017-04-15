@@ -3,9 +3,8 @@ package survey
 import (
 	"fmt"
 
+	"github.com/alecaivazis/survey/terminal"
 	"github.com/chzyer/readline"
-
-	"github.com/alecaivazis/survey/core"
 )
 
 // Input is a regular text input that prints each character the user types on the screen
@@ -50,9 +49,9 @@ func (i *Input) Prompt(rl *readline.Instance) (line string, err error) {
 
 func (i *Input) Cleanup(rl *readline.Instance, val string) error {
 	// go up one line
-	core.CursorPreviousLine(1)
+	terminal.CursorPreviousLine(1)
 	// clear the line
-	core.EraseInLine(1)
+	terminal.EraseInLine(1)
 
 	// render the template
 	out, err := RunTemplate(
@@ -64,7 +63,7 @@ func (i *Input) Cleanup(rl *readline.Instance, val string) error {
 	}
 
 	// print the summary
-	core.Println(out)
+	terminal.Println(out)
 
 	// we're done
 	return err

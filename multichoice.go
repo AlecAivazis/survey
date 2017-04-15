@@ -6,9 +6,8 @@ import (
 	"io/ioutil"
 	"strings"
 
+	"github.com/alecaivazis/survey/terminal"
 	"github.com/chzyer/readline"
-
-	"github.com/alecaivazis/survey/core"
 )
 
 // MultiChoice is a prompt that presents a list of various options to the user
@@ -45,17 +44,17 @@ var MultiChoiceOptionsTemplate = `
 
 // OnChange is called on every keypress.
 func (m *MultiChoice) OnChange(line []rune, pos int, key rune) (newLine []rune, newPos int, ok bool) {
-	if key == core.KeyEnter {
+	if key == terminal.KeyEnter {
 		// just pass on the current value
 		return line, 0, true
-	} else if key == core.KeyArrowUp && m.selectedIndex > 0 {
+	} else if key == terminal.KeyArrowUp && m.selectedIndex > 0 {
 		// decrement the selected index
 		m.selectedIndex--
-	} else if key == core.KeyArrowDown && m.selectedIndex < len(m.Options)-1 {
+	} else if key == terminal.KeyArrowDown && m.selectedIndex < len(m.Options)-1 {
 		// if the user pressed down and there is room to move
 		// increment the selected index
 		m.selectedIndex++
-	} else if key == core.KeySpace {
+	} else if key == terminal.KeySpace {
 		if old, ok := m.checked[m.selectedIndex]; !ok {
 			// otherwise just invert the current value
 			m.checked[m.selectedIndex] = true
@@ -76,8 +75,8 @@ func (m *MultiChoice) OnChange(line []rune, pos int, key rune) (newLine []rune, 
 func (m *MultiChoice) render() error {
 	// clean up what we left behind last time
 	for range m.Options {
-		core.CursorPreviousLine(1)
-		core.EraseInLine(1)
+		terminal.CursorPreviousLine(1)
+		terminal.EraseInLine(1)
 	}
 
 	// render the template summarizing the current state
@@ -94,7 +93,7 @@ func (m *MultiChoice) render() error {
 	}
 
 	// print the summary
-	core.Println(strings.TrimRight(out, "\n"))
+	terminal.Println(strings.TrimRight(out, "\n"))
 
 	// nothing went wrong
 	return nil
@@ -150,11 +149,11 @@ func (m *MultiChoice) Prompt(rl *readline.Instance) (string, error) {
 		return "", err
 	}
 	// hide the cursor
-	core.CursorHide()
+	terminal.CursorHide()
 	// ask the question
-	core.Println(out)
+	terminal.Println(out)
 	for range m.Options {
-		core.Println()
+		terminal.Println()
 	}
 
 	// start waiting for input
@@ -164,7 +163,7 @@ func (m *MultiChoice) Prompt(rl *readline.Instance) (string, error) {
 		return "", err
 	}
 	// show the cursor when we're done
-	core.CursorShow()
+	terminal.CursorShow()
 
 	answers := []string{}
 	for ix, option := range m.Options {
@@ -195,11 +194,11 @@ func (m *MultiChoice) value() (string, error) {
 
 // Cleanup removes the options section, and renders the ask like a normal question.
 func (m *MultiChoice) Cleanup(rl *readline.Instance, val string) error {
-	core.CursorPreviousLine(1)
-	core.EraseInLine(1)
+	terminal.CursorPreviousLine(1)
+	terminal.EraseInLine(1)
 	for range m.Options {
-		core.CursorPreviousLine(1)
-		core.EraseInLine(1)
+		terminal.CursorPreviousLine(1)
+		terminal.EraseInLine(1)
 	}
 
 	// parse the value into a list of strings
@@ -220,7 +219,7 @@ func (m *MultiChoice) Cleanup(rl *readline.Instance, val string) error {
 		return err
 	}
 	// render the summary
-	core.Println(output)
+	terminal.Println(output)
 
 	// nothing went wrong
 	return nil
