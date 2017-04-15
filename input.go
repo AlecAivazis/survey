@@ -3,7 +3,6 @@ package survey
 import (
 	"fmt"
 
-	"github.com/alecaivazis/survey/core"
 	"github.com/chzyer/readline"
 	ansi "github.com/k0kubun/go-ansi"
 )
@@ -33,7 +32,7 @@ var inputQuestionTemplate = `
 
 func (i *Input) Prompt(rl *readline.Instance) (line string, err error) {
 	// render the template
-	out, err := core.RunTemplate(
+	out, err := RunTemplate(
 		inputQuestionTemplate,
 		inputTemplateData{Input: *i},
 	)
@@ -55,7 +54,7 @@ func (i *Input) Cleanup(rl *readline.Instance, val string) error {
 	ansi.EraseInLine(1)
 
 	// render the template
-	out, err := core.RunTemplate(
+	out, err := RunTemplate(
 		inputQuestionTemplate,
 		inputTemplateData{Input: *i, Answer: val},
 	)

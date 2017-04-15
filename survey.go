@@ -74,7 +74,7 @@ func Ask(qs []*Question) (map[string]string, error) {
 		if q.Validate != nil {
 			// wait for a valid response
 			for invalid := q.Validate(ans); invalid != nil; invalid = q.Validate(ans) {
-				out, err := core.RunTemplate(errorTemplate, invalid)
+				out, err := RunTemplate(errorTemplate, invalid)
 				if err != nil {
 					return nil, err
 				}

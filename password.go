@@ -1,7 +1,6 @@
 package survey
 
 import (
-	"github.com/alecaivazis/survey/core"
 	"github.com/chzyer/readline"
 )
 
@@ -18,7 +17,7 @@ var passwordQuestionTemplate = `
 
 func (p *Password) Prompt(rl *readline.Instance) (line string, err error) {
 	// render the question template
-	out, err := core.RunTemplate(
+	out, err := RunTemplate(
 		passwordQuestionTemplate,
 		*p,
 	)

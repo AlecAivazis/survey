@@ -2,13 +2,11 @@ package survey
 
 import (
 	"testing"
-
-	"github.com/alecaivazis/survey/core"
 )
 
 func init() {
 	// disable color output for all prompts to simplify testing
-	core.DisableColor = true
+	DisableColor = true
 }
 
 func TestPasswordFormatQuestion(t *testing.T) {
@@ -17,7 +15,7 @@ func TestPasswordFormatQuestion(t *testing.T) {
 		Message: "Tell me your secret:",
 	}
 
-	actual, err := core.RunTemplate(
+	actual, err := RunTemplate(
 		passwordQuestionTemplate,
 		*prompt,
 	)

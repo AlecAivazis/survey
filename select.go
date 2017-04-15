@@ -69,7 +69,7 @@ func (s *Select) render() error {
 	}
 
 	// the formatted response
-	out, err := core.RunTemplate(
+	out, err := RunTemplate(
 		selectChoicesTemplate,
 		SelectTemplateData{Select: *s},
 	)
@@ -115,7 +115,7 @@ func (s *Select) Prompt(rl *readline.Instance) (string, error) {
 	s.SelectedIndex = sel
 
 	// render the initial question
-	out, err := core.RunTemplate(
+	out, err := RunTemplate(
 		selectQuestionTemplate,
 		SelectTemplateData{Select: *s},
 	)
@@ -160,7 +160,7 @@ func (s *Select) Cleanup(rl *readline.Instance, val string) error {
 	}
 
 	// execute the output summary template with the answer
-	output, err := core.RunTemplate(
+	output, err := RunTemplate(
 		selectQuestionTemplate,
 		SelectTemplateData{Select: *s, Answer: val},
 	)

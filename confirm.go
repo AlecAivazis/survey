@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/alecaivazis/survey/core"
 	"github.com/chzyer/readline"
 	ansi "github.com/k0kubun/go-ansi"
 )
@@ -65,7 +64,7 @@ func (c *Confirm) getBool(rl *readline.Instance) (bool, error) {
 		answer = c.Default
 	default:
 		// we didnt get a valid answer, so print error and prompt again
-		out, err := core.RunTemplate(
+		out, err := RunTemplate(
 			errorTemplate, fmt.Errorf("%q is not a valid answer, please try again.", val),
 		)
 		// if something went wrong
@@ -98,7 +97,7 @@ func (c *Confirm) Prompt(rl *readline.Instance) (string, error) {
 	}
 
 	// render the question template
-	out, err := core.RunTemplate(
+	out, err := RunTemplate(
 		confirmQuestionTemplate,
 		confirmTemplateData{Confirm: *c},
 	)
@@ -132,7 +131,7 @@ func (c *Confirm) Cleanup(rl *readline.Instance, val string) error {
 	ansi.EraseInLine(1)
 
 	// render the template
-	out, err := core.RunTemplate(
+	out, err := RunTemplate(
 		confirmQuestionTemplate,
 		confirmTemplateData{Confirm: *c, Answer: val},
 	)

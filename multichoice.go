@@ -57,8 +57,14 @@ func (m *MultiChoice) OnChange(line []rune, pos int, key rune) (newLine []rune, 
 		// increment the selected index
 		m.SelectedIndex++
 	} else if key == core.KeySpace {
-		// otherwise just invert the current value
-		m.Checked[m.SelectedIndex] = true
+		if old, ok := m.Checked[m.SelectedIndex]; !ok {
+			// otherwise just invert the current value
+			m.Checked[m.SelectedIndex] = true
+		} else {
+			// otherwise just invert the current value
+			m.Checked[m.SelectedIndex] = !old
+		}
+
 	}
 
 	// print the template summarizing the current state of the selection
@@ -79,7 +85,7 @@ func (m *MultiChoice) render() error {
 	}
 
 	// render the template summarizing the current state
-	out, err := core.RunTemplate(
+	out, err := RunTemplate(
 		multiChoiceOptionsTemplate,
 		multiChoiceTemplateData{MultiChoice: *m},
 	)
@@ -132,7 +138,7 @@ func (m *MultiChoice) Prompt(rl *readline.Instance) (string, error) {
 		return "", errors.New("please provide options to select from")
 	}
 	// generate the template for the current state of the prompt
-	out, err := core.RunTemplate(
+	out, err := RunTemplate(
 		multiChoiceQuestionTemplate,
 		multiChoiceTemplateData{MultiChoice: *m},
 	)
@@ -197,7 +203,7 @@ func (m *MultiChoice) Cleanup(rl *readline.Instance, val string) error {
 	json.Unmarshal([]byte(val), &value)
 
 	// execute the output summary template with the answer
-	output, err := core.RunTemplate(
+	output, err := RunTemplate(
 		multiChoiceQuestionTemplate,
 		multiChoiceTemplateData{MultiChoice: *m, Answer: value},
 	)

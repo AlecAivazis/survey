@@ -3,20 +3,18 @@ package survey
 import (
 	"fmt"
 	"testing"
-
-	"github.com/alecaivazis/survey/core"
 )
 
 func init() {
 	// disable color output for all prompts to simplify testing
-	core.DisableColor = true
+	DisableColor = true
 }
 
 func TestValidationError(t *testing.T) {
 
 	err := fmt.Errorf("Football is not a valid month")
 
-	actual, err := core.RunTemplate(
+	actual, err := RunTemplate(
 		errorTemplate,
 		err,
 	)

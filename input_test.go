@@ -2,13 +2,11 @@ package survey
 
 import (
 	"testing"
-
-	"github.com/alecaivazis/survey/core"
 )
 
 func init() {
 	// disable color output for all prompts to simplify testing
-	core.DisableColor = true
+	DisableColor = true
 }
 
 func TestInputFormatQuestion(t *testing.T) {
@@ -18,7 +16,7 @@ func TestInputFormatQuestion(t *testing.T) {
 		Default: "April",
 	}
 
-	actual, err := core.RunTemplate(
+	actual, err := RunTemplate(
 		inputQuestionTemplate,
 		inputTemplateData{Input: *prompt},
 	)
@@ -40,7 +38,7 @@ func TestInputFormatAnswer(t *testing.T) {
 		Default: "April",
 	}
 
-	actual, err := core.RunTemplate(
+	actual, err := RunTemplate(
 		inputQuestionTemplate,
 		inputTemplateData{Input: *prompt, Answer: "October"},
 	)

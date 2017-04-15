@@ -2,13 +2,11 @@ package survey
 
 import (
 	"testing"
-
-	"github.com/alecaivazis/survey/core"
 )
 
 func init() {
 	// disable color output for all prompts to simplify testing
-	core.DisableColor = true
+	DisableColor = true
 }
 
 func TestCanFormatSelectOptions(t *testing.T) {
@@ -20,7 +18,7 @@ func TestCanFormatSelectOptions(t *testing.T) {
 	// TODO: figure out a way for the test to actually test this bit of code
 	prompt.SelectedIndex = 2
 
-	actual, err := core.RunTemplate(
+	actual, err := RunTemplate(
 		selectChoicesTemplate,
 		SelectTemplateData{Select: *prompt},
 	)
@@ -48,7 +46,7 @@ func TestSelectFormatQuestion(t *testing.T) {
 		Default: "baz",
 	}
 
-	actual, err := core.RunTemplate(
+	actual, err := RunTemplate(
 		selectQuestionTemplate,
 		SelectTemplateData{Select: *prompt},
 	)
@@ -71,7 +69,7 @@ func TestSelectFormatAnswer(t *testing.T) {
 		Default: "baz",
 	}
 
-	actual, err := core.RunTemplate(
+	actual, err := RunTemplate(
 		selectQuestionTemplate,
 		SelectTemplateData{Select: *prompt, Answer: "buz"},
 	)
