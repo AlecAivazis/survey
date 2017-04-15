@@ -5,10 +5,8 @@ import (
 	"io/ioutil"
 	"strings"
 
-	"github.com/chzyer/readline"
-	ansi "github.com/k0kubun/go-ansi"
-
 	"github.com/alecaivazis/survey/core"
+	"github.com/chzyer/readline"
 )
 
 // Select is a prompt that presents a list of various options to the user
@@ -64,8 +62,8 @@ func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPo
 
 func (s *Select) render() error {
 	for range s.Options {
-		ansi.CursorPreviousLine(1)
-		ansi.EraseInLine(1)
+		core.CursorPreviousLine(1)
+		core.EraseInLine(1)
 	}
 
 	// the formatted response
@@ -78,7 +76,7 @@ func (s *Select) render() error {
 	}
 
 	// ask the question
-	ansi.Println(strings.TrimRight(out, "\n"))
+	core.Println(strings.TrimRight(out, "\n"))
 	// nothing went wrong
 	return nil
 }
@@ -124,16 +122,16 @@ func (s *Select) Prompt(rl *readline.Instance) (string, error) {
 	}
 
 	// hide the cursor
-	ansi.CursorHide()
+	core.CursorHide()
 	// ask the question
-	ansi.Println(out)
+	core.Println(out)
 	for range s.Options {
-		ansi.Println()
+		core.Println()
 	}
 	// start waiting for input
 	val, err := rl.Readline()
 	// show the cursor when we're done
-	ansi.CursorShow()
+	core.CursorShow()
 
 	//  if the value is empty (not sure why)
 	if val == "" {
@@ -152,11 +150,11 @@ func (s *Select) Prompt(rl *readline.Instance) (string, error) {
 }
 
 func (s *Select) Cleanup(rl *readline.Instance, val string) error {
-	ansi.CursorPreviousLine(1)
-	ansi.EraseInLine(1)
+	core.CursorPreviousLine(1)
+	core.EraseInLine(1)
 	for range s.Options {
-		ansi.CursorPreviousLine(1)
-		ansi.EraseInLine(1)
+		core.CursorPreviousLine(1)
+		core.EraseInLine(1)
 	}
 
 	// execute the output summary template with the answer
@@ -168,7 +166,7 @@ func (s *Select) Cleanup(rl *readline.Instance, val string) error {
 		return err
 	}
 	// render the summary
-	ansi.Println(output)
+	core.Println(output)
 
 	// nothing went wrong
 	return nil

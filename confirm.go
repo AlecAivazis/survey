@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"regexp"
 
+	"github.com/alecaivazis/survey/core"
 	"github.com/chzyer/readline"
-	ansi "github.com/k0kubun/go-ansi"
 )
 
 // Confirm is a regular text input that accept yes/no answers.
@@ -73,7 +73,7 @@ func (c *Confirm) getBool(rl *readline.Instance) (bool, error) {
 			return c.Default, err
 		}
 		// send the message to the user
-		ansi.Print(out)
+		core.Print(out)
 
 		answer, err = c.getBool(rl)
 		// if something went wrong
@@ -126,9 +126,9 @@ func (c *Confirm) Prompt(rl *readline.Instance) (string, error) {
 // Cleanup overwrite the line with the finalized formatted version
 func (c *Confirm) Cleanup(rl *readline.Instance, val string) error {
 	// go up one line
-	ansi.CursorPreviousLine(1)
+	core.CursorPreviousLine(1)
 	// clear the line
-	ansi.EraseInLine(1)
+	core.EraseInLine(1)
 
 	// render the template
 	out, err := RunTemplate(
@@ -140,7 +140,7 @@ func (c *Confirm) Cleanup(rl *readline.Instance, val string) error {
 	}
 
 	// print the summary
-	ansi.Println(out)
+	core.Println(out)
 
 	// we're done
 	return nil

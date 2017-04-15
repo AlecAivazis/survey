@@ -3,13 +3,12 @@ package survey
 import (
 	"encoding/json"
 	"errors"
+	"io/ioutil"
 	"strings"
 
-	"io/ioutil"
+	"github.com/chzyer/readline"
 
 	"github.com/alecaivazis/survey/core"
-	"github.com/chzyer/readline"
-	ansi "github.com/k0kubun/go-ansi"
 )
 
 // MultiChoice is a prompt that presents a list of various options to the user
@@ -77,8 +76,8 @@ func (m *MultiChoice) OnChange(line []rune, pos int, key rune) (newLine []rune, 
 func (m *MultiChoice) render() error {
 	// clean up what we left behind last time
 	for range m.Options {
-		ansi.CursorPreviousLine(1)
-		ansi.EraseInLine(1)
+		core.CursorPreviousLine(1)
+		core.EraseInLine(1)
 	}
 
 	// render the template summarizing the current state
@@ -95,7 +94,7 @@ func (m *MultiChoice) render() error {
 	}
 
 	// print the summary
-	ansi.Println(strings.TrimRight(out, "\n"))
+	core.Println(strings.TrimRight(out, "\n"))
 
 	// nothing went wrong
 	return nil
@@ -151,11 +150,11 @@ func (m *MultiChoice) Prompt(rl *readline.Instance) (string, error) {
 		return "", err
 	}
 	// hide the cursor
-	ansi.CursorHide()
+	core.CursorHide()
 	// ask the question
-	ansi.Println(out)
+	core.Println(out)
 	for range m.Options {
-		ansi.Println()
+		core.Println()
 	}
 
 	// start waiting for input
@@ -165,7 +164,7 @@ func (m *MultiChoice) Prompt(rl *readline.Instance) (string, error) {
 		return "", err
 	}
 	// show the cursor when we're done
-	ansi.CursorShow()
+	core.CursorShow()
 
 	answers := []string{}
 	for ix, option := range m.Options {
@@ -196,11 +195,11 @@ func (m *MultiChoice) value() (string, error) {
 
 // Cleanup removes the options section, and renders the ask like a normal question.
 func (m *MultiChoice) Cleanup(rl *readline.Instance, val string) error {
-	ansi.CursorPreviousLine(1)
-	ansi.EraseInLine(1)
+	core.CursorPreviousLine(1)
+	core.EraseInLine(1)
 	for range m.Options {
-		ansi.CursorPreviousLine(1)
-		ansi.EraseInLine(1)
+		core.CursorPreviousLine(1)
+		core.EraseInLine(1)
 	}
 
 	// parse the value into a list of strings
@@ -221,7 +220,7 @@ func (m *MultiChoice) Cleanup(rl *readline.Instance, val string) error {
 		return err
 	}
 	// render the summary
-	ansi.Println(output)
+	core.Println(output)
 
 	// nothing went wrong
 	return nil
