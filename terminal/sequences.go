@@ -1,4 +1,4 @@
-package core
+package terminal
 
 const (
 	KeyArrowLeft  = '\x02'

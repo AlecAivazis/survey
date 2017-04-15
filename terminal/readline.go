@@ -1,4 +1,4 @@
-package core
+package terminal
 
 // this file defines the interface between readline and the rest of the package
 

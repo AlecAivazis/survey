@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/alecaivazis/survey/core"
+	"github.com/alecaivazis/survey/terminal"
 	"github.com/chzyer/readline"
-	// tm "github.com/buger/goterm"
 )
 
 // Validator is a function passed to a Question in order to redefine
@@ -54,7 +53,7 @@ func handleError(err error) {
 // Ask performs the prompt loop
 func Ask(qs []*Question) (map[string]string, error) {
 	// grab the readline instance
-	rl, err := core.GetReadline()
+	rl, err := terminal.GetReadline()
 	if err != nil {
 		handleError(err)
 	}
