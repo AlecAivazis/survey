@@ -2,6 +2,7 @@ package survey
 
 import (
 	"errors"
+	"io/ioutil"
 	"strings"
 
 	"github.com/chzyer/readline"
@@ -85,7 +86,7 @@ func (s *Select) render() error {
 func (s *Select) Prompt(rl *readline.Instance) (string, error) {
 	config := &readline.Config{
 		Listener: s,
-		Stdout:   &core.DevNull{},
+		Stdout:   ioutil.Discard,
 	}
 	rl.SetConfig(config)
 

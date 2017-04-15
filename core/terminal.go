@@ -26,10 +26,3 @@ func (t *Terminal) SoundBell() {
 	fmt.Fprintf(t, "%c", readline.CharBell)
 	t.Bell()
 }
-
-// DevNull is a writer that writes no where (ie, leave the printing up to me)
-type DevNull struct{}
-
-func (dn *DevNull) Write(p []byte) (n int, err error) {
-	return len(p), nil
-}

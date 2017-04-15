@@ -31,7 +31,6 @@ func (p *Password) Prompt(rl *readline.Instance) (line string, err error) {
 	// use the right prompt (make sure there is an empty space after the prompt)
 	config.Prompt = out + " "
 
-	// config.Stdout = &core.DevNull{}
 	config.MaskRune = '*'
 
 	// ask for the user's Password

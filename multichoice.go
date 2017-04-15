@@ -5,6 +5,8 @@ import (
 	"errors"
 	"strings"
 
+	"io/ioutil"
+
 	"github.com/alecaivazis/survey/core"
 	"github.com/chzyer/readline"
 	ansi "github.com/k0kubun/go-ansi"
@@ -103,7 +105,7 @@ func (m *MultiChoice) Prompt(rl *readline.Instance) (string, error) {
 	// the readline config
 	config := &readline.Config{
 		Listener: m,
-		Stdout:   &core.DevNull{},
+		Stdout:   ioutil.Discard,
 	}
 	rl.SetConfig(config)
 
