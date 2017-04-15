@@ -17,9 +17,9 @@ var simpleQs = []*survey.Question{
 	},
 	{
 		Name: "color",
-		Prompt: &survey.Choice{
+		Prompt: &survey.Select{
 			Message: "Choose a color:",
-			Choices: []string{"red", "blue", "green"},
+			Options: []string{"red", "blue", "green"},
 		},
 		Validate: survey.Required,
 	},
