@@ -13,6 +13,7 @@ import (
 type Confirm struct {
 	Message string
 	Default bool
+	Answer  *bool
 }
 
 // data available to the templates when processing
@@ -89,6 +90,13 @@ func (c *Confirm) getBool(rl *readline.Instance) (bool, error) {
 // Prompt prompts the user with a simple text field and expects a reply followed
 // by a carriage return.
 func (c *Confirm) Prompt(rl *readline.Instance) (string, error) {
+	// if we weren't passed an answer
+	if c.Answer == nil {
+		// build one
+		answer := false
+		c.Answer = &answer
+	}
+
 	// render the question template
 	out, err := core.RunTemplate(
 		confirmQuestionTemplate,
@@ -108,6 +116,9 @@ func (c *Confirm) Prompt(rl *readline.Instance) (string, error) {
 		// bubble up
 		return "", err
 	}
+
+	// return the value
+	*c.Answer = answer
 
 	// convert the boolean into the appropriate string
 	return yesNo(answer), nil

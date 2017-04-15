@@ -93,6 +93,12 @@ func (m *MultiChoice) render() error {
 }
 
 func (m *MultiChoice) Prompt(rl *readline.Instance) (string, error) {
+	// if the user didn't pass an answer reference
+	if m.Answer == nil {
+		// build one
+		answer := []string{}
+		m.Answer = &answer
+	}
 
 	// the readline config
 	config := &readline.Config{
@@ -147,6 +153,14 @@ func (m *MultiChoice) Prompt(rl *readline.Instance) (string, error) {
 	}
 	// show the cursor when we're done
 	ansi.CursorShow()
+
+	answers := []string{}
+	for ix, option := range m.Options {
+		if val, ok := m.Checked[ix]; ok && val {
+			answers = append(answers, option)
+		}
+	}
+	*m.Answer = answers
 
 	// nothing went wrong
 	return m.value()
