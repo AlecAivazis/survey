@@ -26,7 +26,7 @@ type Prompt interface {
 	Cleanup(*readline.Instance, string) error
 }
 
-var errorTemplate = `{{color "red"}}✘ Sorry, your reply was invalid: {{.Error}}{{color "reset"}}
+var ErrorTemplate = `{{color "red"}}✘ Sorry, your reply was invalid: {{.Error}}{{color "reset"}}
 `
 
 // AskOne asks a single question without performing validation on the answer.
@@ -74,7 +74,7 @@ func Ask(qs []*Question) (map[string]string, error) {
 		if q.Validate != nil {
 			// wait for a valid response
 			for invalid := q.Validate(ans); invalid != nil; invalid = q.Validate(ans) {
-				out, err := RunTemplate(errorTemplate, invalid)
+				out, err := RunTemplate(ErrorTemplate, invalid)
 				if err != nil {
 					return nil, err
 				}

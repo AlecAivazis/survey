@@ -15,13 +15,13 @@ type Input struct {
 }
 
 // data available to the templates when processing
-type inputTemplateData struct {
+type InputTemplateData struct {
 	Input
 	Answer string
 }
 
 // Templates with Color formatting. See Documentation: https://github.com/mgutz/ansi#style-format
-var inputQuestionTemplate = `
+var InputQuestionTemplate = `
 {{- color "green+hb"}}? {{color "reset"}}
 {{- color "default+hb"}}{{ .Message }} {{color "reset"}}
 {{- if .Answer}}
@@ -33,8 +33,8 @@ var inputQuestionTemplate = `
 func (i *Input) Prompt(rl *readline.Instance) (line string, err error) {
 	// render the template
 	out, err := RunTemplate(
-		inputQuestionTemplate,
-		inputTemplateData{Input: *i},
+		InputQuestionTemplate,
+		InputTemplateData{Input: *i},
 	)
 	if err != nil {
 		return "", err
@@ -55,8 +55,8 @@ func (i *Input) Cleanup(rl *readline.Instance, val string) error {
 
 	// render the template
 	out, err := RunTemplate(
-		inputQuestionTemplate,
-		inputTemplateData{Input: *i, Answer: val},
+		InputQuestionTemplate,
+		InputTemplateData{Input: *i, Answer: val},
 	)
 	if err != nil {
 		return err

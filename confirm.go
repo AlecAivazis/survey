@@ -16,13 +16,13 @@ type Confirm struct {
 }
 
 // data available to the templates when processing
-type confirmTemplateData struct {
+type ConfirmTemplateData struct {
 	Confirm
 	Answer string
 }
 
 // Templates with Color formatting. See Documentation: https://github.com/mgutz/ansi#style-format
-var confirmQuestionTemplate = `
+var ConfirmQuestionTemplate = `
 {{- color "green+hb"}}? {{color "reset"}}
 {{- color "default+hb"}}{{ .Message }} {{color "reset"}}
 {{- if .Answer}}
@@ -65,7 +65,7 @@ func (c *Confirm) getBool(rl *readline.Instance) (bool, error) {
 	default:
 		// we didnt get a valid answer, so print error and prompt again
 		out, err := RunTemplate(
-			errorTemplate, fmt.Errorf("%q is not a valid answer, please try again.", val),
+			ErrorTemplate, fmt.Errorf("%q is not a valid answer, please try again.", val),
 		)
 		// if something went wrong
 		if err != nil {
@@ -98,8 +98,8 @@ func (c *Confirm) Prompt(rl *readline.Instance) (string, error) {
 
 	// render the question template
 	out, err := RunTemplate(
-		confirmQuestionTemplate,
-		confirmTemplateData{Confirm: *c},
+		ConfirmQuestionTemplate,
+		ConfirmTemplateData{Confirm: *c},
 	)
 	if err != nil {
 		return "", err
@@ -132,8 +132,8 @@ func (c *Confirm) Cleanup(rl *readline.Instance, val string) error {
 
 	// render the template
 	out, err := RunTemplate(
-		confirmQuestionTemplate,
-		confirmTemplateData{Confirm: *c, Answer: val},
+		ConfirmQuestionTemplate,
+		ConfirmTemplateData{Confirm: *c, Answer: val},
 	)
 	if err != nil {
 		return err

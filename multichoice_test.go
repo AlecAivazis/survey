@@ -16,7 +16,11 @@ func TestCanFormatMultiChoiceOptions(t *testing.T) {
 
 	actual, err := RunTemplate(
 		MultiChoiceOptionsTemplate,
-		MultiChoiceTemplateData{MultiChoice: *prompt, Selected: 2, Checked: map[int]bool{1: true, 3: true}},
+		MultiChoiceTemplateData{
+			MultiChoice:   *prompt,
+			SelectedIndex: 2,
+			Checked:       map[int]bool{1: true, 3: true},
+		},
 	)
 
 	if err != nil {

@@ -16,7 +16,7 @@ func TestPasswordFormatQuestion(t *testing.T) {
 	}
 
 	actual, err := RunTemplate(
-		passwordQuestionTemplate,
+		PasswordQuestionTemplate,
 		*prompt,
 	)
 	if err != nil {

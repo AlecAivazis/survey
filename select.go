@@ -27,12 +27,12 @@ type SelectTemplateData struct {
 }
 
 const (
-	selectQuestionTemplate = `
+	SelectQuestionTemplate = `
 {{- color "green+hb"}}? {{color "reset"}}
 {{- color "default+hb"}}{{ .Message }} {{color "reset"}}
 {{- if .Answer}}{{color "cyan"}}{{.Answer}}{{color "reset"}}{{end}}`
 	// the template used to show the list of Selects
-	selectChoicesTemplate = `
+	SelectChoicesTemplate = `
 {{- range $ix, $choice := .Options}}
   {{- if eq $ix $.Select.SelectedIndex}}{{color "cyan+b"}}> {{else}}{{color "default+hb"}}  {{end}}
   {{- $choice}}
@@ -70,7 +70,7 @@ func (s *Select) render() error {
 
 	// the formatted response
 	out, err := RunTemplate(
-		selectChoicesTemplate,
+		SelectChoicesTemplate,
 		SelectTemplateData{Select: *s},
 	)
 	if err != nil {
@@ -116,7 +116,7 @@ func (s *Select) Prompt(rl *readline.Instance) (string, error) {
 
 	// render the initial question
 	out, err := RunTemplate(
-		selectQuestionTemplate,
+		SelectQuestionTemplate,
 		SelectTemplateData{Select: *s},
 	)
 	if err != nil {
@@ -161,7 +161,7 @@ func (s *Select) Cleanup(rl *readline.Instance, val string) error {
 
 	// execute the output summary template with the answer
 	output, err := RunTemplate(
-		selectQuestionTemplate,
+		SelectQuestionTemplate,
 		SelectTemplateData{Select: *s, Answer: val},
 	)
 	if err != nil {

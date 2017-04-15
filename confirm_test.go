@@ -17,8 +17,8 @@ func TestConfirmFormatQuestion(t *testing.T) {
 	}
 
 	actual, err := RunTemplate(
-		confirmQuestionTemplate,
-		confirmTemplateData{Confirm: *prompt},
+		ConfirmQuestionTemplate,
+		ConfirmTemplateData{Confirm: *prompt},
 	)
 	if err != nil {
 		t.Errorf("Failed to run template to format input question: %s", err)
@@ -39,8 +39,8 @@ func TestConfirmFormatQuestionDefaultFalse(t *testing.T) {
 	}
 
 	actual, err := RunTemplate(
-		confirmQuestionTemplate,
-		confirmTemplateData{Confirm: *prompt},
+		ConfirmQuestionTemplate,
+		ConfirmTemplateData{Confirm: *prompt},
 	)
 	if err != nil {
 		t.Errorf("Failed to run template to format input answer: %s", err)
@@ -61,8 +61,8 @@ func TestConfirmFormatAnswer(t *testing.T) {
 	}
 
 	actual, err := RunTemplate(
-		confirmQuestionTemplate,
-		confirmTemplateData{Confirm: *prompt, Answer: "Yes"},
+		ConfirmQuestionTemplate,
+		ConfirmTemplateData{Confirm: *prompt, Answer: "Yes"},
 	)
 	if err != nil {
 		t.Errorf("Failed to run template to format input answer: %s", err)

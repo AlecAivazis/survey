@@ -17,8 +17,8 @@ func TestInputFormatQuestion(t *testing.T) {
 	}
 
 	actual, err := RunTemplate(
-		inputQuestionTemplate,
-		inputTemplateData{Input: *prompt},
+		InputQuestionTemplate,
+		InputTemplateData{Input: *prompt},
 	)
 	if err != nil {
 		t.Errorf("Failed to run template to format input question: %s", err)
@@ -39,8 +39,8 @@ func TestInputFormatAnswer(t *testing.T) {
 	}
 
 	actual, err := RunTemplate(
-		inputQuestionTemplate,
-		inputTemplateData{Input: *prompt, Answer: "October"},
+		InputQuestionTemplate,
+		InputTemplateData{Input: *prompt, Answer: "October"},
 	)
 	if err != nil {
 		t.Errorf("Failed to run template to format input answer: %s", err)

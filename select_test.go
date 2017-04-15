@@ -19,7 +19,7 @@ func TestCanFormatSelectOptions(t *testing.T) {
 	prompt.SelectedIndex = 2
 
 	actual, err := RunTemplate(
-		selectChoicesTemplate,
+		SelectChoicesTemplate,
 		SelectTemplateData{Select: *prompt},
 	)
 
@@ -47,7 +47,7 @@ func TestSelectFormatQuestion(t *testing.T) {
 	}
 
 	actual, err := RunTemplate(
-		selectQuestionTemplate,
+		SelectQuestionTemplate,
 		SelectTemplateData{Select: *prompt},
 	)
 	if err != nil {
@@ -70,7 +70,7 @@ func TestSelectFormatAnswer(t *testing.T) {
 	}
 
 	actual, err := RunTemplate(
-		selectQuestionTemplate,
+		SelectQuestionTemplate,
 		SelectTemplateData{Select: *prompt, Answer: "buz"},
 	)
 	if err != nil {

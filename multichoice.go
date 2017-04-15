@@ -19,27 +19,27 @@ type MultiChoice struct {
 	Options       []string
 	Defaults      []string
 	Answer        *[]string
-	SelectedIndex int
-	Checked       map[int]bool
+	selectedIndex int
+	checked       map[int]bool
 }
 
 // data available to the templates when processing
-type multiChoiceTemplateData struct {
+type MultiChoiceTemplateData struct {
 	MultiChoice
 	Answer        []string
 	Checked       map[int]bool
 	SelectedIndex int
 }
 
-var multiChoiceQuestionTemplate = `
+var MultiChoiceQuestionTemplate = `
 {{- color "green+hb"}}? {{color "reset"}}
 {{- color "default+hb"}}{{ .Message }} {{color "reset"}}
 {{- if .Answer}}{{color "cyan"}}{{.Answer | printf "%q"}}{{color "reset"}}{{end}}`
 
-var multiChoiceOptionsTemplate = `
+var MultiChoiceOptionsTemplate = `
 {{- range $ix, $option := .Options}}
-  {{- if eq $ix $.MultiChoice.SelectedIndex}}{{color "cyan"}}❯{{color "reset"}}{{else}} {{end}}
-  {{- if index $.MultiChoice.Checked $ix}}{{color "green"}} ◉ {{else}}{{color "default+hb"}} ◯ {{end}}
+  {{- if eq $ix $.SelectedIndex}}{{color "cyan"}}❯{{color "reset"}}{{else}} {{end}}
+  {{- if index $.Checked $ix}}{{color "green"}} ◉ {{else}}{{color "default+hb"}} ◯ {{end}}
   {{- color "reset"}}
   {{- " "}}{{$option}}
 {{end}}`
@@ -49,28 +49,25 @@ func (m *MultiChoice) OnChange(line []rune, pos int, key rune) (newLine []rune, 
 	if key == core.KeyEnter {
 		// just pass on the current value
 		return line, 0, true
-	} else if key == core.KeyArrowUp && m.SelectedIndex > 0 {
+	} else if key == core.KeyArrowUp && m.selectedIndex > 0 {
 		// decrement the selected index
-		m.SelectedIndex--
-	} else if key == core.KeyArrowDown && m.SelectedIndex < len(m.Options)-1 {
+		m.selectedIndex--
+	} else if key == core.KeyArrowDown && m.selectedIndex < len(m.Options)-1 {
 		// if the user pressed down and there is room to move
 		// increment the selected index
-		m.SelectedIndex++
+		m.selectedIndex++
 	} else if key == core.KeySpace {
-		if old, ok := m.Checked[m.SelectedIndex]; !ok {
+		if old, ok := m.checked[m.selectedIndex]; !ok {
 			// otherwise just invert the current value
-			m.Checked[m.SelectedIndex] = true
+			m.checked[m.selectedIndex] = true
 		} else {
 			// otherwise just invert the current value
-			m.Checked[m.SelectedIndex] = !old
+			m.checked[m.selectedIndex] = !old
 		}
 
 	}
 
-	// print the template summarizing the current state of the selection
-
 	// render the options
-	// ansi.Print(m.SelectedIndex, m.Checked[m.SelectedIndex])
 	m.render()
 
 	// if we are not pressing ent
@@ -86,8 +83,12 @@ func (m *MultiChoice) render() error {
 
 	// render the template summarizing the current state
 	out, err := RunTemplate(
-		multiChoiceOptionsTemplate,
-		multiChoiceTemplateData{MultiChoice: *m},
+		MultiChoiceOptionsTemplate,
+		MultiChoiceTemplateData{
+			MultiChoice:   *m,
+			SelectedIndex: m.selectedIndex,
+			Checked:       m.checked,
+		},
 	)
 	if err != nil {
 		return err
@@ -116,7 +117,7 @@ func (m *MultiChoice) Prompt(rl *readline.Instance) (string, error) {
 	rl.SetConfig(config)
 
 	// compute the default state
-	m.Checked = make(map[int]bool)
+	m.checked = make(map[int]bool)
 	// if there is a default
 	if len(m.Defaults) > 0 {
 		for _, dflt := range m.Defaults {
@@ -124,7 +125,7 @@ func (m *MultiChoice) Prompt(rl *readline.Instance) (string, error) {
 				// if the option correponds to the default
 				if opt == dflt {
 					// we found our initial value
-					m.Checked[i] = true
+					m.checked[i] = true
 					// stop looking
 					break
 				}
@@ -139,8 +140,12 @@ func (m *MultiChoice) Prompt(rl *readline.Instance) (string, error) {
 	}
 	// generate the template for the current state of the prompt
 	out, err := RunTemplate(
-		multiChoiceQuestionTemplate,
-		multiChoiceTemplateData{MultiChoice: *m},
+		MultiChoiceQuestionTemplate,
+		MultiChoiceTemplateData{
+			MultiChoice:   *m,
+			SelectedIndex: m.selectedIndex,
+			Checked:       m.checked,
+		},
 	)
 	if err != nil {
 		return "", err
@@ -164,7 +169,7 @@ func (m *MultiChoice) Prompt(rl *readline.Instance) (string, error) {
 
 	answers := []string{}
 	for ix, option := range m.Options {
-		if val, ok := m.Checked[ix]; ok && val {
+		if val, ok := m.checked[ix]; ok && val {
 			answers = append(answers, option)
 		}
 	}
@@ -177,7 +182,7 @@ func (m *MultiChoice) Prompt(rl *readline.Instance) (string, error) {
 func (m *MultiChoice) value() (string, error) {
 	answers := []string{}
 	for ix, option := range m.Options {
-		if val, ok := m.Checked[ix]; ok && val {
+		if val, ok := m.checked[ix]; ok && val {
 			answers = append(answers, option)
 		}
 	}
@@ -204,8 +209,13 @@ func (m *MultiChoice) Cleanup(rl *readline.Instance, val string) error {
 
 	// execute the output summary template with the answer
 	output, err := RunTemplate(
-		multiChoiceQuestionTemplate,
-		multiChoiceTemplateData{MultiChoice: *m, Answer: value},
+		MultiChoiceQuestionTemplate,
+		MultiChoiceTemplateData{
+			MultiChoice:   *m,
+			SelectedIndex: m.selectedIndex,
+			Checked:       m.checked,
+			Answer:        value,
+		},
 	)
 	if err != nil {
 		return err
