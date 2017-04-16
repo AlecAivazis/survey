@@ -1,6 +1,6 @@
 tests:
   summary: Run the test suite
-  command: go test -v {{.files}}
+  command: go test {{.files}}
 
 install-deps:
   summary: Install all of package dependencies
