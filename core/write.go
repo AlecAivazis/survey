@@ -43,6 +43,8 @@ func WriteAnswer(t interface{}, name string, v interface{}) (err error) {
 	return copy(elem, value)
 }
 
+// BUG(alecaivazis): the current implementation might cause weird conflicts if there are
+// two fields with same name that only differ by casing.
 func findFieldIndex(s reflect.Value, name string) (int, error) {
 	// the type of the value
 	sType := s.Type()
