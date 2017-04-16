@@ -46,15 +46,11 @@ func WriteAnswer(t interface{}, name string, v interface{}) (err error) {
 func findFieldIndex(s reflect.Value, name string) (int, error) {
 	// the type of the value
 	sType := s.Type()
-	// scan the fields of the struct
+
+	// first look for matching tags
 	for i := 0; i < sType.NumField(); i++ {
 		// the field we are current scanning
 		field := sType.Field(i)
-
-		// if the name of the field matches what we're looking for
-		if strings.ToLower(field.Name) == name {
-			return i, nil
-		}
 
 		// the value of the survey tag
 		tag := field.Tag.Get(tagName)
@@ -64,6 +60,18 @@ func findFieldIndex(s reflect.Value, name string) (int, error) {
 			return i, nil
 		}
 	}
+
+	// then look for matching names
+	for i := 0; i < sType.NumField(); i++ {
+		// the field we are current scanning
+		field := sType.Field(i)
+
+		// if the name of the field matches what we're looking for
+		if strings.ToLower(field.Name) == name {
+			return i, nil
+		}
+	}
+
 	// we didn't find the field
 	return -1, fmt.Errorf("could not find field matching %v", name)
 }

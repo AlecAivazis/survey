@@ -177,3 +177,26 @@ func TestFindFieldIndex_canFindTaggedField(t *testing.T) {
 		t.Errorf("Did not find the correct field name. Expected 'Username' found %v.", val.Type().Field(fieldIndex).Name)
 	}
 }
+
+func TestFindFieldIndex_tagOverwriteFieldName(t *testing.T) {
+	// the struct to look through
+	val := reflect.ValueOf(struct {
+		Name     string
+		Username string `survey:"name"`
+	}{})
+
+	// find the field matching "name"
+	fieldIndex, err := findFieldIndex(val, "name")
+	// if something went wrong
+	if err != nil {
+		// the test failed
+		t.Error(err.Error())
+		return
+	}
+
+	// make sure we got the right value
+	if val.Type().Field(fieldIndex).Name != "Username" {
+		// the test failed
+		t.Errorf("Did not find the correct field name. Expected 'Username' found %v.", val.Type().Field(fieldIndex).Name)
+	}
+}
