@@ -7,6 +7,9 @@ import (
 	"strings"
 )
 
+// the tag used to denote the name of the question
+const tagName = "survey"
+
 func WriteAnswer(t interface{}, name string, v interface{}) (err error) {
 	// the target to write to
 	target := reflect.ValueOf(t)
@@ -50,6 +53,14 @@ func findFieldIndex(s reflect.Value, name string) (int, error) {
 
 		// if the name of the field matches what we're looking for
 		if strings.ToLower(field.Name) == name {
+			return i, nil
+		}
+
+		// the value of the survey tag
+		tag := field.Tag.Get(tagName)
+		// if the tag matches the name we are looking for
+		if tag != "" && tag == name {
+			// then we found our index
 			return i, nil
 		}
 	}

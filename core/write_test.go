@@ -137,11 +137,8 @@ func TestWriteAnswer_returnsErrWhenFieldNotFound(t *testing.T) {
 }
 
 func TestFindFieldIndex_canFindExportedField(t *testing.T) {
-	// the struct to look through
-	ptr := struct{ Name string }{}
-
-	// create a reflective wrapper over the value
-	val := reflect.ValueOf(ptr)
+	// create a reflective wrapper over the struct to look through
+	val := reflect.ValueOf(struct{ Name string }{})
 
 	// find the field matching "name"
 	fieldIndex, err := findFieldIndex(val, "name")
@@ -156,5 +153,27 @@ func TestFindFieldIndex_canFindExportedField(t *testing.T) {
 	if val.Type().Field(fieldIndex).Name != "Name" {
 		// the test failed
 		t.Errorf("Did not find the correct field name. Expected 'Name' found %v.", val.Type().Field(fieldIndex).Name)
+	}
+}
+
+func TestFindFieldIndex_canFindTaggedField(t *testing.T) {
+	// the struct to look through
+	val := reflect.ValueOf(struct {
+		Username string `survey:"name"`
+	}{})
+
+	// find the field matching "name"
+	fieldIndex, err := findFieldIndex(val, "name")
+	// if something went wrong
+	if err != nil {
+		// the test failed
+		t.Error(err.Error())
+		return
+	}
+
+	// make sure we got the right value
+	if val.Type().Field(fieldIndex).Name != "Username" {
+		// the test failed
+		t.Errorf("Did not find the correct field name. Expected 'Username' found %v.", val.Type().Field(fieldIndex).Name)
 	}
 }
