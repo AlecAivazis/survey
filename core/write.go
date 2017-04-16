@@ -25,7 +25,7 @@ func WriteAnswer(t interface{}, name string, v interface{}) (err error) {
 	// if we are writing to a struct
 	case reflect.Struct:
 		// get the name of the field that matches the string we  were given
-		fieldIndex, err := findFieldName(elem, name)
+		fieldIndex, err := findFieldIndex(elem, name)
 		// if something went wrong
 		if err != nil {
 			// bubble up
@@ -40,7 +40,7 @@ func WriteAnswer(t interface{}, name string, v interface{}) (err error) {
 	return copy(elem, value)
 }
 
-func findFieldName(s reflect.Value, name string) (int, error) {
+func findFieldIndex(s reflect.Value, name string) (int, error) {
 	// the type of the value
 	sType := s.Type()
 	// scan the fields of the struct
