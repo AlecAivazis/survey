@@ -1,7 +1,6 @@
 package core
 
 import (
-	"fmt"
 	"reflect"
 	"testing"
 )
@@ -114,8 +113,6 @@ func TestWriteAnswer_canMutateStruct(t *testing.T) {
 		return
 	}
 
-	fmt.Println(ptr.Name)
-
 	// make sure we changed the field
 	if ptr.Name != "world" {
 		// the test failed
@@ -175,6 +172,26 @@ func TestFindFieldIndex_canFindTaggedField(t *testing.T) {
 	if val.Type().Field(fieldIndex).Name != "Username" {
 		// the test failed
 		t.Errorf("Did not find the correct field name. Expected 'Username' found %v.", val.Type().Field(fieldIndex).Name)
+	}
+}
+
+func TestFindFieldIndex_canHandleCapitalAnswerNames(t *testing.T) {
+	// create a reflective wrapper over the struct to look through
+	val := reflect.ValueOf(struct{ Name string }{})
+
+	// find the field matching "name"
+	fieldIndex, err := findFieldIndex(val, "Name")
+	// if something went wrong
+	if err != nil {
+		// the test failed
+		t.Error(err.Error())
+		return
+	}
+
+	// make sure we got the right value
+	if val.Type().Field(fieldIndex).Name != "Name" {
+		// the test failed
+		t.Errorf("Did not find the correct field name. Expected 'Name' found %v.", val.Type().Field(fieldIndex).Name)
 	}
 }
 

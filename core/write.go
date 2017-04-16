@@ -47,7 +47,7 @@ func findFieldIndex(s reflect.Value, name string) (int, error) {
 	// the type of the value
 	sType := s.Type()
 
-	// first look for matching tags
+	// first look for matching tags so we can overwrite matching field names
 	for i := 0; i < sType.NumField(); i++ {
 		// the field we are current scanning
 		field := sType.Field(i)
@@ -67,7 +67,7 @@ func findFieldIndex(s reflect.Value, name string) (int, error) {
 		field := sType.Field(i)
 
 		// if the name of the field matches what we're looking for
-		if strings.ToLower(field.Name) == name {
+		if strings.ToLower(field.Name) == strings.ToLower(name) {
 			return i, nil
 		}
 	}
