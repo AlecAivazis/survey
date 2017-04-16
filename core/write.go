@@ -2,61 +2,80 @@ package core
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
+	"strings"
 )
 
-// Write takes a value and copies it to the target
-func Write(t interface{}, v interface{}) (err error) {
+func WriteAnswer(t interface{}, name string, v interface{}) (err error) {
 	// the target to write to
 	target := reflect.ValueOf(t)
+	// the value to write from
 	value := reflect.ValueOf(v)
 
-	// make sure we were handed a point
+	// make sure we are writing to a pointer
 	if target.Kind() != reflect.Ptr {
 		return errors.New("you must pass a pointer as the target of a Write operation")
 	}
+	// the object "inside" of the target pointer
+	elem := target.Elem()
 
-	// handle the target based on its prop
-	switch target.Elem().Kind() {
-	// if we are writing to a string
-	case reflect.String:
-		err = writeString(target.Elem(), value)
-	// if we are writing to a bool
-	case reflect.Bool:
-		err = writeBool(target.Elem(), value)
+	// handle the special types
+	switch elem.Kind() {
+	// if we are writing to a struct
+	case reflect.Struct:
+		// get the name of the field that matches the string we  were given
+		fieldIndex, err := findFieldName(elem, name)
+		// if something went wrong
+		if err != nil {
+			// bubble up
+			return err
+		}
+
+		// copy the value over to the field
+		return copy(elem.Field(fieldIndex), value)
 	}
+
+	// otherwise just copy the value to the target
+	return copy(elem, value)
+}
+
+func findFieldName(s reflect.Value, name string) (int, error) {
+	// the type of the value
+	sType := s.Type()
+	// scan the fields of the struct
+	for i := 0; i < sType.NumField(); i++ {
+		// the field we are current scanning
+		field := sType.Field(i)
+
+		// if the name of the field matches what we're looking for
+		if strings.ToLower(field.Name) == name {
+			return i, nil
+		}
+	}
+	// we didn't find the field
+	return -1, fmt.Errorf("could not find field matching %v", name)
+}
+
+// Write takes a value and copies it to the target
+func copy(t reflect.Value, v reflect.Value) (err error) {
+	// if something ends up panicing we need to catch it in a deferred func
+	defer func() {
+		if r := recover(); r != nil {
+			// if we paniced with an error
+			if _, ok := r.(error); ok {
+				// cast the result to an error object
+				err = r.(error)
+			} else if _, ok := r.(string); ok {
+				// otherwise we could have paniced with a string so wrap it in an error
+				err = errors.New(r.(string))
+			}
+		}
+	}()
+
+	// attempt to copy the underlying value to the target
+	t.Set(v)
 
 	// we're done
-	return err
-}
-
-func writeBool(target, source reflect.Value) (err error) {
-	// make sure we handle the source type
-	switch source.Kind() {
-	// if we are turning a boolean into a boolean
-	case reflect.Bool:
-		// just copy the boolean over
-		target.SetBool(source.Bool())
-	// otherwise its a source we do not recognize
-	default:
-		err = errors.New("Cannot convert to bool")
-	}
-	// nothing went wrong
-	return err
-}
-
-func writeString(target, source reflect.Value) (err error) {
-	// make sure we handle the source type
-	switch source.Kind() {
-	// if we are turning a string into a string
-	case reflect.String:
-		// just copy the string over
-		target.SetString(source.String())
-	// otherwise its a source we do not recognize
-	default:
-		err = errors.New("Cannot convert to string")
-	}
-
-	// nothing went wrong
-	return err
+	return
 }
