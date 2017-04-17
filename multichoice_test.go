@@ -1,6 +1,7 @@
 package survey
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/alecaivazis/survey/core"
@@ -75,13 +76,13 @@ func TestMultiChoiceFormatAnswer(t *testing.T) {
 
 	actual, err := core.RunTemplate(
 		MultiChoiceQuestionTemplate,
-		MultiChoiceTemplateData{MultiChoice: *prompt, Answer: []string{"foo", "buz"}},
+		MultiChoiceTemplateData{MultiChoice: *prompt, Answer: strings.Join([]string{"foo", "buz"}, ", ")},
 	)
 	if err != nil {
 		t.Errorf("Failed to run template to format checkbox answer: %s", err)
 	}
 
-	expected := `? Pick your words: ["foo" "buz"]`
+	expected := `? Pick your words: foo, buz`
 
 	if actual != expected {
 		t.Errorf("Formatted checkbox answer was not formatted correctly. Found:\n%s\nExpected:\n%s", actual, expected)

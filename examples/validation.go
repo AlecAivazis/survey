@@ -3,6 +3,8 @@ package main
 import (
 	"errors"
 	"fmt"
+	"reflect"
+
 	"github.com/alecaivazis/survey"
 )
 
@@ -16,20 +18,23 @@ var validationQs = []*survey.Question{
 	{
 		Name:   "valid",
 		Prompt: &survey.Input{"Enter 'foo':", "not foo"},
-		Validate: func(str string) error {
-			// if the input matches the expectation
-			if str != "foo" {
-				return errors.New(fmt.Sprintf("You entered %s, not 'foo'.", str))
+		Validate: func(val interface{}) error {
+			// if the value passed in is the zero value of the appropriate type
+			if val == reflect.Zero(reflect.TypeOf(val)).Interface() {
+				return errors.New("Value is required")
 			}
-			// nothing was wrong
 			return nil
 		},
 	},
 }
 
 func main() {
-
-	_, err := survey.Ask(validationQs)
+	// the place to hold the answers
+	answers := struct {
+		Name  string
+		Valid string
+	}{}
+	err := survey.Ask(validationQs, &answers)
 
 	if err != nil {
 		fmt.Println("\n", err.Error())

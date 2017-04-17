@@ -52,6 +52,20 @@ func TestMinLength(t *testing.T) {
 	}
 }
 
+func TestMinLengthOnInt(t *testing.T) {
+	// validate the string
+	if err := MinLength(12)(1); err == nil {
+		t.Error("No error returned when enforcing length on int.")
+	}
+}
+
+func TestMaxLengthOnInt(t *testing.T) {
+	// validate the string
+	if err := MaxLength(12)(1); err == nil {
+		t.Error("No error returned when enforcing length on int.")
+	}
+}
+
 func TestComposeValidatorsPasses(t *testing.T) {
 	// create a validator that requires a string of no more than 10 characters
 	valid := ComposeValidators(
