@@ -1,7 +1,6 @@
 package survey
 
 import (
-	"encoding/json"
 	"errors"
 	"io/ioutil"
 	"strings"
@@ -25,7 +24,7 @@ type MultiChoice struct {
 // data available to the templates when processing
 type MultiChoiceTemplateData struct {
 	MultiChoice
-	Answer        []string
+	Answer        string
 	Checked       map[int]bool
 	SelectedIndex int
 }
@@ -33,7 +32,7 @@ type MultiChoiceTemplateData struct {
 var MultiChoiceQuestionTemplate = `
 {{- color "green+hb"}}? {{color "reset"}}
 {{- color "default+hb"}}{{ .Message }} {{color "reset"}}
-{{- if .Answer}}{{color "cyan"}}{{.Answer | printf "%q"}}{{color "reset"}}{{end}}`
+{{- if .Answer}}{{color "cyan"}}{{.Answer}}{{color "reset"}}{{end}}`
 
 var MultiChoiceOptionsTemplate = `
 {{- range $ix, $option := .Options}}
@@ -77,7 +76,7 @@ func (m *MultiChoice) render() error {
 	// clean up what we left behind last time
 	for range m.Options {
 		terminal.CursorPreviousLine(1)
-		terminal.EraseInLine(1)
+		terminal.EraseInLine(0)
 	}
 
 	// render the template summarizing the current state
@@ -100,14 +99,7 @@ func (m *MultiChoice) render() error {
 	return nil
 }
 
-func (m *MultiChoice) Prompt(rl *readline.Instance) (string, error) {
-	// if the user didn't pass an answer reference
-	if m.Answer == nil {
-		// build one
-		answer := []string{}
-		m.Answer = &answer
-	}
-
+func (m *MultiChoice) Prompt(rl *readline.Instance) (interface{}, error) {
 	// the readline config
 	config := &readline.Config{
 		Listener: m,
@@ -172,39 +164,18 @@ func (m *MultiChoice) Prompt(rl *readline.Instance) (string, error) {
 			answers = append(answers, option)
 		}
 	}
-	*m.Answer = answers
 
-	// nothing went wrong
-	return m.value()
-}
-
-func (m *MultiChoice) value() (string, error) {
-	answers := []string{}
-	for ix, option := range m.Options {
-		if val, ok := m.checked[ix]; ok && val {
-			answers = append(answers, option)
-		}
-	}
-	// return the selected option
-	js, err := json.Marshal(answers)
-	if err != nil {
-		return "", err
-	}
-	return string(js), nil
+	return answers, nil
 }
 
 // Cleanup removes the options section, and renders the ask like a normal question.
-func (m *MultiChoice) Cleanup(rl *readline.Instance, val string) error {
+func (m *MultiChoice) Cleanup(rl *readline.Instance, val interface{}) error {
 	terminal.CursorPreviousLine(1)
-	terminal.EraseInLine(1)
+	terminal.EraseInLine(0)
 	for range m.Options {
 		terminal.CursorPreviousLine(1)
-		terminal.EraseInLine(1)
+		terminal.EraseInLine(0)
 	}
-
-	// parse the value into a list of strings
-	var value []string
-	json.Unmarshal([]byte(val), &value)
 
 	// execute the output summary template with the answer
 	output, err := core.RunTemplate(
@@ -213,7 +184,7 @@ func (m *MultiChoice) Cleanup(rl *readline.Instance, val string) error {
 			MultiChoice:   *m,
 			SelectedIndex: m.selectedIndex,
 			Checked:       m.checked,
-			Answer:        value,
+			Answer:        strings.Join(val.([]string), ","),
 		},
 	)
 	if err != nil {
