@@ -83,7 +83,9 @@ survey.AskOne(prompt, &name, nil)
 
 ```golang
 password := ""
-prompt = &survey.Password{"Please type your password"}
+prompt = &survey.Password{
+    Message: "Please type your password",
+}
 survey.AskOne(prompt, &password, nil)
 ```
 
@@ -106,7 +108,8 @@ survey.AskOne(prompt, &name, nil)
 ```golang
 color := ""
 prompt = &survey.Select{
-    Options: []string{"red", "blue" "green"}
+    Message: "Choose a color:",
+    Options: []string{"red", "blue" "green"},
 }
 survey.AskOne(prompt, &color, nil)
 ```
@@ -146,12 +149,23 @@ q := &survey.Question{
 ```
 
 ### Built-in Validators
-surey comes prepackaged with a few validators to fit common situations. Currently these validators
-include:
+`survey` comes prepackaged with a few validators to fit common situations. Currently these
+validators include:
 
-|    name   |   valid types   |       description                                       |
-|-----------|-----------------|---------------------------------------------------------|
-| Required  |   any           |   Rejects zero values of the response type              |
-| MinLength |   string        |   Enforces that a response is at least the given length |
+|    name      |   valid types   |       description                                             |
+|--------------|-----------------|---------------------------------------------------------------|
+| Required     |   any           |   Rejects zero values of the response type                    |
+| MinLength(n) |   string        |   Enforces that a response is at least the given length       |
+| MaxLength(n) |   string        |   Enforces that a response is no longer than the given length |
 
 ## Versioning
+
+This project tries to maintain semantic GitHub releases as closely as possible. As such, services
+like [gopkg.in](http://labix.org/gopkg.in) work very well to ensure non-breaking changes whenever
+you build your application. For example, importing v1 of survey would look something like
+
+```golang
+package main
+
+import "gopkg.in/alecaivazis/survey.v1"
+```
