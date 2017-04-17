@@ -2,6 +2,7 @@ package TestUtil
 
 import (
 	"fmt"
+	"reflect"
 
 	"github.com/alecaivazis/survey"
 )
@@ -9,11 +10,12 @@ import (
 type TestTableEntry struct {
 	Name   string
 	Prompt survey.Prompt
+	Value  interface{}
 }
 
-func formatAnswer(ans string) {
+func formatAnswer(ans interface{}) {
 	// show the answer to the user
-	fmt.Printf("Answered %v.\n", ans)
+	fmt.Printf("Answered %v.\n", reflect.ValueOf(ans).Elem())
 	fmt.Println("---------------------")
 }
 
@@ -23,13 +25,13 @@ func RunTable(table []TestTableEntry) {
 		// tell the user what we are going to ask them
 		fmt.Println(entry.Name)
 		// perform the ask
-		answer, err := survey.AskOne(entry.Prompt)
+		err := survey.AskOne(entry.Prompt, entry.Value, nil)
 		if err != nil {
 			fmt.Printf("AskOne on %v's prompt failed: %v.", entry.Name, err.Error())
 			break
 		}
 		// show the answer to the user
-		formatAnswer(answer)
+		formatAnswer(entry.Value)
 	}
 }
 
@@ -39,7 +41,7 @@ func RunErrorTable(table []TestTableEntry) {
 		// tell the user what we are going to ask them
 		fmt.Println(entry.Name)
 		// perform the ask
-		_, err := survey.AskOne(entry.Prompt)
+		err := survey.AskOne(entry.Prompt, entry.Value, nil)
 		if err == nil {
 			fmt.Printf("AskOne on %v's prompt didn't fail.", entry.Name)
 			break
