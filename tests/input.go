@@ -5,12 +5,14 @@ import (
 	"github.com/alecaivazis/survey/tests/util"
 )
 
+var val = ""
+
 var table = []TestUtil.TestTableEntry{
 	{
-		"no default", &survey.Input{"Hello world", ""},
+		"no default", &survey.Input{"Hello world", ""}, &val,
 	},
 	{
-		"default", &survey.Input{"Hello world", "default"},
+		"default", &survey.Input{"Hello world", "default"}, &val,
 	},
 }
 
