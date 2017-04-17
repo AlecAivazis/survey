@@ -72,7 +72,7 @@ go run examples/validation.go
 ```golang
 name := ""
 prompt = &survey.Input{
-    Message: "What's your name?",
+    Message: "ping",
 }
 survey.AskOne(prompt, &name, nil)
 ```
@@ -123,3 +123,35 @@ prompt = &survey.MultiSelect{
 }
 survey.AskOne(prompt, &days, nil)
 ```
+
+## Validation
+
+Validating individual responses for a particular question can be done by defining a
+`Validate` field on the `survey.Question` to be validated. This function takes an
+`interface{}` type and returns an error to show to the user, prompting them for another
+response:
+
+```golang
+q := &survey.Question{
+    Prompt: &survey.Input{Message: "Hello world validation"},
+    Validate: func (val interface{}) error {
+        // since we are validating an Input, this will always succeed
+        if str, ok := val.(string) ; ok {
+            if len(str) > 10 {
+                return errors.New("This response cannot be longer than 10 characters.")
+            }
+        }
+    }
+}
+```
+
+### Built-in Validators
+surey comes prepackaged with a few validators to fit common situations. Currently these validators
+include:
+
+|    name   |   valid types   |       description                                       |
+|-----------|-----------------|---------------------------------------------------------|
+| Required  |   any           |   Rejects zero values of the response type              |
+| MinLength |   string        |   Enforces that a response is at least the given length |
+
+## Versioning
