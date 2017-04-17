@@ -10,7 +10,7 @@ import (
 )
 
 // Validator is a function passed to a Question in order to redefine
-type Validator func(string) error
+type Validator func(interface{}) error
 
 // Question is the core data structure for a survey questionnaire.
 type Question struct {
@@ -22,8 +22,8 @@ type Question struct {
 // Prompt is the primary interface for the objects that can take user input
 // and return a string value.
 type Prompt interface {
-	Prompt(*readline.Instance) (string, error)
-	Cleanup(*readline.Instance, string) error
+	Prompt(*readline.Instance) (interface{}, error)
+	Cleanup(*readline.Instance, interface{}) error
 }
 
 var ErrorTemplate = `{{color "red"}}✘ Sorry, your reply was invalid: {{.Error}}{{color "reset"}}
