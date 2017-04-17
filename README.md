@@ -113,7 +113,7 @@ survey.AskOne(prompt, &color, nil)
 
 
 ### MultiSelect
-<img src="http://gph.to/2nTUbca" width="300px"/>
+<img src="https://media.giphy.com/media/3o7bukX6PNQJo7JUwo/giphy.gif" width="300px"/>
 
 ```golang
 days := []string{}
