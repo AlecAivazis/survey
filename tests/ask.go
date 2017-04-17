@@ -29,16 +29,20 @@ var simpleQs = []*survey.Question{
 func main() {
 
 	fmt.Println("Asking many.")
-
-	answers, err := survey.Ask(simpleQs)
+	// a place to store the answers
+	ans := struct {
+		Name  string
+		Color string
+	}{}
+	err := survey.Ask(simpleQs, &ans)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
 	}
-	fmt.Printf("%s chose %s.\n", answers["name"], answers["color"])
 
 	fmt.Println("Asking one.")
-	answer, err := survey.AskOne(simpleQs[0].Prompt)
+	answer := ""
+	err = survey.AskOne(simpleQs[0].Prompt, &answer, nil)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
@@ -46,10 +50,11 @@ func main() {
 	fmt.Printf("Answered with %v.\n", answer)
 
 	fmt.Println("Asking one with validation.")
-	answer, err = survey.AskOneValidate(&survey.Input{"What is your name?", ""}, survey.Required)
+	vAns := ""
+	err = survey.AskOne(&survey.Input{"What is your name?", ""}, &vAns, survey.Required)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
 	}
-	fmt.Printf("Answered with %v.\n", answer)
+	fmt.Printf("Answered with %v.\n", vAns)
 }

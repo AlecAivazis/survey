@@ -52,7 +52,7 @@ func (i *Input) Cleanup(rl *readline.Instance, val string) error {
 	// go up one line
 	terminal.CursorPreviousLine(1)
 	// clear the line
-	terminal.EraseInLine(1)
+	terminal.EraseInLine(0)
 
 	// render the template
 	out, err := core.RunTemplate(
