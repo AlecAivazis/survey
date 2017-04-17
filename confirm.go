@@ -89,7 +89,7 @@ func (c *Confirm) getBool(rl *readline.Instance) (bool, error) {
 
 // Prompt prompts the user with a simple text field and expects a reply followed
 // by a carriage return.
-func (c *Confirm) Prompt(rl *readline.Instance) (string, error) {
+func (c *Confirm) Prompt(rl *readline.Instance) (interface{}, error) {
 	// if we weren't passed an answer
 	if c.Answer == nil {
 		// build one
@@ -117,24 +117,30 @@ func (c *Confirm) Prompt(rl *readline.Instance) (string, error) {
 		return "", err
 	}
 
-	// return the value
-	*c.Answer = answer
-
 	// convert the boolean into the appropriate string
-	return yesNo(answer), nil
+	return answer, nil
 }
 
 // Cleanup overwrite the line with the finalized formatted version
-func (c *Confirm) Cleanup(rl *readline.Instance, val string) error {
+func (c *Confirm) Cleanup(rl *readline.Instance, val interface{}) error {
 	// go up one line
 	terminal.CursorPreviousLine(1)
 	// clear the line
-	terminal.EraseInLine(1)
+	terminal.EraseInLine(0)
+
+	// the string version of the answer
+	ans := ""
+	// if the value was previously true
+	if val.(bool) {
+		ans = "true"
+	} else {
+		ans = "false"
+	}
 
 	// render the template
 	out, err := core.RunTemplate(
 		ConfirmQuestionTemplate,
-		ConfirmTemplateData{Confirm: *c, Answer: val},
+		ConfirmTemplateData{Confirm: *c, Answer: ans},
 	)
 	if err != nil {
 		return err
