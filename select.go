@@ -64,7 +64,7 @@ func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPo
 func (s *Select) render() error {
 	for range s.Options {
 		terminal.CursorPreviousLine(1)
-		terminal.EraseInLine(1)
+		terminal.EraseInLine(0)
 	}
 
 	// the formatted response
@@ -82,7 +82,7 @@ func (s *Select) render() error {
 	return nil
 }
 
-func (s *Select) Prompt(rl *readline.Instance) (string, error) {
+func (s *Select) Prompt(rl *readline.Instance) (interface{}, error) {
 	config := &readline.Config{
 		Listener: s,
 		Stdout:   ioutil.Discard,
@@ -150,18 +150,18 @@ func (s *Select) Prompt(rl *readline.Instance) (string, error) {
 	return val, err
 }
 
-func (s *Select) Cleanup(rl *readline.Instance, val string) error {
+func (s *Select) Cleanup(rl *readline.Instance, val interface{}) error {
 	terminal.CursorPreviousLine(1)
-	terminal.EraseInLine(1)
+	terminal.EraseInLine(0)
 	for range s.Options {
 		terminal.CursorPreviousLine(1)
-		terminal.EraseInLine(1)
+		terminal.EraseInLine(0)
 	}
 
 	// execute the output summary template with the answer
 	output, err := core.RunTemplate(
 		SelectQuestionTemplate,
-		SelectTemplateData{Select: *s, Answer: val},
+		SelectTemplateData{Select: *s, Answer: val.(string)},
 	)
 	if err != nil {
 		return err
