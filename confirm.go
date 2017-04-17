@@ -13,7 +13,6 @@ import (
 type Confirm struct {
 	Message string
 	Default bool
-	Answer  *bool
 }
 
 // data available to the templates when processing

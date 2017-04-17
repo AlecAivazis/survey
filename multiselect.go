@@ -16,7 +16,6 @@ type MultiSelect struct {
 	Message       string
 	Options       []string
 	Defaults      []string
-	Answer        *[]string
 	selectedIndex int
 	checked       map[int]bool
 }
