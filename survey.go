@@ -1,6 +1,7 @@
 package survey
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/alecaivazis/survey/core"
@@ -44,6 +45,12 @@ func Ask(qs []*Question, t interface{}) error {
 	rl, err := terminal.GetReadline()
 	if err != nil {
 		return err
+	}
+
+	// if we weren't passed a place to record the answers
+	if t == nil {
+		// we can't go any further
+		return errors.New("cannot call Ask() with a nil reference to record the answers")
 	}
 
 	// go over every question

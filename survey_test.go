@@ -31,3 +31,14 @@ func TestValidationError(t *testing.T) {
 		t.Errorf("Formatted error was not formatted correctly. Found:\n%s\nExpected:\n%s", actual, expected)
 	}
 }
+
+func TestAsk_returnsErrorIfTargetIsNil(t *testing.T) {
+	// pass an empty place to leave the answers
+	err := Ask([]*Question{}, nil)
+
+	// if we didn't get an error
+	if err == nil {
+		// the test failed
+		t.Error("Did not encounter error when asking with no where to record.")
+	}
+}
