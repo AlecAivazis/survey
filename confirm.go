@@ -124,9 +124,9 @@ func (c *Confirm) Cleanup(rl *readline.Instance, val interface{}) error {
 	ans := ""
 	// if the value was previously true
 	if val.(bool) {
-		ans = "true"
+		ans = "yes"
 	} else {
-		ans = "false"
+		ans = "no"
 	}
 
 	// render the template

@@ -183,7 +183,7 @@ func (m *MultiSelect) Cleanup(rl *readline.Instance, val interface{}) error {
 			MultiSelect:   *m,
 			SelectedIndex: m.selectedIndex,
 			Checked:       m.checked,
-			Answer:        strings.Join(val.([]string), ","),
+			Answer:        strings.Join(val.([]string), ", "),
 		},
 	)
 	if err != nil {
