@@ -8,7 +8,7 @@ import (
 
 func main() {
 	days := []string{}
-	prompt := &survey.MultiChoice{
+	prompt := &survey.MultiSelect{
 		Message:  "What days do you prefer:",
 		Options:  []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
 		Defaults: []string{"Saturday", "Sunday"},

@@ -12,17 +12,17 @@ func init() {
 	core.DisableColor = true
 }
 
-func TestCanFormatMultiChoiceOptions(t *testing.T) {
+func TestCanFormatMultiSelectOptions(t *testing.T) {
 
-	prompt := &MultiChoice{
+	prompt := &MultiSelect{
 		Options:  []string{"foo", "bar", "baz", "buz"},
 		Defaults: []string{"bar", "buz"},
 	}
 
 	actual, err := core.RunTemplate(
-		MultiChoiceOptionsTemplate,
-		MultiChoiceTemplateData{
-			MultiChoice:   *prompt,
+		MultiSelectOptionsTemplate,
+		MultiSelectTemplateData{
+			MultiSelect:   *prompt,
 			SelectedIndex: 2,
 			Checked:       map[int]bool{1: true, 3: true},
 		},
@@ -43,17 +43,17 @@ func TestCanFormatMultiChoiceOptions(t *testing.T) {
 	}
 }
 
-func TestMultiChoiceFormatQuestion(t *testing.T) {
+func TestMultiSelectFormatQuestion(t *testing.T) {
 
-	prompt := &MultiChoice{
+	prompt := &MultiSelect{
 		Message:  "Pick your words:",
 		Options:  []string{"foo", "bar", "baz", "buz"},
 		Defaults: []string{"bar", "buz"},
 	}
 
 	actual, err := core.RunTemplate(
-		MultiChoiceQuestionTemplate,
-		MultiChoiceTemplateData{MultiChoice: *prompt},
+		MultiSelectQuestionTemplate,
+		MultiSelectTemplateData{MultiSelect: *prompt},
 	)
 	if err != nil {
 		t.Errorf("Failed to run template to format checkbox question: %s", err)
@@ -66,17 +66,17 @@ func TestMultiChoiceFormatQuestion(t *testing.T) {
 	}
 }
 
-func TestMultiChoiceFormatAnswer(t *testing.T) {
+func TestMultiSelectFormatAnswer(t *testing.T) {
 
-	prompt := &MultiChoice{
+	prompt := &MultiSelect{
 		Message:  "Pick your words:",
 		Options:  []string{"foo", "bar", "baz", "buz"},
 		Defaults: []string{"bar", "buz"},
 	}
 
 	actual, err := core.RunTemplate(
-		MultiChoiceQuestionTemplate,
-		MultiChoiceTemplateData{MultiChoice: *prompt, Answer: strings.Join([]string{"foo", "buz"}, ", ")},
+		MultiSelectQuestionTemplate,
+		MultiSelectTemplateData{MultiSelect: *prompt, Answer: strings.Join([]string{"foo", "buz"}, ", ")},
 	)
 	if err != nil {
 		t.Errorf("Failed to run template to format checkbox answer: %s", err)

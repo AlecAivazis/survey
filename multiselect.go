@@ -10,9 +10,9 @@ import (
 	"github.com/chzyer/readline"
 )
 
-// MultiChoice is a prompt that presents a list of various options to the user
+// MultiSelect is a prompt that presents a list of various options to the user
 // for them to select using the arrow keys and enter.
-type MultiChoice struct {
+type MultiSelect struct {
 	Message       string
 	Options       []string
 	Defaults      []string
@@ -22,19 +22,19 @@ type MultiChoice struct {
 }
 
 // data available to the templates when processing
-type MultiChoiceTemplateData struct {
-	MultiChoice
+type MultiSelectTemplateData struct {
+	MultiSelect
 	Answer        string
 	Checked       map[int]bool
 	SelectedIndex int
 }
 
-var MultiChoiceQuestionTemplate = `
+var MultiSelectQuestionTemplate = `
 {{- color "green+hb"}}? {{color "reset"}}
 {{- color "default+hb"}}{{ .Message }} {{color "reset"}}
 {{- if .Answer}}{{color "cyan"}}{{.Answer}}{{color "reset"}}{{end}}`
 
-var MultiChoiceOptionsTemplate = `
+var MultiSelectOptionsTemplate = `
 {{- range $ix, $option := .Options}}
   {{- if eq $ix $.SelectedIndex}}{{color "cyan"}}❯{{color "reset"}}{{else}} {{end}}
   {{- if index $.Checked $ix}}{{color "green"}} ◉ {{else}}{{color "default+hb"}} ◯ {{end}}
@@ -43,7 +43,7 @@ var MultiChoiceOptionsTemplate = `
 {{end}}`
 
 // OnChange is called on every keypress.
-func (m *MultiChoice) OnChange(line []rune, pos int, key rune) (newLine []rune, newPos int, ok bool) {
+func (m *MultiSelect) OnChange(line []rune, pos int, key rune) (newLine []rune, newPos int, ok bool) {
 	if key == terminal.KeyEnter {
 		// just pass on the current value
 		return line, 0, true
@@ -72,7 +72,7 @@ func (m *MultiChoice) OnChange(line []rune, pos int, key rune) (newLine []rune, 
 	return line, 0, true
 }
 
-func (m *MultiChoice) render() error {
+func (m *MultiSelect) render() error {
 	// clean up what we left behind last time
 	for range m.Options {
 		terminal.CursorPreviousLine(1)
@@ -81,9 +81,9 @@ func (m *MultiChoice) render() error {
 
 	// render the template summarizing the current state
 	out, err := core.RunTemplate(
-		MultiChoiceOptionsTemplate,
-		MultiChoiceTemplateData{
-			MultiChoice:   *m,
+		MultiSelectOptionsTemplate,
+		MultiSelectTemplateData{
+			MultiSelect:   *m,
 			SelectedIndex: m.selectedIndex,
 			Checked:       m.checked,
 		},
@@ -99,7 +99,7 @@ func (m *MultiChoice) render() error {
 	return nil
 }
 
-func (m *MultiChoice) Prompt(rl *readline.Instance) (interface{}, error) {
+func (m *MultiSelect) Prompt(rl *readline.Instance) (interface{}, error) {
 	// the readline config
 	config := &readline.Config{
 		Listener: m,
@@ -131,9 +131,9 @@ func (m *MultiChoice) Prompt(rl *readline.Instance) (interface{}, error) {
 	}
 	// generate the template for the current state of the prompt
 	out, err := core.RunTemplate(
-		MultiChoiceQuestionTemplate,
-		MultiChoiceTemplateData{
-			MultiChoice:   *m,
+		MultiSelectQuestionTemplate,
+		MultiSelectTemplateData{
+			MultiSelect:   *m,
 			SelectedIndex: m.selectedIndex,
 			Checked:       m.checked,
 		},
@@ -169,7 +169,7 @@ func (m *MultiChoice) Prompt(rl *readline.Instance) (interface{}, error) {
 }
 
 // Cleanup removes the options section, and renders the ask like a normal question.
-func (m *MultiChoice) Cleanup(rl *readline.Instance, val interface{}) error {
+func (m *MultiSelect) Cleanup(rl *readline.Instance, val interface{}) error {
 	terminal.CursorPreviousLine(1)
 	terminal.EraseInLine(0)
 	for range m.Options {
@@ -179,9 +179,9 @@ func (m *MultiChoice) Cleanup(rl *readline.Instance, val interface{}) error {
 
 	// execute the output summary template with the answer
 	output, err := core.RunTemplate(
-		MultiChoiceQuestionTemplate,
-		MultiChoiceTemplateData{
-			MultiChoice:   *m,
+		MultiSelectQuestionTemplate,
+		MultiSelectTemplateData{
+			MultiSelect:   *m,
 			SelectedIndex: m.selectedIndex,
 			Checked:       m.checked,
 			Answer:        strings.Join(val.([]string), ","),
