@@ -39,7 +39,7 @@ func main() {
     answers := struct {
         Name          string                  // survey will match the question and field names
         FavoriteColor string `survey:"color"` // or you can tag fields to match a specific name
-    }
+    }{}
 
     // perform the questions
     err := survey.Ask(qs, &answers)
