@@ -15,7 +15,7 @@ import (
 type MultiSelect struct {
 	Message       string
 	Options       []string
-	Defaults      []string
+	Default       []string
 	selectedIndex int
 	checked       map[int]bool
 }
@@ -109,8 +109,8 @@ func (m *MultiSelect) Prompt(rl *readline.Instance) (interface{}, error) {
 	// compute the default state
 	m.checked = make(map[int]bool)
 	// if there is a default
-	if len(m.Defaults) > 0 {
-		for _, dflt := range m.Defaults {
+	if len(m.Default) > 0 {
+		for _, dflt := range m.Default {
 			for i, opt := range m.Options {
 				// if the option correponds to the default
 				if opt == dflt {

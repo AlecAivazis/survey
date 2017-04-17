@@ -15,8 +15,8 @@ func init() {
 func TestCanFormatMultiSelectOptions(t *testing.T) {
 
 	prompt := &MultiSelect{
-		Options:  []string{"foo", "bar", "baz", "buz"},
-		Defaults: []string{"bar", "buz"},
+		Options: []string{"foo", "bar", "baz", "buz"},
+		Default: []string{"bar", "buz"},
 	}
 
 	actual, err := core.RunTemplate(
@@ -46,9 +46,9 @@ func TestCanFormatMultiSelectOptions(t *testing.T) {
 func TestMultiSelectFormatQuestion(t *testing.T) {
 
 	prompt := &MultiSelect{
-		Message:  "Pick your words:",
-		Options:  []string{"foo", "bar", "baz", "buz"},
-		Defaults: []string{"bar", "buz"},
+		Message: "Pick your words:",
+		Options: []string{"foo", "bar", "baz", "buz"},
+		Default: []string{"bar", "buz"},
 	}
 
 	actual, err := core.RunTemplate(
@@ -69,9 +69,9 @@ func TestMultiSelectFormatQuestion(t *testing.T) {
 func TestMultiSelectFormatAnswer(t *testing.T) {
 
 	prompt := &MultiSelect{
-		Message:  "Pick your words:",
-		Options:  []string{"foo", "bar", "baz", "buz"},
-		Defaults: []string{"bar", "buz"},
+		Message: "Pick your words:",
+		Options: []string{"foo", "bar", "baz", "buz"},
+		Default: []string{"bar", "buz"},
 	}
 
 	actual, err := core.RunTemplate(
