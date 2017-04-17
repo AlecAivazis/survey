@@ -89,13 +89,6 @@ func (c *Confirm) getBool(rl *readline.Instance) (bool, error) {
 // Prompt prompts the user with a simple text field and expects a reply followed
 // by a carriage return.
 func (c *Confirm) Prompt(rl *readline.Instance) (interface{}, error) {
-	// if we weren't passed an answer
-	if c.Answer == nil {
-		// build one
-		answer := false
-		c.Answer = &answer
-	}
-
 	// render the question template
 	out, err := core.RunTemplate(
 		ConfirmQuestionTemplate,

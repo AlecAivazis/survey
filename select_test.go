@@ -18,11 +18,11 @@ func TestCanFormatSelectOptions(t *testing.T) {
 		Default: "baz",
 	}
 	// TODO: figure out a way for the test to actually test this bit of code
-	prompt.SelectedIndex = 2
+	prompt.selectedIndex = 2
 
 	actual, err := core.RunTemplate(
 		SelectChoicesTemplate,
-		SelectTemplateData{Select: *prompt},
+		SelectTemplateData{Select: *prompt, SelectedIndex: 2},
 	)
 
 	if err != nil {

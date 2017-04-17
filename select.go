@@ -16,13 +16,14 @@ type Select struct {
 	Message       string
 	Options       []string
 	Default       string
-	SelectedIndex int
+	selectedIndex int
 }
 
 // the data available to the templates when processing
 type SelectTemplateData struct {
 	Select
-	Answer string
+	SelectedIndex int
+	Answer        string
 }
 
 const (
@@ -33,7 +34,7 @@ const (
 	// the template used to show the list of Selects
 	SelectChoicesTemplate = `
 {{- range $ix, $choice := .Options}}
-  {{- if eq $ix $.Select.SelectedIndex}}{{color "cyan+b"}}> {{else}}{{color "default+hb"}}  {{end}}
+  {{- if eq $ix $.SelectedIndex}}{{color "cyan+b"}}> {{else}}{{color "default+hb"}}  {{end}}
   {{- $choice}}
   {{- color "reset"}}
 {{end}}`
@@ -43,22 +44,22 @@ const (
 func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPos int, ok bool) {
 	// if the user pressed the enter key
 	if key == terminal.KeyEnter {
-		return []rune(s.Options[s.SelectedIndex]), 0, true
+		return []rune(s.Options[s.selectedIndex]), 0, true
 		// if the user pressed the up arrow
-	} else if key == terminal.KeyArrowUp && s.SelectedIndex > 0 {
+	} else if key == terminal.KeyArrowUp && s.selectedIndex > 0 {
 		// decrement the selected index
-		s.SelectedIndex--
+		s.selectedIndex--
 		// if the user pressed down and there is room to move
-	} else if key == terminal.KeyArrowDown && s.SelectedIndex < len(s.Options)-1 {
+	} else if key == terminal.KeyArrowDown && s.selectedIndex < len(s.Options)-1 {
 		// increment the selected index
-		s.SelectedIndex++
+		s.selectedIndex++
 	}
 
 	// render the options
 	s.render()
 
 	// if we are not pressing ent
-	return []rune(s.Options[s.SelectedIndex]), 0, true
+	return []rune(s.Options[s.selectedIndex]), 0, true
 }
 
 func (s *Select) render() error {
@@ -70,7 +71,7 @@ func (s *Select) render() error {
 	// the formatted response
 	out, err := core.RunTemplate(
 		SelectChoicesTemplate,
-		SelectTemplateData{Select: *s},
+		SelectTemplateData{Select: *s, SelectedIndex: s.selectedIndex},
 	)
 	if err != nil {
 		return err
@@ -111,12 +112,12 @@ func (s *Select) Prompt(rl *readline.Instance) (interface{}, error) {
 		}
 	}
 	// save the selected index
-	s.SelectedIndex = sel
+	s.selectedIndex = sel
 
 	// render the initial question
 	out, err := core.RunTemplate(
 		SelectQuestionTemplate,
-		SelectTemplateData{Select: *s},
+		SelectTemplateData{Select: *s, SelectedIndex: sel},
 	)
 	if err != nil {
 		return "", err
