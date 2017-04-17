@@ -31,7 +31,7 @@ var InputQuestionTemplate = `
   {{- if .Default}}{{color "white"}}({{.Default}}) {{color "reset"}}{{end}}
 {{- end}}`
 
-func (i *Input) Prompt(rl *readline.Instance) (line string, err error) {
+func (i *Input) Prompt(rl *readline.Instance) (line interface{}, err error) {
 	// render the template
 	out, err := core.RunTemplate(
 		InputQuestionTemplate,
@@ -48,7 +48,7 @@ func (i *Input) Prompt(rl *readline.Instance) (line string, err error) {
 	return line, err
 }
 
-func (i *Input) Cleanup(rl *readline.Instance, val string) error {
+func (i *Input) Cleanup(rl *readline.Instance, val interface{}) error {
 	// go up one line
 	terminal.CursorPreviousLine(1)
 	// clear the line
@@ -57,7 +57,7 @@ func (i *Input) Cleanup(rl *readline.Instance, val string) error {
 	// render the template
 	out, err := core.RunTemplate(
 		InputQuestionTemplate,
-		InputTemplateData{Input: *i, Answer: val},
+		InputTemplateData{Input: *i, Answer: val.(string)},
 	)
 	if err != nil {
 		return err
