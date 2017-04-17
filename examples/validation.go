@@ -1,9 +1,7 @@
 package main
 
 import (
-	"errors"
 	"fmt"
-	"reflect"
 
 	"github.com/alecaivazis/survey"
 )
@@ -19,10 +17,11 @@ var validationQs = []*survey.Question{
 		Name:   "valid",
 		Prompt: &survey.Input{"Enter 'foo':", "not foo"},
 		Validate: func(val interface{}) error {
-			// if the value passed in is the zero value of the appropriate type
-			if val == reflect.Zero(reflect.TypeOf(val)).Interface() {
-				return errors.New("Value is required")
+			// if the input matches the expectation
+			if str := val.(string); str != "foo" {
+				return fmt.Errorf("You entered %s, not 'foo'.", str)
 			}
+			// nothing was wrong
 			return nil
 		},
 	},
