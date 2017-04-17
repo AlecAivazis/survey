@@ -35,14 +35,20 @@ var qs = []*survey.Question{
 }
 
 func main() {
-    answers, err := survey.Ask(qs)
+    // the answers will be written to this struct
+    answers := struct {
+        Name string
+        Color string
+    }
+
+    err := survey.Ask(qs, &answers)
 
     if err != nil {
         fmt.Println("\n", err.Error())
         return
     }
 
-    fmt.Printf("%s chose %s.", answers["name"], answers["color"])
+    fmt.Printf("%s chose %s.", answers.Name, answers.Color)
 }
 
 ```

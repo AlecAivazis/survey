@@ -44,10 +44,8 @@ func TestMaxLength(t *testing.T) {
 }
 
 func TestMinLength(t *testing.T) {
-	// the string to test
-	testStr := randString(10)
 	// validate the string
-	if err := MinLength(12)(testStr); err == nil {
+	if err := MinLength(12)(randString(10)); err == nil {
 		t.Error("No error returned with input less than 12 characters.")
 	}
 }
