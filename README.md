@@ -71,7 +71,7 @@ go run examples/validation.go
 
 ```golang
 name := ""
-prompt = &survey.Input{
+prompt := &survey.Input{
     Message: "ping",
 }
 survey.AskOne(prompt, &name, nil)
@@ -83,7 +83,7 @@ survey.AskOne(prompt, &name, nil)
 
 ```golang
 password := ""
-prompt = &survey.Password{
+prompt := &survey.Password{
     Message: "Please type your password",
 }
 survey.AskOne(prompt, &password, nil)
@@ -95,7 +95,7 @@ survey.AskOne(prompt, &password, nil)
 
 ```golang
 name := false
-prompt = &survey.Confirm{
+prompt := &survey.Confirm{
     Message: "Do you like pie?",
 }
 survey.AskOne(prompt, &name, nil)
@@ -107,9 +107,9 @@ survey.AskOne(prompt, &name, nil)
 
 ```golang
 color := ""
-prompt = &survey.Select{
+prompt := &survey.Select{
     Message: "Choose a color:",
-    Options: []string{"red", "blue" "green"},
+    Options: []string{"red", "blue", "green"},
 }
 survey.AskOne(prompt, &color, nil)
 ```
@@ -120,7 +120,7 @@ survey.AskOne(prompt, &color, nil)
 
 ```golang
 days := []string{}
-prompt = &survey.MultiSelect{
+prompt := &survey.MultiSelect{
     Message: "What days do you prefer:",
     Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
 }
