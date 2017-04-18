@@ -75,7 +75,7 @@ func (m *MultiSelect) render() error {
 	// clean up what we left behind last time
 	for range m.Options {
 		terminal.CursorPreviousLine(1)
-		terminal.EraseInLine(terminal.ERASE_LINE_ALL)
+		terminal.EraseLine(terminal.ERASE_LINE_ALL)
 	}
 
 	// render the template summarizing the current state
@@ -170,10 +170,10 @@ func (m *MultiSelect) Prompt(rl *readline.Instance) (interface{}, error) {
 // Cleanup removes the options section, and renders the ask like a normal question.
 func (m *MultiSelect) Cleanup(rl *readline.Instance, val interface{}) error {
 	terminal.CursorPreviousLine(1)
-	terminal.EraseInLine(terminal.ERASE_LINE_ALL)
+	terminal.EraseLine(terminal.ERASE_LINE_ALL)
 	for range m.Options {
 		terminal.CursorPreviousLine(1)
-		terminal.EraseInLine(terminal.ERASE_LINE_ALL)
+		terminal.EraseLine(terminal.ERASE_LINE_ALL)
 	}
 
 	// execute the output summary template with the answer

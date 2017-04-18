@@ -118,7 +118,7 @@ func (c *Confirm) Cleanup(rl *readline.Instance, val interface{}) error {
 	// go up one line
 	terminal.CursorPreviousLine(1)
 	// clear the line
-	terminal.EraseInLine(terminal.ERASE_LINE_ALL)
+	terminal.EraseLine(terminal.ERASE_LINE_ALL)
 
 	// the string version of the answer
 	ans := ""

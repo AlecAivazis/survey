@@ -6,7 +6,7 @@ import (
 	"unsafe"
 )
 
-func EraseInLine(mode EraseLineMode) {
+func EraseLine(mode EraseLineMode) {
 	handle := syscall.Handle(os.Stdout.Fd())
 
 	var csbi consoleScreenBufferInfo

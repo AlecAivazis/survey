@@ -6,6 +6,6 @@ import (
 	"fmt"
 )
 
-func EraseInLine(mode EraseLineMode) {
+func EraseLine(mode EraseLineMode) {
 	fmt.Printf("\x1b[%dK", mode)
 }
