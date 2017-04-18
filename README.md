@@ -1,6 +1,6 @@
 # Survey
 [![Build Status](https://travis-ci.org/AlecAivazis/survey.svg?branch=feature%2Fpretty)](https://travis-ci.org/AlecAivazis/survey)
-[![GoDoc](http://img.shields.io/badge/godoc-reference-5272B4.svg)](https://godoc.org/github.com/alecaivazis/survey)
+[![GoDoc](http://img.shields.io/badge/godoc-reference-5272B4.svg)](https://godoc.org/github.com/AlecAivazis/survey)
 
 
 A library for building interactive prompts. Heavily inspired by the great [inquirer.js](https://github.com/SBoudrias/Inquirer.js/).
@@ -14,7 +14,7 @@ package main
 
 import (
     "fmt"
-    "gopkg.in/alecaivazis/survey.v1"
+    "gopkg.in/AlecAivazis/survey.v1"
 )
 
 // the questions to ask
@@ -56,7 +56,7 @@ func main() {
 Examples can be found in the `examples/` directory. Run them
 to see basic behavior:
 ```bash
-go get github.com/alecaivazis/survey
+go get github.com/AlecAivazis/survey
 
 # ... navigate to the repo in your GOPATH
 
@@ -167,5 +167,5 @@ you build your application. For example, importing v1 of survey would look somet
 ```golang
 package main
 
-import "gopkg.in/alecaivazis/survey.v1"
+import "gopkg.in/AlecAivazis/survey.v1"
 ```

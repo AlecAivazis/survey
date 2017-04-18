@@ -3,8 +3,8 @@ package survey
 import (
 	"fmt"
 
-	"github.com/alecaivazis/survey/core"
-	"github.com/alecaivazis/survey/terminal"
+	"github.com/AlecAivazis/survey/core"
+	"github.com/AlecAivazis/survey/terminal"
 	"github.com/chzyer/readline"
 )
 

@@ -3,7 +3,7 @@ package survey
 import (
 	"github.com/chzyer/readline"
 
-	"github.com/alecaivazis/survey/core"
+	"github.com/AlecAivazis/survey/core"
 )
 
 // Password is like a normal Input but the text shows up as *'s and

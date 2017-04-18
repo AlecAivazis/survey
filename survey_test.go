@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/alecaivazis/survey/core"
+	"github.com/AlecAivazis/survey/core"
 )
 
 func init() {

@@ -1,7 +1,7 @@
 language: go
 
 before_install:
-  - go get github.com/alecaivazis/run
+  - go get github.com/AlecAivazis/run
 
 install:
   - run install-deps

@@ -7,4 +7,4 @@ install-deps:
   command: go get -t {{.files}}
 
 variables:
-  files: '$(go list -v ./... | grep -Ev "github.com/alecaivazis/survey/(tests|examples)")'
+  files: '$(go list -v ./... | grep -Ev "github.com/AlecAivazis/survey/(tests|examples)")'

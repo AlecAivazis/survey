@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/alecaivazis/survey"
+	"github.com/AlecAivazis/survey"
 )
 
 type TestTableEntry struct {
