@@ -2,6 +2,8 @@ package survey
 
 import (
 	"github.com/chzyer/readline"
+
+	"github.com/AlecAivazis/survey/core"
 )
 
 // Password is like a normal Input but the text shows up as *'s and
@@ -15,9 +17,9 @@ var PasswordQuestionTemplate = `
 {{- color "green+hb"}}? {{color "reset"}}
 {{- color "default+hb"}}{{ .Message }} {{color "reset"}}`
 
-func (p *Password) Prompt(rl *readline.Instance) (line string, err error) {
+func (p *Password) Prompt(rl *readline.Instance) (line interface{}, err error) {
 	// render the question template
-	out, err := RunTemplate(
+	out, err := core.RunTemplate(
 		PasswordQuestionTemplate,
 		*p,
 	)
@@ -39,6 +41,6 @@ func (p *Password) Prompt(rl *readline.Instance) (line string, err error) {
 }
 
 // Cleanup hides the string with a fixed number of characters.
-func (prompt *Password) Cleanup(rl *readline.Instance, val string) error {
+func (prompt *Password) Cleanup(rl *readline.Instance, val interface{}) error {
 	return nil
 }

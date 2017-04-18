@@ -1,9 +1,9 @@
 package main
 
 import (
-	"errors"
 	"fmt"
-	"github.com/alecaivazis/survey"
+
+	"github.com/AlecAivazis/survey"
 )
 
 // the questions to ask
@@ -16,10 +16,10 @@ var validationQs = []*survey.Question{
 	{
 		Name:   "valid",
 		Prompt: &survey.Input{"Enter 'foo':", "not foo"},
-		Validate: func(str string) error {
+		Validate: func(val interface{}) error {
 			// if the input matches the expectation
-			if str != "foo" {
-				return errors.New(fmt.Sprintf("You entered %s, not 'foo'.", str))
+			if str := val.(string); str != "foo" {
+				return fmt.Errorf("You entered %s, not 'foo'.", str)
 			}
 			// nothing was wrong
 			return nil
@@ -28,8 +28,12 @@ var validationQs = []*survey.Question{
 }
 
 func main() {
-
-	_, err := survey.Ask(validationQs)
+	// the place to hold the answers
+	answers := struct {
+		Name  string
+		Valid string
+	}{}
+	err := survey.Ask(validationQs, &answers)
 
 	if err != nil {
 		fmt.Println("\n", err.Error())

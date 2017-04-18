@@ -1,4 +1,4 @@
-package survey
+package core
 
 import (
 	"bytes"

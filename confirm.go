@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/alecaivazis/survey/terminal"
+	"github.com/AlecAivazis/survey/core"
+	"github.com/AlecAivazis/survey/terminal"
 	"github.com/chzyer/readline"
 )
 
@@ -12,7 +13,6 @@ import (
 type Confirm struct {
 	Message string
 	Default bool
-	Answer  *bool
 }
 
 // data available to the templates when processing
@@ -64,7 +64,7 @@ func (c *Confirm) getBool(rl *readline.Instance) (bool, error) {
 		answer = c.Default
 	default:
 		// we didnt get a valid answer, so print error and prompt again
-		out, err := RunTemplate(
+		out, err := core.RunTemplate(
 			ErrorTemplate, fmt.Errorf("%q is not a valid answer, please try again.", val),
 		)
 		// if something went wrong
@@ -88,16 +88,9 @@ func (c *Confirm) getBool(rl *readline.Instance) (bool, error) {
 
 // Prompt prompts the user with a simple text field and expects a reply followed
 // by a carriage return.
-func (c *Confirm) Prompt(rl *readline.Instance) (string, error) {
-	// if we weren't passed an answer
-	if c.Answer == nil {
-		// build one
-		answer := false
-		c.Answer = &answer
-	}
-
+func (c *Confirm) Prompt(rl *readline.Instance) (interface{}, error) {
 	// render the question template
-	out, err := RunTemplate(
+	out, err := core.RunTemplate(
 		ConfirmQuestionTemplate,
 		ConfirmTemplateData{Confirm: *c},
 	)
@@ -116,24 +109,30 @@ func (c *Confirm) Prompt(rl *readline.Instance) (string, error) {
 		return "", err
 	}
 
-	// return the value
-	*c.Answer = answer
-
 	// convert the boolean into the appropriate string
-	return yesNo(answer), nil
+	return answer, nil
 }
 
 // Cleanup overwrite the line with the finalized formatted version
-func (c *Confirm) Cleanup(rl *readline.Instance, val string) error {
+func (c *Confirm) Cleanup(rl *readline.Instance, val interface{}) error {
 	// go up one line
 	terminal.CursorPreviousLine(1)
 	// clear the line
-	terminal.EraseInLine(1)
+	terminal.EraseInLine(0)
+
+	// the string version of the answer
+	ans := ""
+	// if the value was previously true
+	if val.(bool) {
+		ans = "yes"
+	} else {
+		ans = "no"
+	}
 
 	// render the template
-	out, err := RunTemplate(
+	out, err := core.RunTemplate(
 		ConfirmQuestionTemplate,
-		ConfirmTemplateData{Confirm: *c, Answer: val},
+		ConfirmTemplateData{Confirm: *c, Answer: ans},
 	)
 	if err != nil {
 		return err

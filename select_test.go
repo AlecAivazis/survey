@@ -2,29 +2,31 @@ package survey
 
 import (
 	"testing"
+
+	"github.com/AlecAivazis/survey/core"
 )
 
 func init() {
 	// disable color output for all prompts to simplify testing
-	DisableColor = true
+	core.DisableColor = true
 }
 
 func TestCanFormatSelectOptions(t *testing.T) {
 
-	prompt := &Choice{
-		Choices: []string{"foo", "bar", "baz", "buz"},
+	prompt := &Select{
+		Options: []string{"foo", "bar", "baz", "buz"},
 		Default: "baz",
 	}
 	// TODO: figure out a way for the test to actually test this bit of code
-	prompt.SelectedIndex = 2
+	prompt.selectedIndex = 2
 
-	actual, err := RunTemplate(
+	actual, err := core.RunTemplate(
 		SelectChoicesTemplate,
-		SelectTemplateData{Select: *prompt},
+		SelectTemplateData{Select: *prompt, SelectedIndex: 2},
 	)
 
 	if err != nil {
-		t.Errorf("Failed to run template to format choice choices: %s", err)
+		t.Errorf("Failed to run template to format choice options: %s", err)
 	}
 
 	expected := `  foo
@@ -40,13 +42,13 @@ func TestCanFormatSelectOptions(t *testing.T) {
 
 func TestSelectFormatQuestion(t *testing.T) {
 
-	prompt := &Choice{
+	prompt := &Select{
 		Message: "Pick your word:",
-		Choices: []string{"foo", "bar", "baz", "buz"},
+		Options: []string{"foo", "bar", "baz", "buz"},
 		Default: "baz",
 	}
 
-	actual, err := RunTemplate(
+	actual, err := core.RunTemplate(
 		SelectQuestionTemplate,
 		SelectTemplateData{Select: *prompt},
 	)
@@ -63,13 +65,13 @@ func TestSelectFormatQuestion(t *testing.T) {
 
 func TestSelectFormatAnswer(t *testing.T) {
 
-	prompt := &Choice{
+	prompt := &Select{
 		Message: "Pick your word:",
-		Choices: []string{"foo", "bar", "baz", "buz"},
+		Options: []string{"foo", "bar", "baz", "buz"},
 		Default: "baz",
 	}
 
-	actual, err := RunTemplate(
+	actual, err := core.RunTemplate(
 		SelectQuestionTemplate,
 		SelectTemplateData{Select: *prompt, Answer: "buz"},
 	)

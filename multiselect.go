@@ -1,40 +1,39 @@
 package survey
 
 import (
-	"encoding/json"
 	"errors"
 	"io/ioutil"
 	"strings"
 
-	"github.com/alecaivazis/survey/terminal"
+	"github.com/AlecAivazis/survey/core"
+	"github.com/AlecAivazis/survey/terminal"
 	"github.com/chzyer/readline"
 )
 
-// MultiChoice is a prompt that presents a list of various options to the user
+// MultiSelect is a prompt that presents a list of various options to the user
 // for them to select using the arrow keys and enter.
-type MultiChoice struct {
+type MultiSelect struct {
 	Message       string
 	Options       []string
-	Defaults      []string
-	Answer        *[]string
+	Default       []string
 	selectedIndex int
 	checked       map[int]bool
 }
 
 // data available to the templates when processing
-type MultiChoiceTemplateData struct {
-	MultiChoice
-	Answer        []string
+type MultiSelectTemplateData struct {
+	MultiSelect
+	Answer        string
 	Checked       map[int]bool
 	SelectedIndex int
 }
 
-var MultiChoiceQuestionTemplate = `
+var MultiSelectQuestionTemplate = `
 {{- color "green+hb"}}? {{color "reset"}}
 {{- color "default+hb"}}{{ .Message }} {{color "reset"}}
-{{- if .Answer}}{{color "cyan"}}{{.Answer | printf "%q"}}{{color "reset"}}{{end}}`
+{{- if .Answer}}{{color "cyan"}}{{.Answer}}{{color "reset"}}{{end}}`
 
-var MultiChoiceOptionsTemplate = `
+var MultiSelectOptionsTemplate = `
 {{- range $ix, $option := .Options}}
   {{- if eq $ix $.SelectedIndex}}{{color "cyan"}}❯{{color "reset"}}{{else}} {{end}}
   {{- if index $.Checked $ix}}{{color "green"}} ◉ {{else}}{{color "default+hb"}} ◯ {{end}}
@@ -43,7 +42,7 @@ var MultiChoiceOptionsTemplate = `
 {{end}}`
 
 // OnChange is called on every keypress.
-func (m *MultiChoice) OnChange(line []rune, pos int, key rune) (newLine []rune, newPos int, ok bool) {
+func (m *MultiSelect) OnChange(line []rune, pos int, key rune) (newLine []rune, newPos int, ok bool) {
 	if key == terminal.KeyEnter {
 		// just pass on the current value
 		return line, 0, true
@@ -72,18 +71,18 @@ func (m *MultiChoice) OnChange(line []rune, pos int, key rune) (newLine []rune, 
 	return line, 0, true
 }
 
-func (m *MultiChoice) render() error {
+func (m *MultiSelect) render() error {
 	// clean up what we left behind last time
 	for range m.Options {
 		terminal.CursorPreviousLine(1)
-		terminal.EraseInLine(1)
+		terminal.EraseInLine(0)
 	}
 
 	// render the template summarizing the current state
-	out, err := RunTemplate(
-		MultiChoiceOptionsTemplate,
-		MultiChoiceTemplateData{
-			MultiChoice:   *m,
+	out, err := core.RunTemplate(
+		MultiSelectOptionsTemplate,
+		MultiSelectTemplateData{
+			MultiSelect:   *m,
 			SelectedIndex: m.selectedIndex,
 			Checked:       m.checked,
 		},
@@ -99,14 +98,7 @@ func (m *MultiChoice) render() error {
 	return nil
 }
 
-func (m *MultiChoice) Prompt(rl *readline.Instance) (string, error) {
-	// if the user didn't pass an answer reference
-	if m.Answer == nil {
-		// build one
-		answer := []string{}
-		m.Answer = &answer
-	}
-
+func (m *MultiSelect) Prompt(rl *readline.Instance) (interface{}, error) {
 	// the readline config
 	config := &readline.Config{
 		Listener: m,
@@ -117,8 +109,8 @@ func (m *MultiChoice) Prompt(rl *readline.Instance) (string, error) {
 	// compute the default state
 	m.checked = make(map[int]bool)
 	// if there is a default
-	if len(m.Defaults) > 0 {
-		for _, dflt := range m.Defaults {
+	if len(m.Default) > 0 {
+		for _, dflt := range m.Default {
 			for i, opt := range m.Options {
 				// if the option correponds to the default
 				if opt == dflt {
@@ -137,10 +129,10 @@ func (m *MultiChoice) Prompt(rl *readline.Instance) (string, error) {
 		return "", errors.New("please provide options to select from")
 	}
 	// generate the template for the current state of the prompt
-	out, err := RunTemplate(
-		MultiChoiceQuestionTemplate,
-		MultiChoiceTemplateData{
-			MultiChoice:   *m,
+	out, err := core.RunTemplate(
+		MultiSelectQuestionTemplate,
+		MultiSelectTemplateData{
+			MultiSelect:   *m,
 			SelectedIndex: m.selectedIndex,
 			Checked:       m.checked,
 		},
@@ -171,48 +163,27 @@ func (m *MultiChoice) Prompt(rl *readline.Instance) (string, error) {
 			answers = append(answers, option)
 		}
 	}
-	*m.Answer = answers
 
-	// nothing went wrong
-	return m.value()
-}
-
-func (m *MultiChoice) value() (string, error) {
-	answers := []string{}
-	for ix, option := range m.Options {
-		if val, ok := m.checked[ix]; ok && val {
-			answers = append(answers, option)
-		}
-	}
-	// return the selected option
-	js, err := json.Marshal(answers)
-	if err != nil {
-		return "", err
-	}
-	return string(js), nil
+	return answers, nil
 }
 
 // Cleanup removes the options section, and renders the ask like a normal question.
-func (m *MultiChoice) Cleanup(rl *readline.Instance, val string) error {
+func (m *MultiSelect) Cleanup(rl *readline.Instance, val interface{}) error {
 	terminal.CursorPreviousLine(1)
-	terminal.EraseInLine(1)
+	terminal.EraseInLine(0)
 	for range m.Options {
 		terminal.CursorPreviousLine(1)
-		terminal.EraseInLine(1)
+		terminal.EraseInLine(0)
 	}
 
-	// parse the value into a list of strings
-	var value []string
-	json.Unmarshal([]byte(val), &value)
-
 	// execute the output summary template with the answer
-	output, err := RunTemplate(
-		MultiChoiceQuestionTemplate,
-		MultiChoiceTemplateData{
-			MultiChoice:   *m,
+	output, err := core.RunTemplate(
+		MultiSelectQuestionTemplate,
+		MultiSelectTemplateData{
+			MultiSelect:   *m,
 			SelectedIndex: m.selectedIndex,
 			Checked:       m.checked,
-			Answer:        value,
+			Answer:        strings.Join(val.([]string), ", "),
 		},
 	)
 	if err != nil {

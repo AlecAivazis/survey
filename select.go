@@ -5,71 +5,73 @@ import (
 	"io/ioutil"
 	"strings"
 
-	"github.com/alecaivazis/survey/terminal"
+	"github.com/AlecAivazis/survey/core"
+	"github.com/AlecAivazis/survey/terminal"
 	"github.com/chzyer/readline"
 )
 
-// Choice is a prompt that presents a list of various options to the user
+// Select is a prompt that presents a list of various options to the user
 // for them to select using the arrow keys and enter.
-type Choice struct {
+type Select struct {
 	Message       string
-	Choices       []string
+	Options       []string
 	Default       string
-	SelectedIndex int
+	selectedIndex int
 }
 
 // the data available to the templates when processing
 type SelectTemplateData struct {
-	Select Choice
-	Answer string
+	Select
+	SelectedIndex int
+	Answer        string
 }
 
 const (
 	SelectQuestionTemplate = `
 {{- color "green+hb"}}? {{color "reset"}}
-{{- color "default+hb"}}{{ $.Select.Message }} {{color "reset"}}
+{{- color "default+hb"}}{{ .Message }} {{color "reset"}}
 {{- if .Answer}}{{color "cyan"}}{{.Answer}}{{color "reset"}}{{end}}`
 	// the template used to show the list of Selects
 	SelectChoicesTemplate = `
-{{- range $ix, $choice := $.Select.Choices}}
-  {{- if eq $ix $.Select.SelectedIndex}}{{color "cyan+b"}}> {{else}}{{color "default+hb"}}  {{end}}
+{{- range $ix, $choice := .Options}}
+  {{- if eq $ix $.SelectedIndex}}{{color "cyan+b"}}> {{else}}{{color "default+hb"}}  {{end}}
   {{- $choice}}
   {{- color "reset"}}
 {{end}}`
 )
 
 // OnChange is called on every keypress.
-func (s *Choice) OnChange(line []rune, pos int, key rune) (newLine []rune, newPos int, ok bool) {
+func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPos int, ok bool) {
 	// if the user pressed the enter key
 	if key == terminal.KeyEnter {
-		return []rune(s.Choices[s.SelectedIndex]), 0, true
+		return []rune(s.Options[s.selectedIndex]), 0, true
 		// if the user pressed the up arrow
-	} else if key == terminal.KeyArrowUp && s.SelectedIndex > 0 {
+	} else if key == terminal.KeyArrowUp && s.selectedIndex > 0 {
 		// decrement the selected index
-		s.SelectedIndex--
+		s.selectedIndex--
 		// if the user pressed down and there is room to move
-	} else if key == terminal.KeyArrowDown && s.SelectedIndex < len(s.Choices)-1 {
+	} else if key == terminal.KeyArrowDown && s.selectedIndex < len(s.Options)-1 {
 		// increment the selected index
-		s.SelectedIndex++
+		s.selectedIndex++
 	}
 
 	// render the options
 	s.render()
 
 	// if we are not pressing ent
-	return []rune(s.Choices[s.SelectedIndex]), 0, true
+	return []rune(s.Options[s.selectedIndex]), 0, true
 }
 
-func (s *Choice) render() error {
-	for range s.Choices {
+func (s *Select) render() error {
+	for range s.Options {
 		terminal.CursorPreviousLine(1)
-		terminal.EraseInLine(1)
+		terminal.EraseInLine(0)
 	}
 
 	// the formatted response
-	out, err := RunTemplate(
+	out, err := core.RunTemplate(
 		SelectChoicesTemplate,
-		SelectTemplateData{Select: *s},
+		SelectTemplateData{Select: *s, SelectedIndex: s.selectedIndex},
 	)
 	if err != nil {
 		return err
@@ -81,7 +83,7 @@ func (s *Choice) render() error {
 	return nil
 }
 
-func (s *Choice) Prompt(rl *readline.Instance) (string, error) {
+func (s *Select) Prompt(rl *readline.Instance) (interface{}, error) {
 	config := &readline.Config{
 		Listener: s,
 		Stdout:   ioutil.Discard,
@@ -89,7 +91,7 @@ func (s *Choice) Prompt(rl *readline.Instance) (string, error) {
 	rl.SetConfig(config)
 
 	// if there are no options to render
-	if len(s.Choices) == 0 {
+	if len(s.Options) == 0 {
 		// we failed
 		return "", errors.New("please provide options to select from")
 	}
@@ -99,7 +101,7 @@ func (s *Choice) Prompt(rl *readline.Instance) (string, error) {
 	// if there is a default
 	if s.Default != "" {
 		// find the choice
-		for i, opt := range s.Choices {
+		for i, opt := range s.Options {
 			// if the option correponds to the default
 			if opt == s.Default {
 				// we found our initial value
@@ -110,12 +112,12 @@ func (s *Choice) Prompt(rl *readline.Instance) (string, error) {
 		}
 	}
 	// save the selected index
-	s.SelectedIndex = sel
+	s.selectedIndex = sel
 
 	// render the initial question
-	out, err := RunTemplate(
+	out, err := core.RunTemplate(
 		SelectQuestionTemplate,
-		SelectTemplateData{Select: *s},
+		SelectTemplateData{Select: *s, SelectedIndex: sel},
 	)
 	if err != nil {
 		return "", err
@@ -125,7 +127,7 @@ func (s *Choice) Prompt(rl *readline.Instance) (string, error) {
 	terminal.CursorHide()
 	// ask the question
 	terminal.Println(out)
-	for range s.Choices {
+	for range s.Options {
 		terminal.Println()
 	}
 	// start waiting for input
@@ -141,7 +143,7 @@ func (s *Choice) Prompt(rl *readline.Instance) (string, error) {
 			val = s.Default
 		} else {
 			// there is no default value so use the first
-			val = s.Choices[0]
+			val = s.Options[0]
 		}
 	}
 
@@ -149,18 +151,18 @@ func (s *Choice) Prompt(rl *readline.Instance) (string, error) {
 	return val, err
 }
 
-func (s *Choice) Cleanup(rl *readline.Instance, val string) error {
+func (s *Select) Cleanup(rl *readline.Instance, val interface{}) error {
 	terminal.CursorPreviousLine(1)
-	terminal.EraseInLine(1)
-	for range s.Choices {
+	terminal.EraseInLine(0)
+	for range s.Options {
 		terminal.CursorPreviousLine(1)
-		terminal.EraseInLine(1)
+		terminal.EraseInLine(0)
 	}
 
 	// execute the output summary template with the answer
-	output, err := RunTemplate(
+	output, err := core.RunTemplate(
 		SelectQuestionTemplate,
-		SelectTemplateData{Select: *s, Answer: val},
+		SelectTemplateData{Select: *s, Answer: val.(string)},
 	)
 	if err != nil {
 		return err

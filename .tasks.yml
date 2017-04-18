@@ -1,0 +1,10 @@
+tests:
+  summary: Run the test suite
+  command: go test {{.files}}
+
+install-deps:
+  summary: Install all of package dependencies
+  command: go get -t {{.files}}
+
+variables:
+  files: '$(go list -v ./... | grep -Ev "github.com/AlecAivazis/survey/(tests|examples)")'

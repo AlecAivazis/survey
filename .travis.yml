@@ -1,7 +1,10 @@
 language: go
 
+before_install:
+  - go get github.com/AlecAivazis/run
+
 install:
-  - go get -t . ./terminal/...
+  - run install-deps
 
 script:
-  - go test -v . ./terminal/...
+  - run tests

@@ -1,43 +1,45 @@
 package main
 
 import (
-	"github.com/alecaivazis/survey"
-	"github.com/alecaivazis/survey/tests/util"
+	"github.com/AlecAivazis/survey"
+	"github.com/AlecAivazis/survey/tests/util"
 )
+
+var answer = ""
 
 var goodTable = []TestUtil.TestTableEntry{
 	{
-		"standard", &survey.Choice{
+		"standard", &survey.Select{
 			Message: "Choose a color:",
-			Choices: []string{"red", "blue", "green"},
-		},
+			Options: []string{"red", "blue", "green"},
+		}, &answer,
 	},
 	{
-		"short", &survey.Choice{
+		"short", &survey.Select{
 			Message: "Choose a color:",
-			Choices: []string{"red", "blue"},
-		},
+			Options: []string{"red", "blue"},
+		}, &answer,
 	},
 	{
-		"default", &survey.Choice{
+		"default", &survey.Select{
 			Message: "Choose a color (should default blue):",
-			Choices: []string{"red", "blue", "green"},
+			Options: []string{"red", "blue", "green"},
 			Default: "blue",
-		},
+		}, &answer,
 	},
 	{
-		"one", &survey.Choice{
+		"one", &survey.Select{
 			Message: "Choose one:",
-			Choices: []string{"hello"},
-		},
+			Options: []string{"hello"},
+		}, &answer,
 	},
 }
 
 var badTable = []TestUtil.TestTableEntry{
 	{
-		"no Choices", &survey.Choice{
+		"no options", &survey.Select{
 			Message: "Choose one:",
-		},
+		}, &answer,
 	},
 }
 

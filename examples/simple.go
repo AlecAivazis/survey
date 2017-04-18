@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/alecaivazis/survey"
+	"github.com/AlecAivazis/survey"
 )
 
 // the questions to ask
@@ -17,22 +17,26 @@ var simpleQs = []*survey.Question{
 	},
 	{
 		Name: "color",
-		Prompt: &survey.Choice{
+		Prompt: &survey.Select{
 			Message: "Choose a color:",
-			Choices: []string{"red", "blue", "green"},
+			Options: []string{"red", "blue", "green"},
 		},
 		Validate: survey.Required,
 	},
 }
 
 func main() {
+	answers := struct {
+		Name  string
+		Color string
+	}{}
 	// ask the question
-	answers, err := survey.Ask(simpleQs)
+	err := survey.Ask(simpleQs, &answers)
 
 	if err != nil {
 		fmt.Println(err.Error())
 		return
 	}
 	// print the answers
-	fmt.Printf("%s chose %s", answers["name"], answers["color"])
+	fmt.Printf("%s chose %s.\n", answers.Name, answers.Color)
 }
