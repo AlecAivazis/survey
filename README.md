@@ -67,7 +67,7 @@ go run examples/validation.go
 ## Prompts
 
 ### Input
-<img src="https://media.giphy.com/media/3og0IxS8JsuD9Z8syA/giphy.gif" width="300px"/>
+<img src="https://media.giphy.com/media/3og0IxS8JsuD9Z8syA/giphy.gif" width="400px"/>
 
 ```golang
 name := ""
@@ -79,7 +79,7 @@ survey.AskOne(prompt, &name, nil)
 
 
 ### Password
-<img src="https://media.giphy.com/media/26FmQr6mUivkq71GE/giphy.gif" width="300px" />
+<img src="https://media.giphy.com/media/26FmQr6mUivkq71GE/giphy.gif" width="400px" />
 
 ```golang
 password := ""
@@ -91,7 +91,7 @@ survey.AskOne(prompt, &password, nil)
 
 
 ### Confirm
-<img src="https://media.giphy.com/media/3oKIPgsUmTp4m3eo4E/giphy.gif" width="300px"/>
+<img src="https://media.giphy.com/media/3oKIPgsUmTp4m3eo4E/giphy.gif" width="400px"/>
 
 ```golang
 name := false
@@ -103,7 +103,7 @@ survey.AskOne(prompt, &name, nil)
 
 
 ### Select
-<img src="https://media.giphy.com/media/3oKIPxigmMu5YqpUPK/giphy.gif" width="300px"/>
+<img src="https://media.giphy.com/media/3oKIPxigmMu5YqpUPK/giphy.gif" width="400px"/>
 
 ```golang
 color := ""
@@ -116,7 +116,7 @@ survey.AskOne(prompt, &color, nil)
 
 
 ### MultiSelect
-<img src="https://media.giphy.com/media/3oKIP8lHYFtGeQDH0c/giphy.gif" width="300px"/>
+<img src="https://media.giphy.com/media/3oKIP8lHYFtGeQDH0c/giphy.gif" width="400px"/>
 
 ```golang
 days := []string{}
