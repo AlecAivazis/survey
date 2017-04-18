@@ -138,11 +138,9 @@ response:
 q := &survey.Question{
     Prompt: &survey.Input{Message: "Hello world validation"},
     Validate: func (val interface{}) error {
-        // since we are validating an Input, this will always succeed
-        if str, ok := val.(string) ; ok {
-            if len(str) > 10 {
-                return errors.New("This response cannot be longer than 10 characters.")
-            }
+        // since we are validating an Input, the assertion will always succeed
+        if str, ok := val.(string) ; ok && len(str) > 10 {
+            return errors.New("This response cannot be longer than 10 characters.")
         }
     }
 }
