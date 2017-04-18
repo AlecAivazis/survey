@@ -162,7 +162,7 @@ validators include:
 
 This project tries to maintain semantic GitHub releases as closely as possible. As such, services
 like [gopkg.in](http://labix.org/gopkg.in) work very well to ensure non-breaking changes whenever
-you build your application. For example, importing v1 of survey would look something like
+you build your application. For example, importing v1 of survey could look something like
 
 ```golang
 package main
