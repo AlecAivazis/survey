@@ -65,7 +65,7 @@ func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPo
 func (s *Select) render() error {
 	for range s.Options {
 		terminal.CursorPreviousLine(1)
-		terminal.EraseInLine(0)
+		terminal.EraseLine(terminal.ERASE_LINE_ALL)
 	}
 
 	// the formatted response
@@ -153,10 +153,10 @@ func (s *Select) Prompt(rl *readline.Instance) (interface{}, error) {
 
 func (s *Select) Cleanup(rl *readline.Instance, val interface{}) error {
 	terminal.CursorPreviousLine(1)
-	terminal.EraseInLine(0)
+	terminal.EraseLine(terminal.ERASE_LINE_ALL)
 	for range s.Options {
 		terminal.CursorPreviousLine(1)
-		terminal.EraseInLine(0)
+		terminal.EraseLine(terminal.ERASE_LINE_ALL)
 	}
 
 	// execute the output summary template with the answer
