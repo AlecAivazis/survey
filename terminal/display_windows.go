@@ -6,7 +6,7 @@ import (
 	"unsafe"
 )
 
-func EraseInLine(mode int) {
+func EraseLine(mode EraseLineMode) {
 	handle := syscall.Handle(os.Stdout.Fd())
 
 	var csbi consoleScreenBufferInfo
@@ -16,11 +16,11 @@ func EraseInLine(mode int) {
 	var x short
 	cursor := csbi.cursorPosition
 	switch mode {
-	case 1:
+	case ERASE_LINE_END:
 		x = csbi.size.x
-	case 2:
+	case ERASE_LINE_START:
 		x = 0
-	case 3:
+	case ERASE_LINE_ALL:
 		cursor.x = 0
 		x = csbi.size.x
 	}

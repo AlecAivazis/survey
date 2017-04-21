@@ -138,11 +138,9 @@ response:
 q := &survey.Question{
     Prompt: &survey.Input{Message: "Hello world validation"},
     Validate: func (val interface{}) error {
-        // since we are validating an Input, this will always succeed
-        if str, ok := val.(string) ; ok {
-            if len(str) > 10 {
-                return errors.New("This response cannot be longer than 10 characters.")
-            }
+        // since we are validating an Input, the assertion will always succeed
+        if str, ok := val.(string) ; ok && len(str) > 10 {
+            return errors.New("This response cannot be longer than 10 characters.")
         }
     }
 }
@@ -162,7 +160,7 @@ validators include:
 
 This project tries to maintain semantic GitHub releases as closely as possible. As such, services
 like [gopkg.in](http://labix.org/gopkg.in) work very well to ensure non-breaking changes whenever
-you build your application. For example, importing v1 of survey would look something like
+you build your application. For example, importing v1 of survey could look something like
 
 ```golang
 package main
