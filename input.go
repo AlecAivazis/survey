@@ -44,6 +44,13 @@ func (i *Input) Prompt(rl *readline.Instance) (line interface{}, err error) {
 	rl.SetPrompt(fmt.Sprintf(out))
 	// get the next line
 	line, err = rl.Readline()
+
+	// if the line is empty
+	if line == "" {
+		// use the default value
+		line = i.Default
+	}
+
 	// we're done
 	return line, err
 }
