@@ -20,7 +20,7 @@ func TestConfirmRender(t *testing.T) {
 		expected string
 	}{
 		{
-			"Test Connfirm question output with default true",
+			"Test Confirm question output with default true",
 			Confirm{Message: "Is pizza your favorite food?", Default: true},
 			ConfirmTemplateData{},
 			`? Is pizza your favorite food? (Y/n) `,
