@@ -128,6 +128,8 @@ func (s *Select) Prompt(rl *readline.Instance) (interface{}, error) {
 
 	// hide the cursor
 	terminal.CursorHide()
+	// show the cursor when we're done
+	defer terminal.CursorShow()
 	// ask the question
 	terminal.Println(out)
 	for range s.Options {
@@ -138,8 +140,6 @@ func (s *Select) Prompt(rl *readline.Instance) (interface{}, error) {
 
 	// start waiting for input
 	_, err = rl.Readline()
-	// show the cursor when we're done
-	terminal.CursorShow()
 
 	var val string
 	// if we are supposed to use the default value
