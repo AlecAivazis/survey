@@ -14,23 +14,27 @@ func init() {
 
 func TestInputRender(t *testing.T) {
 
-	prompt := Input{
-		Message: "What is your favorite month:",
-		Default: "April",
-	}
-
 	tests := []struct {
+		title    string
 		prompt   Input
 		data     InputTemplateData
 		expected string
 	}{
 		{
-			prompt,
+			"Test Input question output without default",
+			Input{Message: "What is your favorite month:"},
+			InputTemplateData{},
+			"? What is your favorite month: ",
+		},
+		{
+			"Test Input question output with default",
+			Input{Message: "What is your favorite month:", Default: "April"},
 			InputTemplateData{},
 			"? What is your favorite month: (April) ",
 		},
 		{
-			prompt,
+			"Test Input answer output",
+			Input{Message: "What is your favorite month:"},
 			InputTemplateData{Answer: "October"},
 			"? What is your favorite month: October",
 		},
@@ -42,7 +46,7 @@ func TestInputRender(t *testing.T) {
 			InputQuestionTemplate,
 			test.data,
 		)
-		assert.Nil(t, err)
-		assert.Equal(t, test.expected, actual)
+		assert.Nil(t, err, test.title)
+		assert.Equal(t, test.expected, actual, test.title)
 	}
 }

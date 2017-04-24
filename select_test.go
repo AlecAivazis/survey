@@ -21,12 +21,14 @@ func TestSelectRender(t *testing.T) {
 	}
 
 	tests := []struct {
+		title    string
 		prompt   Select
 		template string
 		data     SelectTemplateData
 		expected string
 	}{
 		{
+			"Test Select choices output",
 			prompt,
 			SelectChoicesTemplate,
 			SelectTemplateData{SelectedIndex: 2},
@@ -37,12 +39,14 @@ func TestSelectRender(t *testing.T) {
 `,
 		},
 		{
+			"Test Select question output",
 			prompt,
 			SelectQuestionTemplate,
 			SelectTemplateData{},
 			"? Pick your word:",
 		},
 		{
+			"Test Select answer output",
 			prompt,
 			SelectQuestionTemplate,
 			SelectTemplateData{Answer: "buz"},
@@ -56,7 +60,7 @@ func TestSelectRender(t *testing.T) {
 			test.template,
 			test.data,
 		)
-		assert.Nil(t, err)
-		assert.Equal(t, test.expected, actual)
+		assert.Nil(t, err, test.title)
+		assert.Equal(t, test.expected, actual, test.title)
 	}
 }
