@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/AlecAivazis/survey/core"
+	"github.com/stretchr/testify/assert"
 )
 
 func init() {
@@ -11,23 +12,30 @@ func init() {
 	core.DisableColor = true
 }
 
-func TestPasswordFormatQuestion(t *testing.T) {
+func TestPasswordRender(t *testing.T) {
 
-	prompt := &Input{
+	prompt := Password{
 		Message: "Tell me your secret:",
 	}
 
-	actual, err := core.RunTemplate(
-		PasswordQuestionTemplate,
-		*prompt,
-	)
-	if err != nil {
-		t.Errorf("Failed to run template to format password question: %s", err)
+	tests := []struct {
+		title    string
+		prompt   Password
+		expected string
+	}{
+		{
+			"Test Password question output",
+			prompt,
+			"? Tell me your secret: ",
+		},
 	}
 
-	expected := `? Tell me your secret: `
-
-	if actual != expected {
-		t.Errorf("Formatted input question was not formatted correctly. Found:\n%s\nExpected:\n%s", actual, expected)
+	for _, test := range tests {
+		actual, err := core.RunTemplate(
+			PasswordQuestionTemplate,
+			&test.prompt,
+		)
+		assert.Nil(t, err, test.title)
+		assert.Equal(t, test.expected, actual, test.title)
 	}
 }
