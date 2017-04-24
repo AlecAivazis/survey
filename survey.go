@@ -41,12 +41,6 @@ func AskOne(p Prompt, t interface{}, v Validator) error {
 
 // Ask performs the prompt loop
 func Ask(qs []*Question, t interface{}) error {
-	// grab the readline instance
-	rl, err := terminal.GetReadline()
-	if err != nil {
-		return err
-	}
-	defer rl.Close()
 
 	// if we weren't passed a place to record the answers
 	if t == nil {
@@ -56,6 +50,12 @@ func Ask(qs []*Question, t interface{}) error {
 
 	// go over every question
 	for _, q := range qs {
+		// grab the readline instance
+		rl, err := terminal.GetReadline()
+		if err != nil {
+			return err
+		}
+
 		// grab the user input and save it
 		ans, err := q.Prompt.Prompt(rl)
 		// if there was a problem
@@ -84,6 +84,9 @@ func Ask(qs []*Question, t interface{}) error {
 
 		// tell the prompt to cleanup with the validated value
 		q.Prompt.Cleanup(rl, ans)
+
+		// make sure we close the readline instance
+		rl.Close()
 
 		// if something went wrong
 		if err != nil {

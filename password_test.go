@@ -21,10 +21,12 @@ func TestPasswordRender(t *testing.T) {
 	}
 
 	tests := []struct {
+		title    string
 		prompt   Password
 		expected string
 	}{
 		{
+			"Test Password question output",
 			prompt,
 			"? Tell me your secret: ",
 		},
@@ -39,7 +41,7 @@ func TestPasswordRender(t *testing.T) {
 			PasswordQuestionTemplate,
 			&test.prompt,
 		)
-		assert.Nil(t, err)
-		assert.Equal(t, test.expected, outputBuffer.String())
+		assert.Nil(t, err, test.title)
+		assert.Equal(t, test.expected, outputBuffer.String(), test.title)
 	}
 }

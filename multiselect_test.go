@@ -23,11 +23,13 @@ func TestMultiSelectRender(t *testing.T) {
 	}
 
 	tests := []struct {
+		title    string
 		prompt   MultiSelect
 		data     MultiSelectTemplateData
 		expected string
 	}{
 		{
+			"Test MultiSelect question output",
 			prompt,
 			MultiSelectTemplateData{SelectedIndex: 2, Checked: map[int]bool{1: true, 3: true}},
 			`? Pick your words:
@@ -38,6 +40,7 @@ func TestMultiSelectRender(t *testing.T) {
 `,
 		},
 		{
+			"Test MultiSelect answer output",
 			prompt,
 			MultiSelectTemplateData{Answer: "foo, buz"},
 			"? Pick your words: foo, buz\n",
@@ -54,7 +57,7 @@ func TestMultiSelectRender(t *testing.T) {
 			MultiSelectQuestionTemplate,
 			test.data,
 		)
-		assert.Nil(t, err)
-		assert.Equal(t, test.expected, outputBuffer.String())
+		assert.Nil(t, err, test.title)
+		assert.Equal(t, test.expected, outputBuffer.String(), test.title)
 	}
 }
