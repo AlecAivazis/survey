@@ -1,10 +1,10 @@
 package survey
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/AlecAivazis/survey/core"
+	"github.com/stretchr/testify/assert"
 )
 
 func init() {
@@ -12,79 +12,51 @@ func init() {
 	core.DisableColor = true
 }
 
-func TestCanFormatMultiSelectOptions(t *testing.T) {
+func TestMultiSelectRender(t *testing.T) {
 
-	prompt := &MultiSelect{
+	prompt := MultiSelect{
+		Message: "Pick your words:",
 		Options: []string{"foo", "bar", "baz", "buz"},
 		Default: []string{"bar", "buz"},
 	}
 
-	actual, err := core.RunTemplate(
-		MultiSelectOptionsTemplate,
-		MultiSelectTemplateData{
-			MultiSelect:   *prompt,
-			SelectedIndex: 2,
-			Checked:       map[int]bool{1: true, 3: true},
-		},
-	)
-
-	if err != nil {
-		t.Errorf("Failed to run template to format checkbox options: %s", err)
-	}
-
-	expected := `  ◯  foo
+	tests := []struct {
+		prompt   MultiSelect
+		template string
+		data     MultiSelectTemplateData
+		expected string
+	}{
+		{
+			prompt,
+			MultiSelectOptionsTemplate,
+			MultiSelectTemplateData{SelectedIndex: 2, Checked: map[int]bool{1: true, 3: true}},
+			`  ◯  foo
   ◉  bar
 ❯ ◯  baz
   ◉  buz
-`
-
-	if actual != expected {
-		t.Errorf("Formatted checkbox options were not formatted correctly. Found:\n%s\nExpected:\n%s", actual, expected)
-	}
-}
-
-func TestMultiSelectFormatQuestion(t *testing.T) {
-
-	prompt := &MultiSelect{
-		Message: "Pick your words:",
-		Options: []string{"foo", "bar", "baz", "buz"},
-		Default: []string{"bar", "buz"},
-	}
-
-	actual, err := core.RunTemplate(
-		MultiSelectQuestionTemplate,
-		MultiSelectTemplateData{MultiSelect: *prompt},
-	)
-	if err != nil {
-		t.Errorf("Failed to run template to format checkbox question: %s", err)
+`,
+		},
+		{
+			prompt,
+			MultiSelectQuestionTemplate,
+			MultiSelectTemplateData{},
+			"? Pick your words:",
+		},
+		{
+			prompt,
+			MultiSelectQuestionTemplate,
+			MultiSelectTemplateData{Answer: "foo, buz"},
+			"? Pick your words: foo, buz",
+		},
 	}
 
-	expected := `? Pick your words: `
-
-	if actual != expected {
-		t.Errorf("Formatted checkbox question was not formatted correctly. Found:\n%s\nExpected:\n%s", actual, expected)
-	}
-}
-
-func TestMultiSelectFormatAnswer(t *testing.T) {
-
-	prompt := &MultiSelect{
-		Message: "Pick your words:",
-		Options: []string{"foo", "bar", "baz", "buz"},
-		Default: []string{"bar", "buz"},
-	}
-
-	actual, err := core.RunTemplate(
-		MultiSelectQuestionTemplate,
-		MultiSelectTemplateData{MultiSelect: *prompt, Answer: strings.Join([]string{"foo", "buz"}, ", ")},
-	)
-	if err != nil {
-		t.Errorf("Failed to run template to format checkbox answer: %s", err)
-	}
-
-	expected := `? Pick your words: foo, buz`
-
-	if actual != expected {
-		t.Errorf("Formatted checkbox answer was not formatted correctly. Found:\n%s\nExpected:\n%s", actual, expected)
+	for _, test := range tests {
+		test.data.MultiSelect = test.prompt
+		actual, err := core.RunTemplate(
+			test.template,
+			test.data,
+		)
+		assert.Nil(t, err)
+		assert.Equal(t, test.expected, actual)
 	}
 }

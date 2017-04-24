@@ -30,8 +30,8 @@ type SelectTemplateData struct {
 const (
 	SelectQuestionTemplate = `
 {{- color "green+hb"}}? {{color "reset"}}
-{{- color "default+hb"}}{{ .Message }} {{color "reset"}}
-{{- if .Answer}}{{color "cyan"}}{{.Answer}}{{color "reset"}}{{end}}`
+{{- color "default+hb"}}{{ .Message }}{{color "reset"}}
+{{- if .Answer}}{{color "cyan"}} {{.Answer}}{{color "reset"}}{{end}}`
 	// the template used to show the list of Selects
 	SelectChoicesTemplate = `
 {{- range $ix, $choice := .Options}}

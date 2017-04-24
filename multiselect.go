@@ -30,8 +30,8 @@ type MultiSelectTemplateData struct {
 
 var MultiSelectQuestionTemplate = `
 {{- color "green+hb"}}? {{color "reset"}}
-{{- color "default+hb"}}{{ .Message }} {{color "reset"}}
-{{- if .Answer}}{{color "cyan"}}{{.Answer}}{{color "reset"}}{{end}}`
+{{- color "default+hb"}}{{ .Message }}{{color "reset"}}
+{{- if .Answer}}{{color "cyan"}} {{.Answer}}{{color "reset"}}{{end}}`
 
 var MultiSelectOptionsTemplate = `
 {{- range $ix, $option := .Options}}

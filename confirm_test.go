@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/AlecAivazis/survey/core"
+	"github.com/stretchr/testify/assert"
 )
 
 func init() {
@@ -11,68 +12,36 @@ func init() {
 	core.DisableColor = true
 }
 
-func TestConfirmFormatQuestion(t *testing.T) {
-
-	prompt := &Confirm{
-		Message: "Is pizza your favorite food?",
-		Default: true,
+func TestConfirmRender(t *testing.T) {
+	tests := []struct {
+		prompt   Confirm
+		data     ConfirmTemplateData
+		expected string
+	}{
+		{
+			Confirm{Message: "Is pizza your favorite food?", Default: true},
+			ConfirmTemplateData{},
+			`? Is pizza your favorite food? (Y/n) `,
+		},
+		{
+			Confirm{Message: "Is pizza your favorite food?", Default: false},
+			ConfirmTemplateData{},
+			`? Is pizza your favorite food? (y/N) `,
+		},
+		{
+			Confirm{Message: "Is pizza your favorite food?"},
+			ConfirmTemplateData{Answer: "Yes"},
+			"? Is pizza your favorite food? Yes",
+		},
 	}
 
-	actual, err := core.RunTemplate(
-		ConfirmQuestionTemplate,
-		ConfirmTemplateData{Confirm: *prompt},
-	)
-	if err != nil {
-		t.Errorf("Failed to run template to format input question: %s", err)
-	}
-
-	expected := `? Is pizza your favorite food? (Y/n) `
-
-	if actual != expected {
-		t.Errorf("Formatted input question was not formatted correctly. Found:\n%s\nExpected:\n%s", actual, expected)
-	}
-}
-
-func TestConfirmFormatQuestionDefaultFalse(t *testing.T) {
-
-	prompt := &Confirm{
-		Message: "Is pizza your favorite food?",
-		Default: false,
-	}
-
-	actual, err := core.RunTemplate(
-		ConfirmQuestionTemplate,
-		ConfirmTemplateData{Confirm: *prompt},
-	)
-	if err != nil {
-		t.Errorf("Failed to run template to format input answer: %s", err)
-	}
-
-	expected := `? Is pizza your favorite food? (y/N) `
-
-	if actual != expected {
-		t.Errorf("Formatted input answer was not formatted correctly. Found:\n%s\nExpected:\n%s", actual, expected)
-	}
-}
-
-func TestConfirmFormatAnswer(t *testing.T) {
-
-	// default false
-	prompt := &Confirm{
-		Message: "Is pizza your favorite food?",
-	}
-
-	actual, err := core.RunTemplate(
-		ConfirmQuestionTemplate,
-		ConfirmTemplateData{Confirm: *prompt, Answer: "Yes"},
-	)
-	if err != nil {
-		t.Errorf("Failed to run template to format input answer: %s", err)
-	}
-
-	expected := `? Is pizza your favorite food? Yes`
-
-	if actual != expected {
-		t.Errorf("Formatted input answer was not formatted correctly. Found:\n%s\nExpected:\n%s", actual, expected)
+	for _, test := range tests {
+		test.data.Confirm = test.prompt
+		actual, err := core.RunTemplate(
+			ConfirmQuestionTemplate,
+			test.data,
+		)
+		assert.Nil(t, err)
+		assert.Equal(t, test.expected, actual)
 	}
 }
