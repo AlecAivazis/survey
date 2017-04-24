@@ -142,6 +142,8 @@ func (m *MultiSelect) Prompt(rl *readline.Instance) (interface{}, error) {
 	}
 	// hide the cursor
 	terminal.CursorHide()
+	// show the cursor when we're done
+	defer terminal.CursorShow()
 	// ask the question
 	terminal.Println(out)
 	for range m.Options {
@@ -154,8 +156,6 @@ func (m *MultiSelect) Prompt(rl *readline.Instance) (interface{}, error) {
 	if err != nil {
 		return "", err
 	}
-	// show the cursor when we're done
-	terminal.CursorShow()
 
 	answers := []string{}
 	for ix, option := range m.Options {
