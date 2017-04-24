@@ -1,9 +1,12 @@
 package survey
 
 import (
+	"bytes"
 	"testing"
 
 	"github.com/AlecAivazis/survey/core"
+	"github.com/AlecAivazis/survey/terminal"
+	"github.com/stretchr/testify/assert"
 )
 
 func init() {
@@ -11,23 +14,32 @@ func init() {
 	core.DisableColor = true
 }
 
-func TestPasswordFormatQuestion(t *testing.T) {
+func TestPasswordRender(t *testing.T) {
 
-	prompt := &Input{
+	prompt := Password{
 		Message: "Tell me your secret:",
 	}
 
-	actual, err := core.RunTemplate(
-		PasswordQuestionTemplate,
-		*prompt,
-	)
-	if err != nil {
-		t.Errorf("Failed to run template to format password question: %s", err)
+	tests := []struct {
+		prompt   Password
+		expected string
+	}{
+		{
+			prompt,
+			"? Tell me your secret: ",
+		},
 	}
 
-	expected := `? Tell me your secret: `
+	outputBuffer := bytes.NewBufferString("")
+	terminal.AnsiStdout = outputBuffer
 
-	if actual != expected {
-		t.Errorf("Formatted input question was not formatted correctly. Found:\n%s\nExpected:\n%s", actual, expected)
+	for _, test := range tests {
+		outputBuffer.Reset()
+		err := test.prompt.render(
+			PasswordQuestionTemplate,
+			&test.prompt,
+		)
+		assert.Nil(t, err)
+		assert.Equal(t, test.expected, outputBuffer.String())
 	}
 }

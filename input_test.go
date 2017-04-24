@@ -1,9 +1,12 @@
 package survey
 
 import (
+	"bytes"
 	"testing"
 
 	"github.com/AlecAivazis/survey/core"
+	"github.com/AlecAivazis/survey/terminal"
+	"github.com/stretchr/testify/assert"
 )
 
 func init() {
@@ -11,46 +14,41 @@ func init() {
 	core.DisableColor = true
 }
 
-func TestInputFormatQuestion(t *testing.T) {
+func TestInputRender(t *testing.T) {
 
-	prompt := &Input{
+	prompt := Input{
 		Message: "What is your favorite month:",
 		Default: "April",
 	}
 
-	actual, err := core.RunTemplate(
-		InputQuestionTemplate,
-		InputTemplateData{Input: *prompt},
-	)
-	if err != nil {
-		t.Errorf("Failed to run template to format input question: %s", err)
+	tests := []struct {
+		prompt   Input
+		data     InputTemplateData
+		expected string
+	}{
+		{
+			prompt,
+			InputTemplateData{},
+			"? What is your favorite month: (April) ",
+		},
+		{
+			prompt,
+			InputTemplateData{Answer: "October"},
+			"? What is your favorite month: October\n",
+		},
 	}
 
-	expected := `? What is your favorite month: (April) `
+	outputBuffer := bytes.NewBufferString("")
+	terminal.AnsiStdout = outputBuffer
 
-	if actual != expected {
-		t.Errorf("Formatted input question was not formatted correctly. Found:\n%s\nExpected:\n%s", actual, expected)
-	}
-}
-
-func TestInputFormatAnswer(t *testing.T) {
-
-	prompt := &Input{
-		Message: "What is your favorite month:",
-		Default: "April",
-	}
-
-	actual, err := core.RunTemplate(
-		InputQuestionTemplate,
-		InputTemplateData{Input: *prompt, Answer: "October"},
-	)
-	if err != nil {
-		t.Errorf("Failed to run template to format input answer: %s", err)
-	}
-
-	expected := `? What is your favorite month: October`
-
-	if actual != expected {
-		t.Errorf("Formatted input answer was not formatted correctly. Found:\n%s\nExpected:\n%s", actual, expected)
+	for _, test := range tests {
+		outputBuffer.Reset()
+		test.data.Input = test.prompt
+		err := test.prompt.render(
+			InputQuestionTemplate,
+			test.data,
+		)
+		assert.Nil(t, err)
+		assert.Equal(t, test.expected, outputBuffer.String())
 	}
 }

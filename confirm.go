@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/AlecAivazis/survey/core"
 	"github.com/AlecAivazis/survey/terminal"
 	"github.com/chzyer/readline"
 )
 
 // Confirm is a regular text input that accept yes/no answers.
 type Confirm struct {
+	renderer
 	Message string
 	Default bool
 }
@@ -19,14 +19,16 @@ type Confirm struct {
 type ConfirmTemplateData struct {
 	Confirm
 	Answer string
+	Error  *error
 }
 
 // Templates with Color formatting. See Documentation: https://github.com/mgutz/ansi#style-format
 var ConfirmQuestionTemplate = `
+{{- if .Error }}` + ErrorTemplate + `{{end}}
 {{- color "green+hb"}}? {{color "reset"}}
 {{- color "default+hb"}}{{ .Message }} {{color "reset"}}
 {{- if .Answer}}
-  {{- color "cyan"}}{{.Answer}}{{color "reset"}}
+  {{- color "cyan"}}{{.Answer}}{{color "reset"}}{{"\n"}}
 {{- else }}
   {{- color "white"}}{{if .Default}}(Y/n) {{else}}(y/N) {{end}}{{color "reset"}}
 {{- end}}`
@@ -47,6 +49,8 @@ func yesNo(t bool) string {
 func (c *Confirm) getBool(rl *readline.Instance) (bool, error) {
 	// start waiting for input
 	val, err := rl.Readline()
+	// move back up a line to compensate for the \n echoed from Readline
+	terminal.CursorUp(1)
 	// if something went wrong
 	if err != nil {
 		// use the default value and bubble up
@@ -64,23 +68,16 @@ func (c *Confirm) getBool(rl *readline.Instance) (bool, error) {
 		answer = c.Default
 	default:
 		// we didnt get a valid answer, so print error and prompt again
-		out, err := core.RunTemplate(
-			ErrorTemplate, fmt.Errorf("%q is not a valid answer, please try again.", val),
+		e := fmt.Errorf("%q is not a valid answer, please try again.", val)
+		err = c.render(
+			ConfirmQuestionTemplate,
+			ConfirmTemplateData{Confirm: *c, Error: &e},
 		)
-		// if something went wrong
 		if err != nil {
 			// use the default value and bubble up
 			return c.Default, err
 		}
-		// send the message to the user
-		terminal.Print(out)
-
-		answer, err = c.getBool(rl)
-		// if something went wrong
-		if err != nil {
-			// use the default value
-			return c.Default, err
-		}
+		return c.getBool(rl)
 	}
 
 	return answer, nil
@@ -90,7 +87,7 @@ func (c *Confirm) getBool(rl *readline.Instance) (bool, error) {
 // by a carriage return.
 func (c *Confirm) Prompt(rl *readline.Instance) (interface{}, error) {
 	// render the question template
-	out, err := core.RunTemplate(
+	err := c.render(
 		ConfirmQuestionTemplate,
 		ConfirmTemplateData{Confirm: *c},
 	)
@@ -98,49 +95,19 @@ func (c *Confirm) Prompt(rl *readline.Instance) (interface{}, error) {
 		return "", err
 	}
 
-	// use the result of the template as the prompt for the readline instance
-	rl.SetPrompt(fmt.Sprintf(out))
+	rl.SetConfig(simpleReadlineConfig)
 
-	// start waiting for input
-	answer, err := c.getBool(rl)
-	// if something went wrong
-	if err != nil {
-		// bubble up
-		return "", err
-	}
-
-	// convert the boolean into the appropriate string
-	return answer, nil
+	// get input and return
+	return c.getBool(rl)
 }
 
 // Cleanup overwrite the line with the finalized formatted version
 func (c *Confirm) Cleanup(rl *readline.Instance, val interface{}) error {
-	// go up one line
-	terminal.CursorPreviousLine(1)
-	// clear the line
-	terminal.EraseLine(terminal.ERASE_LINE_ALL)
-
-	// the string version of the answer
-	ans := ""
 	// if the value was previously true
-	if val.(bool) {
-		ans = "yes"
-	} else {
-		ans = "no"
-	}
-
+	ans := yesNo(val.(bool))
 	// render the template
-	out, err := core.RunTemplate(
+	return c.render(
 		ConfirmQuestionTemplate,
 		ConfirmTemplateData{Confirm: *c, Answer: ans},
 	)
-	if err != nil {
-		return err
-	}
-
-	// print the summary
-	terminal.Println(out)
-
-	// we're done
-	return nil
 }

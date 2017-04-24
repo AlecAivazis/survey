@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"strings"
 
-	"github.com/AlecAivazis/survey/core"
 	"github.com/AlecAivazis/survey/terminal"
 	"github.com/chzyer/readline"
 )
@@ -13,6 +12,7 @@ import (
 // MultiSelect is a prompt that presents a list of various options to the user
 // for them to select using the arrow keys and enter.
 type MultiSelect struct {
+	renderer
 	Message       string
 	Options       []string
 	Default       []string
@@ -30,16 +30,17 @@ type MultiSelectTemplateData struct {
 
 var MultiSelectQuestionTemplate = `
 {{- color "green+hb"}}? {{color "reset"}}
-{{- color "default+hb"}}{{ .Message }} {{color "reset"}}
-{{- if .Answer}}{{color "cyan"}}{{.Answer}}{{color "reset"}}{{end}}`
-
-var MultiSelectOptionsTemplate = `
-{{- range $ix, $option := .Options}}
-  {{- if eq $ix $.SelectedIndex}}{{color "cyan"}}❯{{color "reset"}}{{else}} {{end}}
-  {{- if index $.Checked $ix}}{{color "green"}} ◉ {{else}}{{color "default+hb"}} ◯ {{end}}
-  {{- color "reset"}}
-  {{- " "}}{{$option}}
-{{end}}`
+{{- color "default+hb"}}{{ .Message }}{{color "reset"}}
+{{- if .Answer}}{{color "cyan"}} {{.Answer}}{{color "reset"}}{{"\n"}}
+{{- else }}
+  {{- "\n"}}
+  {{- range $ix, $option := .Options}}
+    {{- if eq $ix $.SelectedIndex}}{{color "cyan"}}❯{{color "reset"}}{{else}} {{end}}
+    {{- if index $.Checked $ix}}{{color "green"}} ◉ {{else}}{{color "default+hb"}} ◯ {{end}}
+    {{- color "reset"}}
+    {{- " "}}{{$option}}{{"\n"}}
+  {{- end}}
+{{- end}}`
 
 // OnChange is called on every keypress.
 func (m *MultiSelect) OnChange(line []rune, pos int, key rune) (newLine []rune, newPos int, ok bool) {
@@ -65,37 +66,17 @@ func (m *MultiSelect) OnChange(line []rune, pos int, key rune) (newLine []rune, 
 	}
 
 	// render the options
-	m.render()
-
-	// if we are not pressing ent
-	return line, 0, true
-}
-
-func (m *MultiSelect) render() error {
-	// clean up what we left behind last time
-	for range m.Options {
-		terminal.CursorPreviousLine(1)
-		terminal.EraseLine(terminal.ERASE_LINE_ALL)
-	}
-
-	// render the template summarizing the current state
-	out, err := core.RunTemplate(
-		MultiSelectOptionsTemplate,
+	m.render(
+		MultiSelectQuestionTemplate,
 		MultiSelectTemplateData{
 			MultiSelect:   *m,
 			SelectedIndex: m.selectedIndex,
 			Checked:       m.checked,
 		},
 	)
-	if err != nil {
-		return err
-	}
 
-	// print the summary
-	terminal.Println(strings.TrimRight(out, "\n"))
-
-	// nothing went wrong
-	return nil
+	// if we are not pressing ent
+	return line, 0, true
 }
 
 func (m *MultiSelect) Prompt(rl *readline.Instance) (interface{}, error) {
@@ -128,8 +109,14 @@ func (m *MultiSelect) Prompt(rl *readline.Instance) (interface{}, error) {
 		// we failed
 		return "", errors.New("please provide options to select from")
 	}
-	// generate the template for the current state of the prompt
-	out, err := core.RunTemplate(
+
+	// hide the cursor
+	terminal.CursorHide()
+	// show the cursor when we're done
+	defer terminal.CursorShow()
+
+	// ask the question
+	err := m.render(
 		MultiSelectQuestionTemplate,
 		MultiSelectTemplateData{
 			MultiSelect:   *m,
@@ -140,13 +127,6 @@ func (m *MultiSelect) Prompt(rl *readline.Instance) (interface{}, error) {
 	if err != nil {
 		return "", err
 	}
-	// hide the cursor
-	terminal.CursorHide()
-	// ask the question
-	terminal.Println(out)
-	for range m.Options {
-		terminal.Println()
-	}
 
 	// start waiting for input
 	_, err = rl.Readline()
@@ -154,8 +134,6 @@ func (m *MultiSelect) Prompt(rl *readline.Instance) (interface{}, error) {
 	if err != nil {
 		return "", err
 	}
-	// show the cursor when we're done
-	terminal.CursorShow()
 
 	answers := []string{}
 	for ix, option := range m.Options {
@@ -169,15 +147,8 @@ func (m *MultiSelect) Prompt(rl *readline.Instance) (interface{}, error) {
 
 // Cleanup removes the options section, and renders the ask like a normal question.
 func (m *MultiSelect) Cleanup(rl *readline.Instance, val interface{}) error {
-	terminal.CursorPreviousLine(1)
-	terminal.EraseLine(terminal.ERASE_LINE_ALL)
-	for range m.Options {
-		terminal.CursorPreviousLine(1)
-		terminal.EraseLine(terminal.ERASE_LINE_ALL)
-	}
-
 	// execute the output summary template with the answer
-	output, err := core.RunTemplate(
+	return m.render(
 		MultiSelectQuestionTemplate,
 		MultiSelectTemplateData{
 			MultiSelect:   *m,
@@ -186,12 +157,4 @@ func (m *MultiSelect) Cleanup(rl *readline.Instance, val interface{}) error {
 			Answer:        strings.Join(val.([]string), ", "),
 		},
 	)
-	if err != nil {
-		return err
-	}
-	// render the summary
-	terminal.Println(output)
-
-	// nothing went wrong
-	return nil
 }

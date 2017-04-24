@@ -3,9 +3,7 @@ package survey
 import (
 	"errors"
 	"io/ioutil"
-	"strings"
 
-	"github.com/AlecAivazis/survey/core"
 	"github.com/AlecAivazis/survey/terminal"
 	"github.com/chzyer/readline"
 )
@@ -13,6 +11,7 @@ import (
 // Select is a prompt that presents a list of various options to the user
 // for them to select using the arrow keys and enter.
 type Select struct {
+	renderer
 	Message       string
 	Options       []string
 	Default       string
@@ -26,19 +25,18 @@ type SelectTemplateData struct {
 	Answer        string
 }
 
-const (
-	SelectQuestionTemplate = `
+const SelectQuestionTemplate = `
 {{- color "green+hb"}}? {{color "reset"}}
-{{- color "default+hb"}}{{ .Message }} {{color "reset"}}
-{{- if .Answer}}{{color "cyan"}}{{.Answer}}{{color "reset"}}{{end}}`
-	// the template used to show the list of Selects
-	SelectChoicesTemplate = `
-{{- range $ix, $choice := .Options}}
-  {{- if eq $ix $.SelectedIndex}}{{color "cyan+b"}}> {{else}}{{color "default+hb"}}  {{end}}
-  {{- $choice}}
-  {{- color "reset"}}
-{{end}}`
-)
+{{- color "default+hb"}}{{ .Message }}{{color "reset"}}
+{{- if .Answer}}{{color "cyan"}} {{.Answer}}{{color "reset"}}{{"\n"}}
+{{- else}}
+  {{- "\n"}}
+  {{- range $ix, $choice := .Options}}
+    {{- if eq $ix $.SelectedIndex}}{{color "cyan+b"}}> {{else}}{{color "default+hb"}}  {{end}}
+    {{- $choice}}
+    {{- color "reset"}}{{"\n"}}
+  {{- end}}
+{{- end}}`
 
 // OnChange is called on every keypress.
 func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPos int, ok bool) {
@@ -56,31 +54,13 @@ func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPo
 	}
 
 	// render the options
-	s.render()
+	s.render(
+		SelectQuestionTemplate,
+		SelectTemplateData{Select: *s, SelectedIndex: s.selectedIndex},
+	)
 
 	// if we are not pressing ent
 	return []rune(s.Options[s.selectedIndex]), 0, true
-}
-
-func (s *Select) render() error {
-	for range s.Options {
-		terminal.CursorPreviousLine(1)
-		terminal.EraseLine(terminal.ERASE_LINE_ALL)
-	}
-
-	// the formatted response
-	out, err := core.RunTemplate(
-		SelectChoicesTemplate,
-		SelectTemplateData{Select: *s, SelectedIndex: s.selectedIndex},
-	)
-	if err != nil {
-		return err
-	}
-
-	// ask the question
-	terminal.Println(strings.TrimRight(out, "\n"))
-	// nothing went wrong
-	return nil
 }
 
 func (s *Select) Prompt(rl *readline.Instance) (interface{}, error) {
@@ -114,8 +94,8 @@ func (s *Select) Prompt(rl *readline.Instance) (interface{}, error) {
 	// save the selected index
 	s.selectedIndex = sel
 
-	// render the initial question
-	out, err := core.RunTemplate(
+	// ask the question
+	err := s.render(
 		SelectQuestionTemplate,
 		SelectTemplateData{Select: *s, SelectedIndex: sel},
 	)
@@ -125,15 +105,11 @@ func (s *Select) Prompt(rl *readline.Instance) (interface{}, error) {
 
 	// hide the cursor
 	terminal.CursorHide()
-	// ask the question
-	terminal.Println(out)
-	for range s.Options {
-		terminal.Println()
-	}
+	// show the cursor when we're done
+	defer terminal.CursorShow()
+
 	// start waiting for input
 	val, err := rl.Readline()
-	// show the cursor when we're done
-	terminal.CursorShow()
 
 	//  if the value is empty (not sure why)
 	if val == "" {
@@ -152,24 +128,8 @@ func (s *Select) Prompt(rl *readline.Instance) (interface{}, error) {
 }
 
 func (s *Select) Cleanup(rl *readline.Instance, val interface{}) error {
-	terminal.CursorPreviousLine(1)
-	terminal.EraseLine(terminal.ERASE_LINE_ALL)
-	for range s.Options {
-		terminal.CursorPreviousLine(1)
-		terminal.EraseLine(terminal.ERASE_LINE_ALL)
-	}
-
-	// execute the output summary template with the answer
-	output, err := core.RunTemplate(
+	return s.render(
 		SelectQuestionTemplate,
 		SelectTemplateData{Select: *s, Answer: val.(string)},
 	)
-	if err != nil {
-		return err
-	}
-	// render the summary
-	terminal.Println(output)
-
-	// nothing went wrong
-	return nil
 }
