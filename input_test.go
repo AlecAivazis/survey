@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/AlecAivazis/survey/core"
+	"github.com/stretchr/testify/assert"
 )
 
 func init() {
@@ -11,46 +12,41 @@ func init() {
 	core.DisableColor = true
 }
 
-func TestInputFormatQuestion(t *testing.T) {
+func TestInputRender(t *testing.T) {
 
-	prompt := &Input{
-		Message: "What is your favorite month:",
-		Default: "April",
+	tests := []struct {
+		title    string
+		prompt   Input
+		data     InputTemplateData
+		expected string
+	}{
+		{
+			"Test Input question output without default",
+			Input{Message: "What is your favorite month:"},
+			InputTemplateData{},
+			"? What is your favorite month: ",
+		},
+		{
+			"Test Input question output with default",
+			Input{Message: "What is your favorite month:", Default: "April"},
+			InputTemplateData{},
+			"? What is your favorite month: (April) ",
+		},
+		{
+			"Test Input answer output",
+			Input{Message: "What is your favorite month:"},
+			InputTemplateData{Answer: "October"},
+			"? What is your favorite month: October",
+		},
 	}
 
-	actual, err := core.RunTemplate(
-		InputQuestionTemplate,
-		InputTemplateData{Input: *prompt},
-	)
-	if err != nil {
-		t.Errorf("Failed to run template to format input question: %s", err)
-	}
-
-	expected := `? What is your favorite month: (April) `
-
-	if actual != expected {
-		t.Errorf("Formatted input question was not formatted correctly. Found:\n%s\nExpected:\n%s", actual, expected)
-	}
-}
-
-func TestInputFormatAnswer(t *testing.T) {
-
-	prompt := &Input{
-		Message: "What is your favorite month:",
-		Default: "April",
-	}
-
-	actual, err := core.RunTemplate(
-		InputQuestionTemplate,
-		InputTemplateData{Input: *prompt, Answer: "October"},
-	)
-	if err != nil {
-		t.Errorf("Failed to run template to format input answer: %s", err)
-	}
-
-	expected := `? What is your favorite month: October`
-
-	if actual != expected {
-		t.Errorf("Formatted input answer was not formatted correctly. Found:\n%s\nExpected:\n%s", actual, expected)
+	for _, test := range tests {
+		test.data.Input = test.prompt
+		actual, err := core.RunTemplate(
+			InputQuestionTemplate,
+			test.data,
+		)
+		assert.Nil(t, err, test.title)
+		assert.Equal(t, test.expected, actual, test.title)
 	}
 }
