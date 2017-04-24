@@ -16,6 +16,7 @@ type Select struct {
 	Options       []string
 	Default       string
 	selectedIndex int
+	useDefault    bool
 }
 
 // the data available to the templates when processing
@@ -45,10 +46,12 @@ func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPo
 		return []rune(s.Options[s.selectedIndex]), 0, true
 		// if the user pressed the up arrow
 	} else if key == terminal.KeyArrowUp && s.selectedIndex > 0 {
+		s.useDefault = false
 		// decrement the selected index
 		s.selectedIndex--
 		// if the user pressed down and there is room to move
 	} else if key == terminal.KeyArrowDown && s.selectedIndex < len(s.Options)-1 {
+		s.useDefault = false
 		// increment the selected index
 		s.selectedIndex++
 	}
@@ -108,11 +111,15 @@ func (s *Select) Prompt(rl *readline.Instance) (interface{}, error) {
 	// show the cursor when we're done
 	defer terminal.CursorShow()
 
-	// start waiting for input
-	val, err := rl.Readline()
+	// by default, use the default value
+	s.useDefault = true
 
-	//  if the value is empty (not sure why)
-	if val == "" {
+	// start waiting for input
+	_, err = rl.Readline()
+
+	var val string
+	// if we are supposed to use the default value
+	if s.useDefault {
 		// if there is a default value
 		if s.Default != "" {
 			// use the default value
@@ -121,9 +128,12 @@ func (s *Select) Prompt(rl *readline.Instance) (interface{}, error) {
 			// there is no default value so use the first
 			val = s.Options[0]
 		}
+		// otherwise the selected index points to the value
+	} else {
+		// the
+		val = s.Options[s.selectedIndex]
 	}
 
-	// return rl.Readline()
 	return val, err
 }
 

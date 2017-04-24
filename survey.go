@@ -46,6 +46,7 @@ func Ask(qs []*Question, t interface{}) error {
 	if err != nil {
 		return err
 	}
+	defer rl.Close()
 
 	// if we weren't passed a place to record the answers
 	if t == nil {
@@ -96,6 +97,7 @@ func Ask(qs []*Question, t interface{}) error {
 		if err != nil {
 			return err
 		}
+
 	}
 	// return the response
 	return nil

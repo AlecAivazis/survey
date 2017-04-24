@@ -41,10 +41,18 @@ func (i *Input) Prompt(rl *readline.Instance) (line interface{}, err error) {
 	rl.SetConfig(simpleReadlineConfig)
 
 	// get the next line
-	ans, err := rl.Readline()
+	line, err = rl.Readline()
 	// readline will echo the \n so we need to jump back up one row
 	terminal.CursorUp(1)
-	return ans, err
+
+	// if the line is empty
+	if line == "" {
+		// use the default value
+		line = i.Default
+	}
+
+	// we're done
+	return line, err
 }
 
 func (i *Input) Cleanup(rl *readline.Instance, val interface{}) error {
