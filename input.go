@@ -12,21 +12,25 @@ type Input struct {
 	core.Renderer
 	Message string
 	Default string
+	Help    string
 }
 
 // data available to the templates when processing
 type InputTemplateData struct {
 	Input
-	Answer string
+	Answer   string
+	ShowHelp bool
 }
 
 // Templates with Color formatting. See Documentation: https://github.com/mgutz/ansi#style-format
 var InputQuestionTemplate = `
+{{- if .ShowHelp }}{{- color "cyan"}}{{ .Help }}{{color "reset"}}{{"\n"}}{{end}}
 {{- color "green+hb"}}? {{color "reset"}}
 {{- color "default+hb"}}{{ .Message }} {{color "reset"}}
 {{- if .Answer}}
   {{- color "cyan"}}{{.Answer}}{{color "reset"}}{{"\n"}}
 {{- else }}
+  {{- if and .Help (not .ShowHelp)}}{{color "cyan"}}[? for help] {{color "reset"}}{{end}}
   {{- if .Default}}{{color "white"}}({{.Default}}) {{color "reset"}}{{end}}
 {{- end}}`
 
@@ -45,6 +49,20 @@ func (i *Input) Prompt(rl *readline.Instance) (line interface{}, err error) {
 	line, err = rl.Readline()
 	// readline will echo the \n so we need to jump back up one row
 	terminal.CursorUp(1)
+
+	if err == nil && line == "?" {
+		err = i.Render(
+			InputQuestionTemplate,
+			InputTemplateData{Input: *i, ShowHelp: true},
+		)
+		if err != nil {
+			return "", err
+		}
+		// get the next line
+		line, err = rl.Readline()
+		// readline will echo the \n so we need to jump back up one row
+		terminal.CursorUp(1)
+	}
 
 	// if the line is empty
 	if line == "" {

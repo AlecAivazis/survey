@@ -7,4 +7,5 @@ const (
 	KeyArrowDown  = '\x0e'
 	KeySpace      = ' '
 	KeyEnter      = '\r'
+	KeyQuestion   = '?'
 )
