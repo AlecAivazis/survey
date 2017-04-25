@@ -53,7 +53,7 @@ func TestConfirmRender(t *testing.T) {
 	}
 
 	outputBuffer := bytes.NewBufferString("")
-	terminal.AnsiStdout = outputBuffer
+	terminal.Stdout = outputBuffer
 
 	for _, test := range tests {
 		outputBuffer.Reset()
