@@ -22,6 +22,9 @@ func TestSelectRender(t *testing.T) {
 		Default: "baz",
 	}
 
+	helpfulPrompt := prompt
+	helpfulPrompt.Help = "This is helpful"
+
 	tests := []struct {
 		title    string
 		prompt   Select
@@ -44,6 +47,29 @@ func TestSelectRender(t *testing.T) {
 			prompt,
 			SelectTemplateData{Answer: "buz"},
 			"? Pick your word: buz\n",
+		},
+		{
+			"Test Select question output with help hidden",
+			helpfulPrompt,
+			SelectTemplateData{SelectedIndex: 2},
+			`? Pick your word: [? for help]
+  foo
+  bar
+> baz
+  buz
+`,
+		},
+		{
+			"Test Select question output with help shown",
+			helpfulPrompt,
+			SelectTemplateData{SelectedIndex: 2, ShowHelp: true},
+			`This is helpful
+? Pick your word:
+  foo
+  bar
+> baz
+  buz
+`,
 		},
 	}
 

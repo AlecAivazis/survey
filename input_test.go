@@ -40,6 +40,32 @@ func TestInputRender(t *testing.T) {
 			InputTemplateData{Answer: "October"},
 			"? What is your favorite month: October\n",
 		},
+		{
+			"Test Input question output without default but with help hidden",
+			Input{Message: "What is your favorite month:", Help: "This is helpful"},
+			InputTemplateData{},
+			"? What is your favorite month: [? for help] ",
+		},
+		{
+			"Test Input question output with default and with help hidden",
+			Input{Message: "What is your favorite month:", Default: "April", Help: "This is helpful"},
+			InputTemplateData{},
+			"? What is your favorite month: [? for help] (April) ",
+		},
+		{
+			"Test Input question output without default but with help shown",
+			Input{Message: "What is your favorite month:", Help: "This is helpful"},
+			InputTemplateData{ShowHelp: true},
+			`This is helpful
+? What is your favorite month: `,
+		},
+		{
+			"Test Input question output with default and with help shown",
+			Input{Message: "What is your favorite month:", Default: "April", Help: "This is helpful"},
+			InputTemplateData{ShowHelp: true},
+			`This is helpful
+? What is your favorite month: (April) `,
+		},
 	}
 
 	outputBuffer := bytes.NewBufferString("")
