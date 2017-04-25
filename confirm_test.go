@@ -1,9 +1,12 @@
 package survey
 
 import (
+	"bytes"
+	"fmt"
 	"testing"
 
 	"github.com/AlecAivazis/survey/core"
+	"github.com/AlecAivazis/survey/terminal"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -13,6 +16,8 @@ func init() {
 }
 
 func TestConfirmRender(t *testing.T) {
+
+	testError := fmt.Errorf("TEST")
 	tests := []struct {
 		title    string
 		prompt   Confirm
@@ -35,17 +40,29 @@ func TestConfirmRender(t *testing.T) {
 			"Test Confirm answer output",
 			Confirm{Message: "Is pizza your favorite food?"},
 			ConfirmTemplateData{Answer: "Yes"},
-			"? Is pizza your favorite food? Yes",
+			"? Is pizza your favorite food? Yes\n",
+		},
+		{
+			"Test Confirm error output",
+			Confirm{Message: "Is pizza your favorite food?"},
+			ConfirmTemplateData{Answer: "Yes", Error: &testError},
+			`✘ Sorry, your reply was invalid: TEST
+? Is pizza your favorite food? Yes
+`,
 		},
 	}
 
+	outputBuffer := bytes.NewBufferString("")
+	terminal.Stdout = outputBuffer
+
 	for _, test := range tests {
+		outputBuffer.Reset()
 		test.data.Confirm = test.prompt
-		actual, err := core.RunTemplate(
+		err := test.prompt.Render(
 			ConfirmQuestionTemplate,
 			test.data,
 		)
 		assert.Nil(t, err, test.title)
-		assert.Equal(t, test.expected, actual, test.title)
+		assert.Equal(t, test.expected, outputBuffer.String(), test.title)
 	}
 }

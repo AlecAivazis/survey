@@ -1,8 +1,6 @@
 package survey
 
 import (
-	"fmt"
-
 	"github.com/AlecAivazis/survey/core"
 	"github.com/AlecAivazis/survey/terminal"
 	"github.com/chzyer/readline"
@@ -11,6 +9,7 @@ import (
 // Input is a regular text input that prints each character the user types on the screen
 // and accepts the input with the enter key.
 type Input struct {
+	core.Renderer
 	Message string
 	Default string
 }
@@ -26,24 +25,26 @@ var InputQuestionTemplate = `
 {{- color "green+hb"}}? {{color "reset"}}
 {{- color "default+hb"}}{{ .Message }} {{color "reset"}}
 {{- if .Answer}}
-  {{- color "cyan"}}{{.Answer}}{{color "reset"}}
+  {{- color "cyan"}}{{.Answer}}{{color "reset"}}{{"\n"}}
 {{- else }}
   {{- if .Default}}{{color "white"}}({{.Default}}) {{color "reset"}}{{end}}
 {{- end}}`
 
 func (i *Input) Prompt(rl *readline.Instance) (line interface{}, err error) {
 	// render the template
-	out, err := core.RunTemplate(
+	err = i.Render(
 		InputQuestionTemplate,
 		InputTemplateData{Input: *i},
 	)
 	if err != nil {
 		return "", err
 	}
-	// make sure the prompt matches the expectation
-	rl.SetPrompt(fmt.Sprintf(out))
+	rl.SetConfig(core.SimpleReadlineConfig)
+
 	// get the next line
 	line, err = rl.Readline()
+	// readline will echo the \n so we need to jump back up one row
+	terminal.CursorUp(1)
 
 	// if the line is empty
 	if line == "" {
@@ -56,23 +57,8 @@ func (i *Input) Prompt(rl *readline.Instance) (line interface{}, err error) {
 }
 
 func (i *Input) Cleanup(rl *readline.Instance, val interface{}) error {
-	// go up one line
-	terminal.CursorPreviousLine(1)
-	// clear the line
-	terminal.EraseLine(terminal.ERASE_LINE_ALL)
-
-	// render the template
-	out, err := core.RunTemplate(
+	return i.Render(
 		InputQuestionTemplate,
 		InputTemplateData{Input: *i, Answer: val.(string)},
 	)
-	if err != nil {
-		return err
-	}
-
-	// print the summary
-	terminal.Println(out)
-
-	// we're done
-	return err
 }

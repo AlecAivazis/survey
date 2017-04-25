@@ -1,9 +1,11 @@
 package survey
 
 import (
+	"bytes"
 	"testing"
 
 	"github.com/AlecAivazis/survey/core"
+	"github.com/AlecAivazis/survey/terminal"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -36,17 +38,21 @@ func TestInputRender(t *testing.T) {
 			"Test Input answer output",
 			Input{Message: "What is your favorite month:"},
 			InputTemplateData{Answer: "October"},
-			"? What is your favorite month: October",
+			"? What is your favorite month: October\n",
 		},
 	}
 
+	outputBuffer := bytes.NewBufferString("")
+	terminal.Stdout = outputBuffer
+
 	for _, test := range tests {
+		outputBuffer.Reset()
 		test.data.Input = test.prompt
-		actual, err := core.RunTemplate(
+		err := test.prompt.Render(
 			InputQuestionTemplate,
 			test.data,
 		)
 		assert.Nil(t, err, test.title)
-		assert.Equal(t, test.expected, actual, test.title)
+		assert.Equal(t, test.expected, outputBuffer.String(), test.title)
 	}
 }

@@ -1,9 +1,11 @@
 package survey
 
 import (
+	"bytes"
 	"testing"
 
 	"github.com/AlecAivazis/survey/core"
+	"github.com/AlecAivazis/survey/terminal"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -23,44 +25,39 @@ func TestMultiSelectRender(t *testing.T) {
 	tests := []struct {
 		title    string
 		prompt   MultiSelect
-		template string
 		data     MultiSelectTemplateData
 		expected string
 	}{
 		{
-			"Test MultiSelect options output",
+			"Test MultiSelect question output",
 			prompt,
-			MultiSelectOptionsTemplate,
 			MultiSelectTemplateData{SelectedIndex: 2, Checked: map[int]bool{1: true, 3: true}},
-			`  ◯  foo
+			`? Pick your words:
+  ◯  foo
   ◉  bar
 ❯ ◯  baz
   ◉  buz
 `,
 		},
 		{
-			"Test MultiSelect question output",
-			prompt,
-			MultiSelectQuestionTemplate,
-			MultiSelectTemplateData{},
-			"? Pick your words:",
-		},
-		{
 			"Test MultiSelect answer output",
 			prompt,
-			MultiSelectQuestionTemplate,
 			MultiSelectTemplateData{Answer: "foo, buz"},
-			"? Pick your words: foo, buz",
+			"? Pick your words: foo, buz\n",
 		},
 	}
 
+	outputBuffer := bytes.NewBufferString("")
+	terminal.Stdout = outputBuffer
+
 	for _, test := range tests {
+		outputBuffer.Reset()
 		test.data.MultiSelect = test.prompt
-		actual, err := core.RunTemplate(
-			test.template,
+		err := test.prompt.Render(
+			MultiSelectQuestionTemplate,
 			test.data,
 		)
 		assert.Nil(t, err, test.title)
-		assert.Equal(t, test.expected, actual, test.title)
+		assert.Equal(t, test.expected, outputBuffer.String(), test.title)
 	}
 }

@@ -1,9 +1,11 @@
 package survey
 
 import (
+	"bytes"
 	"testing"
 
 	"github.com/AlecAivazis/survey/core"
+	"github.com/AlecAivazis/survey/terminal"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -23,44 +25,39 @@ func TestSelectRender(t *testing.T) {
 	tests := []struct {
 		title    string
 		prompt   Select
-		template string
 		data     SelectTemplateData
 		expected string
 	}{
 		{
-			"Test Select choices output",
+			"Test Select question output",
 			prompt,
-			SelectChoicesTemplate,
 			SelectTemplateData{SelectedIndex: 2},
-			`  foo
+			`? Pick your word:
+  foo
   bar
 > baz
   buz
 `,
 		},
 		{
-			"Test Select question output",
-			prompt,
-			SelectQuestionTemplate,
-			SelectTemplateData{},
-			"? Pick your word:",
-		},
-		{
 			"Test Select answer output",
 			prompt,
-			SelectQuestionTemplate,
 			SelectTemplateData{Answer: "buz"},
-			"? Pick your word: buz",
+			"? Pick your word: buz\n",
 		},
 	}
 
+	outputBuffer := bytes.NewBufferString("")
+	terminal.Stdout = outputBuffer
+
 	for _, test := range tests {
+		outputBuffer.Reset()
 		test.data.Select = test.prompt
-		actual, err := core.RunTemplate(
-			test.template,
+		err := test.prompt.Render(
+			SelectQuestionTemplate,
 			test.data,
 		)
 		assert.Nil(t, err, test.title)
-		assert.Equal(t, test.expected, actual, test.title)
+		assert.Equal(t, test.expected, outputBuffer.String(), test.title)
 	}
 }
