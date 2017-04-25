@@ -58,7 +58,7 @@ func TestConfirmRender(t *testing.T) {
 	for _, test := range tests {
 		outputBuffer.Reset()
 		test.data.Confirm = test.prompt
-		err := test.prompt.render(
+		err := test.prompt.Render(
 			ConfirmQuestionTemplate,
 			test.data,
 		)

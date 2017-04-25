@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"regexp"
 
+	"github.com/AlecAivazis/survey/core"
 	"github.com/AlecAivazis/survey/terminal"
 	"github.com/chzyer/readline"
 )
 
 // Confirm is a regular text input that accept yes/no answers.
 type Confirm struct {
-	renderer
+	core.Renderer
 	Message string
 	Default bool
 }
@@ -69,7 +70,7 @@ func (c *Confirm) getBool(rl *readline.Instance) (bool, error) {
 	default:
 		// we didnt get a valid answer, so print error and prompt again
 		e := fmt.Errorf("%q is not a valid answer, please try again.", val)
-		err = c.render(
+		err = c.Render(
 			ConfirmQuestionTemplate,
 			ConfirmTemplateData{Confirm: *c, Error: &e},
 		)
@@ -87,7 +88,7 @@ func (c *Confirm) getBool(rl *readline.Instance) (bool, error) {
 // by a carriage return.
 func (c *Confirm) Prompt(rl *readline.Instance) (interface{}, error) {
 	// render the question template
-	err := c.render(
+	err := c.Render(
 		ConfirmQuestionTemplate,
 		ConfirmTemplateData{Confirm: *c},
 	)
@@ -95,7 +96,7 @@ func (c *Confirm) Prompt(rl *readline.Instance) (interface{}, error) {
 		return "", err
 	}
 
-	rl.SetConfig(simpleReadlineConfig)
+	rl.SetConfig(core.SimpleReadlineConfig)
 
 	// get input and return
 	return c.getBool(rl)
@@ -106,7 +107,7 @@ func (c *Confirm) Cleanup(rl *readline.Instance, val interface{}) error {
 	// if the value was previously true
 	ans := yesNo(val.(bool))
 	// render the template
-	return c.render(
+	return c.Render(
 		ConfirmQuestionTemplate,
 		ConfirmTemplateData{Confirm: *c, Answer: ans},
 	)

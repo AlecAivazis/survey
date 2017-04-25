@@ -1,6 +1,7 @@
 package survey
 
 import (
+	"github.com/AlecAivazis/survey/core"
 	"github.com/AlecAivazis/survey/terminal"
 	"github.com/chzyer/readline"
 )
@@ -8,7 +9,7 @@ import (
 // Input is a regular text input that prints each character the user types on the screen
 // and accepts the input with the enter key.
 type Input struct {
-	renderer
+	core.Renderer
 	Message string
 	Default string
 }
@@ -31,14 +32,14 @@ var InputQuestionTemplate = `
 
 func (i *Input) Prompt(rl *readline.Instance) (line interface{}, err error) {
 	// render the template
-	err = i.render(
+	err = i.Render(
 		InputQuestionTemplate,
 		InputTemplateData{Input: *i},
 	)
 	if err != nil {
 		return "", err
 	}
-	rl.SetConfig(simpleReadlineConfig)
+	rl.SetConfig(core.SimpleReadlineConfig)
 
 	// get the next line
 	line, err = rl.Readline()
@@ -56,7 +57,7 @@ func (i *Input) Prompt(rl *readline.Instance) (line interface{}, err error) {
 }
 
 func (i *Input) Cleanup(rl *readline.Instance, val interface{}) error {
-	return i.render(
+	return i.Render(
 		InputQuestionTemplate,
 		InputTemplateData{Input: *i, Answer: val.(string)},
 	)

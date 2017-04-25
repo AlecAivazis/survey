@@ -53,7 +53,7 @@ func TestMultiSelectRender(t *testing.T) {
 	for _, test := range tests {
 		outputBuffer.Reset()
 		test.data.MultiSelect = test.prompt
-		err := test.prompt.render(
+		err := test.prompt.Render(
 			MultiSelectQuestionTemplate,
 			test.data,
 		)

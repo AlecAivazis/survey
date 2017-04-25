@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"strings"
 
+	"github.com/AlecAivazis/survey/core"
 	"github.com/AlecAivazis/survey/terminal"
 	"github.com/chzyer/readline"
 )
@@ -12,7 +13,7 @@ import (
 // MultiSelect is a prompt that presents a list of various options to the user
 // for them to select using the arrow keys and enter.
 type MultiSelect struct {
-	renderer
+	core.Renderer
 	Message       string
 	Options       []string
 	Default       []string
@@ -66,7 +67,7 @@ func (m *MultiSelect) OnChange(line []rune, pos int, key rune) (newLine []rune, 
 	}
 
 	// render the options
-	m.render(
+	m.Render(
 		MultiSelectQuestionTemplate,
 		MultiSelectTemplateData{
 			MultiSelect:   *m,
@@ -116,7 +117,7 @@ func (m *MultiSelect) Prompt(rl *readline.Instance) (interface{}, error) {
 	defer terminal.CursorShow()
 
 	// ask the question
-	err := m.render(
+	err := m.Render(
 		MultiSelectQuestionTemplate,
 		MultiSelectTemplateData{
 			MultiSelect:   *m,
@@ -148,7 +149,7 @@ func (m *MultiSelect) Prompt(rl *readline.Instance) (interface{}, error) {
 // Cleanup removes the options section, and renders the ask like a normal question.
 func (m *MultiSelect) Cleanup(rl *readline.Instance, val interface{}) error {
 	// execute the output summary template with the answer
-	return m.render(
+	return m.Render(
 		MultiSelectQuestionTemplate,
 		MultiSelectTemplateData{
 			MultiSelect:   *m,

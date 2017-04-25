@@ -4,6 +4,7 @@ import (
 	"errors"
 	"io/ioutil"
 
+	"github.com/AlecAivazis/survey/core"
 	"github.com/AlecAivazis/survey/terminal"
 	"github.com/chzyer/readline"
 )
@@ -11,7 +12,7 @@ import (
 // Select is a prompt that presents a list of various options to the user
 // for them to select using the arrow keys and enter.
 type Select struct {
-	renderer
+	core.Renderer
 	Message       string
 	Options       []string
 	Default       string
@@ -57,7 +58,7 @@ func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPo
 	}
 
 	// render the options
-	s.render(
+	s.Render(
 		SelectQuestionTemplate,
 		SelectTemplateData{Select: *s, SelectedIndex: s.selectedIndex},
 	)
@@ -98,7 +99,7 @@ func (s *Select) Prompt(rl *readline.Instance) (interface{}, error) {
 	s.selectedIndex = sel
 
 	// ask the question
-	err := s.render(
+	err := s.Render(
 		SelectQuestionTemplate,
 		SelectTemplateData{Select: *s, SelectedIndex: sel},
 	)
@@ -138,7 +139,7 @@ func (s *Select) Prompt(rl *readline.Instance) (interface{}, error) {
 }
 
 func (s *Select) Cleanup(rl *readline.Instance, val interface{}) error {
-	return s.render(
+	return s.Render(
 		SelectQuestionTemplate,
 		SelectTemplateData{Select: *s, Answer: val.(string)},
 	)

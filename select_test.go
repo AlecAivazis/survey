@@ -53,7 +53,7 @@ func TestSelectRender(t *testing.T) {
 	for _, test := range tests {
 		outputBuffer.Reset()
 		test.data.Select = test.prompt
-		err := test.prompt.render(
+		err := test.prompt.Render(
 			SelectQuestionTemplate,
 			test.data,
 		)

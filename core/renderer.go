@@ -1,10 +1,9 @@
-package survey
+package core
 
 import (
 	"io/ioutil"
 	"strings"
 
-	"github.com/AlecAivazis/survey/core"
 	"github.com/AlecAivazis/survey/terminal"
 	"github.com/chzyer/readline"
 )
@@ -12,7 +11,7 @@ import (
 // basic readline config that does not put terminal in Raw mode
 // so that basic editing works (backspace, arrow keys etc).  This
 // is used by all text-input prompt types
-var simpleReadlineConfig = &readline.Config{
+var SimpleReadlineConfig = &readline.Config{
 	Stdout: ioutil.Discard,
 	FuncMakeRaw: func() error {
 		return nil
@@ -24,12 +23,12 @@ var simpleReadlineConfig = &readline.Config{
 	EOFPrompt:    "\n",
 }
 
-type renderer struct {
+type Renderer struct {
 	lineCount int
 	mask      rune
 }
 
-func (r *renderer) render(tmpl string, data interface{}) error {
+func (r *Renderer) Render(tmpl string, data interface{}) error {
 	// clean out current line in case tmpl didnt end in newline
 	terminal.EraseLine(terminal.ERASE_LINE_ALL)
 	// clean up what we left behind last time
@@ -39,7 +38,7 @@ func (r *renderer) render(tmpl string, data interface{}) error {
 	}
 
 	// render the template summarizing the current state
-	out, err := core.RunTemplate(tmpl, data)
+	out, err := RunTemplate(tmpl, data)
 	if err != nil {
 		return err
 	}
