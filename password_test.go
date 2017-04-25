@@ -1,11 +1,9 @@
 package survey
 
 import (
-	"bytes"
 	"testing"
 
 	"github.com/AlecAivazis/survey/core"
-	"github.com/AlecAivazis/survey/terminal"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -32,16 +30,12 @@ func TestPasswordRender(t *testing.T) {
 		},
 	}
 
-	outputBuffer := bytes.NewBufferString("")
-	terminal.Stdout = outputBuffer
-
 	for _, test := range tests {
-		outputBuffer.Reset()
-		err := test.prompt.render(
+		actual, err := core.RunTemplate(
 			PasswordQuestionTemplate,
 			&test.prompt,
 		)
 		assert.Nil(t, err, test.title)
-		assert.Equal(t, test.expected, outputBuffer.String(), test.title)
+		assert.Equal(t, test.expected, actual, test.title)
 	}
 }
