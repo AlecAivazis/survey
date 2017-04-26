@@ -34,15 +34,15 @@ type MultiSelectTemplateData struct {
 
 var MultiSelectQuestionTemplate = `
 {{- if .ShowHelp }}{{- color "cyan"}}{{ HelpIcon }} {{ .Help }}{{color "reset"}}{{"\n"}}{{end}}
-{{- color "green+hb"}}? {{color "reset"}}
+{{- color "green+hb"}}{{ QuestionIcon }} {{color "reset"}}
 {{- color "default+hb"}}{{ .Message }}{{color "reset"}}
 {{- if .Answer}}{{color "cyan"}} {{.Answer}}{{color "reset"}}{{"\n"}}
 {{- else }}
   {{- if and .Help (not .ShowHelp)}} {{color "cyan"}}[{{ HelpInputRune }} for help]{{color "reset"}}{{end}}
   {{- "\n"}}
   {{- range $ix, $option := .Options}}
-    {{- if eq $ix $.SelectedIndex}}{{color "cyan"}}❯{{color "reset"}}{{else}} {{end}}
-    {{- if index $.Checked $ix}}{{color "green"}} ◉ {{else}}{{color "default+hb"}} ◯ {{end}}
+    {{- if eq $ix $.SelectedIndex}}{{color "cyan"}}{{ MultiSelectFocusIcon }}{{color "reset"}}{{else}} {{end}}
+    {{- if index $.Checked $ix}}{{color "green"}} {{ MarkedOptionIcon }} {{else}}{{color "default+hb"}} {{ UnmarkedOptionIcon }} {{end}}
     {{- color "reset"}}
     {{- " "}}{{$option}}{{"\n"}}
   {{- end}}

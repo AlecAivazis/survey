@@ -14,7 +14,7 @@ type Password struct {
 
 // Templates with Color formatting. See Documentation: https://github.com/mgutz/ansi#style-format
 var PasswordQuestionTemplate = `
-{{- color "green+hb"}}? {{color "reset"}}
+{{- color "green+hb"}}{{ QuestionIcon }} {{color "reset"}}
 {{- color "default+hb"}}{{ .Message }} {{color "reset"}}`
 
 func (p *Password) Prompt(rl *readline.Instance) (line interface{}, err error) {
