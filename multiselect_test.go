@@ -22,6 +22,9 @@ func TestMultiSelectRender(t *testing.T) {
 		Default: []string{"bar", "buz"},
 	}
 
+	helpfulPrompt := prompt
+	helpfulPrompt.Help = "This is helpful"
+
 	tests := []struct {
 		title    string
 		prompt   MultiSelect
@@ -44,6 +47,29 @@ func TestMultiSelectRender(t *testing.T) {
 			prompt,
 			MultiSelectTemplateData{Answer: "foo, buz"},
 			"? Pick your words: foo, buz\n",
+		},
+		{
+			"Test MultiSelect question output with help hidden",
+			helpfulPrompt,
+			MultiSelectTemplateData{SelectedIndex: 2, Checked: map[int]bool{1: true, 3: true}},
+			`? Pick your words: [? for help]
+  ◯  foo
+  ◉  bar
+❯ ◯  baz
+  ◉  buz
+`,
+		},
+		{
+			"Test MultiSelect question output with help shown",
+			helpfulPrompt,
+			MultiSelectTemplateData{SelectedIndex: 2, Checked: map[int]bool{1: true, 3: true}, ShowHelp: true},
+			`ⓘ This is helpful
+? Pick your words:
+  ◯  foo
+  ◉  bar
+❯ ◯  baz
+  ◉  buz
+`,
 		},
 	}
 

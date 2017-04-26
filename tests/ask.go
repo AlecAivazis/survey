@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/AlecAivazis/survey"
-	"github.com/AlecAivazis/survey/core"
 )
 
 // the questions to ask
@@ -52,7 +51,7 @@ func main() {
 
 	fmt.Println("Asking one with validation.")
 	vAns := ""
-	err = survey.AskOne(&survey.Input{core.Renderer{}, "What is your name?", ""}, &vAns, survey.Required)
+	err = survey.AskOne(&survey.Input{Message: "What is your name?"}, &vAns, survey.Required)
 	if err != nil {
 		fmt.Println(err.Error())
 		return

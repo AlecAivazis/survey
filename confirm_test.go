@@ -50,6 +50,19 @@ func TestConfirmRender(t *testing.T) {
 ? Is pizza your favorite food? Yes
 `,
 		},
+		{
+			"Test Confirm with help but help message is hidden",
+			Confirm{Message: "Is pizza your favorite food?", Help: "This is helpful"},
+			ConfirmTemplateData{},
+			"? Is pizza your favorite food? [? for help] (y/N) ",
+		},
+		{
+			"Test Confirm help output with help message shown",
+			Confirm{Message: "Is pizza your favorite food?", Help: "This is helpful"},
+			ConfirmTemplateData{ShowHelp: true},
+			`ⓘ This is helpful
+? Is pizza your favorite food? (y/N) `,
+		},
 	}
 
 	outputBuffer := bytes.NewBufferString("")
