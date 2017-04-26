@@ -11,7 +11,16 @@ var DisableColor = false
 
 var (
 	HelpInputRune = '?'
-	HelpIcon      = "ⓘ"
+
+	ErrorIcon    = "✘"
+	HelpIcon     = "ⓘ"
+	QuestionIcon = "?"
+
+	MarkedOptionIcon   = "◉"
+	UnmarkedOptionIcon = "◯"
+
+	MultiSelectFocusIcon = "❯"
+	SelectFocusIcon      = ">"
 )
 
 var TemplateFuncs = map[string]interface{}{
@@ -25,8 +34,26 @@ var TemplateFuncs = map[string]interface{}{
 	"HelpInputRune": func() string {
 		return string(HelpInputRune)
 	},
+	"ErrorIcon": func() string {
+		return ErrorIcon
+	},
 	"HelpIcon": func() string {
 		return HelpIcon
+	},
+	"QuestionIcon": func() string {
+		return QuestionIcon
+	},
+	"MarkedOptionIcon": func() string {
+		return MarkedOptionIcon
+	},
+	"UnmarkedOptionIcon": func() string {
+		return UnmarkedOptionIcon
+	},
+	"MultiSelectFocusIcon": func() string {
+		return MultiSelectFocusIcon
+	},
+	"SelectFocusIcon": func() string {
+		return SelectFocusIcon
 	},
 }
 

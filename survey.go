@@ -26,7 +26,7 @@ type Prompt interface {
 	Cleanup(*readline.Instance, interface{}) error
 }
 
-var ErrorTemplate = `{{color "red"}}✘ Sorry, your reply was invalid: {{.Error}}{{color "reset"}}
+var ErrorTemplate = `{{color "red"}}{{ ErrorIcon }} Sorry, your reply was invalid: {{.Error}}{{color "reset"}}
 `
 
 // AskOne asks a single question without performing validation on the answer.
