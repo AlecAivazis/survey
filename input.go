@@ -24,13 +24,13 @@ type InputTemplateData struct {
 
 // Templates with Color formatting. See Documentation: https://github.com/mgutz/ansi#style-format
 var InputQuestionTemplate = `
-{{- if .ShowHelp }}{{- color "cyan"}}{{ .Help }}{{color "reset"}}{{"\n"}}{{end}}
+{{- if .ShowHelp }}{{- color "cyan"}}{{ HelpIcon }} {{ .Help }}{{color "reset"}}{{"\n"}}{{end}}
 {{- color "green+hb"}}? {{color "reset"}}
 {{- color "default+hb"}}{{ .Message }} {{color "reset"}}
 {{- if .Answer}}
   {{- color "cyan"}}{{.Answer}}{{color "reset"}}{{"\n"}}
 {{- else }}
-  {{- if and .Help (not .ShowHelp)}}{{color "cyan"}}[? for help] {{color "reset"}}{{end}}
+  {{- if and .Help (not .ShowHelp)}}{{color "cyan"}}[{{ HelpInputRune }} for help]{{color "reset"}} {{end}}
   {{- if .Default}}{{color "white"}}({{.Default}}) {{color "reset"}}{{end}}
 {{- end}}`
 
@@ -50,7 +50,7 @@ func (i *Input) Prompt(rl *readline.Instance) (line interface{}, err error) {
 	// readline will echo the \n so we need to jump back up one row
 	terminal.CursorUp(1)
 
-	if err == nil && line == "?" {
+	if err == nil && line == string(core.HelpInputRune) {
 		err = i.Render(
 			InputQuestionTemplate,
 			InputTemplateData{Input: *i, ShowHelp: true},

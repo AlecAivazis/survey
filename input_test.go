@@ -56,14 +56,14 @@ func TestInputRender(t *testing.T) {
 			"Test Input question output without default but with help shown",
 			Input{Message: "What is your favorite month:", Help: "This is helpful"},
 			InputTemplateData{ShowHelp: true},
-			`This is helpful
+			`ⓘ This is helpful
 ? What is your favorite month: `,
 		},
 		{
 			"Test Input question output with default and with help shown",
 			Input{Message: "What is your favorite month:", Default: "April", Help: "This is helpful"},
 			InputTemplateData{ShowHelp: true},
-			`This is helpful
+			`ⓘ This is helpful
 ? What is your favorite month: (April) `,
 		},
 	}

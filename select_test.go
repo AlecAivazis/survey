@@ -63,7 +63,7 @@ func TestSelectRender(t *testing.T) {
 			"Test Select question output with help shown",
 			helpfulPrompt,
 			SelectTemplateData{SelectedIndex: 2, ShowHelp: true},
-			`This is helpful
+			`ⓘ This is helpful
 ? Pick your word:
   foo
   bar

@@ -60,7 +60,7 @@ func TestConfirmRender(t *testing.T) {
 			"Test Confirm help output with help message shown",
 			Confirm{Message: "Is pizza your favorite food?", Help: "This is helpful"},
 			ConfirmTemplateData{ShowHelp: true},
-			`This is helpful
+			`ⓘ This is helpful
 ? Is pizza your favorite food? (y/N) `,
 		},
 	}

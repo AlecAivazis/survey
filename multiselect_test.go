@@ -63,7 +63,7 @@ func TestMultiSelectRender(t *testing.T) {
 			"Test MultiSelect question output with help shown",
 			helpfulPrompt,
 			MultiSelectTemplateData{SelectedIndex: 2, Checked: map[int]bool{1: true, 3: true}, ShowHelp: true},
-			`This is helpful
+			`ⓘ This is helpful
 ? Pick your words:
   ◯  foo
   ◉  bar

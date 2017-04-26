@@ -9,6 +9,11 @@ import (
 
 var DisableColor = false
 
+var (
+	HelpInputRune = '?'
+	HelpIcon      = "ⓘ"
+)
+
 var TemplateFuncs = map[string]interface{}{
 	// Templates with Color formatting. See Documentation: https://github.com/mgutz/ansi#style-format
 	"color": func(color string) string {
@@ -16,6 +21,12 @@ var TemplateFuncs = map[string]interface{}{
 			return ""
 		}
 		return ansi.ColorCode(color)
+	},
+	"HelpInputRune": func() string {
+		return string(HelpInputRune)
+	},
+	"HelpIcon": func() string {
+		return HelpIcon
 	},
 }
 

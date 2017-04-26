@@ -33,12 +33,12 @@ type MultiSelectTemplateData struct {
 }
 
 var MultiSelectQuestionTemplate = `
-{{- if .ShowHelp }}{{- color "cyan"}}{{ .Help }}{{color "reset"}}{{"\n"}}{{end}}
+{{- if .ShowHelp }}{{- color "cyan"}}{{ HelpIcon }} {{ .Help }}{{color "reset"}}{{"\n"}}{{end}}
 {{- color "green+hb"}}? {{color "reset"}}
 {{- color "default+hb"}}{{ .Message }}{{color "reset"}}
 {{- if .Answer}}{{color "cyan"}} {{.Answer}}{{color "reset"}}{{"\n"}}
 {{- else }}
-  {{- if and .Help (not .ShowHelp)}} {{color "cyan"}}[? for help]{{color "reset"}}{{end}}
+  {{- if and .Help (not .ShowHelp)}} {{color "cyan"}}[{{ HelpInputRune }} for help]{{color "reset"}}{{end}}
   {{- "\n"}}
   {{- range $ix, $option := .Options}}
     {{- if eq $ix $.SelectedIndex}}{{color "cyan"}}❯{{color "reset"}}{{else}} {{end}}
@@ -68,7 +68,7 @@ func (m *MultiSelect) OnChange(line []rune, pos int, key rune) (newLine []rune, 
 			// otherwise just invert the current value
 			m.checked[m.selectedIndex] = !old
 		}
-	} else if key == terminal.KeyQuestion {
+	} else if key == core.HelpInputRune {
 		m.showingHelp = true
 	}
 
