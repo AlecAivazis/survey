@@ -156,6 +156,43 @@ validators include:
 | MinLength(n) |   string        |   Enforces that a response is at least the given length       |
 | MaxLength(n) |   string        |   Enforces that a response is no longer than the given length |
 
+## Help Text
+All of the prompts have a `Help` field which can be defined to provide more information to your users:
+<img src="https://media.giphy.com/media/l1KVbc5CehW6r7pss/giphy.gif" width="400px" style="margin-top: 8px"/>
+
+```golang
+&survey.Input{
+    Message: "What is your phone number:",
+    Help:    "Phone number should include the area code",
+}
+```
+
+### Changing the input rune
+
+In some situations, `?` is a perfectly valid response. To handle this, you can change the rune that survey
+looks for by setting the `HideInputRune` variable in `survey/core`:
+
+```golang
+
+import (
+    "gopkg.in/AlecAivazis/survey.v1"
+    surveyCore "gopkg.in/AlecAivazis/survey.v1/core"
+)
+
+number := ""
+prompt := &survey.Input{
+    Message: "If you have this need, please give me a reasonable message.",
+    Help:    "I couldn't come up with one.",
+}
+
+surveyCore.HideInputRune = '^'
+
+survey.AskOne(prompt, &number, nil)
+```
+
+## Customizing Output
+
+
 ## Versioning
 
 This project tries to maintain semantic GitHub releases as closely as possible. As such, services
