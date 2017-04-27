@@ -52,6 +52,22 @@ func main() {
 }
 ```
 
+## Table of Contents
+
+1. [Examples](#examples)
+1. [Prompts](#prompts)
+    1. [Input](#input)
+    1. [Password](#password)
+    1. [Confirm](#confirm)
+    1. [Select](#select)
+    1. [MultiSelect](#multiselect)
+1. [Validation](#validation)
+    1. [Built-in Validators](#built-in-validators)
+1. [Help Text](#help-text)
+    1. [Changing the input rune](#changing-the-input-run)
+1. [Customizing Output](#customizing-output)
+1. [Versioning](#versioning)
+
 ## Examples
 
 Examples can be found in the `examples/` directory. Run them
