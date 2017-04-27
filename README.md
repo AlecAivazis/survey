@@ -204,15 +204,14 @@ survey.AskOne(prompt, &number, nil)
 Customizing the icons and various parts of survey can easily be done by setting the following variables
 in `survey/core`:
 
-|   name                 |     default    |    description                                        |
-|------------------------|----------------|-------------------------------------------------------|
-| ErrorIcon              |       ✘        | Before an error                                       |
-| HelpIcon               |       ⓘ       | Before help text                                       |
-| QuestionIcon           |       ?        | Before the message of a prompt                        |
-| SelectFocusIcon        |       >        | Marks the current selection in a `Select` prompt      |
-| MarkedOptionIcon       |       ◉        | Marks a chosen selection in a `MultiSelect` prompt    |
-| UnmarkedOptionIcon     |       ◯        | Marks an unselected option in a `MultiSelect` prompt  |
-| MultiSelectFocusIcon   |       ❯        | Marks the current selection in a `MultiSelect` prompt |
+|   name                 |     default    |    description                                                    |
+|------------------------|----------------|-------------------------------------------------------------------|
+| ErrorIcon              |       ✘        | Before an error                                                   |
+| HelpIcon               |       ⓘ       | Before help text                                                   |
+| QuestionIcon           |       ?        | Before the message of a prompt                                    |
+| MultiSelectFocusIcon   |       ❯        | Marks the current selection in `Select` and `MultiSelect` prompts |
+| MarkedOptionIcon       |       ◉        | Marks a chosen selection in a `MultiSelect` prompt                |
+| UnmarkedOptionIcon     |       ◯        | Marks an unselected option in a `MultiSelect` prompt              |
 
 
 
