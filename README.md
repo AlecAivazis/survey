@@ -166,6 +166,7 @@ validators include:
 ## Help Text
 
 All of the prompts (except `Password`) have a `Help` field which can be defined to provide more information to your users:
+
 <img src="https://media.giphy.com/media/l1KVbc5CehW6r7pss/giphy.gif" width="400px" style="margin-top: 8px"/>
 
 ```golang
