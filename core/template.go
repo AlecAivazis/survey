@@ -19,8 +19,7 @@ var (
 	MarkedOptionIcon   = "◉"
 	UnmarkedOptionIcon = "◯"
 
-	MultiSelectFocusIcon = "❯"
-	SelectFocusIcon      = ">"
+	SelectFocusIcon = "❯"
 )
 
 var TemplateFuncs = map[string]interface{}{
@@ -48,9 +47,6 @@ var TemplateFuncs = map[string]interface{}{
 	},
 	"UnmarkedOptionIcon": func() string {
 		return UnmarkedOptionIcon
-	},
-	"MultiSelectFocusIcon": func() string {
-		return MultiSelectFocusIcon
 	},
 	"SelectFocusIcon": func() string {
 		return SelectFocusIcon
