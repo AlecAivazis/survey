@@ -53,6 +53,7 @@ func main() {
 ```
 
 ## Examples
+
 Examples can be found in the `examples/` directory. Run them
 to see basic behavior:
 ```bash
@@ -67,6 +68,7 @@ go run examples/validation.go
 ## Prompts
 
 ### Input
+
 <img src="https://media.giphy.com/media/3og0IxS8JsuD9Z8syA/giphy.gif" width="400px"/>
 
 ```golang
@@ -79,6 +81,7 @@ survey.AskOne(prompt, &name, nil)
 
 
 ### Password
+
 <img src="https://media.giphy.com/media/26FmQr6mUivkq71GE/giphy.gif" width="400px" />
 
 ```golang
@@ -91,6 +94,7 @@ survey.AskOne(prompt, &password, nil)
 
 
 ### Confirm
+
 <img src="https://media.giphy.com/media/3oKIPgsUmTp4m3eo4E/giphy.gif" width="400px"/>
 
 ```golang
@@ -103,6 +107,7 @@ survey.AskOne(prompt, &name, nil)
 
 
 ### Select
+
 <img src="https://media.giphy.com/media/3oKIPxigmMu5YqpUPK/giphy.gif" width="400px"/>
 
 ```golang
@@ -116,6 +121,7 @@ survey.AskOne(prompt, &color, nil)
 
 
 ### MultiSelect
+
 <img src="https://media.giphy.com/media/3oKIP8lHYFtGeQDH0c/giphy.gif" width="400px"/>
 
 ```golang
@@ -147,6 +153,7 @@ q := &survey.Question{
 ```
 
 ### Built-in Validators
+
 `survey` comes prepackaged with a few validators to fit common situations. Currently these
 validators include:
 
@@ -157,6 +164,7 @@ validators include:
 | MaxLength(n) |   string        |   Enforces that a response is no longer than the given length |
 
 ## Help Text
+
 All of the prompts have a `Help` field which can be defined to provide more information to your users:
 <img src="https://media.giphy.com/media/l1KVbc5CehW6r7pss/giphy.gif" width="400px" style="margin-top: 8px"/>
 
@@ -190,7 +198,22 @@ surveyCore.HideInputRune = '^'
 survey.AskOne(prompt, &number, nil)
 ```
 
+
 ## Customizing Output
+
+Customizing the icons and various parts of survey can easily be done by setting the following variables
+in `survey/core`:
+
+|   name                 |     default    |    description                                        |
+|------------------------|----------------|-------------------------------------------------------|
+| ErrorIcon              |       ✘        | Before an error                                       |
+| HelpIcon               |       ⓘ       | Before help text                                       |
+| QuestionIcon           |       ?        | Before the message of a prompt                        |
+| SelectFocusIcon        |       >        | Marks the current selection in a `Select` prompt      |
+| MarkedOptionIcon       |       ◉        | Marks a chosen selection in a `MultiSelect` prompt    |
+| UnmarkedOptionIcon     |       ◯        | Marks an unselected option in a `MultiSelect` prompt  |
+| MultiSelectFocusIcon   |       ❯        | Marks the current selection in a `MultiSelect` prompt |
+
 
 
 ## Versioning
