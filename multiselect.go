@@ -41,7 +41,7 @@ var MultiSelectQuestionTemplate = `
   {{- if and .Help (not .ShowHelp)}} {{color "cyan"}}[{{ HelpInputRune }} for help]{{color "reset"}}{{end}}
   {{- "\n"}}
   {{- range $ix, $option := .Options}}
-    {{- if eq $ix $.SelectedIndex}}{{color "cyan"}}{{ MultiSelectFocusIcon }}{{color "reset"}}{{else}} {{end}}
+    {{- if eq $ix $.SelectedIndex}}{{color "cyan"}}{{ SelectFocusIcon }}{{color "reset"}}{{else}} {{end}}
     {{- if index $.Checked $ix}}{{color "green"}} {{ MarkedOptionIcon }} {{else}}{{color "default+hb"}} {{ UnmarkedOptionIcon }} {{end}}
     {{- color "reset"}}
     {{- " "}}{{$option}}{{"\n"}}
