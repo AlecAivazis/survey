@@ -52,7 +52,24 @@ func main() {
 }
 ```
 
+## Table of Contents
+
+1. [Examples](#examples)
+1. [Prompts](#prompts)
+    1. [Input](#input)
+    1. [Password](#password)
+    1. [Confirm](#confirm)
+    1. [Select](#select)
+    1. [MultiSelect](#multiselect)
+1. [Validation](#validation)
+    1. [Built-in Validators](#built-in-validators)
+1. [Help Text](#help-text)
+    1. [Changing the input rune](#changing-the-input-run)
+1. [Customizing Output](#customizing-output)
+1. [Versioning](#versioning)
+
 ## Examples
+
 Examples can be found in the `examples/` directory. Run them
 to see basic behavior:
 ```bash
@@ -67,6 +84,7 @@ go run examples/validation.go
 ## Prompts
 
 ### Input
+
 <img src="https://media.giphy.com/media/3og0IxS8JsuD9Z8syA/giphy.gif" width="400px"/>
 
 ```golang
@@ -79,6 +97,7 @@ survey.AskOne(prompt, &name, nil)
 
 
 ### Password
+
 <img src="https://media.giphy.com/media/26FmQr6mUivkq71GE/giphy.gif" width="400px" />
 
 ```golang
@@ -91,6 +110,7 @@ survey.AskOne(prompt, &password, nil)
 
 
 ### Confirm
+
 <img src="https://media.giphy.com/media/3oKIPgsUmTp4m3eo4E/giphy.gif" width="400px"/>
 
 ```golang
@@ -103,6 +123,7 @@ survey.AskOne(prompt, &name, nil)
 
 
 ### Select
+
 <img src="https://media.giphy.com/media/3oKIPxigmMu5YqpUPK/giphy.gif" width="400px"/>
 
 ```golang
@@ -116,6 +137,7 @@ survey.AskOne(prompt, &color, nil)
 
 
 ### MultiSelect
+
 <img src="https://media.giphy.com/media/3oKIP8lHYFtGeQDH0c/giphy.gif" width="400px"/>
 
 ```golang
@@ -147,6 +169,7 @@ q := &survey.Question{
 ```
 
 ### Built-in Validators
+
 `survey` comes prepackaged with a few validators to fit common situations. Currently these
 validators include:
 
@@ -155,6 +178,59 @@ validators include:
 | Required     |   any           |   Rejects zero values of the response type                    |
 | MinLength(n) |   string        |   Enforces that a response is at least the given length       |
 | MaxLength(n) |   string        |   Enforces that a response is no longer than the given length |
+
+## Help Text
+
+All of the prompts (except `Password`) have a `Help` field which can be defined to provide more information to your users:
+
+<img src="https://media.giphy.com/media/l1KVbc5CehW6r7pss/giphy.gif" width="400px" style="margin-top: 8px"/>
+
+```golang
+&survey.Input{
+    Message: "What is your phone number:",
+    Help:    "Phone number should include the area code",
+}
+```
+
+### Changing the input rune
+
+In some situations, `?` is a perfectly valid response. To handle this, you can change the rune that survey
+looks for by setting the `HideInputRune` variable in `survey/core`:
+
+```golang
+
+import (
+    "gopkg.in/AlecAivazis/survey.v1"
+    surveyCore "gopkg.in/AlecAivazis/survey.v1/core"
+)
+
+number := ""
+prompt := &survey.Input{
+    Message: "If you have this need, please give me a reasonable message.",
+    Help:    "I couldn't come up with one.",
+}
+
+surveyCore.HideInputRune = '^'
+
+survey.AskOne(prompt, &number, nil)
+```
+
+
+## Customizing Output
+
+Customizing the icons and various parts of survey can easily be done by setting the following variables
+in `survey/core`:
+
+|   name              |     default    |    description                                                    |
+|---------------------|----------------|-------------------------------------------------------------------|
+| ErrorIcon           |       ✘        | Before an error                                                   |
+| HelpIcon            |       ⓘ       | Before help text                                                   |
+| QuestionIcon        |       ?        | Before the message of a prompt                                    |
+| SelectFocusIcon     |       ❯        | Marks the current selection in `Select` and `MultiSelect` prompts |
+| MarkedOptionIcon    |       ◉        | Marks a chosen selection in a `MultiSelect` prompt                |
+| UnmarkedOptionIcon  |       ◯        | Marks an unselected option in a `MultiSelect` prompt              |
+
+
 
 ## Versioning
 

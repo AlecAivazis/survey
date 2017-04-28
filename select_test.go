@@ -38,7 +38,7 @@ func TestSelectRender(t *testing.T) {
 			`? Pick your word:
   foo
   bar
-> baz
+❯ baz
   buz
 `,
 		},
@@ -55,7 +55,7 @@ func TestSelectRender(t *testing.T) {
 			`? Pick your word: [? for help]
   foo
   bar
-> baz
+❯ baz
   buz
 `,
 		},
@@ -67,7 +67,7 @@ func TestSelectRender(t *testing.T) {
 ? Pick your word:
   foo
   bar
-> baz
+❯ baz
   buz
 `,
 		},
