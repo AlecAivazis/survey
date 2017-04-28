@@ -177,7 +177,7 @@ var DriverTemplate = `
 //
 //  This file was automatically generated via the command:
 //
-//      go run record/recorder.go -- {{.File}}
+//      go run recorder/recorder.go -- {{.File}}
 //
 ////////////////////////////////////////////////////////////////////////////////
 package main

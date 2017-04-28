@@ -4,7 +4,7 @@
 //
 //  This file was automatically generated via the command:
 //
-//      go run record/recorder.go -- select.go
+//      go run recorder/recorder.go -- select.go
 //
 ////////////////////////////////////////////////////////////////////////////////
 package main
