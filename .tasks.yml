@@ -4,7 +4,10 @@ tests:
 
 install-deps:
   summary: Install all of package dependencies
-  command: go get -t {{.files}}
+  command: |-
+    go get -t {{.files}}
+    # for autoplay tests
+    go get github.com/kr/pty
 
 variables:
   files: '$(go list -v ./... | grep -iEv "github.com/AlecAivazis/survey/(tests|examples)")'
