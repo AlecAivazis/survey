@@ -2,9 +2,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 //                          DO NOT MODIFY THIS FILE!
 //
-//  This file was automatically generated via the command:
+//  This file was automatically generated via the commands:
 //
-//      go run recorder/recorder.go -- selectThanInput.go
+//      go get github.com/coryb/autoplay
+//      autoplay --name autoplay/selectThanInput.go --squash \\r\\b go run selectThanInput.go
 //
 ////////////////////////////////////////////////////////////////////////////////
 package main
@@ -14,6 +15,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+
 	"github.com/kr/pty"
 )
 

@@ -2,9 +2,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 //                          DO NOT MODIFY THIS FILE!
 //
-//  This file was automatically generated via the command:
+//  This file was automatically generated via the commands:
 //
-//      go run recorder/recorder.go -- password.go
+//      go get github.com/coryb/autoplay
+//      autoplay --name autoplay/password.go --squash \\r\\b go run password.go
 //
 ////////////////////////////////////////////////////////////////////////////////
 package main
@@ -14,6 +15,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+
 	"strings"
 
 	"github.com/kr/pty"
@@ -31,8 +33,7 @@ func main() {
 	buf := bufio.NewReaderSize(fh, 1024)
 
 	expect("standard\r\n", buf)
-	expect("\r\b", buf)
-	expect(strings.Repeat("\r\b", 29), buf)
+	expect(strings.Repeat("\r\b", 30), buf)
 	expect("\x1b[J\x1b[1;92m? \x1b[0m\x1b[1;99mPlease type your password: \x1b[0m  \b", buf)
 	fh.Write([]byte("f"))
 	expect(strings.Repeat("\r\b", 30), buf)
@@ -60,8 +61,7 @@ func main() {
 	expect("\x1b[JAnswered foobar.\r\n", buf)
 	expect("---------------------\r\n", buf)
 	expect("please make sure paste works\r\n", buf)
-	expect("\r\b", buf)
-	expect(strings.Repeat("\r\b", 30), buf)
+	expect(strings.Repeat("\r\b", 31), buf)
 	expect("\x1b[J\x1b[1;92m? \x1b[0m\x1b[1;99mPlease paste your password: \x1b[0m  \b", buf)
 	fh.Write([]byte("b"))
 	fh.Write([]byte("o"))
