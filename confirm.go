@@ -2,7 +2,9 @@ package survey
 
 import (
 	"fmt"
+	"io"
 	"regexp"
+	"time"
 
 	"github.com/AlecAivazis/survey/core"
 	"github.com/AlecAivazis/survey/terminal"
@@ -51,9 +53,18 @@ func yesNo(t bool) string {
 	return "No"
 }
 
-func (c *Confirm) getBool(rl *readline.Instance, showHelp bool) (bool, error) {
+func (c *Confirm) getBool(rl *readline.Instance, showHelp bool) (bool, err error) {
 	// start waiting for input
-	val, err := rl.Readline()
+	var val string
+	for {
+		val, err = rl.Readline()
+		if err == io.EOF {
+			time.Sleep(10 * time.Millisecond)
+			continue
+		}
+		break
+	}
+
 	// move back up a line to compensate for the \n echoed from Readline
 	terminal.CursorUp(1)
 	// if something went wrong

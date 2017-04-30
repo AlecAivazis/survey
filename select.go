@@ -2,7 +2,9 @@ package survey
 
 import (
 	"errors"
+	"io"
 	"io/ioutil"
+	"time"
 
 	"github.com/AlecAivazis/survey/core"
 	"github.com/AlecAivazis/survey/terminal"
@@ -123,7 +125,14 @@ func (s *Select) Prompt(rl *readline.Instance) (interface{}, error) {
 	s.useDefault = true
 
 	// start waiting for input
-	_, err = rl.Readline()
+	for {
+		_, err = rl.Readline()
+		if err == io.EOF {
+			time.Sleep(10 * time.Millisecond)
+			continue
+		}
+		break
+	}
 
 	var val string
 	// if we are supposed to use the default value

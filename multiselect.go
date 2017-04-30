@@ -2,8 +2,10 @@ package survey
 
 import (
 	"errors"
+	"io"
 	"io/ioutil"
 	"strings"
+	"time"
 
 	"github.com/AlecAivazis/survey/core"
 	"github.com/AlecAivazis/survey/terminal"
@@ -137,7 +139,14 @@ func (m *MultiSelect) Prompt(rl *readline.Instance) (interface{}, error) {
 	}
 
 	// start waiting for input
-	_, err = rl.Readline()
+	for {
+		_, err = rl.Readline()
+		if err == io.EOF {
+			time.Sleep(10 * time.Millisecond)
+			continue
+		}
+		break
+	}
 	// if something went wrong
 	if err != nil {
 		return "", err

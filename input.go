@@ -1,6 +1,9 @@
 package survey
 
 import (
+	"io"
+	"time"
+
 	"github.com/AlecAivazis/survey/core"
 	"github.com/AlecAivazis/survey/terminal"
 	"github.com/chzyer/readline"
@@ -45,8 +48,15 @@ func (i *Input) Prompt(rl *readline.Instance) (line interface{}, err error) {
 	}
 	rl.SetConfig(core.SimpleReadlineConfig)
 
-	// get the next line
-	line, err = rl.Readline()
+	var line string
+	for {
+		line, err = rl.Readline()
+		if err == io.EOF {
+			time.Sleep(10 * time.Millisecond)
+			continue
+		}
+		break
+	}
 	// readline will echo the \n so we need to jump back up one row
 	terminal.CursorUp(1)
 
@@ -59,7 +69,14 @@ func (i *Input) Prompt(rl *readline.Instance) (line interface{}, err error) {
 			return "", err
 		}
 		// get the next line
-		line, err = rl.Readline()
+		for {
+			line, err = rl.Readline()
+			if err == io.EOF {
+				time.Sleep(10 * time.Millisecond)
+				continue
+			}
+			break
+		}
 		// readline will echo the \n so we need to jump back up one row
 		terminal.CursorUp(1)
 	}
