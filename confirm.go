@@ -53,9 +53,10 @@ func yesNo(t bool) string {
 	return "No"
 }
 
-func (c *Confirm) getBool(rl *readline.Instance, showHelp bool) (bool, err error) {
+func (c *Confirm) getBool(rl *readline.Instance, showHelp bool) (bool, error) {
 	// start waiting for input
 	var val string
+	var err error
 	for {
 		val, err = rl.Readline()
 		if err == io.EOF {

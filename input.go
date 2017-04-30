@@ -48,7 +48,6 @@ func (i *Input) Prompt(rl *readline.Instance) (line interface{}, err error) {
 	}
 	rl.SetConfig(core.SimpleReadlineConfig)
 
-	var line string
 	for {
 		line, err = rl.Readline()
 		if err == io.EOF {
