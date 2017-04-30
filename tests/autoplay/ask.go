@@ -1,4 +1,3 @@
-
 ////////////////////////////////////////////////////////////////////////////////
 //                          DO NOT MODIFY THIS FILE!
 //
@@ -13,10 +12,16 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
+	"strconv"
+	"strings"
+	"time"
+	"unicode"
 
 	"github.com/kr/pty"
+	"github.com/mgutz/ansi"
 )
 
 func main() {
@@ -148,12 +153,33 @@ func main() {
 func expect(expected string, buf *bufio.Reader) {
 	sofar := []rune{}
 	for _, r := range expected {
-		got, _, _ := buf.ReadRune()
+		got, _, err := buf.ReadRune()
+		if err == io.EOF || got == unicode.ReplacementChar {
+			time.Sleep(10 * time.Millisecond)
+			continue
+		}
+
 		sofar = append(sofar, got)
 		if got != r {
 			fmt.Fprintln(os.Stderr)
-			fmt.Fprintf(os.Stderr, "Expected: %q\n", expected[:len(sofar)])
-			fmt.Fprintf(os.Stderr, "Got:      %q\n", string(sofar))
+			fmt.Fprintln(os.Stderr, ansi.ColorCode("reset"))
+			red := ansi.ColorCode("red")
+			reset := ansi.ColorCode("reset")
+
+			expStart := strings.TrimSuffix(strconv.Quote(expected[:len(sofar)-1]), "\"")
+			expMiss := strings.TrimSuffix(strings.TrimPrefix(strconv.Quote(string(expected[len(sofar)-1])), "\""), "\"")
+			expEnd := strings.TrimPrefix(strconv.Quote(expected[len(sofar):]), "\"")
+
+			fmt.Fprintf(os.Stderr, "Expected: %s%s%s%s%s\n", expStart, red, expMiss, reset, expEnd)
+
+			p := make([]byte, buf.Buffered())
+			buf.Read(p)
+
+			gotStart := strings.TrimSuffix(strconv.Quote(string(sofar[:len(sofar)-1])), "\"")
+			gotMiss := strings.TrimSuffix(strings.TrimPrefix(strconv.Quote(string(sofar[len(sofar)-1])), "\""), "\"")
+			gotEnd := strings.TrimPrefix(strconv.Quote(string(p)), "\"")
+
+			fmt.Fprintf(os.Stderr, "Got:      %s.%s.%s.%s.%s\n", gotStart, red, gotMiss, reset, gotEnd)
 			panic(fmt.Errorf("Unexpected Rune %q, Expected %q\n", got, r))
 		} else {
 			fmt.Printf("%c", r)
