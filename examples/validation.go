@@ -10,12 +10,12 @@ import (
 var validationQs = []*survey.Question{
 	{
 		Name:     "name",
-		Prompt:   &survey.Input{"What is your name?", ""},
+		Prompt:   &survey.Input{Message: "What is your name?"},
 		Validate: survey.Required,
 	},
 	{
 		Name:   "valid",
-		Prompt: &survey.Input{"Enter 'foo':", "not foo"},
+		Prompt: &survey.Input{Message: "Enter 'foo':", Default: "not foo"},
 		Validate: func(val interface{}) error {
 			// if the input matches the expectation
 			if str := val.(string); str != "foo" {
