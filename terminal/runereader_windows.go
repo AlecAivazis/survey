@@ -98,7 +98,7 @@ func (rr *RuneReader) ReadRune() (rune, int, error) {
 		// above that this event does correspond to a key event
 		key := (*keyEventRecord)(unsafe.Pointer(&ir.event[0]))
 		// we only care about key down events
-		if key.bKeyDown != 0 {
+		if key.bKeyDown == 0 {
 			continue
 		}
 		if key.wdControlKeyState&(LEFT_CTRL_PRESSED|RIGHT_CTRL_PRESSED) != 0 && key.unicodeChar == 'C' {
