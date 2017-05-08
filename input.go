@@ -1,9 +1,11 @@
 package survey
 
 import (
+	"bufio"
+	"os"
+
 	"github.com/AlecAivazis/survey/core"
 	"github.com/AlecAivazis/survey/terminal"
-	"github.com/chzyer/readline"
 )
 
 // Input is a regular text input that prints each character the user types on the screen
@@ -35,7 +37,7 @@ var InputQuestionTemplate = `
   {{- if .Default}}{{color "white"}}({{.Default}}) {{color "reset"}}{{end}}
 {{- end}}`
 
-func (i *Input) Prompt(rl *readline.Instance) (line interface{}, err error) {
+func (i *Input) Prompt() (line interface{}, err error) {
 	// render the template
 	err = i.Render(
 		InputQuestionTemplate,
@@ -44,25 +46,25 @@ func (i *Input) Prompt(rl *readline.Instance) (line interface{}, err error) {
 	if err != nil {
 		return "", err
 	}
-	rl.SetConfig(core.SimpleReadlineConfig)
 
+	buf := bufio.NewScanner(os.Stdin)
 	// get the next line
-	line, err = rl.Readline()
-	// readline will echo the \n so we need to jump back up one row
-	terminal.CursorUp(1)
+	for buf.Scan() {
+		// terminal will echo the \n so we need to jump back up one row
+		terminal.CursorPreviousLine(1)
+		line = buf.Text()
 
-	if err == nil && line == string(core.HelpInputRune) {
-		err = i.Render(
-			InputQuestionTemplate,
-			InputTemplateData{Input: *i, ShowHelp: true},
-		)
-		if err != nil {
-			return "", err
+		if line == string(core.HelpInputRune) {
+			err = i.Render(
+				InputQuestionTemplate,
+				InputTemplateData{Input: *i, ShowHelp: true},
+			)
+			if err != nil {
+				return "", err
+			}
+			continue
 		}
-		// get the next line
-		line, err = rl.Readline()
-		// readline will echo the \n so we need to jump back up one row
-		terminal.CursorUp(1)
+		break
 	}
 
 	// if the line is empty
@@ -75,7 +77,7 @@ func (i *Input) Prompt(rl *readline.Instance) (line interface{}, err error) {
 	return line, err
 }
 
-func (i *Input) Cleanup(rl *readline.Instance, val interface{}) error {
+func (i *Input) Cleanup(val interface{}) error {
 	return i.Render(
 		InputQuestionTemplate,
 		InputTemplateData{Input: *i, Answer: val.(string), ShowAnswer: true},
