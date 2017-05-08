@@ -19,27 +19,13 @@ import (
 type runeReaderState struct {
 	term syscall.Termios
 	buf  *bufio.Reader
-	// sigs chan os.Signal
-	// done chan bool
 }
 
 func newRuneReaderState(input *os.File) runeReaderState {
 	return runeReaderState{
 		buf: bufio.NewReader(input),
-		// sigs: make(chan os.Signal, 1),
-		// done: make(chan bool, 1),
 	}
 }
-
-// func (rr *RuneReader) restoreOnSignal() {
-// 	select {
-// 	case <-rr.state.sigs:
-// 		rr.RestoreTermMode()
-// 		os.Exit(1)
-// 	case <-rr.state.done:
-// 		return
-// 	}
-// }
 
 // For reading runes we just want to disable echo.
 func (rr *RuneReader) SetTermMode() error {
@@ -54,9 +40,6 @@ func (rr *RuneReader) SetTermMode() error {
 		return err
 	}
 
-	// signal.Notify(rr.state.sigs, syscall.SIGINT, syscall.SIGTERM)
-	// go rr.restoreOnSignal()
-
 	return nil
 }
 
@@ -64,7 +47,6 @@ func (rr *RuneReader) RestoreTermMode() error {
 	if _, _, err := syscall.Syscall6(syscall.SYS_IOCTL, uintptr(rr.Input.Fd()), ioctlWriteTermios, uintptr(unsafe.Pointer(&rr.state.term)), 0, 0, 0); err != 0 {
 		return err
 	}
-	// rr.state.done <- true
 	return nil
 }
 
