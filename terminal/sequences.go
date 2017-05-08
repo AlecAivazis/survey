@@ -7,4 +7,7 @@ const (
 	KeyArrowDown  = '\x0e'
 	KeySpace      = ' '
 	KeyEnter      = '\r'
+	KeyBackspace  = '\b'
+	KeyDelete     = '\x7f'
+	KeyInterrupt  = '\x03'
 )

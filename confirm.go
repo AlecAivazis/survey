@@ -1,12 +1,13 @@
 package survey
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 	"regexp"
 
 	"github.com/AlecAivazis/survey/core"
 	"github.com/AlecAivazis/survey/terminal"
-	"github.com/chzyer/readline"
 )
 
 // Confirm is a regular text input that accept yes/no answers.
@@ -51,56 +52,56 @@ func yesNo(t bool) string {
 	return "No"
 }
 
-func (c *Confirm) getBool(rl *readline.Instance, showHelp bool) (bool, error) {
+func (c *Confirm) getBool(showHelp bool) (bool, error) {
+	scanner := bufio.NewScanner(os.Stdin)
 	// start waiting for input
-	val, err := rl.Readline()
-	// move back up a line to compensate for the \n echoed from Readline
-	terminal.CursorUp(1)
-	// if something went wrong
-	if err != nil {
-		// use the default value and bubble up
-		return c.Default, err
-	}
+	for scanner.Scan() {
+		// move back up a line to compensate for the \n echoed from terminal
+		terminal.CursorPreviousLine(1)
+		val := scanner.Text()
 
-	// get the answer that matches the
-	var answer bool
-	switch {
-	case yesRx.Match([]byte(val)):
-		answer = true
-	case noRx.Match([]byte(val)):
-		answer = false
-	case val == "":
-		answer = c.Default
-	case val == string(core.HelpInputRune):
-		err = c.Render(
-			ConfirmQuestionTemplate,
-			ConfirmTemplateData{Confirm: *c, ShowHelp: true},
-		)
-		if err != nil {
-			// use the default value and bubble up
-			return c.Default, err
+		// get the answer that matches the
+		var answer bool
+		switch {
+		case yesRx.Match([]byte(val)):
+			answer = true
+		case noRx.Match([]byte(val)):
+			answer = false
+		case val == "":
+			answer = c.Default
+		case val == string(core.HelpInputRune):
+			err := c.Render(
+				ConfirmQuestionTemplate,
+				ConfirmTemplateData{Confirm: *c, ShowHelp: true},
+			)
+			if err != nil {
+				// use the default value and bubble up
+				return c.Default, err
+			}
+			showHelp = true
+			continue
+		default:
+			// we didnt get a valid answer, so print error and prompt again
+			e := fmt.Errorf("%q is not a valid answer, please try again.", val)
+			err := c.Render(
+				ConfirmQuestionTemplate,
+				ConfirmTemplateData{Confirm: *c, Error: &e, ShowHelp: showHelp},
+			)
+			if err != nil {
+				// use the default value and bubble up
+				return c.Default, err
+			}
+			continue
 		}
-		return c.getBool(rl, true)
-	default:
-		// we didnt get a valid answer, so print error and prompt again
-		e := fmt.Errorf("%q is not a valid answer, please try again.", val)
-		err = c.Render(
-			ConfirmQuestionTemplate,
-			ConfirmTemplateData{Confirm: *c, Error: &e, ShowHelp: showHelp},
-		)
-		if err != nil {
-			// use the default value and bubble up
-			return c.Default, err
-		}
-		return c.getBool(rl, showHelp)
+		return answer, nil
 	}
-
-	return answer, nil
+	// should not get here
+	return c.Default, nil
 }
 
 // Prompt prompts the user with a simple text field and expects a reply followed
 // by a carriage return.
-func (c *Confirm) Prompt(rl *readline.Instance) (interface{}, error) {
+func (c *Confirm) Prompt() (interface{}, error) {
 	// render the question template
 	err := c.Render(
 		ConfirmQuestionTemplate,
@@ -110,14 +111,12 @@ func (c *Confirm) Prompt(rl *readline.Instance) (interface{}, error) {
 		return "", err
 	}
 
-	rl.SetConfig(core.SimpleReadlineConfig)
-
 	// get input and return
-	return c.getBool(rl, false)
+	return c.getBool(false)
 }
 
 // Cleanup overwrite the line with the finalized formatted version
-func (c *Confirm) Cleanup(rl *readline.Instance, val interface{}) error {
+func (c *Confirm) Cleanup(val interface{}) error {
 	// if the value was previously true
 	ans := yesNo(val.(bool))
 	// render the template

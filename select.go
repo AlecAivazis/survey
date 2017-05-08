@@ -2,11 +2,11 @@ package survey
 
 import (
 	"errors"
-	"io/ioutil"
+	"fmt"
+	"os"
 
 	"github.com/AlecAivazis/survey/core"
 	"github.com/AlecAivazis/survey/terminal"
-	"github.com/chzyer/readline"
 )
 
 // Select is a prompt that presents a list of various options to the user
@@ -64,6 +64,9 @@ func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPo
 		s.showingHelp = true
 	}
 
+	s.Help = fmt.Sprintf("Rune: %q", key)
+	s.showingHelp = true
+
 	// render the options
 	s.Render(
 		SelectQuestionTemplate,
@@ -74,13 +77,7 @@ func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPo
 	return []rune(s.Options[s.selectedIndex]), 0, true
 }
 
-func (s *Select) Prompt(rl *readline.Instance) (interface{}, error) {
-	config := &readline.Config{
-		Listener: s,
-		Stdout:   ioutil.Discard,
-	}
-	rl.SetConfig(config)
-
+func (s *Select) Prompt() (interface{}, error) {
 	// if there are no options to render
 	if len(s.Options) == 0 {
 		// we failed
@@ -122,8 +119,23 @@ func (s *Select) Prompt(rl *readline.Instance) (interface{}, error) {
 	// by default, use the default value
 	s.useDefault = true
 
+	rr := terminal.NewRuneReader(os.Stdin)
+	rr.SetTermMode()
+	defer rr.RestoreTermMode()
 	// start waiting for input
-	_, err = rl.Readline()
+	for {
+		r, _, err := rr.ReadRune()
+		if err != nil {
+			return "", err
+		}
+		if r == '\r' || r == '\n' {
+			break
+		}
+		if r == terminal.KeyInterrupt {
+			return "", fmt.Errorf("interrupt")
+		}
+		s.OnChange(nil, 0, r)
+	}
 
 	var val string
 	// if we are supposed to use the default value
@@ -145,7 +157,7 @@ func (s *Select) Prompt(rl *readline.Instance) (interface{}, error) {
 	return val, err
 }
 
-func (s *Select) Cleanup(rl *readline.Instance, val interface{}) error {
+func (s *Select) Cleanup(val interface{}) error {
 	return s.Render(
 		SelectQuestionTemplate,
 		SelectTemplateData{Select: *s, Answer: val.(string)},

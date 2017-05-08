@@ -1,9 +1,12 @@
 package survey
 
 import (
-	"github.com/chzyer/readline"
+	"fmt"
+	"os"
+	"unicode"
 
 	"github.com/AlecAivazis/survey/core"
+	"github.com/AlecAivazis/survey/terminal"
 )
 
 // Password is like a normal Input but the text shows up as *'s and
@@ -17,30 +20,49 @@ var PasswordQuestionTemplate = `
 {{- color "green+hb"}}{{ QuestionIcon }} {{color "reset"}}
 {{- color "default+hb"}}{{ .Message }} {{color "reset"}}`
 
-func (p *Password) Prompt(rl *readline.Instance) (line interface{}, err error) {
+func (p *Password) Prompt() (line interface{}, err error) {
 	// render the question template
 	out, err := core.RunTemplate(
 		PasswordQuestionTemplate,
 		*p,
 	)
+	terminal.Print(out)
 	if err != nil {
 		return "", err
 	}
 
-	// a configuration for the password prompt
-	config := rl.GenPasswordConfig()
-	// use the right prompt (make sure there is an empty space after the prompt)
-	config.Prompt = out + " "
+	rr := terminal.NewRuneReader(os.Stdin)
+	rr.SetTermMode()
+	defer rr.RestoreTermMode()
 
-	config.MaskRune = '*'
-
-	// ask for the user's Password
-	pass, err := rl.ReadPasswordWithConfig(config)
-	// we're done here
+	pass := []rune{}
+	for {
+		r, _, _ := rr.ReadRune()
+		if r == '\r' || r == '\n' {
+			terminal.Print("\r\n")
+			break
+		}
+		if r == terminal.KeyInterrupt {
+			return "", fmt.Errorf("interrupt")
+		}
+		// allow for backspace/delete editing of password
+		if r == terminal.KeyBackspace || r == terminal.KeyDelete {
+			if len(pass) > 0 {
+				pass = pass[:len(pass)-1]
+				terminal.CursorBack(1)
+				terminal.EraseLine(terminal.ERASE_LINE_END)
+			}
+			continue
+		}
+		if unicode.IsPrint(r) {
+			pass = append(pass, r)
+			terminal.Print("*")
+		}
+	}
 	return string(pass), err
 }
 
 // Cleanup hides the string with a fixed number of characters.
-func (prompt *Password) Cleanup(rl *readline.Instance, val interface{}) error {
+func (prompt *Password) Cleanup(val interface{}) error {
 	return nil
 }

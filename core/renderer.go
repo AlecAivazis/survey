@@ -1,27 +1,10 @@
 package core
 
 import (
-	"io/ioutil"
 	"strings"
 
 	"github.com/AlecAivazis/survey/terminal"
-	"github.com/chzyer/readline"
 )
-
-// basic readline config that does not put terminal in Raw mode
-// so that basic editing works (backspace, arrow keys etc).  This
-// is used by all text-input prompt types
-var SimpleReadlineConfig = &readline.Config{
-	Stdout: ioutil.Discard,
-	FuncMakeRaw: func() error {
-		return nil
-	},
-	FuncExitRaw: func() error {
-		return nil
-	},
-	HistoryLimit: -1,
-	EOFPrompt:    "\n",
-}
 
 type Renderer struct {
 	lineCount int
