@@ -65,9 +65,6 @@ func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPo
 		s.showingHelp = true
 	}
 
-	s.Help = fmt.Sprintf("Rune: %q", key)
-	s.showingHelp = true
-
 	// render the options
 	s.Render(
 		SelectQuestionTemplate,
