@@ -2,9 +2,9 @@ package survey
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/AlecAivazis/survey/core"
+	"github.com/AlecAivazis/survey/terminal"
 )
 
 // Validator is a function passed to a Question in order to redefine
@@ -64,7 +64,7 @@ func Ask(qs []*Question, t interface{}) error {
 					return err
 				}
 				// send the message to the user
-				fmt.Print(out)
+				terminal.Print(out)
 				// ask for more input
 				ans, err = q.Prompt.Prompt()
 				// if there was a problem
