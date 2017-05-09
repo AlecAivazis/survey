@@ -13,6 +13,7 @@ type Renderer struct {
 
 func (r *Renderer) Render(tmpl string, data interface{}) error {
 	// clean out current line in case tmpl didnt end in newline
+	terminal.CursorHorizontalAbsolute(1)
 	terminal.EraseLine(terminal.ERASE_LINE_ALL)
 	// clean up what we left behind last time
 	for i := 0; i < r.lineCount; i++ {

@@ -46,12 +46,12 @@ func (i *Input) Prompt() (line interface{}, err error) {
 		return "", err
 	}
 
-	buf := bufio.NewScanner(os.Stdin)
+	scanner := bufio.NewScanner(os.Stdin)
 	// get the next line
-	for buf.Scan() {
+	for scanner.Scan() {
 		// terminal will echo the \n so we need to jump back up one row
 		terminal.CursorPreviousLine(1)
-		line = buf.Text()
+		line = scanner.Text()
 
 		if line == string(core.HelpInputRune) {
 			err = i.Render(
@@ -66,6 +66,9 @@ func (i *Input) Prompt() (line interface{}, err error) {
 		break
 	}
 
+	if err := scanner.Err(); err != nil {
+		return i.Default, err
+	}
 	// if the line is empty
 	if line == "" || line == nil {
 		// use the default value
