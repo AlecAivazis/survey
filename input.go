@@ -68,7 +68,7 @@ func (i *Input) Prompt() (line interface{}, err error) {
 	}
 
 	// if the line is empty
-	if line == "" {
+	if line == "" || line == nil {
 		// use the default value
 		line = i.Default
 	}
