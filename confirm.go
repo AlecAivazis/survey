@@ -95,6 +95,9 @@ func (c *Confirm) getBool(showHelp bool) (bool, error) {
 		}
 		return answer, nil
 	}
+	if err := scanner.Err(); err != nil {
+		return c.Default, err
+	}
 	// should not get here
 	return c.Default, nil
 }
