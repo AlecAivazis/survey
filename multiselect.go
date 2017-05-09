@@ -139,6 +139,9 @@ func (m *MultiSelect) Prompt() (interface{}, error) {
 		if r == terminal.KeyInterrupt {
 			return "", fmt.Errorf("interrupt")
 		}
+		if r == terminal.KeyEndTransmission {
+			break
+		}
 		m.OnChange(nil, 0, r)
 	}
 

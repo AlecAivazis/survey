@@ -26,8 +26,9 @@ const (
 	RIGHT_CTRL_PRESSED = 0x0004
 	LEFT_CTRL_PRESSED  = 0x0008
 
-	ENABLE_ECHO_INPUT uint32 = 0x0004
-	ENABLE_LINE_INPUT uint32 = 0x0002
+	ENABLE_ECHO_INPUT      uint32 = 0x0004
+	ENABLE_LINE_INPUT      uint32 = 0x0002
+	ENABLE_PROCESSED_INPUT uint32 = 0x0001
 )
 
 type inputRecord struct {
@@ -61,7 +62,7 @@ func (rr *RuneReader) SetTermMode() error {
 	}
 
 	newState := rr.state.term
-	newState &^= ENABLE_ECHO_INPUT | ENABLE_LINE_INPUT
+	newState &^= ENABLE_ECHO_INPUT | ENABLE_LINE_INPUT | ENABLE_PROCESSED_INPUT
 	r, _, err = setConsoleMode.Call(uintptr(rr.Input.Fd()), uintptr(newState))
 	// windows return 0 on error
 	if r == 0 {
@@ -104,6 +105,7 @@ func (rr *RuneReader) ReadRune() (rune, int, error) {
 		if key.wdControlKeyState&(LEFT_CTRL_PRESSED|RIGHT_CTRL_PRESSED) != 0 && key.unicodeChar == 'C' {
 			return KeyInterrupt, bytesRead, nil
 		}
+
 		// not a normal character so look up the input sequence from the
 		// virtual key code mappings (VK_*)
 		if key.unicodeChar == 0 {
