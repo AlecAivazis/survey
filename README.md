@@ -195,7 +195,7 @@ All of the prompts (except `Password`) have a `Help` field which can be defined 
 ### Changing the input rune
 
 In some situations, `?` is a perfectly valid response. To handle this, you can change the rune that survey
-looks for by setting the `HideInputRune` variable in `survey/core`:
+looks for by setting the `HelpInputRune` variable in `survey/core`:
 
 ```golang
 
@@ -210,7 +210,7 @@ prompt := &survey.Input{
     Help:    "I couldn't come up with one.",
 }
 
-surveyCore.HideInputRune = '^'
+surveyCore.HelpInputRune = '^'
 
 survey.AskOne(prompt, &number, nil)
 ```
