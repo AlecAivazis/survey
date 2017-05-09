@@ -1,7 +1,6 @@
 package survey
 
 import (
-	"bufio"
 	"os"
 
 	"github.com/AlecAivazis/survey/core"
@@ -36,9 +35,9 @@ var InputQuestionTemplate = `
   {{- if .Default}}{{color "white"}}({{.Default}}) {{color "reset"}}{{end}}
 {{- end}}`
 
-func (i *Input) Prompt() (line interface{}, err error) {
+func (i *Input) Prompt() (interface{}, error) {
 	// render the template
-	err = i.Render(
+	err := i.Render(
 		InputQuestionTemplate,
 		InputTemplateData{Input: *i},
 	)
@@ -46,14 +45,21 @@ func (i *Input) Prompt() (line interface{}, err error) {
 		return "", err
 	}
 
-	scanner := bufio.NewScanner(os.Stdin)
+	rr := terminal.NewRuneReader(os.Stdin)
+	rr.SetTermMode()
+	defer rr.RestoreTermMode()
+
+	line := []rune{}
 	// get the next line
-	for scanner.Scan() {
+	for {
+		line, err = rr.ReadLine(0)
+		if err != nil {
+			return string(line), err
+		}
 		// terminal will echo the \n so we need to jump back up one row
 		terminal.CursorPreviousLine(1)
-		line = scanner.Text()
 
-		if line == string(core.HelpInputRune) {
+		if string(line) == string(core.HelpInputRune) {
 			err = i.Render(
 				InputQuestionTemplate,
 				InputTemplateData{Input: *i, ShowHelp: true},
@@ -66,17 +72,14 @@ func (i *Input) Prompt() (line interface{}, err error) {
 		break
 	}
 
-	if err := scanner.Err(); err != nil {
-		return i.Default, err
-	}
 	// if the line is empty
-	if line == "" || line == nil {
+	if line == nil || len(line) == 0 {
 		// use the default value
-		line = i.Default
+		return i.Default, err
 	}
 
 	// we're done
-	return line, err
+	return string(line), err
 }
 
 func (i *Input) Cleanup(val interface{}) error {

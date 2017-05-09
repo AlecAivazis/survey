@@ -1,7 +1,6 @@
 package survey
 
 import (
-	"bufio"
 	"fmt"
 	"os"
 	"regexp"
@@ -53,12 +52,18 @@ func yesNo(t bool) string {
 }
 
 func (c *Confirm) getBool(showHelp bool) (bool, error) {
-	scanner := bufio.NewScanner(os.Stdin)
+	rr := terminal.NewRuneReader(os.Stdin)
+	rr.SetTermMode()
+	defer rr.RestoreTermMode()
 	// start waiting for input
-	for scanner.Scan() {
+	for {
+		line, err := rr.ReadLine(0)
+		if err != nil {
+			return false, err
+		}
 		// move back up a line to compensate for the \n echoed from terminal
 		terminal.CursorPreviousLine(1)
-		val := scanner.Text()
+		val := string(line)
 
 		// get the answer that matches the
 		var answer bool
@@ -94,9 +99,6 @@ func (c *Confirm) getBool(showHelp bool) (bool, error) {
 			continue
 		}
 		return answer, nil
-	}
-	if err := scanner.Err(); err != nil {
-		return c.Default, err
 	}
 	// should not get here
 	return c.Default, nil
