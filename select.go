@@ -132,6 +132,9 @@ func (s *Select) Prompt() (interface{}, error) {
 		if r == terminal.KeyInterrupt {
 			return "", fmt.Errorf("interrupt")
 		}
+		if r == terminal.KeyEndTransmission {
+			break
+		}
 		s.OnChange(nil, 0, r)
 	}
 

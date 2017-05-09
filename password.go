@@ -45,6 +45,9 @@ func (p *Password) Prompt() (line interface{}, err error) {
 		if r == terminal.KeyInterrupt {
 			return "", fmt.Errorf("interrupt")
 		}
+		if r == terminal.KeyEndTransmission {
+			break
+		}
 		// allow for backspace/delete editing of password
 		if r == terminal.KeyBackspace || r == terminal.KeyDelete {
 			if len(pass) > 0 {
