@@ -4,7 +4,20 @@ tests:
 
 install-deps:
   summary: Install all of package dependencies
-  command: go get -t {{.files}}
+  command: |-
+    go get -t {{.files}}
+    # for autoplay tests
+    go get github.com/kr/pty
 
 variables:
   files: '$(go list -v ./... | grep -iEv "github.com/AlecAivazis/survey/(tests|examples)")'
+
+autoplay-tests:
+  summary: Replaying interactive tests
+  command: |-
+    cd tests
+    set -e
+    for test in autoplay/*.go; do
+      echo "==> Running $test"
+      go run $test
+    done
