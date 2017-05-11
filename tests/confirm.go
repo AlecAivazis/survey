@@ -30,6 +30,12 @@ var goodTable = []TestUtil.TestTableEntry{
 			Default: true,
 		}, &answer,
 	},
+	{
+		"no help - type '?'", &survey.Confirm{
+			Message: "yes:",
+			Default: true,
+		}, &answer,
+	},
 }
 
 func main() {

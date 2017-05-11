@@ -69,7 +69,8 @@ func (m *MultiSelect) OnChange(line []rune, pos int, key rune) (newLine []rune, 
 			// otherwise just invert the current value
 			m.checked[m.selectedIndex] = !old
 		}
-	} else if key == core.HelpInputRune {
+		// only show the help message if we have one to show
+	} else if key == core.HelpInputRune && m.Help != "" {
 		m.showingHelp = true
 	}
 

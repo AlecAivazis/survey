@@ -71,7 +71,8 @@ func (c *Confirm) getBool(rl *readline.Instance, showHelp bool) (bool, error) {
 		answer = false
 	case val == "":
 		answer = c.Default
-	case val == string(core.HelpInputRune):
+	// only show the help message if we have one
+	case val == string(core.HelpInputRune) && c.Help != "":
 		err = c.Render(
 			ConfirmQuestionTemplate,
 			ConfirmTemplateData{Confirm: *c, ShowHelp: true},
