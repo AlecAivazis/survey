@@ -10,19 +10,28 @@ import (
 // Password is like a normal Input but the text shows up as *'s and
 // there is no default.
 type Password struct {
+	core.Renderer
 	Message string
+	Help    string
+}
+
+type PasswordTemplateData struct {
+	Password
+	ShowHelp bool
 }
 
 // Templates with Color formatting. See Documentation: https://github.com/mgutz/ansi#style-format
 var PasswordQuestionTemplate = `
+{{- if .ShowHelp }}{{- color "cyan"}}{{ HelpIcon }} {{ .Help }}{{color "reset"}}{{"\n"}}{{end}}
 {{- color "green+hb"}}{{ QuestionIcon }} {{color "reset"}}
-{{- color "default+hb"}}{{ .Message }} {{color "reset"}}`
+{{- color "default+hb"}}{{ .Message }} {{color "reset"}}
+{{- if and .Help (not .ShowHelp)}}{{color "cyan"}}[{{ HelpInputRune }} for help]{{color "reset"}} {{end}}`
 
 func (p *Password) Prompt() (line interface{}, err error) {
 	// render the question template
 	out, err := core.RunTemplate(
 		PasswordQuestionTemplate,
-		*p,
+		PasswordTemplateData{Password: *p},
 	)
 	terminal.Print(out)
 	if err != nil {
@@ -32,7 +41,34 @@ func (p *Password) Prompt() (line interface{}, err error) {
 	rr := terminal.NewRuneReader(os.Stdin)
 	rr.SetTermMode()
 	defer rr.RestoreTermMode()
-	return rr.ReadLine('*')
+
+	// no help msg?  Just return any response
+	if p.Help == "" {
+		return rr.ReadLine('*')
+	}
+
+	// process answers looking for help prompt answer
+	for {
+		line, err := rr.ReadLine('*')
+		if err != nil {
+			return string(line), err
+		}
+
+		if string(line) == string(core.HelpInputRune) {
+			// terminal will echo the \n so we need to jump back up one row
+			terminal.CursorPreviousLine(1)
+
+			err = p.Render(
+				PasswordQuestionTemplate,
+				PasswordTemplateData{Password: *p, ShowHelp: true},
+			)
+			if err != nil {
+				return "", err
+			}
+			continue
+		}
+		return string(line), err
+	}
 }
 
 // Cleanup hides the string with a fixed number of characters.
