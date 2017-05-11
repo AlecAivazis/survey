@@ -9,10 +9,13 @@ var value = ""
 
 var table = []TestUtil.TestTableEntry{
 	{
-		"standard", &survey.Password{"Please type your password:"}, &value,
+		"standard", &survey.Password{Message: "Please type your password:"}, &value,
 	},
 	{
-		"please make sure paste works", &survey.Password{"Please paste your password:"}, &value,
+		"please make sure paste works", &survey.Password{Message: "Please paste your password:"}, &value,
+	},
+	{
+		"no help, send '?'", &survey.Password{Message: "Please type your password:"}, &value,
 	},
 }
 

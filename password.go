@@ -44,7 +44,8 @@ func (p *Password) Prompt() (line interface{}, err error) {
 
 	// no help msg?  Just return any response
 	if p.Help == "" {
-		return rr.ReadLine('*')
+		line, err := rr.ReadLine('*')
+		return string(line), err
 	}
 
 	// process answers looking for help prompt answer
