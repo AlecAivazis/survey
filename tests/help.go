@@ -10,6 +10,7 @@ var (
 	inputAns       = ""
 	multiselectAns = []string{}
 	selectAns      = ""
+	passwordAns    = ""
 )
 
 var goodTable = []TestUtil.TestTableEntry{
@@ -40,6 +41,12 @@ var goodTable = []TestUtil.TestTableEntry{
 			Options: []string{"red", "blue", "green"},
 			Default: "blue",
 		}, &selectAns,
+	},
+	{
+		"password", &survey.Password{
+			Message: "Enter a secret:",
+			Help:    "Don't really enter a secret, this is just for testing",
+		}, &passwordAns,
 	},
 }
 

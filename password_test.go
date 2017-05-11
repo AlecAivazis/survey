@@ -14,26 +14,38 @@ func init() {
 
 func TestPasswordRender(t *testing.T) {
 
-	prompt := Password{
-		Message: "Tell me your secret:",
-	}
-
 	tests := []struct {
 		title    string
 		prompt   Password
+		data     PasswordTemplateData
 		expected string
 	}{
 		{
 			"Test Password question output",
-			prompt,
+			Password{Message: "Tell me your secret:"},
+			PasswordTemplateData{},
 			"? Tell me your secret: ",
+		},
+		{
+			"Test Password question output with help hidden",
+			Password{Message: "Tell me your secret:", Help: "This is helpful"},
+			PasswordTemplateData{},
+			"? Tell me your secret: [? for help] ",
+		},
+		{
+			"Test Password question output with help shown",
+			Password{Message: "Tell me your secret:", Help: "This is helpful"},
+			PasswordTemplateData{ShowHelp: true},
+			`ⓘ This is helpful
+? Tell me your secret: `,
 		},
 	}
 
 	for _, test := range tests {
+		test.data.Password = test.prompt
 		actual, err := core.RunTemplate(
 			PasswordQuestionTemplate,
-			&test.prompt,
+			&test.data,
 		)
 		assert.Nil(t, err, test.title)
 		assert.Equal(t, test.expected, actual, test.title)
