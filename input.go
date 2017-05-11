@@ -51,7 +51,8 @@ func (i *Input) Prompt(rl *readline.Instance) (line interface{}, err error) {
 	// readline will echo the \n so we need to jump back up one row
 	terminal.CursorUp(1)
 
-	if err == nil && line == string(core.HelpInputRune) {
+	// show the help message if the user sends the help rune and we have we message to show
+	if err == nil && line == string(core.HelpInputRune) && i.Help != "" {
 		err = i.Render(
 			InputQuestionTemplate,
 			InputTemplateData{Input: *i, ShowHelp: true},
