@@ -14,6 +14,9 @@ var table = []TestUtil.TestTableEntry{
 	{
 		"default", &survey.Input{Message: "Hello world", Default: "default"}, &val,
 	},
+	{
+		"no help, send '?'", &survey.Input{Message: "Hello world"}, &val,
+	},
 }
 
 func main() {
