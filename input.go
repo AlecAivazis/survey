@@ -19,8 +19,9 @@ type Input struct {
 // data available to the templates when processing
 type InputTemplateData struct {
 	Input
-	Answer   string
-	ShowHelp bool
+	Answer     string
+	ShowAnswer bool
+	ShowHelp   bool
 }
 
 // Templates with Color formatting. See Documentation: https://github.com/mgutz/ansi#style-format
@@ -28,7 +29,7 @@ var InputQuestionTemplate = `
 {{- if .ShowHelp }}{{- color "cyan"}}{{ HelpIcon }} {{ .Help }}{{color "reset"}}{{"\n"}}{{end}}
 {{- color "green+hb"}}{{ QuestionIcon }} {{color "reset"}}
 {{- color "default+hb"}}{{ .Message }} {{color "reset"}}
-{{- if .Answer}}
+{{- if .ShowAnswer}}
   {{- color "cyan"}}{{.Answer}}{{color "reset"}}{{"\n"}}
 {{- else }}
   {{- if and .Help (not .ShowHelp)}}{{color "cyan"}}[{{ HelpInputRune }} for help]{{color "reset"}} {{end}}
@@ -85,6 +86,6 @@ func (i *Input) Prompt() (interface{}, error) {
 func (i *Input) Cleanup(val interface{}) error {
 	return i.Render(
 		InputQuestionTemplate,
-		InputTemplateData{Input: *i, Answer: val.(string)},
+		InputTemplateData{Input: *i, Answer: val.(string), ShowAnswer: true},
 	)
 }
