@@ -27,6 +27,7 @@ type SelectTemplateData struct {
 	Select
 	SelectedIndex int
 	Answer        string
+	ShowAnswer    bool
 	ShowHelp      bool
 }
 
@@ -34,7 +35,7 @@ var SelectQuestionTemplate = `
 {{- if .ShowHelp }}{{- color "cyan"}}{{ HelpIcon }} {{ .Help }}{{color "reset"}}{{"\n"}}{{end}}
 {{- color "green+hb"}}{{ QuestionIcon }} {{color "reset"}}
 {{- color "default+hb"}}{{ .Message }}{{color "reset"}}
-{{- if .Answer}}{{color "cyan"}} {{.Answer}}{{color "reset"}}{{"\n"}}
+{{- if .ShowAnswer}}{{color "cyan"}} {{.Answer}}{{color "reset"}}{{"\n"}}
 {{- else}}
   {{- if and .Help (not .ShowHelp)}} {{color "cyan"}}[{{ HelpInputRune }} for help]{{color "reset"}}{{end}}
   {{- "\n"}}
@@ -148,6 +149,6 @@ func (s *Select) Prompt(rl *readline.Instance) (interface{}, error) {
 func (s *Select) Cleanup(rl *readline.Instance, val interface{}) error {
 	return s.Render(
 		SelectQuestionTemplate,
-		SelectTemplateData{Select: *s, Answer: val.(string)},
+		SelectTemplateData{Select: *s, Answer: val.(string), ShowAnswer: true},
 	)
 }

@@ -45,7 +45,7 @@ func TestSelectRender(t *testing.T) {
 		{
 			"Test Select answer output",
 			prompt,
-			SelectTemplateData{Answer: "buz"},
+			SelectTemplateData{Answer: "buz", ShowAnswer: true},
 			"? Pick your word: buz\n",
 		},
 		{
