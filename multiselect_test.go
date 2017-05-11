@@ -45,7 +45,7 @@ func TestMultiSelectRender(t *testing.T) {
 		{
 			"Test MultiSelect answer output",
 			prompt,
-			MultiSelectTemplateData{Answer: "foo, buz"},
+			MultiSelectTemplateData{Answer: "foo, buz", ShowAnswer: true},
 			"? Pick your words: foo, buz\n",
 		},
 		{

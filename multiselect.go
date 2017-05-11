@@ -27,6 +27,7 @@ type MultiSelect struct {
 type MultiSelectTemplateData struct {
 	MultiSelect
 	Answer        string
+	ShowAnswer    bool
 	Checked       map[int]bool
 	SelectedIndex int
 	ShowHelp      bool
@@ -36,7 +37,7 @@ var MultiSelectQuestionTemplate = `
 {{- if .ShowHelp }}{{- color "cyan"}}{{ HelpIcon }} {{ .Help }}{{color "reset"}}{{"\n"}}{{end}}
 {{- color "green+hb"}}{{ QuestionIcon }} {{color "reset"}}
 {{- color "default+hb"}}{{ .Message }}{{color "reset"}}
-{{- if .Answer}}{{color "cyan"}} {{.Answer}}{{color "reset"}}{{"\n"}}
+{{- if .ShowAnswer}}{{color "cyan"}} {{.Answer}}{{color "reset"}}{{"\n"}}
 {{- else }}
   {{- if and .Help (not .ShowHelp)}} {{color "cyan"}}[{{ HelpInputRune }} for help]{{color "reset"}}{{end}}
   {{- "\n"}}
@@ -163,6 +164,7 @@ func (m *MultiSelect) Cleanup(rl *readline.Instance, val interface{}) error {
 			SelectedIndex: m.selectedIndex,
 			Checked:       m.checked,
 			Answer:        strings.Join(val.([]string), ", "),
+			ShowAnswer:    true,
 		},
 	)
 }
