@@ -1,17 +1,3 @@
-tests:
-  summary: Run the test suite
-  command: go test {{.files}}
-
-install-deps:
-  summary: Install all of package dependencies
-  command: |-
-    go get -t {{.files}}
-    # for autoplay tests
-    go get github.com/kr/pty
-
-variables:
-  files: '$(go list -v ./... | grep -iEv "github.com/AlecAivazis/survey/(tests|examples)")'
-
 autoplay-tests:
   summary: Replaying interactive tests
   command: |-
@@ -21,3 +7,17 @@ autoplay-tests:
       echo "==> Running $test"
       go run $test
     done
+
+install-deps:
+  summary: Install all of package dependencies
+  command: |-
+    go get -t {{.files}}
+    # for autoplay tests
+    go get github.com/kr/pty
+
+tests:
+  summary: Run the test suite
+  command: go test {{.files}}
+
+variables:
+  files: '$(go list -v ./... | grep -iEv "github.com/AlecAivazis/survey/(tests|examples)")'
