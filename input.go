@@ -1,9 +1,10 @@
 package survey
 
 import (
+	"os"
+
 	"github.com/AlecAivazis/survey/core"
 	"github.com/AlecAivazis/survey/terminal"
-	"github.com/chzyer/readline"
 )
 
 // Input is a regular text input that prints each character the user types on the screen
@@ -35,48 +36,54 @@ var InputQuestionTemplate = `
   {{- if .Default}}{{color "white"}}({{.Default}}) {{color "reset"}}{{end}}
 {{- end}}`
 
-func (i *Input) Prompt(rl *readline.Instance) (line interface{}, err error) {
+func (i *Input) Prompt() (interface{}, error) {
 	// render the template
-	err = i.Render(
+	err := i.Render(
 		InputQuestionTemplate,
 		InputTemplateData{Input: *i},
 	)
 	if err != nil {
 		return "", err
 	}
-	rl.SetConfig(core.SimpleReadlineConfig)
 
+	rr := terminal.NewRuneReader(os.Stdin)
+	rr.SetTermMode()
+	defer rr.RestoreTermMode()
+
+	line := []rune{}
 	// get the next line
-	line, err = rl.Readline()
-	// readline will echo the \n so we need to jump back up one row
-	terminal.CursorUp(1)
-
-	// show the help message if the user sends the help rune and we have we message to show
-	if err == nil && line == string(core.HelpInputRune) && i.Help != "" {
-		err = i.Render(
-			InputQuestionTemplate,
-			InputTemplateData{Input: *i, ShowHelp: true},
-		)
+	for {
+		line, err = rr.ReadLine(0)
 		if err != nil {
-			return "", err
+			return string(line), err
 		}
-		// get the next line
-		line, err = rl.Readline()
-		// readline will echo the \n so we need to jump back up one row
-		terminal.CursorUp(1)
+		// terminal will echo the \n so we need to jump back up one row
+		terminal.CursorPreviousLine(1)
+
+		if string(line) == string(core.HelpInputRune) && i.Help != "" {
+			err = i.Render(
+				InputQuestionTemplate,
+				InputTemplateData{Input: *i, ShowHelp: true},
+			)
+			if err != nil {
+				return "", err
+			}
+			continue
+		}
+		break
 	}
 
 	// if the line is empty
-	if line == "" {
+	if line == nil || len(line) == 0 {
 		// use the default value
-		line = i.Default
+		return i.Default, err
 	}
 
 	// we're done
-	return line, err
+	return string(line), err
 }
 
-func (i *Input) Cleanup(rl *readline.Instance, val interface{}) error {
+func (i *Input) Cleanup(val interface{}) error {
 	return i.Render(
 		InputQuestionTemplate,
 		InputTemplateData{Input: *i, Answer: val.(string), ShowAnswer: true},

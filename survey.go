@@ -2,11 +2,9 @@ package survey
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/AlecAivazis/survey/core"
 	"github.com/AlecAivazis/survey/terminal"
-	"github.com/chzyer/readline"
 )
 
 // Validator is a function passed to a Question in order to redefine
@@ -22,8 +20,8 @@ type Question struct {
 // Prompt is the primary interface for the objects that can take user input
 // and return a string value.
 type Prompt interface {
-	Prompt(*readline.Instance) (interface{}, error)
-	Cleanup(*readline.Instance, interface{}) error
+	Prompt() (interface{}, error)
+	Cleanup(interface{}) error
 }
 
 var ErrorTemplate = `{{color "red"}}{{ ErrorIcon }} Sorry, your reply was invalid: {{.Error}}{{color "reset"}}
@@ -50,14 +48,8 @@ func Ask(qs []*Question, t interface{}) error {
 
 	// go over every question
 	for _, q := range qs {
-		// grab the readline instance
-		rl, err := terminal.GetReadline()
-		if err != nil {
-			return err
-		}
-
 		// grab the user input and save it
-		ans, err := q.Prompt.Prompt(rl)
+		ans, err := q.Prompt.Prompt()
 		// if there was a problem
 		if err != nil {
 			return err
@@ -72,9 +64,9 @@ func Ask(qs []*Question, t interface{}) error {
 					return err
 				}
 				// send the message to the user
-				fmt.Print(out)
+				terminal.Print(out)
 				// ask for more input
-				ans, err = q.Prompt.Prompt(rl)
+				ans, err = q.Prompt.Prompt()
 				// if there was a problem
 				if err != nil {
 					return err
@@ -83,10 +75,7 @@ func Ask(qs []*Question, t interface{}) error {
 		}
 
 		// tell the prompt to cleanup with the validated value
-		q.Prompt.Cleanup(rl, ans)
-
-		// make sure we close the readline instance
-		rl.Close()
+		q.Prompt.Cleanup(ans)
 
 		// if something went wrong
 		if err != nil {

@@ -1,9 +1,10 @@
 package survey
 
 import (
-	"github.com/chzyer/readline"
+	"os"
 
 	"github.com/AlecAivazis/survey/core"
+	"github.com/AlecAivazis/survey/terminal"
 )
 
 // Password is like a normal Input but the text shows up as *'s and
@@ -17,30 +18,24 @@ var PasswordQuestionTemplate = `
 {{- color "green+hb"}}{{ QuestionIcon }} {{color "reset"}}
 {{- color "default+hb"}}{{ .Message }} {{color "reset"}}`
 
-func (p *Password) Prompt(rl *readline.Instance) (line interface{}, err error) {
+func (p *Password) Prompt() (line interface{}, err error) {
 	// render the question template
 	out, err := core.RunTemplate(
 		PasswordQuestionTemplate,
 		*p,
 	)
+	terminal.Print(out)
 	if err != nil {
 		return "", err
 	}
 
-	// a configuration for the password prompt
-	config := rl.GenPasswordConfig()
-	// use the right prompt (make sure there is an empty space after the prompt)
-	config.Prompt = out + " "
-
-	config.MaskRune = '*'
-
-	// ask for the user's Password
-	pass, err := rl.ReadPasswordWithConfig(config)
-	// we're done here
-	return string(pass), err
+	rr := terminal.NewRuneReader(os.Stdin)
+	rr.SetTermMode()
+	defer rr.RestoreTermMode()
+	return rr.ReadLine('*')
 }
 
 // Cleanup hides the string with a fixed number of characters.
-func (prompt *Password) Cleanup(rl *readline.Instance, val interface{}) error {
+func (prompt *Password) Cleanup(val interface{}) error {
 	return nil
 }

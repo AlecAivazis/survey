@@ -2,12 +2,12 @@ package survey
 
 import (
 	"errors"
-	"io/ioutil"
+	"fmt"
+	"os"
 	"strings"
 
 	"github.com/AlecAivazis/survey/core"
 	"github.com/AlecAivazis/survey/terminal"
-	"github.com/chzyer/readline"
 )
 
 // MultiSelect is a prompt that presents a list of various options to the user
@@ -51,10 +51,7 @@ var MultiSelectQuestionTemplate = `
 
 // OnChange is called on every keypress.
 func (m *MultiSelect) OnChange(line []rune, pos int, key rune) (newLine []rune, newPos int, ok bool) {
-	if key == terminal.KeyEnter {
-		// just pass on the current value
-		return line, 0, true
-	} else if key == terminal.KeyArrowUp && m.selectedIndex > 0 {
+	if key == terminal.KeyArrowUp && m.selectedIndex > 0 {
 		// decrement the selected index
 		m.selectedIndex--
 	} else if key == terminal.KeyArrowDown && m.selectedIndex < len(m.Options)-1 {
@@ -89,14 +86,7 @@ func (m *MultiSelect) OnChange(line []rune, pos int, key rune) (newLine []rune, 
 	return line, 0, true
 }
 
-func (m *MultiSelect) Prompt(rl *readline.Instance) (interface{}, error) {
-	// the readline config
-	config := &readline.Config{
-		Listener: m,
-		Stdout:   ioutil.Discard,
-	}
-	rl.SetConfig(config)
-
+func (m *MultiSelect) Prompt() (interface{}, error) {
 	// compute the default state
 	m.checked = make(map[int]bool)
 	// if there is a default
@@ -138,11 +128,23 @@ func (m *MultiSelect) Prompt(rl *readline.Instance) (interface{}, error) {
 		return "", err
 	}
 
+	rr := terminal.NewRuneReader(os.Stdin)
+	rr.SetTermMode()
+	defer rr.RestoreTermMode()
+
 	// start waiting for input
-	_, err = rl.Readline()
-	// if something went wrong
-	if err != nil {
-		return "", err
+	for {
+		r, _, _ := rr.ReadRune()
+		if r == '\r' || r == '\n' {
+			break
+		}
+		if r == terminal.KeyInterrupt {
+			return "", fmt.Errorf("interrupt")
+		}
+		if r == terminal.KeyEndTransmission {
+			break
+		}
+		m.OnChange(nil, 0, r)
 	}
 
 	answers := []string{}
@@ -156,7 +158,7 @@ func (m *MultiSelect) Prompt(rl *readline.Instance) (interface{}, error) {
 }
 
 // Cleanup removes the options section, and renders the ask like a normal question.
-func (m *MultiSelect) Cleanup(rl *readline.Instance, val interface{}) error {
+func (m *MultiSelect) Cleanup(val interface{}) error {
 	// execute the output summary template with the answer
 	return m.Render(
 		MultiSelectQuestionTemplate,
