@@ -61,7 +61,8 @@ func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPo
 		s.useDefault = false
 		// increment the selected index
 		s.selectedIndex++
-	} else if key == core.HelpInputRune {
+		// only show the help message if we have one
+	} else if key == core.HelpInputRune && s.Help != "" {
 		s.showingHelp = true
 	}
 

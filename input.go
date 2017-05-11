@@ -60,7 +60,7 @@ func (i *Input) Prompt() (interface{}, error) {
 		// terminal will echo the \n so we need to jump back up one row
 		terminal.CursorPreviousLine(1)
 
-		if string(line) == string(core.HelpInputRune) {
+		if string(line) == string(core.HelpInputRune) && i.Help != "" {
 			err = i.Render(
 				InputQuestionTemplate,
 				InputTemplateData{Input: *i, ShowHelp: true},
