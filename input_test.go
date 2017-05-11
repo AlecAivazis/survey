@@ -37,7 +37,7 @@ func TestInputRender(t *testing.T) {
 		{
 			"Test Input answer output",
 			Input{Message: "What is your favorite month:"},
-			InputTemplateData{Answer: "October"},
+			InputTemplateData{Answer: "October", ShowAnswer: true},
 			"? What is your favorite month: October\n",
 		},
 		{
