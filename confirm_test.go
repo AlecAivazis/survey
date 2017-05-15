@@ -2,7 +2,6 @@ package survey
 
 import (
 	"bytes"
-	"fmt"
 	"testing"
 
 	"github.com/AlecAivazis/survey/core"
@@ -17,7 +16,6 @@ func init() {
 
 func TestConfirmRender(t *testing.T) {
 
-	testError := fmt.Errorf("TEST")
 	tests := []struct {
 		title    string
 		prompt   Confirm
@@ -41,14 +39,6 @@ func TestConfirmRender(t *testing.T) {
 			Confirm{Message: "Is pizza your favorite food?"},
 			ConfirmTemplateData{Answer: "Yes"},
 			"? Is pizza your favorite food? Yes\n",
-		},
-		{
-			"Test Confirm error output",
-			Confirm{Message: "Is pizza your favorite food?"},
-			ConfirmTemplateData{Answer: "Yes", Error: &testError},
-			`✘ Sorry, your reply was invalid: TEST
-? Is pizza your favorite food? Yes
-`,
 		},
 		{
 			"Test Confirm with help but help message is hidden",

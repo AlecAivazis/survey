@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"github.com/AlecAivazis/survey/core"
-	"github.com/AlecAivazis/survey/terminal"
 )
 
 // Validator is a function passed to a Question in order to redefine
@@ -22,10 +21,8 @@ type Question struct {
 type Prompt interface {
 	Prompt() (interface{}, error)
 	Cleanup(interface{}) error
+	Error(error) error
 }
-
-var ErrorTemplate = `{{color "red"}}{{ ErrorIcon }} Sorry, your reply was invalid: {{.Error}}{{color "reset"}}
-`
 
 // AskOne asks a single question without performing validation on the answer.
 func AskOne(p Prompt, t interface{}, v Validator) error {
@@ -59,12 +56,12 @@ func Ask(qs []*Question, t interface{}) error {
 		if q.Validate != nil {
 			// wait for a valid response
 			for invalid := q.Validate(ans); invalid != nil; invalid = q.Validate(ans) {
-				out, err := core.RunTemplate(ErrorTemplate, invalid)
+				err := q.Prompt.Error(invalid)
+				// if there was a problem
 				if err != nil {
 					return err
 				}
-				// send the message to the user
-				terminal.Print(out)
+
 				// ask for more input
 				ans, err = q.Prompt.Prompt()
 				// if there was a problem
