@@ -21,14 +21,12 @@ type Confirm struct {
 type ConfirmTemplateData struct {
 	Confirm
 	Answer   string
-	Error    *error
 	ShowHelp bool
 }
 
 // Templates with Color formatting. See Documentation: https://github.com/mgutz/ansi#style-format
 var ConfirmQuestionTemplate = `
 {{- if .ShowHelp }}{{- color "cyan"}}{{ HelpIcon }} {{ .Help }}{{color "reset"}}{{"\n"}}{{end}}
-{{- if .Error }}` + ErrorTemplate + `{{end}}
 {{- color "green+hb"}}{{ QuestionIcon }} {{color "reset"}}
 {{- color "default+hb"}}{{ .Message }} {{color "reset"}}
 {{- if .Answer}}
@@ -87,10 +85,12 @@ func (c *Confirm) getBool(showHelp bool) (bool, error) {
 			continue
 		default:
 			// we didnt get a valid answer, so print error and prompt again
-			e := fmt.Errorf("%q is not a valid answer, please try again.", val)
+			if err := c.Error(fmt.Errorf("%q is not a valid answer, please try again.", val)); err != nil {
+				return c.Default, err
+			}
 			err := c.Render(
 				ConfirmQuestionTemplate,
-				ConfirmTemplateData{Confirm: *c, Error: &e, ShowHelp: showHelp},
+				ConfirmTemplateData{Confirm: *c, ShowHelp: showHelp},
 			)
 			if err != nil {
 				// use the default value and bubble up

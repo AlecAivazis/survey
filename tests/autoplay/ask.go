@@ -115,7 +115,7 @@ func main() {
 	expect("\x1b[0G\x1b[2K\x1b[1;92m? \x1b[0m\x1b[1;99mWhat is your name? \x1b[0m", buf)
 	fh.Write([]byte("\r"))
 	expect("\r\r\n", buf)
-	expect("\x1b[1F\x1b[31m✘ Sorry, your reply was invalid: Value is required\x1b[0m\r\n", buf)
+	expect("\x1b[1F\x1b[0G\x1b[2K\x1b[31m✘ Sorry, your reply was invalid: Value is required\x1b[0m\r\n", buf)
 	expect("\x1b[0G\x1b[2K\x1b[1;92m? \x1b[0m\x1b[1;99mWhat is your name? \x1b[0m", buf)
 	fh.Write([]byte("L"))
 	expect("L", buf)
