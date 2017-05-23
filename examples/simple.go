@@ -26,17 +26,20 @@ var simpleQs = []*survey.Question{
 }
 
 func main() {
-	answers := struct {
-		Name  string
-		Color string
-	}{}
+	//	answers := struct {
+	//		Name  string
+	//		Color string
+	//	}{}
+
+	ansmap := make(map[string]interface{})
+
 	// ask the question
-	err := survey.Ask(simpleQs, &answers)
+	err := survey.Ask(simpleQs, &ansmap)
 
 	if err != nil {
 		fmt.Println(err.Error())
 		return
 	}
 	// print the answers
-	fmt.Printf("%s chose %s.\n", answers.Name, answers.Color)
+	fmt.Printf("%s chose %s.\n", ansmap["name"], ansmap["color"])
 }

@@ -37,8 +37,11 @@ func WriteAnswer(t interface{}, name string, v interface{}) (err error) {
 
 		// copy the value over to the field
 		return copy(elem.Field(fieldIndex), value)
+	case reflect.Map:
+		mt := *t.(*map[string]interface{})
+		mt[name] = value
+		return nil
 	}
-
 	// otherwise just copy the value to the target
 	return copy(elem, value)
 }
