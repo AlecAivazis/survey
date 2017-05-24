@@ -39,11 +39,11 @@ func WriteAnswer(t interface{}, name string, v interface{}) (err error) {
 		return copy(elem.Field(fieldIndex), value)
 	case reflect.Map:
 		mapType := reflect.TypeOf(t).Elem()
-		if mapType.Key().Kind() != reflect.String || mapType.Elem().Kind() != reflect.String {
-			return errors.New("answer maps must be of type map[string]string")
+		if mapType.Key().Kind() != reflect.String || mapType.Elem().Kind() != reflect.Interface {
+			return errors.New("answer maps must be of type map[string]interface")
 		}
-		mt := *t.(*map[string]string)
-		mt[name] = value.Interface().(string)
+		mt := *t.(*map[string]interface{})
+		mt[name] = value.Interface()
 		return nil
 	}
 	// otherwise just copy the value to the target

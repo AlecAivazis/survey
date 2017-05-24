@@ -122,7 +122,7 @@ func TestWriteAnswer_canMutateStruct(t *testing.T) {
 
 func TestWriteAnswer_canMutateMap(t *testing.T) {
 	// the map to hold the answer
-	ptr := make(map[string]string)
+	ptr := make(map[string]interface{})
 
 	// write a value to an existing field
 	err := WriteAnswer(&ptr, "name", "world")
@@ -141,7 +141,7 @@ func TestWriteAnswer_canMutateMap(t *testing.T) {
 }
 
 func TestWrite_returnsErrorIfInvalidMapType(t *testing.T) {
-	// try to copy a value to a non map[string]string
+	// try to copy a value to a non map[string]interface{}
 	ptr := make(map[int]string)
 
 	err := WriteAnswer(&ptr, "name", "world")
