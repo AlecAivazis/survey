@@ -38,8 +38,12 @@ func WriteAnswer(t interface{}, name string, v interface{}) (err error) {
 		// copy the value over to the field
 		return copy(elem.Field(fieldIndex), value)
 	case reflect.Map:
-		mt := *t.(*map[string]interface{})
-		mt[name] = value
+		mapType := reflect.TypeOf(t).Elem()
+		if mapType.Key().Kind() != reflect.String || mapType.Elem().Kind() != reflect.String {
+			return errors.New("answer maps must be of type map[string]string")
+		}
+		mt := *t.(*map[string]string)
+		mt[name] = value.Interface().(string)
 		return nil
 	}
 	// otherwise just copy the value to the target
