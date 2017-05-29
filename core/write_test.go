@@ -120,6 +120,37 @@ func TestWriteAnswer_canMutateStruct(t *testing.T) {
 	}
 }
 
+func TestWriteAnswer_canMutateMap(t *testing.T) {
+	// the map to hold the answer
+	ptr := make(map[string]interface{})
+
+	// write a value to an existing field
+	err := WriteAnswer(&ptr, "name", "world")
+	if err != nil {
+		// the test failed
+		t.Errorf("Encountered error while writing answer: %v", err.Error())
+		// we're done here
+		return
+	}
+
+	// make sure we changed the field
+	if ptr["name"] != "world" {
+		// the test failed
+		t.Error("Did not mutate map when writing answer.")
+	}
+}
+
+func TestWrite_returnsErrorIfInvalidMapType(t *testing.T) {
+	// try to copy a value to a non map[string]interface{}
+	ptr := make(map[int]string)
+
+	err := WriteAnswer(&ptr, "name", "world")
+	// make sure there was an error
+	if err == nil {
+		t.Error("Did not encounter error when writing to invalid map.")
+	}
+}
+
 func TestWriteAnswer_returnsErrWhenFieldNotFound(t *testing.T) {
 	// the struct to hold the answer
 	ptr := struct{ Name string }{}
