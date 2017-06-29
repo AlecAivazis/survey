@@ -51,13 +51,25 @@ var MultiSelectQuestionTemplate = `
 
 // OnChange is called on every keypress.
 func (m *MultiSelect) OnChange(line []rune, pos int, key rune) (newLine []rune, newPos int, ok bool) {
-	if key == terminal.KeyArrowUp && m.selectedIndex > 0 {
-		// decrement the selected index
-		m.selectedIndex--
-	} else if key == terminal.KeyArrowDown && m.selectedIndex < len(m.Options)-1 {
+	if key == terminal.KeyArrowUp {
+		// if we are at the top of the list
+		if m.selectedIndex == 0 {
+			// go to the bottom
+			m.selectedIndex = len(m.Options) - 1
+		} else {
+			// decrement the selected index
+			m.selectedIndex--
+		}
+	} else if key == terminal.KeyArrowDown {
+		// if we are at the bottom of the list
+		if m.selectedIndex == len(m.Options)-1 {
+			// start at the top
+			m.selectedIndex = 0
+		} else {
+			// increment the selected index
+			m.selectedIndex++
+		}
 		// if the user pressed down and there is room to move
-		// increment the selected index
-		m.selectedIndex++
 	} else if key == terminal.KeySpace {
 		if old, ok := m.checked[m.selectedIndex]; !ok {
 			// otherwise just invert the current value

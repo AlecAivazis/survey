@@ -52,15 +52,28 @@ func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPo
 	if key == terminal.KeyEnter {
 		return []rune(s.Options[s.selectedIndex]), 0, true
 		// if the user pressed the up arrow
-	} else if key == terminal.KeyArrowUp && s.selectedIndex > 0 {
+	} else if key == terminal.KeyArrowUp {
 		s.useDefault = false
-		// decrement the selected index
-		s.selectedIndex--
+
+		// if we are at the top of the list
+		if s.selectedIndex == 0 {
+			// start from the button
+			s.selectedIndex = len(s.Options) - 1
+		} else {
+			// otherwise we are not at the top of the list so decrement the selected index
+			s.selectedIndex--
+		}
 		// if the user pressed down and there is room to move
-	} else if key == terminal.KeyArrowDown && s.selectedIndex < len(s.Options)-1 {
+	} else if key == terminal.KeyArrowDown {
 		s.useDefault = false
-		// increment the selected index
-		s.selectedIndex++
+		// if we are at the bottom of the list
+		if s.selectedIndex == len(s.Options)-1 {
+			// start from the top
+			s.selectedIndex = 0
+		} else {
+			// increment the selected index
+			s.selectedIndex++
+		}
 		// only show the help message if we have one
 	} else if key == core.HelpInputRune && s.Help != "" {
 		s.showingHelp = true
