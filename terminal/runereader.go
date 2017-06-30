@@ -101,8 +101,8 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 
 			} else {
 				// otherwise we are at the beginning of where we started reading lines
-
-				// sound the bell?
+				// sound the bell
+				soundBell()
 			}
 
 			// we're done processing this key press
@@ -120,8 +120,8 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 
 			} else {
 				// otherwise we are at the end of the word and can't go past
-
-				// sound the bell?
+				// sound the bell
+				soundBell()
 			}
 
 			// we're done processing this key press
