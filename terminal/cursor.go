@@ -66,7 +66,7 @@ func CursorLocation() (*coord, error) {
 	// spec says we read 'til R, so do that
 	text, err := reader.ReadSlice('R')
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 
 	// spec also says they're split by ;, so do that too
@@ -81,13 +81,13 @@ func CursorLocation() (*coord, error) {
 		// try to cast the col number to an int
 		col, err := strconv.Atoi(coords[1])
 		if err != nil {
-			return nil, nil
+			return nil, err
 		}
 
 		// try to cast the row number to an int
 		row, err := strconv.Atoi(coords[0])
 		if err != nil {
-			return nil, nil
+			return nil, err
 		}
 
 		// return the coordinate object with the col and row we calculated
@@ -95,5 +95,5 @@ func CursorLocation() (*coord, error) {
 	}
 
 	// it didn't work so return an error
-	return nil, nil
+	return nil, fmt.Errorf("could not compute the cursor position using ascii escape sequences")
 }
