@@ -13,7 +13,7 @@ func EraseLine(mode EraseLineMode) {
 	procGetConsoleScreenBufferInfo.Call(uintptr(handle), uintptr(unsafe.Pointer(&csbi)))
 
 	var w uint32
-	var x short
+	var x Short
 	cursor := csbi.cursorPosition
 	switch mode {
 	case ERASE_LINE_END:

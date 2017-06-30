@@ -57,7 +57,7 @@ func CursorHide() {
 }
 
 // CursorLocation returns the current location of the cursor in the terminal
-func CursorLocation() (*coord, error) {
+func CursorLocation() (*Coord, error) {
 	// print the escape sequence to recieve the position in our stdin
 	fmt.Print("\x1b[6n")
 
@@ -91,7 +91,7 @@ func CursorLocation() (*coord, error) {
 		}
 
 		// return the coordinate object with the col and row we calculated
-		return &coord{short(col), short(row)}, nil
+		return &Coord{Short(col), Short(row)}, nil
 	}
 
 	// it didn't work so return an error

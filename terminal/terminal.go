@@ -1,8 +1,8 @@
 package terminal
 
-type short int16
+type Short int16
 
-type coord struct {
-	x short
-	y short
+type Coord struct {
+	x Short
+	y Short
 }
