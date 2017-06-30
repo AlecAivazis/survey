@@ -133,7 +133,16 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 			EraseLine(ERASE_LINE_END)
 
 			// print the rest of the word after
-			Printf(string(line[index:]))
+			for _, char := range line[index:] {
+				// if we don't need to mask the input
+				if mask == 0 {
+					// just print the character the user pressed
+					Printf("%c", char)
+				} else {
+					// otherwise print the mask we were given
+					Printf("%c", mask)
+				}
+			}
 
 			// leave the cursor where the user left it
 			CursorBack(len(line) - index - 1)
