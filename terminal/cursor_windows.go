@@ -81,3 +81,12 @@ func CursorHide() {
 
 	procSetConsoleCursorInfo.Call(uintptr(handle), uintptr(unsafe.Pointer(&cci)))
 }
+
+func CursorLocation() (coord, error) {
+	handle := syscall.Handle(os.Stdout.Fd())
+
+	var csbi consoleScreenBufferInfo
+	procGetConsoleScreenBufferInfo.Call(uintptr(handle), uintptr(unsafe.Pointer(&csbi)))
+
+	return csbi.cursorPosition, nil
+}

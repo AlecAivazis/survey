@@ -16,13 +16,6 @@ var simpleQs = []*survey.Question{
 		},
 		Validate: survey.Required,
 	},
-	{
-		Name: "name",
-		Prompt: &survey.Input{
-			Message: "What is your name?",
-		},
-		Validate: survey.Required,
-	},
 }
 
 func main() {

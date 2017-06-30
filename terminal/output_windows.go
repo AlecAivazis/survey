@@ -154,7 +154,6 @@ func (w *Writer) applyEscapeCode(buf []byte, arg string, code rune) {
 }
 
 // Original implementation: https://github.com/mattn/go-colorable
-// FIXME: Fallback to original go-colorable to avoid duplicate implementation
 func (w *Writer) applySelectGraphicRendition(arg string) {
 	if arg == "" {
 		procSetConsoleTextAttribute.Call(uintptr(w.handle), uintptr(w.orgAttr))

@@ -3,7 +3,12 @@
 package terminal
 
 import (
+	"bufio"
 	"fmt"
+	"os"
+	"regexp"
+	"strconv"
+	"strings"
 )
 
 // Move the cursor n cells to up.
@@ -49,4 +54,46 @@ func CursorShow() {
 // Hide the cursor.
 func CursorHide() {
 	fmt.Print("\x1b[?25l")
+}
+
+// CursorLocation returns the current location of the cursor in the terminal
+func CursorLocation() (*coord, error) {
+	// print the escape sequence to recieve the position in our stdin
+	fmt.Print("\x1b[6n")
+
+	// read from stdin to get the response
+	reader := bufio.NewReader(os.Stdin)
+	// spec says we read 'til R, so do that
+	text, err := reader.ReadSlice('R')
+	if err != nil {
+		return nil, nil
+	}
+
+	// spec also says they're split by ;, so do that too
+	if strings.Contains(string(text), ";") {
+		// a regex to parse the output of the ansi code
+		re := regexp.MustCompile(`\d+;\d+`)
+		line := re.FindString(string(text))
+
+		// find the column and rows embedded in the string
+		coords := strings.Split(line, ";")
+
+		// try to cast the col number to an int
+		col, err := strconv.Atoi(coords[1])
+		if err != nil {
+			return nil, nil
+		}
+
+		// try to cast the row number to an int
+		row, err := strconv.Atoi(coords[0])
+		if err != nil {
+			return nil, nil
+		}
+
+		// return the coordinate object with the col and row we calculated
+		return &coord{short(col), short(row)}, nil
+	}
+
+	// it didn't work so return an error
+	return nil, nil
 }

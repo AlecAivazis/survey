@@ -15,14 +15,8 @@ var (
 )
 
 type wchar uint16
-type short int16
 type dword uint32
 type word uint16
-
-type coord struct {
-	x short
-	y short
-}
 
 type smallRect struct {
 	left   short
