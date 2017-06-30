@@ -129,11 +129,6 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 			continue
 		}
 
-		// ignore up and down arrow so they don't add to line
-		if r == KeyArrowUp || r == KeyArrowDown {
-			continue
-		}
-
 		// if the letter is another escape sequence
 		if unicode.IsControl(r) {
 			// ignore it
