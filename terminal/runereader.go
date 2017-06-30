@@ -52,16 +52,41 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 		// allow for backspace/delete editing of password
 		if r == KeyBackspace || r == KeyDelete {
 			// and we're not at the beginning of the line
-			if index > 0 {
-
-				if len(line) > 0 {
+			if index > 0 && len(line) > 0 {
+				// if we are at the end of the word
+				if index == len(line) {
+					// just remove the last letter from the internal representation
 					line = line[:len(line)-1]
+
+					// go back one
+					CursorBack(1)
+
+					// clear the rest of the line
+					EraseLine(ERASE_LINE_END)
+				} else {
+					// we need to remove a character from the middle of the word
+
+					// remove the current index from the list
+					line = append(line[:index-1], line[index:]...)
+
+					// go back one space so we can clear the rest
+					CursorBack(1)
+
+					// clear the rest of the line
+					EraseLine(ERASE_LINE_END)
+
+					// print what comes after
+					Print(string(line[index-1:]))
+
+					// leave the cursor where the user left it
+					CursorBack(len(line) - index + 1)
 				}
-				CursorBack(1)
-				EraseLine(ERASE_LINE_END)
+
+				// decrement the index
 				index--
 			}
-			// decrement the index
+
+			// we're done processing this key
 			continue
 		}
 
