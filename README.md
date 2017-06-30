@@ -2,10 +2,7 @@
 [![Build Status](https://travis-ci.org/AlecAivazis/survey.svg?branch=feature%2Fpretty)](https://travis-ci.org/AlecAivazis/survey)
 [![GoDoc](http://img.shields.io/badge/godoc-reference-5272B4.svg)](https://godoc.org/github.com/AlecAivazis/survey)
 
-
 A library for building interactive prompts. Heavily inspired by the great [inquirer.js](https://github.com/SBoudrias/Inquirer.js/).
-
-
 
 ![](https://zippy.gfycat.com/AmusingBossyArrowworm.gif)
 
@@ -72,6 +69,7 @@ func main() {
 
 Examples can be found in the `examples/` directory. Run them
 to see basic behavior:
+
 ```bash
 go get github.com/AlecAivazis/survey
 
@@ -226,11 +224,9 @@ in `survey/core`:
 | ErrorIcon           |       ✘        | Before an error                                                   |
 | HelpIcon            |       ⓘ       | Before help text                                                   |
 | QuestionIcon        |       ?        | Before the message of a prompt                                    |
-| SelectFocusIcon     |       ❯        | Marks the current selection in `Select` and `MultiSelect` prompts |
+| SelectFocusIcon     |       ❯        | Marks the current focus in `Select` and `MultiSelect` prompts     |
 | MarkedOptionIcon    |       ◉        | Marks a chosen selection in a `MultiSelect` prompt                |
 | UnmarkedOptionIcon  |       ◯        | Marks an unselected option in a `MultiSelect` prompt              |
-
-
 
 ## Versioning
 
