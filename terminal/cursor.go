@@ -11,49 +11,54 @@ import (
 	"strings"
 )
 
-// Move the cursor n cells to up.
+// CursorUp moves the cursor n cells to up.
 func CursorUp(n int) {
 	fmt.Printf("\x1b[%dA", n)
 }
 
-// Move the cursor n cells to down.
+// CursorDown moves the cursor n cells to down.
 func CursorDown(n int) {
 	fmt.Printf("\x1b[%dB", n)
 }
 
-// Move the cursor n cells to right.
+// CursorForward moves the cursor n cells to right.
 func CursorForward(n int) {
 	fmt.Printf("\x1b[%dC", n)
 }
 
-// Move the cursor n cells to left.
+// CursorBack moves the cursor n cells to left.
 func CursorBack(n int) {
 	fmt.Printf("\x1b[%dD", n)
 }
 
-// Move cursor to beginning of the line n lines down.
+// CursorNextLine moves cursor to beginning of the line n lines down.
 func CursorNextLine(n int) {
 	fmt.Printf("\x1b[%dE", n)
 }
 
-// Move cursor to beginning of the line n lines up.
+// CursorPreviousLine moves cursor to beginning of the line n lines up.
 func CursorPreviousLine(n int) {
 	fmt.Printf("\x1b[%dF", n)
 }
 
-// Move cursor horizontally to x.
+// CursorHorizontalAbsolute moves cursor horizontally to x.
 func CursorHorizontalAbsolute(x int) {
 	fmt.Printf("\x1b[%dG", x)
 }
 
-// Show the cursor.
+// CursorShow shows the cursor.
 func CursorShow() {
 	fmt.Print("\x1b[?25h")
 }
 
-// Hide the cursor.
+// CursorHide hide the cursor.
 func CursorHide() {
 	fmt.Print("\x1b[?25l")
+}
+
+// CursorMove moves the cursor to a specific x,y location.
+func CursorMove(x int, y int) {
+	fmt.Printf("\x1b[%d;%df", x, y)
 }
 
 // CursorLocation returns the current location of the cursor in the terminal
@@ -96,4 +101,34 @@ func CursorLocation() (*Coord, error) {
 
 	// it didn't work so return an error
 	return nil, fmt.Errorf("could not compute the cursor position using ascii escape sequences")
+}
+
+// Size returns the height and width of the terminal.
+func Size() (*Coord, error) {
+	// the general approach here is to move the cursor to the very bottom
+	// of the terminal, ask for the current location and then move the
+	// cursor back where we started
+
+	// save the current location of the cursor
+	origin, err := CursorLocation()
+	if err != nil {
+		return nil, err
+	}
+
+	// move the cursor to the very bottom of the terminal
+	CursorMove(999, 999)
+
+	// ask for the current location
+	bottom, err := CursorLocation()
+	if err != nil {
+		return nil, err
+	}
+
+	// move back where we began
+	CursorUp(int(bottom.Y - origin.Y))
+	CursorHorizontalAbsolute(int(origin.X))
+
+	// sice the bottom was calcuated in the lower right corner, it
+	// is the dimensions we are looking for
+	return bottom, nil
 }

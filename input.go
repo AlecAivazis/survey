@@ -46,6 +46,7 @@ func (i *Input) Prompt() (interface{}, error) {
 		return "", err
 	}
 
+	// start reading runes from the standard in
 	rr := terminal.NewRuneReader(os.Stdin)
 	rr.SetTermMode()
 	defer rr.RestoreTermMode()

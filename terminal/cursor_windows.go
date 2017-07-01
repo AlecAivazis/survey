@@ -90,3 +90,12 @@ func CursorLocation() (Coord, error) {
 
 	return csbi.cursorPosition, nil
 }
+
+func Size() (Coord, error) {
+	handle := syscall.Handle(os.Stdout.Fd())
+
+	var csbi consoleScreenBufferInfo
+	procGetConsoleScreenBufferInfo.Call(uintptr(handle), uintptr(unsafe.Pointer(&csbi)))
+
+	return csbi.size, nil
+}
