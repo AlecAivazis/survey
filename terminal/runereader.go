@@ -50,7 +50,7 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 			return line, fmt.Errorf("interrupt")
 		}
 
-		// allow for backspace/delete editing of password
+		// allow for backspace/delete editing of inputs
 		if r == KeyBackspace || r == KeyDelete {
 			// and we're not at the beginning of the line
 			if index > 0 && len(line) > 0 {
@@ -85,6 +85,9 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 
 				// decrement the index
 				index--
+			} else {
+				// otherwise the user pressed backspace while at the beginning of the line
+				soundBell()
 			}
 
 			// we're done processing this key
