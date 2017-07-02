@@ -18,8 +18,9 @@ type MultiSelect struct {
 	Options       []string
 	Default       []string
 	Help          string
+	PageSize      int
 	selectedIndex int
-	checked       map[int]bool
+	checked       map[string]bool
 	showingHelp   bool
 }
 
@@ -28,9 +29,10 @@ type MultiSelectTemplateData struct {
 	MultiSelect
 	Answer        string
 	ShowAnswer    bool
-	Checked       map[int]bool
+	Checked       map[string]bool
 	SelectedIndex int
 	ShowHelp      bool
+	Choices       []string
 }
 
 var MultiSelectQuestionTemplate = `
@@ -41,9 +43,9 @@ var MultiSelectQuestionTemplate = `
 {{- else }}
   {{- if and .Help (not .ShowHelp)}} {{color "cyan"}}[{{ HelpInputRune }} for help]{{color "reset"}}{{end}}
   {{- "\n"}}
-  {{- range $ix, $option := .Options}}
+  {{- range $ix, $option := .Choices}}
     {{- if eq $ix $.SelectedIndex}}{{color "cyan"}}{{ SelectFocusIcon }}{{color "reset"}}{{else}} {{end}}
-    {{- if index $.Checked $ix}}{{color "green"}} {{ MarkedOptionIcon }} {{else}}{{color "default+hb"}} {{ UnmarkedOptionIcon }} {{end}}
+    {{- if index $.Checked $option}}{{color "green"}} {{ MarkedOptionIcon }} {{else}}{{color "default+hb"}} {{ UnmarkedOptionIcon }} {{end}}
     {{- color "reset"}}
     {{- " "}}{{$option}}{{"\n"}}
   {{- end}}
@@ -71,26 +73,30 @@ func (m *MultiSelect) OnChange(line []rune, pos int, key rune) (newLine []rune, 
 		}
 		// if the user pressed down and there is room to move
 	} else if key == terminal.KeySpace {
-		if old, ok := m.checked[m.selectedIndex]; !ok {
+		if old, ok := m.checked[m.Options[m.selectedIndex]]; !ok {
 			// otherwise just invert the current value
-			m.checked[m.selectedIndex] = true
+			m.checked[m.Options[m.selectedIndex]] = true
 		} else {
 			// otherwise just invert the current value
-			m.checked[m.selectedIndex] = !old
+			m.checked[m.Options[m.selectedIndex]] = !old
 		}
 		// only show the help message if we have one to show
 	} else if key == core.HelpInputRune && m.Help != "" {
 		m.showingHelp = true
 	}
 
+	// paginate the options
+	choices, idx := paginate(m.PageSize, m.Options, m.selectedIndex)
+
 	// render the options
 	m.Render(
 		MultiSelectQuestionTemplate,
 		MultiSelectTemplateData{
 			MultiSelect:   *m,
-			SelectedIndex: m.selectedIndex,
+			SelectedIndex: idx,
 			Checked:       m.checked,
 			ShowHelp:      m.showingHelp,
+			Choices:       choices,
 		},
 	)
 
@@ -100,15 +106,15 @@ func (m *MultiSelect) OnChange(line []rune, pos int, key rune) (newLine []rune, 
 
 func (m *MultiSelect) Prompt() (interface{}, error) {
 	// compute the default state
-	m.checked = make(map[int]bool)
+	m.checked = make(map[string]bool)
 	// if there is a default
 	if len(m.Default) > 0 {
 		for _, dflt := range m.Default {
-			for i, opt := range m.Options {
+			for _, opt := range m.Options {
 				// if the option correponds to the default
 				if opt == dflt {
 					// we found our initial value
-					m.checked[i] = true
+					m.checked[opt] = true
 					// stop looking
 					break
 				}
@@ -127,13 +133,17 @@ func (m *MultiSelect) Prompt() (interface{}, error) {
 	// show the cursor when we're done
 	defer terminal.CursorShow()
 
+	// paginate the options
+	choices, idx := paginate(m.PageSize, m.Options, m.selectedIndex)
+
 	// ask the question
 	err := m.Render(
 		MultiSelectQuestionTemplate,
 		MultiSelectTemplateData{
 			MultiSelect:   *m,
-			SelectedIndex: m.selectedIndex,
+			SelectedIndex: idx,
 			Checked:       m.checked,
+			Choices:       choices,
 		},
 	)
 	if err != nil {
@@ -160,8 +170,8 @@ func (m *MultiSelect) Prompt() (interface{}, error) {
 	}
 
 	answers := []string{}
-	for ix, option := range m.Options {
-		if val, ok := m.checked[ix]; ok && val {
+	for _, option := range m.Options {
+		if val, ok := m.checked[option]; ok && val {
 			answers = append(answers, option)
 		}
 	}
