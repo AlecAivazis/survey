@@ -17,6 +17,7 @@ type Select struct {
 	Options       []string
 	Default       string
 	Help          string
+	PageSize      int
 	selectedIndex int
 	useDefault    bool
 	showingHelp   bool
@@ -25,6 +26,7 @@ type Select struct {
 // the data available to the templates when processing
 type SelectTemplateData struct {
 	Select
+	Choices       []string
 	SelectedIndex int
 	Answer        string
 	ShowAnswer    bool
@@ -39,7 +41,7 @@ var SelectQuestionTemplate = `
 {{- else}}
   {{- if and .Help (not .ShowHelp)}} {{color "cyan"}}[{{ HelpInputRune }} for help]{{color "reset"}}{{end}}
   {{- "\n"}}
-  {{- range $ix, $choice := .Options}}
+  {{- range $ix, $choice := .Choices}}
     {{- if eq $ix $.SelectedIndex}}{{color "cyan+b"}}{{ SelectFocusIcon }} {{else}}{{color "default+hb"}}  {{end}}
     {{- $choice}}
     {{- color "reset"}}{{"\n"}}
@@ -79,10 +81,18 @@ func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPo
 		s.showingHelp = true
 	}
 
+	// figure out the options and index to render
+	opts, idx := paginate(s.PageSize, s.Options, s.selectedIndex)
+
 	// render the options
 	s.Render(
 		SelectQuestionTemplate,
-		SelectTemplateData{Select: *s, SelectedIndex: s.selectedIndex, ShowHelp: s.showingHelp},
+		SelectTemplateData{
+			Select:        *s,
+			SelectedIndex: idx,
+			ShowHelp:      s.showingHelp,
+			Choices:       opts,
+		},
 	)
 
 	// if we are not pressing ent
@@ -114,10 +124,17 @@ func (s *Select) Prompt() (interface{}, error) {
 	// save the selected index
 	s.selectedIndex = sel
 
+	// figure out the options and index to render
+	opts, idx := paginate(s.PageSize, s.Options, sel)
+
 	// ask the question
 	err := s.Render(
 		SelectQuestionTemplate,
-		SelectTemplateData{Select: *s, SelectedIndex: sel},
+		SelectTemplateData{
+			Select:        *s,
+			Choices:       opts,
+			SelectedIndex: idx,
+		},
 	)
 	if err != nil {
 		return "", err
@@ -175,6 +192,10 @@ func (s *Select) Prompt() (interface{}, error) {
 func (s *Select) Cleanup(val interface{}) error {
 	return s.Render(
 		SelectQuestionTemplate,
-		SelectTemplateData{Select: *s, Answer: val.(string), ShowAnswer: true},
+		SelectTemplateData{
+			Select:     *s,
+			Answer:     val.(string),
+			ShowAnswer: true,
+		},
 	)
 }
