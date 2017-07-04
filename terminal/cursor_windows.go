@@ -29,8 +29,8 @@ func cursorMove(x int, y int) {
 	procGetConsoleScreenBufferInfo.Call(uintptr(handle), uintptr(unsafe.Pointer(&csbi)))
 
 	var cursor Coord
-	cursor.x = csbi.cursorPosition.x + Short(x)
-	cursor.y = csbi.cursorPosition.y + Short(y)
+	cursor.X = csbi.cursorPosition.X + Short(x)
+	cursor.Y = csbi.cursorPosition.Y + Short(y)
 
 	procSetConsoleCursorPosition.Call(uintptr(handle), uintptr(*(*int32)(unsafe.Pointer(&cursor))))
 }
@@ -52,11 +52,11 @@ func CursorHorizontalAbsolute(x int) {
 	procGetConsoleScreenBufferInfo.Call(uintptr(handle), uintptr(unsafe.Pointer(&csbi)))
 
 	var cursor Coord
-	cursor.x = Short(x)
-	cursor.y = csbi.cursorPosition.y
+	cursor.X = Short(x)
+	cursor.Y = csbi.cursorPosition.Y
 
-	if csbi.size.x < cursor.x {
-		cursor.x = csbi.size.x
+	if csbi.size.X < cursor.X {
+		cursor.X = csbi.size.X
 	}
 
 	procSetConsoleCursorPosition.Call(uintptr(handle), uintptr(*(*int32)(unsafe.Pointer(&cursor))))
