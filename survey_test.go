@@ -69,7 +69,8 @@ func TestPagination_firstHalf(t *testing.T) {
 	// the choices for the test
 	choices := []string{"choice1", "choice2", "choice3", "choice4", "choice5", "choice6"}
 
-	// section the choices into groups of 3
+	// section the choices into groups of 4 so the choice is somewhere in the middle
+	// to verify there is no displacement of the page
 	pageSize := 4
 
 	// test the second item
