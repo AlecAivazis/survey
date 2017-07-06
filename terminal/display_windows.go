@@ -17,12 +17,12 @@ func EraseLine(mode EraseLineMode) {
 	cursor := csbi.cursorPosition
 	switch mode {
 	case ERASE_LINE_END:
-		x = csbi.size.x
+		x = csbi.size.X
 	case ERASE_LINE_START:
 		x = 0
 	case ERASE_LINE_ALL:
-		cursor.x = 0
-		x = csbi.size.x
+		cursor.X = 0
+		x = csbi.size.X
 	}
 	procFillConsoleOutputCharacter.Call(uintptr(handle), uintptr(' '), uintptr(x), uintptr(*(*int32)(unsafe.Pointer(&cursor))), uintptr(unsafe.Pointer(&w)))
 }
