@@ -26,7 +26,7 @@ type Select struct {
 // the data available to the templates when processing
 type SelectTemplateData struct {
 	Select
-	Choices       []string
+	PageEntries   []string
 	SelectedIndex int
 	Answer        string
 	ShowAnswer    bool
@@ -41,7 +41,7 @@ var SelectQuestionTemplate = `
 {{- else}}
   {{- if and .Help (not .ShowHelp)}} {{color "cyan"}}[{{ HelpInputRune }} for help]{{color "reset"}}{{end}}
   {{- "\n"}}
-  {{- range $ix, $choice := .Choices}}
+  {{- range $ix, $choice := .PageEntries}}
     {{- if eq $ix $.SelectedIndex}}{{color "cyan+b"}}{{ SelectFocusIcon }} {{else}}{{color "default+hb"}}  {{end}}
     {{- $choice}}
     {{- color "reset"}}{{"\n"}}
@@ -91,7 +91,7 @@ func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPo
 			Select:        *s,
 			SelectedIndex: idx,
 			ShowHelp:      s.showingHelp,
-			Choices:       opts,
+			PageEntries:   opts,
 		},
 	)
 
@@ -132,7 +132,7 @@ func (s *Select) Prompt() (interface{}, error) {
 		SelectQuestionTemplate,
 		SelectTemplateData{
 			Select:        *s,
-			Choices:       opts,
+			PageEntries:   opts,
 			SelectedIndex: idx,
 		},
 	)

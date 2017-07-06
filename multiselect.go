@@ -32,7 +32,7 @@ type MultiSelectTemplateData struct {
 	Checked       map[string]bool
 	SelectedIndex int
 	ShowHelp      bool
-	Choices       []string
+	PageEntries   []string
 }
 
 var MultiSelectQuestionTemplate = `
@@ -43,7 +43,7 @@ var MultiSelectQuestionTemplate = `
 {{- else }}
   {{- if and .Help (not .ShowHelp)}} {{color "cyan"}}[{{ HelpInputRune }} for help]{{color "reset"}}{{end}}
   {{- "\n"}}
-  {{- range $ix, $option := .Choices}}
+  {{- range $ix, $option := .PageEntries}}
     {{- if eq $ix $.SelectedIndex}}{{color "cyan"}}{{ SelectFocusIcon }}{{color "reset"}}{{else}} {{end}}
     {{- if index $.Checked $option}}{{color "green"}} {{ MarkedOptionIcon }} {{else}}{{color "default+hb"}} {{ UnmarkedOptionIcon }} {{end}}
     {{- color "reset"}}
@@ -86,7 +86,7 @@ func (m *MultiSelect) OnChange(line []rune, pos int, key rune) (newLine []rune, 
 	}
 
 	// paginate the options
-	choices, idx := paginate(m.PageSize, m.Options, m.selectedIndex)
+	opts, idx := paginate(m.PageSize, m.Options, m.selectedIndex)
 
 	// render the options
 	m.Render(
@@ -96,7 +96,7 @@ func (m *MultiSelect) OnChange(line []rune, pos int, key rune) (newLine []rune, 
 			SelectedIndex: idx,
 			Checked:       m.checked,
 			ShowHelp:      m.showingHelp,
-			Choices:       choices,
+			PageEntries:   opts,
 		},
 	)
 
@@ -134,7 +134,7 @@ func (m *MultiSelect) Prompt() (interface{}, error) {
 	defer terminal.CursorShow()
 
 	// paginate the options
-	choices, idx := paginate(m.PageSize, m.Options, m.selectedIndex)
+	opts, idx := paginate(m.PageSize, m.Options, m.selectedIndex)
 
 	// ask the question
 	err := m.Render(
@@ -143,7 +143,7 @@ func (m *MultiSelect) Prompt() (interface{}, error) {
 			MultiSelect:   *m,
 			SelectedIndex: idx,
 			Checked:       m.checked,
-			Choices:       choices,
+			PageEntries:   opts,
 		},
 	)
 	if err != nil {

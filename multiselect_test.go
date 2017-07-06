@@ -36,7 +36,7 @@ func TestMultiSelectRender(t *testing.T) {
 			prompt,
 			MultiSelectTemplateData{
 				SelectedIndex: 2,
-				Choices:       prompt.Options,
+				PageEntries:   prompt.Options,
 				Checked:       map[string]bool{"bar": true, "buz": true},
 			},
 			`? Pick your words:
@@ -60,7 +60,7 @@ func TestMultiSelectRender(t *testing.T) {
 			helpfulPrompt,
 			MultiSelectTemplateData{
 				SelectedIndex: 2,
-				Choices:       prompt.Options,
+				PageEntries:   prompt.Options,
 				Checked:       map[string]bool{"bar": true, "buz": true},
 			},
 			`? Pick your words: [? for help]
@@ -75,7 +75,7 @@ func TestMultiSelectRender(t *testing.T) {
 			helpfulPrompt,
 			MultiSelectTemplateData{
 				SelectedIndex: 2,
-				Choices:       prompt.Options,
+				PageEntries:   prompt.Options,
 				Checked:       map[string]bool{"bar": true, "buz": true},
 				ShowHelp:      true,
 			},
