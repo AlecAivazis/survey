@@ -8,4 +8,4 @@ install:
 
 script:
   - run tests
-  - run autoplay-tests
+  # - run autoplay-tests
