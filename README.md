@@ -2,10 +2,7 @@
 [![Build Status](https://travis-ci.org/AlecAivazis/survey.svg?branch=feature%2Fpretty)](https://travis-ci.org/AlecAivazis/survey)
 [![GoDoc](http://img.shields.io/badge/godoc-reference-5272B4.svg)](https://godoc.org/github.com/AlecAivazis/survey)
 
-
 A library for building interactive prompts. Heavily inspired by the great [inquirer.js](https://github.com/SBoudrias/Inquirer.js/).
-
-
 
 ![](https://zippy.gfycat.com/AmusingBossyArrowworm.gif)
 
@@ -72,6 +69,7 @@ func main() {
 
 Examples can be found in the `examples/` directory. Run them
 to see basic behavior:
+
 ```bash
 go get github.com/AlecAivazis/survey
 
@@ -135,6 +133,13 @@ prompt := &survey.Select{
 survey.AskOne(prompt, &color, nil)
 ```
 
+By default, the select prompt is limited to showing 7 options at a time
+and will paginate lists of options longer than that. To increase, you can either
+change the global `survey.PageCount`, or set the `PageSize` field on the prompt:
+
+```golang
+prompt := &survey.Select{..., PageSize: 10}
+```
 
 ### MultiSelect
 
@@ -147,6 +152,14 @@ prompt := &survey.MultiSelect{
     Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
 }
 survey.AskOne(prompt, &days, nil)
+```
+
+By default, the MultiSelect prompt is limited to showing 7 options at a time
+and will paginate lists of options longer than that. To increase, you can either
+change the global `survey.PageCount`, or set the `PageSize` field on the prompt:
+
+```golang
+prompt := &survey.MultiSelect{..., PageSize: 10}
 ```
 
 ## Validation
@@ -226,11 +239,9 @@ in `survey/core`:
 | ErrorIcon           |       ✘        | Before an error                                                   |
 | HelpIcon            |       ⓘ       | Before help text                                                   |
 | QuestionIcon        |       ?        | Before the message of a prompt                                    |
-| SelectFocusIcon     |       ❯        | Marks the current selection in `Select` and `MultiSelect` prompts |
+| SelectFocusIcon     |       ❯        | Marks the current focus in `Select` and `MultiSelect` prompts     |
 | MarkedOptionIcon    |       ◉        | Marks a chosen selection in a `MultiSelect` prompt                |
 | UnmarkedOptionIcon  |       ◯        | Marks an unselected option in a `MultiSelect` prompt              |
-
-
 
 ## Versioning
 

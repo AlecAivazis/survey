@@ -15,28 +15,22 @@ var (
 )
 
 type wchar uint16
-type short int16
 type dword uint32
 type word uint16
 
-type coord struct {
-	x short
-	y short
-}
-
 type smallRect struct {
-	left   short
-	top    short
-	right  short
-	bottom short
+	left   Short
+	top    Short
+	right  Short
+	bottom Short
 }
 
 type consoleScreenBufferInfo struct {
-	size              coord
-	cursorPosition    coord
+	size              Coord
+	cursorPosition    Coord
 	attributes        word
 	window            smallRect
-	maximumWindowSize coord
+	maximumWindowSize Coord
 }
 
 type consoleCursorInfo struct {

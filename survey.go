@@ -6,6 +6,9 @@ import (
 	"github.com/AlecAivazis/survey/core"
 )
 
+// PageSize is the default maximum number of items to show in select/multiselect prompts
+var PageSize = 7
+
 // Validator is a function passed to a Question in order to redefine
 type Validator func(interface{}) error
 
@@ -90,4 +93,53 @@ func Ask(qs []*Question, t interface{}) error {
 	}
 	// return the response
 	return nil
+}
+
+// paginate returns a single page of choices given the page size, the total list of
+// possible choices, and the current selected index in the total list.
+func paginate(page int, choices []string, sel int) ([]string, int) {
+	// the number of elements to show in a single page
+	var pageSize int
+	// if the select has a specific page size
+	if page != 0 {
+		// use the specified one
+		pageSize = page
+		// otherwise the select does not have a page size
+	} else {
+		// use the package default
+		pageSize = PageSize
+	}
+
+	var start, end, cursor int
+
+	if len(choices) < pageSize {
+		// if we dont have enough options to fill a page
+		start = 0
+		end = len(choices)
+		cursor = sel
+
+	} else if sel < pageSize/2 {
+		// if we are in the first half page
+		start = 0
+		end = pageSize
+		cursor = sel
+
+	} else if len(choices)-sel-1 < pageSize/2 {
+		// if we are in the last half page
+		start = len(choices) - pageSize
+		end = len(choices)
+		cursor = sel - start
+
+	} else {
+		// somewhere in the middle
+		above := pageSize / 2
+		below := pageSize - above
+
+		cursor = pageSize / 2
+		start = sel - above
+		end = sel + below
+	}
+
+	// return the subset we care about and the index
+	return choices[start:end], cursor
 }

@@ -12,3 +12,7 @@ const (
 	KeyInterrupt       = '\x03'
 	KeyEndTransmission = '\x04'
 )
+
+func soundBell() {
+	Print("\a")
+}

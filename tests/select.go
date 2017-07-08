@@ -39,6 +39,18 @@ var goodTable = []TestUtil.TestTableEntry{
 			Options: []string{"red", "blue"},
 		}, &answer,
 	},
+	{
+		"passes through bottom", &survey.Select{
+			Message: "Choose one:",
+			Options: []string{"red", "blue"},
+		}, &answer,
+	},
+	{
+		"passes through top", &survey.Select{
+			Message: "Choose one:",
+			Options: []string{"red", "blue"},
+		}, &answer,
+	},
 }
 
 var badTable = []TestUtil.TestTableEntry{
