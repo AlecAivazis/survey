@@ -25,7 +25,7 @@ func RunTable(table []TestTableEntry) {
 		// tell the user what we are going to ask them
 		fmt.Println(entry.Name)
 		// perform the ask
-		err := survey.AskOne(entry.Prompt, entry.Value, nil)
+		err := survey.AskOne(entry.Prompt, entry.Value, nil, nil)
 		if err != nil {
 			fmt.Printf("AskOne on %v's prompt failed: %v.", entry.Name, err.Error())
 			break
@@ -41,7 +41,7 @@ func RunErrorTable(table []TestTableEntry) {
 		// tell the user what we are going to ask them
 		fmt.Println(entry.Name)
 		// perform the ask
-		err := survey.AskOne(entry.Prompt, entry.Value, nil)
+		err := survey.AskOne(entry.Prompt, entry.Value, nil, nil)
 		if err == nil {
 			fmt.Printf("AskOne on %v's prompt didn't fail.", entry.Name)
 			break

@@ -12,11 +12,15 @@ var PageSize = 7
 // Validator is a function passed to a Question in order to redefine
 type Validator func(interface{}) error
 
+// Converter is a function passed to a Question in order to convert value types
+type Converter func(interface{}) (interface{}, error)
+
 // Question is the core data structure for a survey questionnaire.
 type Question struct {
 	Name     string
 	Prompt   Prompt
 	Validate Validator
+	Convert  Converter
 }
 
 // Prompt is the primary interface for the objects that can take user input
@@ -28,8 +32,8 @@ type Prompt interface {
 }
 
 // AskOne asks a single question without performing validation on the answer.
-func AskOne(p Prompt, t interface{}, v Validator) error {
-	err := Ask([]*Question{{Prompt: p, Validate: v}}, t)
+func AskOne(p Prompt, t interface{}, v Validator, c Converter) error {
+	err := Ask([]*Question{{Prompt: p, Validate: v, Convert: c}}, t)
 	if err != nil {
 		return err
 	}
@@ -50,15 +54,37 @@ func Ask(qs []*Question, t interface{}) error {
 	for _, q := range qs {
 		// grab the user input and save it
 		ans, err := q.Prompt.Prompt()
+		convertedAns := ans
 		// if there was a problem
 		if err != nil {
 			return err
 		}
 
+		// if there's a converter
+		if q.Convert != nil {
+			var invalid error
+
+			// wait for a valid response
+			for convertedAns, invalid = q.Convert(ans); invalid != nil; convertedAns, invalid = q.Convert(ans) {
+				err := q.Prompt.Error(invalid)
+				// if there was a problem
+				if err != nil {
+					return err
+				}
+
+				// ask for more input
+				ans, err = q.Prompt.Prompt()
+				// if there was a problem
+				if err != nil {
+					return err
+				}
+			}
+		}
+
 		// if there is a validate handler for this question
 		if q.Validate != nil {
 			// wait for a valid response
-			for invalid := q.Validate(ans); invalid != nil; invalid = q.Validate(ans) {
+			for invalid := q.Validate(convertedAns); invalid != nil; invalid = q.Validate(convertedAns) {
 				err := q.Prompt.Error(invalid)
 				// if there was a problem
 				if err != nil {
@@ -84,7 +110,7 @@ func Ask(qs []*Question, t interface{}) error {
 		}
 
 		// add it to the map
-		err = core.WriteAnswer(t, q.Name, ans)
+		err = core.WriteAnswer(t, q.Name, convertedAns)
 		// if something went wrong
 		if err != nil {
 			return err
