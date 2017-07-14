@@ -256,7 +256,7 @@ type testSettable struct {
 	Value string
 }
 
-func (t *testSettable) Set(value interface{}) error {
+func (t *testSettable) WriteAnswer(value interface{}) error {
 	if v, ok := value.(string); ok {
 		t.Value = v
 		return nil
@@ -280,7 +280,7 @@ type testFieldSettable struct {
 	Values map[string]string
 }
 
-func (t *testFieldSettable) SetField(name string, value interface{}) error {
+func (t *testFieldSettable) WriteAnswerField(name string, value interface{}) error {
 	if t.Values == nil {
 		t.Values = map[string]string{}
 	}

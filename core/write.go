@@ -12,20 +12,20 @@ const tagName = "survey"
 
 // add a few interfaces so users can configure how the prompt values are set
 type settable interface {
-	Set(value interface{}) error
+	WriteAnswer(value interface{}) error
 }
 
 type fieldsettable interface {
-	SetField(field string, value interface{}) error
+	WriteAnswerField(field string, value interface{}) error
 }
 
 func WriteAnswer(t interface{}, name string, v interface{}) (err error) {
 
 	if s, ok := t.(settable); ok {
-		return s.Set(v)
+		return s.WriteAnswer(v)
 	}
 	if fs, ok := t.(fieldsettable); ok {
-		return fs.SetField(name, v)
+		return fs.WriteAnswerField(name, v)
 	}
 
 	// the target to write to
