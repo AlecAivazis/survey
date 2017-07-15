@@ -42,7 +42,7 @@ func main() {
 
 	fmt.Println("Asking one.")
 	answer := ""
-	err = survey.AskOne(simpleQs[0].Prompt, &answer, nil, nil)
+	err = survey.AskOne(simpleQs[0].Prompt, &answer, nil)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
@@ -51,7 +51,7 @@ func main() {
 
 	fmt.Println("Asking one with validation.")
 	vAns := ""
-	err = survey.AskOne(&survey.Input{Message: "What is your name?"}, &vAns, survey.Required, nil)
+	err = survey.AskOne(&survey.Input{Message: "What is your name?"}, &vAns, survey.Required)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
