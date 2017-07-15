@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
 )
 
@@ -119,6 +120,82 @@ func copy(t reflect.Value, v reflect.Value) (err error) {
 	}()
 
 	// attempt to copy the underlying value to the target
+	if v.Kind() == reflect.String && v.Type() != t.Type() {
+		var castVal interface{}
+		var casterr error
+		vString := v.Interface().(string)
+
+		switch t.Kind() {
+		case reflect.Bool:
+			castVal, casterr = strconv.ParseBool(vString)
+		case reflect.Int:
+			castVal, casterr = strconv.Atoi(vString)
+		case reflect.Int8:
+			var val64 int64
+			val64, casterr = strconv.ParseInt(vString, 10, 8)
+			if casterr == nil {
+				castVal = int8(val64)
+			}
+		case reflect.Int16:
+			var val64 int64
+			val64, casterr = strconv.ParseInt(vString, 10, 16)
+			if casterr == nil {
+				castVal = int16(val64)
+			}
+		case reflect.Int32:
+			var val64 int64
+			val64, casterr = strconv.ParseInt(vString, 10, 32)
+			if casterr == nil {
+				castVal = int32(val64)
+			}
+		case reflect.Int64:
+			castVal, casterr = strconv.ParseInt(vString, 10, 64)
+		case reflect.Uint:
+			var val64 uint64
+			val64, casterr = strconv.ParseUint(vString, 10, 8)
+			if casterr == nil {
+				castVal = uint(val64)
+			}
+		case reflect.Uint8:
+			var val64 uint64
+			val64, casterr = strconv.ParseUint(vString, 10, 8)
+			if casterr == nil {
+				castVal = uint8(val64)
+			}
+		case reflect.Uint16:
+			var val64 uint64
+			val64, casterr = strconv.ParseUint(vString, 10, 16)
+			if casterr == nil {
+				castVal = uint16(val64)
+			}
+		case reflect.Uint32:
+			var val64 uint64
+			val64, casterr = strconv.ParseUint(vString, 10, 32)
+			if casterr == nil {
+				castVal = uint32(val64)
+			}
+		case reflect.Uint64:
+			castVal, casterr = strconv.ParseUint(vString, 10, 64)
+		case reflect.Float32:
+			var val64 float64
+			val64, casterr = strconv.ParseFloat(vString, 32)
+			if casterr == nil {
+				castVal = float32(val64)
+			}
+		case reflect.Float64:
+			castVal, casterr = strconv.ParseFloat(vString, 64)
+		default:
+			return fmt.Errorf("Unable to convert from string to type %s", t.Kind())
+		}
+
+		if casterr != nil {
+			return casterr
+		}
+
+		t.Set(reflect.ValueOf(castVal))
+		return
+	}
+
 	t.Set(v)
 
 	// we're done

@@ -302,3 +302,225 @@ func TestWriteWithFieldSettable(t *testing.T) {
 	assert.Error(t, fmt.Errorf("Incompatible type int64"), err)
 	assert.Equal(t, map[string]string{}, testSet2.Values)
 }
+  
+// CONVERSION TESTS
+func TestWrite_canStringToBool(t *testing.T) {
+	// a pointer to hold the boolean value
+	ptr := true
+
+	// try to copy a false value to the pointer
+	WriteAnswer(&ptr, "", "false")
+
+	// if the value is true
+	if ptr {
+		// the test failed
+		t.Error("Could not convert string to pointer type")
+	}
+}
+
+func TestWrite_canStringToInt(t *testing.T) {
+	// a pointer to hold the value
+	var ptr int = 1
+
+	// try to copy a value to the pointer
+	WriteAnswer(&ptr, "", "2")
+
+	// if the value is true
+	if ptr != 2 {
+		// the test failed
+		t.Error("Could not convert string to pointer type")
+	}
+}
+
+func TestWrite_canStringToInt8(t *testing.T) {
+	// a pointer to hold the value
+	var ptr int8 = 1
+
+	// try to copy a value to the pointer
+	WriteAnswer(&ptr, "", "2")
+
+	// if the value is true
+	if ptr != 2 {
+		// the test failed
+		t.Error("Could not convert string to pointer type")
+	}
+}
+
+func TestWrite_canStringToInt16(t *testing.T) {
+	// a pointer to hold the value
+	var ptr int16 = 1
+
+	// try to copy a value to the pointer
+	WriteAnswer(&ptr, "", "2")
+
+	// if the value is true
+	if ptr != 2 {
+		// the test failed
+		t.Error("Could not convert string to pointer type")
+	}
+}
+
+func TestWrite_canStringToInt32(t *testing.T) {
+	// a pointer to hold the value
+	var ptr int32 = 1
+
+	// try to copy a value to the pointer
+	WriteAnswer(&ptr, "", "2")
+
+	// if the value is true
+	if ptr != 2 {
+		// the test failed
+		t.Error("Could not convert string to pointer type")
+	}
+}
+
+func TestWrite_canStringToInt64(t *testing.T) {
+	// a pointer to hold the value
+	var ptr int64 = 1
+
+	// try to copy a value to the pointer
+	WriteAnswer(&ptr, "", "2")
+
+	// if the value is true
+	if ptr != 2 {
+		// the test failed
+		t.Error("Could not convert string to pointer type")
+	}
+}
+
+func TestWrite_canStringToUint(t *testing.T) {
+	// a pointer to hold the value
+	var ptr uint = 1
+
+	// try to copy a value to the pointer
+	WriteAnswer(&ptr, "", "2")
+
+	// if the value is true
+	if ptr != 2 {
+		// the test failed
+		t.Error("Could not convert string to pointer type")
+	}
+}
+
+func TestWrite_canStringToUint8(t *testing.T) {
+	// a pointer to hold the value
+	var ptr uint8 = 1
+
+	// try to copy a value to the pointer
+	WriteAnswer(&ptr, "", "2")
+
+	// if the value is true
+	if ptr != 2 {
+		// the test failed
+		t.Error("Could not convert string to pointer type")
+	}
+}
+
+func TestWrite_canStringToUint16(t *testing.T) {
+	// a pointer to hold the value
+	var ptr uint16 = 1
+
+	// try to copy a value to the pointer
+	WriteAnswer(&ptr, "", "2")
+
+	// if the value is true
+	if ptr != 2 {
+		// the test failed
+		t.Error("Could not convert string to pointer type")
+	}
+}
+
+func TestWrite_canStringToUint32(t *testing.T) {
+	// a pointer to hold the value
+	var ptr uint32 = 1
+
+	// try to copy a value to the pointer
+	WriteAnswer(&ptr, "", "2")
+
+	// if the value is true
+	if ptr != 2 {
+		// the test failed
+		t.Error("Could not convert string to pointer type")
+	}
+}
+
+func TestWrite_canStringToUint64(t *testing.T) {
+	// a pointer to hold the value
+	var ptr uint64 = 1
+
+	// try to copy a value to the pointer
+	WriteAnswer(&ptr, "", "2")
+
+	// if the value is true
+	if ptr != 2 {
+		// the test failed
+		t.Error("Could not convert string to pointer type")
+	}
+}
+
+func TestWrite_canStringToFloat32(t *testing.T) {
+	// a pointer to hold the value
+	var ptr float32 = 1.0
+
+	// try to copy a value to the pointer
+	WriteAnswer(&ptr, "", "2.5")
+
+	// if the value is true
+	if ptr != 2.5 {
+		// the test failed
+		t.Error("Could not convert string to pointer type")
+	}
+}
+
+func TestWrite_canStringToFloat64(t *testing.T) {
+	// a pointer to hold the value
+	var ptr float64 = 1.0
+
+	// try to copy a value to the pointer
+	WriteAnswer(&ptr, "", "2.5")
+
+	// if the value is true
+	if ptr != 2.5 {
+		// the test failed
+		t.Error("Could not convert string to pointer type")
+	}
+}
+
+func TestWrite_canConvertStructFieldTypes(t *testing.T) {
+	// the struct to hold the answer
+	ptr := struct {
+		Name   string
+		Age    uint
+		Male   bool
+		Height float64
+	}{}
+
+	// write the values as strings
+	check(t, WriteAnswer(&ptr, "name", "Bob"))
+	check(t, WriteAnswer(&ptr, "age", "22"))
+	check(t, WriteAnswer(&ptr, "male", "true"))
+	check(t, WriteAnswer(&ptr, "height", "6.2"))
+
+	// make sure we changed the fields
+	if ptr.Name != "Bob" {
+		t.Error("Did not mutate Name when writing answer.")
+	}
+
+	if ptr.Age != 22 {
+		t.Error("Did not mutate Age when writing answer.")
+	}
+
+	if !ptr.Male {
+		t.Error("Did not mutate Male when writing answer.")
+	}
+
+	if ptr.Height != 6.2 {
+		t.Error("Did not mutate Height when writing answer.")
+	}
+}
+
+func check(t *testing.T, err error) {
+	if err != nil {
+		t.Fatalf("Encountered error while writing answer: %v", err.Error())
+	}
+}
