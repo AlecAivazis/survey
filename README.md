@@ -29,6 +29,10 @@ var qs = []*survey.Question{
             Default: "red",
         },
     },
+    {
+        Name: "age",
+        Prompt:   &survey.Input{Message: "How old are you?"},
+    },
 }
 
 func main() {
@@ -36,6 +40,7 @@ func main() {
     answers := struct {
         Name          string                  // survey will match the question and field names
         FavoriteColor string `survey:"color"` // or you can tag fields to match a specific name
+        Age           int                     // if the types don't match exactly, survey will try to convert for you
     }{}
 
     // perform the questions
