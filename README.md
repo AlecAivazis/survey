@@ -58,6 +58,7 @@ func main() {
     1. [Confirm](#confirm)
     1. [Select](#select)
     1. [MultiSelect](#multiselect)
+1. [Custom Types](#custom-types)
 1. [Validation](#validation)
     1. [Built-in Validators](#built-in-validators)
 1. [Help Text](#help-text)
