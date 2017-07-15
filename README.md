@@ -194,6 +194,7 @@ survey.AskOne(
     &myval,
     nil,
 )
+// myval.value should be populated with the prompt result now.
 ```
 
 If you want to capture the name associated with the prompt you can use this form:
@@ -208,7 +209,8 @@ func (my *MyMapValue) WriteAnswerField(name string, value interface{}) error {
 mymap := MyMapValue{value: make(map[string]string)}
 // qs defined in previous examples
 survey.Ask(qs, &mymap)
-// mymap.value["name"] and mymap.value["color"] should populated now
+// mymap.value["name"] and mymap.value["color"] should be populated with
+// the corresponding prompt results now.
 ```
 
 ## Validation
