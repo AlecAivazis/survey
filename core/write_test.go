@@ -1,8 +1,11 @@
 package core
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestWrite_returnsErrorIfTargetNotPtr(t *testing.T) {
@@ -249,6 +252,57 @@ func TestFindFieldIndex_tagOverwriteFieldName(t *testing.T) {
 	}
 }
 
+type testSettable struct {
+	Value string
+}
+
+func (t *testSettable) WriteAnswer(value interface{}) error {
+	if v, ok := value.(string); ok {
+		t.Value = v
+		return nil
+	}
+	return fmt.Errorf("Incompatible type %T", value)
+}
+
+func TestWriteWithSettable(t *testing.T) {
+	testSet1 := testSettable{}
+	err := WriteAnswer(&testSet1, "prompt", "stringVal")
+	assert.Nil(t, err)
+	assert.Equal(t, "stringVal", testSet1.Value)
+
+	testSet2 := testSettable{}
+	err = WriteAnswer(&testSet2, "prompt", 123)
+	assert.Error(t, fmt.Errorf("Incompatible type int64"), err)
+	assert.Equal(t, "", testSet2.Value)
+}
+
+type testFieldSettable struct {
+	Values map[string]string
+}
+
+func (t *testFieldSettable) WriteAnswerField(name string, value interface{}) error {
+	if t.Values == nil {
+		t.Values = map[string]string{}
+	}
+	if v, ok := value.(string); ok {
+		t.Values[name] = v
+		return nil
+	}
+	return fmt.Errorf("Incompatible type %T", value)
+}
+
+func TestWriteWithFieldSettable(t *testing.T) {
+	testSet1 := testFieldSettable{}
+	err := WriteAnswer(&testSet1, "prompt", "stringVal")
+	assert.Nil(t, err)
+	assert.Equal(t, map[string]string{"prompt": "stringVal"}, testSet1.Values)
+
+	testSet2 := testFieldSettable{}
+	err = WriteAnswer(&testSet2, "prompt", 123)
+	assert.Error(t, fmt.Errorf("Incompatible type int64"), err)
+	assert.Equal(t, map[string]string{}, testSet2.Values)
+}
+  
 // CONVERSION TESTS
 func TestWrite_canStringToBool(t *testing.T) {
 	// a pointer to hold the boolean value
