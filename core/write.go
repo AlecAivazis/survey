@@ -167,6 +167,8 @@ func copy(t reflect.Value, v reflect.Value) (err error) {
 			}
 		case reflect.Float64:
 			castVal, casterr = strconv.ParseFloat(vString, 64)
+		default:
+			return fmt.Errorf("Unable to convert from string to type %s", t.Kind())
 		}
 
 		if casterr != nil {
