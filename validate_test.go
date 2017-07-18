@@ -25,6 +25,26 @@ func TestRequired_canFailOnPrimitiveTypes(t *testing.T) {
 	}
 }
 
+func TestRequired_canSucceedOnMap(t *testing.T) {
+	// an non-empty map to test
+	val := map[string]int{"hello": 1}
+	// if the string is not valid
+	if valid := Required(val); valid != nil {
+		//
+		t.Error("Non null returned an error when one wasn't expected.")
+	}
+}
+
+func TestRequired_canFailOnMap(t *testing.T) {
+	// an non-empty map to test
+	val := map[string]int{}
+	// if the string is valid
+	if notValid := Required(val); notValid == nil {
+		//
+		t.Error("Non null did not return an error when one was expected.")
+	}
+}
+
 func TestRequired_canSucceedOnLists(t *testing.T) {
 	// a string to test
 	str := []string{"hello"}

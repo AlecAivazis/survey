@@ -75,7 +75,7 @@ func ComposeValidators(validators ...Validator) Validator {
 // isZero returns true if the passed value is the zero object
 func isZero(v reflect.Value) bool {
 	switch v.Kind() {
-	case reflect.Slice:
+	case reflect.Slice, reflect.Map:
 		return v.Len() == 0
 	}
 
