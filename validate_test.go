@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestRequiredCanSucceed(t *testing.T) {
+func TestRequired_canSucceedOnPrimitiveTypes(t *testing.T) {
 	// a string to test
 	str := "hello"
 	// if the string is not valid
@@ -14,10 +14,31 @@ func TestRequiredCanSucceed(t *testing.T) {
 		t.Error("Non null returned an error when one wasn't expected.")
 	}
 }
-func TestRequiredCanFail(t *testing.T) {
+
+func TestRequired_canFailOnPrimitiveTypes(t *testing.T) {
 	// a string to test
 	str := ""
 	// if the string is valid
+	if notValid := Required(str); notValid == nil {
+		//
+		t.Error("Non null did not return an error when one was expected.")
+	}
+}
+
+func TestRequired_canSucceedOnLists(t *testing.T) {
+	// a string to test
+	str := []string{"hello"}
+	// if the string is not valid
+	if valid := Required(str); valid != nil {
+		//
+		t.Error("Non null returned an error when one wasn't expected.")
+	}
+}
+
+func TestRequired_canFailOnLists(t *testing.T) {
+	// a string to test
+	str := []string{}
+	// if the string is not valid
 	if notValid := Required(str); notValid == nil {
 		//
 		t.Error("Non null did not return an error when one was expected.")
@@ -50,21 +71,21 @@ func TestMinLength(t *testing.T) {
 	}
 }
 
-func TestMinLengthOnInt(t *testing.T) {
+func TestMinLength_onInt(t *testing.T) {
 	// validate the string
 	if err := MinLength(12)(1); err == nil {
 		t.Error("No error returned when enforcing length on int.")
 	}
 }
 
-func TestMaxLengthOnInt(t *testing.T) {
+func TestMaxLength_onInt(t *testing.T) {
 	// validate the string
 	if err := MaxLength(12)(1); err == nil {
 		t.Error("No error returned when enforcing length on int.")
 	}
 }
 
-func TestComposeValidatorsPasses(t *testing.T) {
+func TestComposeValidators_passes(t *testing.T) {
 	// create a validator that requires a string of no more than 10 characters
 	valid := ComposeValidators(
 		Required,
@@ -80,7 +101,7 @@ func TestComposeValidatorsPasses(t *testing.T) {
 
 }
 
-func TestComposeValidatorsFailsOnFirst(t *testing.T) {
+func TestComposeValidators_failsOnFirstError(t *testing.T) {
 	// create a validator that requires a string of no more than 10 characters
 	valid := ComposeValidators(
 		Required,
@@ -94,7 +115,7 @@ func TestComposeValidatorsFailsOnFirst(t *testing.T) {
 	}
 }
 
-func TestComposeValidatorsFailsOnSubsequentValidators(t *testing.T) {
+func TestComposeValidators_failsOnSubsequentValidators(t *testing.T) {
 	// create a validator that requires a string of no more than 10 characters
 	valid := ComposeValidators(
 		Required,

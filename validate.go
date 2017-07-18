@@ -9,7 +9,7 @@ import (
 // Required does not allow an empty value
 func Required(val interface{}) error {
 	// if the value passed in is the zero value of the appropriate type
-	if val == reflect.Zero(reflect.TypeOf(val)).Interface() {
+	if isZero(reflect.ValueOf(val)) {
 		return errors.New("Value is required")
 	}
 	return nil
@@ -70,4 +70,15 @@ func ComposeValidators(validators ...Validator) Validator {
 		// we passed all validators, the string is valid
 		return nil
 	}
+}
+
+// isZero returns true if the passed value is the zero object
+func isZero(v reflect.Value) bool {
+	switch v.Kind() {
+	case reflect.Slice:
+		return v.Len() == 0
+	}
+
+	// compare the types directly with more general coverage
+	return reflect.DeepEqual(v.Interface(), reflect.Zero(v.Type()).Interface())
 }
