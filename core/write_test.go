@@ -256,6 +256,10 @@ type testSettable struct {
 	Value string
 }
 
+type testSettableStruct struct {
+	Settable testSettable `survey:"settable"`
+}
+
 func (t *testSettable) WriteAnswer(value interface{}) error {
 	if v, ok := value.(string); ok {
 		t.Value = v
@@ -274,6 +278,11 @@ func TestWriteWithSettable(t *testing.T) {
 	err = WriteAnswer(&testSet2, "prompt", 123)
 	assert.Error(t, fmt.Errorf("Incompatible type int64"), err)
 	assert.Equal(t, "", testSet2.Value)
+
+	testSetStruct := testSettableStruct{}
+	err = WriteAnswer(&testSetStruct, "settable", "stringVal1")
+	assert.Nil(t, err)
+	assert.Equal(t, testSetStruct.Settable.Value, "stringVal1")
 }
 
 type testFieldSettable struct {
@@ -302,7 +311,7 @@ func TestWriteWithFieldSettable(t *testing.T) {
 	assert.Error(t, fmt.Errorf("Incompatible type int64"), err)
 	assert.Equal(t, map[string]string{}, testSet2.Values)
 }
-  
+
 // CONVERSION TESTS
 func TestWrite_canStringToBool(t *testing.T) {
 	// a pointer to hold the boolean value

@@ -20,13 +20,19 @@ type fieldsettable interface {
 	WriteAnswerField(field string, value interface{}) error
 }
 
-func WriteAnswer(t interface{}, name string, v interface{}) (err error) {
-
+func writeByInterfaces(t interface{}, name string, v interface{}) (handled bool, err error) {
 	if s, ok := t.(settable); ok {
-		return s.WriteAnswer(v)
+		return true, s.WriteAnswer(v)
 	}
 	if fs, ok := t.(fieldsettable); ok {
-		return fs.WriteAnswerField(name, v)
+		return true, fs.WriteAnswerField(name, v)
+	}
+	return false, nil
+}
+
+func WriteAnswer(t interface{}, name string, v interface{}) (err error) {
+	if handled, err := writeByInterfaces(t, name, v); handled {
+		return err
 	}
 
 	// the target to write to
@@ -52,9 +58,14 @@ func WriteAnswer(t interface{}, name string, v interface{}) (err error) {
 			// bubble up
 			return err
 		}
-
+		field := elem.Field(fieldIndex)
+		if field.CanAddr() {
+			if handled, err := writeByInterfaces(field.Addr().Interface(), name, v); handled {
+				return err
+			}
+		}
 		// copy the value over to the field
-		return copy(elem.Field(fieldIndex), value)
+		return copy(field, value)
 	case reflect.Map:
 		mapType := reflect.TypeOf(t).Elem()
 		if mapType.Key().Kind() != reflect.String || mapType.Elem().Kind() != reflect.Interface {
