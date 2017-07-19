@@ -63,11 +63,11 @@ func main() {
     1. [Confirm](#confirm)
     1. [Select](#select)
     1. [MultiSelect](#multiselect)
-1. [Custom Types](#custom-types)
 1. [Validation](#validation)
     1. [Built-in Validators](#built-in-validators)
 1. [Help Text](#help-text)
     1. [Changing the input rune](#changing-the-input-run)
+1. [Custom Types](#custom-types)
 1. [Customizing Output](#customizing-output)
 1. [Versioning](#versioning)
 
@@ -168,36 +168,6 @@ change the global `survey.PageCount`, or set the `PageSize` field on the prompt:
 prompt := &survey.MultiSelect{..., PageSize: 10}
 ```
 
-## Custom Types
-
-survey will assign prompt answers to your custom types if they implement one of these interfaces:
-
-```golang
-type settable interface {
-    WriteAnswer(field string, value interface{}) error
-}
-```
-
-Here is an example how to use them:
-
-```golang
-type MyValue struct {
-    value string
-}
-func (my *MyValue) WriteAnswer(name string, value interface{}) error {
-     my.value = value.(string)
-}
-
-myval := MyValue{}
-survey.AskOne(
-    &survey.Input{
-        Message: "Enter something:",
-    },
-    &myval,
-    nil,
-)
-```
-
 ## Validation
 
 Validating individual responses for a particular question can be done by defining a
@@ -264,6 +234,35 @@ surveyCore.HelpInputRune = '^'
 survey.AskOne(prompt, &number, nil)
 ```
 
+## Custom Types
+
+survey will assign prompt answers to your custom types if they implement one of these interfaces:
+
+```golang
+type settable interface {
+    WriteAnswer(field string, value interface{}) error
+}
+```
+
+Here is an example how to use them:
+
+```golang
+type MyValue struct {
+    value string
+}
+func (my *MyValue) WriteAnswer(name string, value interface{}) error {
+     my.value = value.(string)
+}
+
+myval := MyValue{}
+survey.AskOne(
+    &survey.Input{
+        Message: "Enter something:",
+    },
+    &myval,
+    nil,
+)
+```
 
 ## Customizing Output
 
