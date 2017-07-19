@@ -171,23 +171,20 @@ prompt := &survey.MultiSelect{..., PageSize: 10}
 ## Custom Types
 
 survey will assign prompt answers to your custom types if they implement one of these interfaces:
+
 ```golang
 type settable interface {
-    WriteAnswer(value interface{}) error
-}
-```
-```golang
-type fieldsettable interface {
-    WriteAnswerField(field string, value interface{}) error
+    WriteAnswer(field string, value interface{}) error
 }
 ```
 
 Here is an example how to use them:
+
 ```golang
 type MyValue struct {
     value string
 }
-func (my *MyValue) WriteAnswer(value interface{}) error {
+func (my *MyValue) WriteAnswer(name string, value interface{}) error {
      my.value = value.(string)
 }
 
@@ -199,23 +196,6 @@ survey.AskOne(
     &myval,
     nil,
 )
-// myval.value should be populated with the prompt result now.
-```
-
-If you want to capture the name associated with the prompt you can use this form:
-```golang
-type MyMapValue struct {
-    value map[string]string
-}
-func (my *MyMapValue) WriteAnswerField(name string, value interface{}) error {
-     my.value[name] = value.(string)
-}
-
-mymap := MyMapValue{value: make(map[string]string)}
-// qs defined in previous examples
-survey.Ask(qs, &mymap)
-// mymap.value["name"] and mymap.value["color"] should be populated with
-// the corresponding prompt results now.
 ```
 
 ## Validation
