@@ -252,44 +252,11 @@ func TestFindFieldIndex_tagOverwriteFieldName(t *testing.T) {
 	}
 }
 
-type testSettable struct {
-	Value string
-}
-
-type testSettableStruct struct {
-	Settable testSettable `survey:"settable"`
-}
-
-func (t *testSettable) WriteAnswer(value interface{}) error {
-	if v, ok := value.(string); ok {
-		t.Value = v
-		return nil
-	}
-	return fmt.Errorf("Incompatible type %T", value)
-}
-
-func TestWriteWithSettable(t *testing.T) {
-	testSet1 := testSettable{}
-	err := WriteAnswer(&testSet1, "prompt", "stringVal")
-	assert.Nil(t, err)
-	assert.Equal(t, "stringVal", testSet1.Value)
-
-	testSet2 := testSettable{}
-	err = WriteAnswer(&testSet2, "prompt", 123)
-	assert.Error(t, fmt.Errorf("Incompatible type int64"), err)
-	assert.Equal(t, "", testSet2.Value)
-
-	testSetStruct := testSettableStruct{}
-	err = WriteAnswer(&testSetStruct, "settable", "stringVal1")
-	assert.Nil(t, err)
-	assert.Equal(t, testSetStruct.Settable.Value, "stringVal1")
-}
-
 type testFieldSettable struct {
 	Values map[string]string
 }
 
-func (t *testFieldSettable) WriteAnswerField(name string, value interface{}) error {
+func (t *testFieldSettable) WriteAnswer(name string, value interface{}) error {
 	if t.Values == nil {
 		t.Values = map[string]string{}
 	}
@@ -302,12 +269,12 @@ func (t *testFieldSettable) WriteAnswerField(name string, value interface{}) err
 
 func TestWriteWithFieldSettable(t *testing.T) {
 	testSet1 := testFieldSettable{}
-	err := WriteAnswer(&testSet1, "prompt", "stringVal")
+	err := WriteAnswer(&testSet1, "values", "stringVal")
 	assert.Nil(t, err)
-	assert.Equal(t, map[string]string{"prompt": "stringVal"}, testSet1.Values)
+	assert.Equal(t, map[string]string{"values": "stringVal"}, testSet1.Values)
 
 	testSet2 := testFieldSettable{}
-	err = WriteAnswer(&testSet2, "prompt", 123)
+	err = WriteAnswer(&testSet2, "values", 123)
 	assert.Error(t, fmt.Errorf("Incompatible type int64"), err)
 	assert.Equal(t, map[string]string{}, testSet2.Values)
 }
