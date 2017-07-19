@@ -13,26 +13,14 @@ const tagName = "survey"
 
 // add a few interfaces so users can configure how the prompt values are set
 type settable interface {
-	WriteAnswer(value interface{}) error
-}
-
-type fieldsettable interface {
-	WriteAnswerField(field string, value interface{}) error
-}
-
-func writeByInterfaces(t interface{}, name string, v interface{}) (handled bool, err error) {
-	if s, ok := t.(settable); ok {
-		return true, s.WriteAnswer(v)
-	}
-	if fs, ok := t.(fieldsettable); ok {
-		return true, fs.WriteAnswerField(name, v)
-	}
-	return false, nil
+	WriteAnswer(field string, value interface{}) error
 }
 
 func WriteAnswer(t interface{}, name string, v interface{}) (err error) {
-	if handled, err := writeByInterfaces(t, name, v); handled {
-		return err
+	// if the field is a custom type
+	if s, ok := t.(settable); ok {
+		// use the interface method
+		return s.WriteAnswer(name, v)
 	}
 
 	// the target to write to
@@ -59,12 +47,13 @@ func WriteAnswer(t interface{}, name string, v interface{}) (err error) {
 			return err
 		}
 		field := elem.Field(fieldIndex)
-		if field.CanAddr() {
-			if handled, err := writeByInterfaces(field.Addr().Interface(), name, v); handled {
-				return err
-			}
+		// handle references to the settable interface aswell
+		if s, ok := t.(settable); ok && field.CanAddr() {
+			// use the interface method
+			return s.WriteAnswer(name, v)
 		}
-		// copy the value over to the field
+
+		// copy the value over to the normal struct
 		return copy(field, value)
 	case reflect.Map:
 		mapType := reflect.TypeOf(t).Elem()
