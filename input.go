@@ -8,7 +8,7 @@ import (
 )
 
 // Input is a regular text input that prints each character the user types on the screen
-// and accepts the input with the enter key.
+// and accepts the input with the enter key. Response type is a string.
 type Input struct {
 	core.Renderer
 	Message string
