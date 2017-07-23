@@ -27,9 +27,21 @@ type Prompt interface {
 	Error(error) error
 }
 
-// AskOne asks a single question without performing validation on the answer.
-func AskOne(p Prompt, t interface{}, v Validator) error {
-	err := Ask([]*Question{{Prompt: p, Validate: v}}, t)
+/*
+AskOne performs the prompt for a single prompt and asks for validation if required.
+Response types should be something that can be casted from the response type designated
+in the documentation. For example:
+
+	name := ""
+	prompt := &survey.Input{
+		Message: "name",
+	}
+
+	survey.AskOne(prompt, &name, nil)
+
+*/
+func AskOne(p Prompt, response interface{}, v Validator) error {
+	err := Ask([]*Question{{Prompt: p, Validate: v}}, response)
 	if err != nil {
 		return err
 	}
@@ -40,9 +52,11 @@ func AskOne(p Prompt, t interface{}, v Validator) error {
 /*
 Ask performs the prompt loop, asking for validation when appropriate. The response
 type can be one of two options. If a struct is passed, the answer will be written to
-the field whose name matches the Name field on the corresponding question. Note, a
-survey tag can also be used to identify a Otherwise, a map[string]interface{} can be
-passed, responses will be written to the key with the matching name. For example:
+the field whose name matches the Name field on the corresponding question. Field types
+should be something that can be casted from the response type designated in the
+documentation. Note, a survey tag can also be used to identify a Otherwise, a
+map[string]interface{} can be passed, responses will be written to the key with the
+matching name. For example:
 
 	qs := []*survey.Question{
 		{
