@@ -9,7 +9,9 @@ import (
 // PageSize is the default maximum number of items to show in select/multiselect prompts
 var PageSize = 7
 
-// Validator is a function passed to a Question in order to redefine
+// Validator is a function passed to a Question after a user has provided a response.
+// If the function returns an error, then the user will be prompted again for another
+// response.
 type Validator func(interface{}) error
 
 // Question is the core data structure for a survey questionnaire.
@@ -20,7 +22,7 @@ type Question struct {
 }
 
 // Prompt is the primary interface for the objects that can take user input
-// and return a string value.
+// and return a response.
 type Prompt interface {
 	Prompt() (interface{}, error)
 	Cleanup(interface{}) error
