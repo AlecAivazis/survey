@@ -236,7 +236,7 @@ survey.AskOne(prompt, &number, nil)
 
 ## Custom Types
 
-survey will assign prompt answers to your custom types if they implement one of these interfaces:
+survey will assign prompt answers to your custom types if they implement this interface:
 
 ```golang
 type settable interface {
