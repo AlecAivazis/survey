@@ -11,7 +11,7 @@ import (
 )
 
 // MultiSelect is a prompt that presents a list of various options to the user
-// for them to select using the arrow keys and enter.
+// for them to select using the arrow keys and enter. Response type is a slice of strings.
 type MultiSelect struct {
 	core.Renderer
 	Message       string
