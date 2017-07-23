@@ -9,7 +9,7 @@ import (
 	"github.com/AlecAivazis/survey/terminal"
 )
 
-// Confirm is a regular text input that accept yes/no answers.
+// Confirm is a regular text input that accept yes/no answers. Return type is a bool.
 type Confirm struct {
 	core.Renderer
 	Message string
