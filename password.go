@@ -7,8 +7,14 @@ import (
 	"github.com/AlecAivazis/survey/terminal"
 )
 
-// Password is like a normal Input but the text shows up as *'s and
-// there is no default. Response type is a string.
+/*
+Password is like a normal Input but the text shows up as *'s and there is no default. Response
+type is a string.
+
+	password := ""
+	prompt := &survey.Password{ Message: "Please type your password" }
+	survey.AskOne(prompt, &password, nil)
+*/
 type Password struct {
 	core.Renderer
 	Message string

@@ -7,8 +7,15 @@ import (
 	"github.com/AlecAivazis/survey/terminal"
 )
 
-// Input is a regular text input that prints each character the user types on the screen
-// and accepts the input with the enter key. Response type is a string.
+/*
+Input is a regular text input that prints each character the user types on the screen
+and accepts the input with the enter key. Response type is a string.
+
+	name := ""
+	prompt := &survey.Input{ Message: "What is your name?" }
+	survey.AskOne(prompt, &name, nil)
+*/
+
 type Input struct {
 	core.Renderer
 	Message string

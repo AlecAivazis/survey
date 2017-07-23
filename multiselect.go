@@ -10,8 +10,17 @@ import (
 	"github.com/AlecAivazis/survey/terminal"
 )
 
-// MultiSelect is a prompt that presents a list of various options to the user
-// for them to select using the arrow keys and enter. Response type is a slice of strings.
+/*
+MultiSelect is a prompt that presents a list of various options to the user
+for them to select using the arrow keys and enter. Response type is a slice of strings.
+
+	days := []string{}
+	prompt := &survey.MultiSelect{
+		Message: "What days do you prefer:",
+		Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
+	}
+	survey.AskOne(prompt, &days, nil)
+*/
 type MultiSelect struct {
 	core.Renderer
 	Message       string
