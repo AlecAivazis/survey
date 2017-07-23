@@ -9,7 +9,9 @@ import (
 // PageSize is the default maximum number of items to show in select/multiselect prompts
 var PageSize = 7
 
-// Validator is a function passed to a Question in order to redefine
+// Validator is a function passed to a Question after a user has provided a response.
+// If the function returns an error, then the user will be prompted again for another
+// response.
 type Validator func(interface{}) error
 
 // Question is the core data structure for a survey questionnaire.
@@ -20,16 +22,28 @@ type Question struct {
 }
 
 // Prompt is the primary interface for the objects that can take user input
-// and return a string value.
+// and return a response.
 type Prompt interface {
 	Prompt() (interface{}, error)
 	Cleanup(interface{}) error
 	Error(error) error
 }
 
-// AskOne asks a single question without performing validation on the answer.
-func AskOne(p Prompt, t interface{}, v Validator) error {
-	err := Ask([]*Question{{Prompt: p, Validate: v}}, t)
+/*
+AskOne performs the prompt for a single prompt and asks for validation if required.
+Response types should be something that can be casted from the response type designated
+in the documentation. For example:
+
+	name := ""
+	prompt := &survey.Input{
+		Message: "name",
+	}
+
+	survey.AskOne(prompt, &name, nil)
+
+*/
+func AskOne(p Prompt, response interface{}, v Validator) error {
+	err := Ask([]*Question{{Prompt: p, Validate: v}}, response)
 	if err != nil {
 		return err
 	}
@@ -37,11 +51,32 @@ func AskOne(p Prompt, t interface{}, v Validator) error {
 	return nil
 }
 
-// Ask performs the prompt loop
-func Ask(qs []*Question, t interface{}) error {
+/*
+Ask performs the prompt loop, asking for validation when appropriate. The response
+type can be one of two options. If a struct is passed, the answer will be written to
+the field whose name matches the Name field on the corresponding question. Field types
+should be something that can be casted from the response type designated in the
+documentation. Note, a survey tag can also be used to identify a Otherwise, a
+map[string]interface{} can be passed, responses will be written to the key with the
+matching name. For example:
+
+	qs := []*survey.Question{
+		{
+			Name:     "name",
+			Prompt:   &survey.Input{Message: "What is your name?"},
+			Validate: survey.Required,
+		},
+	}
+
+	answers := struct{ Name string }{}
+
+
+	err := survey.Ask(qs, &answers)
+*/
+func Ask(qs []*Question, response interface{}) error {
 
 	// if we weren't passed a place to record the answers
-	if t == nil {
+	if response == nil {
 		// we can't go any further
 		return errors.New("cannot call Ask() with a nil reference to record the answers")
 	}
@@ -84,7 +119,7 @@ func Ask(qs []*Question, t interface{}) error {
 		}
 
 		// add it to the map
-		err = core.WriteAnswer(t, q.Name, ans)
+		err = core.WriteAnswer(response, q.Name, ans)
 		// if something went wrong
 		if err != nil {
 			return err

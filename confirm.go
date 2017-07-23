@@ -9,7 +9,7 @@ import (
 	"github.com/AlecAivazis/survey/terminal"
 )
 
-// Confirm is a regular text input that accept yes/no answers.
+// Confirm is a regular text input that accept yes/no answers. Response type is a bool.
 type Confirm struct {
 	core.Renderer
 	Message string
@@ -104,8 +104,14 @@ func (c *Confirm) getBool(showHelp bool) (bool, error) {
 	return c.Default, nil
 }
 
-// Prompt prompts the user with a simple text field and expects a reply followed
-// by a carriage return.
+/*
+Prompt prompts the user with a simple text field and expects a reply followed
+by a carriage return.
+
+	likesPie := false
+	prompt := &survey.Confirm{ Message: "What is your name?" }
+	survey.AskOne(prompt, &name, nil)
+*/
 func (c *Confirm) Prompt() (interface{}, error) {
 	// render the question template
 	err := c.Render(
