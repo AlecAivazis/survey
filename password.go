@@ -8,7 +8,7 @@ import (
 )
 
 // Password is like a normal Input but the text shows up as *'s and
-// there is no default.
+// there is no default. Response type is a string.
 type Password struct {
 	core.Renderer
 	Message string
