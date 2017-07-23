@@ -37,11 +37,30 @@ func AskOne(p Prompt, t interface{}, v Validator) error {
 	return nil
 }
 
-// Ask performs the prompt loop
-func Ask(qs []*Question, t interface{}) error {
+/*
+Ask performs the prompt loop, asking for validation when appropriate. The response
+type can be one of two options. If a struct is passed, the answer will be written to
+the field whose name matches the Name field on the corresponding question. Note, a
+survey tag can also be used to identify a Otherwise, a map[string]interface{} can be
+passed, responses will be written to the key with the matching name. For example:
+
+	qs := []*survey.Question{
+		{
+			Name:     "name",
+			Prompt:   &survey.Input{Message: "What is your name?"},
+			Validate: survey.Required,
+		},
+	}
+
+	answers := struct{ Name string }{}
+
+
+	err := survey.Ask(qs, &answers)
+*/
+func Ask(qs []*Question, response interface{}) error {
 
 	// if we weren't passed a place to record the answers
-	if t == nil {
+	if response == nil {
 		// we can't go any further
 		return errors.New("cannot call Ask() with a nil reference to record the answers")
 	}
@@ -84,7 +103,7 @@ func Ask(qs []*Question, t interface{}) error {
 		}
 
 		// add it to the map
-		err = core.WriteAnswer(t, q.Name, ans)
+		err = core.WriteAnswer(response, q.Name, ans)
 		// if something went wrong
 		if err != nil {
 			return err
