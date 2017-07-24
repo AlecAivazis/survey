@@ -15,7 +15,6 @@ and accepts the input with the enter key. Response type is a string.
 	prompt := &survey.Input{ Message: "What is your name?" }
 	survey.AskOne(prompt, &name, nil)
 */
-
 type Input struct {
 	core.Renderer
 	Message string
