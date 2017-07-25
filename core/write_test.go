@@ -154,6 +154,32 @@ func TestWrite_returnsErrorIfInvalidMapType(t *testing.T) {
 	}
 }
 
+func TestWrite_writesStringSliceToIntSlice(t *testing.T) {
+	// make a slice of int to write to
+	target := []int{}
+
+	// write the answer
+	err := WriteAnswer(&target, "name", []string{"1", "2", "3"})
+
+	// make sure there was no error
+	assert.Nil(t, err, "WriteSlice to Int Slice")
+	// and we got what we wanted
+	assert.Equal(t, []int{1, 2, 3}, target)
+}
+
+func TestWrite_writesStringArrayToIntArray(t *testing.T) {
+	// make a slice of int to write to
+	target := [3]int{}
+
+	// write the answer
+	err := WriteAnswer(&target, "name", [3]string{"1", "2", "3"})
+
+	// make sure there was no error
+	assert.Nil(t, err, "WriteArray to Int Array")
+	// and we got what we wanted
+	assert.Equal(t, [3]int{1, 2, 3}, target)
+}
+
 func TestWriteAnswer_returnsErrWhenFieldNotFound(t *testing.T) {
 	// the struct to hold the answer
 	ptr := struct{ Name string }{}
