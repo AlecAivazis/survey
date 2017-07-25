@@ -256,8 +256,12 @@ type testFieldSettable struct {
 	Values map[string]string
 }
 
+type testStringSettable struct {
+	Value string `survey:"string"`
+}
+
 type testTaggedStruct struct {
-	TaggedValue string `survey:"tagged"`
+	TaggedValue testStringSettable `survey:"tagged"`
 }
 
 func (t *testFieldSettable) WriteAnswer(name string, value interface{}) error {
@@ -271,6 +275,11 @@ func (t *testFieldSettable) WriteAnswer(name string, value interface{}) error {
 	return fmt.Errorf("Incompatible type %T", value)
 }
 
+func (t *testStringSettable) WriteAnswer(_ string, value interface{}) error {
+	t.Value = value.(string)
+	return nil
+}
+
 func TestWriteWithFieldSettable(t *testing.T) {
 	testSet1 := testFieldSettable{}
 	err := WriteAnswer(&testSet1, "values", "stringVal")
@@ -282,10 +291,15 @@ func TestWriteWithFieldSettable(t *testing.T) {
 	assert.Error(t, fmt.Errorf("Incompatible type int64"), err)
 	assert.Equal(t, map[string]string{}, testSet2.Values)
 
+	testString1 := testStringSettable{}
+	err = WriteAnswer(&testString1, "", "value1")
+	assert.Nil(t, err)
+	assert.Equal(t, testStringSettable{"value1"}, testString1)
+
 	testSetStruct := testTaggedStruct{}
 	err = WriteAnswer(&testSetStruct, "tagged", "stringVal1")
 	assert.Nil(t, err)
-	assert.Equal(t, testSetStruct.TaggedValue, "stringVal1")
+	assert.Equal(t, testTaggedStruct{TaggedValue: testStringSettable{"stringVal1"}}, testSetStruct)
 }
 
 // CONVERSION TESTS

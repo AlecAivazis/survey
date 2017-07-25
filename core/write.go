@@ -48,9 +48,11 @@ func WriteAnswer(t interface{}, name string, v interface{}) (err error) {
 		}
 		field := elem.Field(fieldIndex)
 		// handle references to the settable interface aswell
-		if s, ok := t.(settable); ok && field.CanAddr() {
-			// use the interface method
-			return s.WriteAnswer(name, v)
+		if field.CanAddr() {
+			if s, ok := field.Addr().Interface().(settable); ok {
+				// use the interface method
+				return s.WriteAnswer(name, v)
+			}
 		}
 
 		// copy the value over to the normal struct
