@@ -264,6 +264,10 @@ type testTaggedStruct struct {
 	TaggedValue testStringSettable `survey:"tagged"`
 }
 
+type testPtrTaggedStruct struct {
+	TaggedValue *testStringSettable `survey:"tagged"`
+}
+
 func (t *testFieldSettable) WriteAnswer(name string, value interface{}) error {
 	if t.Values == nil {
 		t.Values = map[string]string{}
@@ -300,6 +304,11 @@ func TestWriteWithFieldSettable(t *testing.T) {
 	err = WriteAnswer(&testSetStruct, "tagged", "stringVal1")
 	assert.Nil(t, err)
 	assert.Equal(t, testTaggedStruct{TaggedValue: testStringSettable{"stringVal1"}}, testSetStruct)
+
+	testPtrSetStruct := testPtrTaggedStruct{&testStringSettable{}}
+	err = WriteAnswer(&testPtrSetStruct, "tagged", "stringVal1")
+	assert.Nil(t, err)
+	assert.Equal(t, testPtrTaggedStruct{TaggedValue: &testStringSettable{"stringVal1"}}, testPtrSetStruct)
 }
 
 // CONVERSION TESTS
