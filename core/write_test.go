@@ -55,24 +55,7 @@ func TestWrite_canWriteSlice(t *testing.T) {
 	WriteAnswer(&ptr, "", []string{"hello", "world"})
 
 	// make sure there are two entries
-	if len(ptr) != 2 {
-		// the test failed
-		t.Errorf("Incorrect number of entries in written list. Expected 2, found %v.", len(ptr))
-		// dont move on
-		return
-	}
-
-	// make sure the first entry is hello
-	if ptr[0] != "hello" {
-		// the test failed
-		t.Errorf("incorrect first value in written pointer. expected hello found %v.", ptr[0])
-	}
-
-	// make sure the second entry is world
-	if ptr[1] != "world" {
-		// the test failed
-		t.Errorf("incorrect second value in written pointer. expected world found %v.", ptr[0])
-	}
+	assert.Equal(t, []string{"hello", "world"}, ptr)
 }
 
 func TestWrite_recoversInvalidReflection(t *testing.T) {
