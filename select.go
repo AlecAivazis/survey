@@ -2,7 +2,6 @@ package survey
 
 import (
 	"errors"
-	"fmt"
 	"os"
 
 	"github.com/AlecAivazis/survey/core"
@@ -170,7 +169,7 @@ func (s *Select) Prompt() (interface{}, error) {
 			break
 		}
 		if r == terminal.KeyInterrupt {
-			return "", fmt.Errorf("interrupt")
+			return "", InterruptErr
 		}
 		if r == terminal.KeyEndTransmission {
 			break
