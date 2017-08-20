@@ -2,7 +2,6 @@ package survey
 
 import (
 	"bytes"
-	"errors"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -17,8 +16,9 @@ Editor launches an instance of the users preferred editor on a temporary file.
 The editor to use is determined by reading the $VISUAL or $EDITOR environment
 variables. If neither of those are present, notepad (on Windows) or vim
 (others) is used.
-The launch of the editor is triggered by the enter key. Response type is a
-string.
+The launch of the editor is triggered by the enter key. Since the response may
+be long, it will not be echoed as Input does, instead, it print <Received>.
+Response type is a string.
 
 	message := ""
 	prompt := &survey.Editor{ Message: "What is your commit message?" }
@@ -95,7 +95,7 @@ func (e *Editor) Prompt() (interface{}, error) {
 			break
 		}
 		if r == terminal.KeyInterrupt {
-			return "", errors.New("interrupt")
+			return "", InterruptErr
 		}
 		if r == terminal.KeyEndTransmission {
 			break
@@ -120,6 +120,11 @@ func (e *Editor) Prompt() (interface{}, error) {
 	defer os.Remove(f.Name())
 
 	// write utf8 BOM header
+	// The reason why we do this is because notepad.exe on Windows determines the
+	// encoding of an "empty" text file by the locale, for example, GBK in China,
+	// while golang string only handles utf8 well. However, a text file with utf8
+	// BOM header is not considered "empty" on Windows, and the encoding will then
+	// be determined utf8 by notepad.exe, instead of GBK or other encodings.
 	if _, err := f.Write(bom); err != nil {
 		return "", err
 	}
