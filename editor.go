@@ -134,7 +134,11 @@ func (e *Editor) Prompt() (interface{}, error) {
 	}
 
 	// open the editor
-	if err := exec.Command(editor, f.Name()).Run(); err != nil {
+	cmd := exec.Command(editor, f.Name())
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
 		return "", err
 	}
 
