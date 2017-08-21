@@ -138,6 +138,7 @@ func (e *Editor) Prompt() (interface{}, error) {
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
+	terminal.CursorShow()
 	if err := cmd.Run(); err != nil {
 		return "", err
 	}
