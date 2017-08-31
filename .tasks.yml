@@ -20,4 +20,4 @@ tests:
   command: go test {{.files}}
 
 variables:
-  files: '$(go list -v ./... | grep -iEv "gopkg.in/AlecAivazis/survey.v1/(tests|examples)")'
+  files: '$(go list -v ./... | grep -iEv "tests|examples")'
