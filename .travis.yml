@@ -1,6 +1,6 @@
 language: go
 
-go_import_path: gopkg.in/alecaivazis/survey.v1
+go_import_path: gopkg.in/AlecAivazis/survey.v1
 
 before_install:
   - go get github.com/AlecAivazis/run
