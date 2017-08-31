@@ -1,6 +1,6 @@
 # Survey
 [![Build Status](https://travis-ci.org/AlecAivazis/survey.svg?branch=feature%2Fpretty)](https://travis-ci.org/AlecAivazis/survey)
-[![GoDoc](http://img.shields.io/badge/godoc-reference-5272B4.svg)](https://godoc.org/github.com/AlecAivazis/survey)
+[![GoDoc](http://img.shields.io/badge/godoc-reference-5272B4.svg)](https://github.com/AlecAivazis/survey)
 
 A library for building interactive prompts. Heavily inspired by the great [inquirer.js](https://github.com/SBoudrias/Inquirer.js/).
 
@@ -77,7 +77,7 @@ Examples can be found in the `examples/` directory. Run them
 to see basic behavior:
 
 ```bash
-go get github.com/AlecAivazis/survey
+go get gopkg.in/AlecAivazis/survey.v1
 
 # ... navigate to the repo in your GOPATH
 
@@ -280,9 +280,8 @@ in `survey/core`:
 
 ## Versioning
 
-This project tries to maintain semantic GitHub releases as closely as possible. As such, services
-like [gopkg.in](http://labix.org/gopkg.in) work very well to ensure non-breaking changes whenever
-you build your application. For example, importing v1 of survey could look something like
+This project tries to maintain semantic GitHub releases as closely as possible. And relies on [gopkg.in](http://labix.org/gopkg.in)
+to maintain those releasees. Importing v1 of survey could look something like
 
 ```golang
 package main

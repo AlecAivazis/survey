@@ -1,6 +1,6 @@
 package main
 
-import "github.com/AlecAivazis/survey"
+import "gopkg.in/AlecAivazis/survey.v1"
 
 func main() {
 	color := ""
