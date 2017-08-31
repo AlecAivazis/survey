@@ -2,7 +2,6 @@ package survey
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"strings"
 
@@ -170,7 +169,7 @@ func (m *MultiSelect) Prompt() (interface{}, error) {
 			break
 		}
 		if r == terminal.KeyInterrupt {
-			return "", fmt.Errorf("interrupt")
+			return "", terminal.InterruptErr
 		}
 		if r == terminal.KeyEndTransmission {
 			break
