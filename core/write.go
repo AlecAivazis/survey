@@ -221,14 +221,15 @@ func copy(t reflect.Value, v reflect.Value) (err error) {
 			// if its a slice
 			case reflect.Slice:
 				// an object of the correct type
-				obj := reflect.Zero(t.Type().Elem())
-				fmt.Println("from", v.Index(i), v.Index(i).Type().Kind(), "to", obj, obj.Kind())
-				// write the appropriate value to the obj
-				copy(obj, v.Index(i))
-				fmt.Println(">>", obj)
+				obj := reflect.Indirect(reflect.New(t.Type().Elem()))
+
+				// write the appropriate value to the obj and catch any errors
+				if err := copy(obj, v.Index(i)); err != nil {
+					return err
+				}
 
 				// just append the value to the end
-				reflect.Append(t, obj)
+				t.Set(reflect.Append(t, obj))
 			// otherwise it could be an array
 			case reflect.Array:
 				// set the index to the appropriate value
