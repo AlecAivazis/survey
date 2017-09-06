@@ -151,7 +151,7 @@ func TestWrite_writesStringSliceToIntSlice(t *testing.T) {
 }
 
 func TestWrite_writesStringArrayToIntArray(t *testing.T) {
-	// make a slice of int to write to
+	// make an array of int to write to
 	target := [3]int{}
 
 	// write the answer
