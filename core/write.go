@@ -109,6 +109,16 @@ func findFieldIndex(s reflect.Value, name string) (int, error) {
 	return -1, fmt.Errorf("could not find field matching %v", name)
 }
 
+// isList returns true if the element is something we can Len()
+func isList(v reflect.Value) bool {
+	switch v.Type().Kind() {
+	case reflect.Array, reflect.Slice:
+		return true
+	default:
+		return false
+	}
+}
+
 // Write takes a value and copies it to the target
 func copy(t reflect.Value, v reflect.Value) (err error) {
 	// if something ends up panicing we need to catch it in a deferred func
@@ -125,7 +135,7 @@ func copy(t reflect.Value, v reflect.Value) (err error) {
 		}
 	}()
 
-	// attempt to copy the underlying value to the target
+	// if we are copying from a string result to something else
 	if v.Kind() == reflect.String && v.Type() != t.Type() {
 		var castVal interface{}
 		var casterr error
@@ -202,7 +212,34 @@ func copy(t reflect.Value, v reflect.Value) (err error) {
 		return
 	}
 
-	t.Set(v)
+	// if we are copying from one slice or array to another
+	if isList(v) && isList(t) {
+		// loop over every item in the desired value
+		for i := 0; i < v.Len(); i++ {
+			// write to the target given its kind
+			switch t.Kind() {
+			// if its a slice
+			case reflect.Slice:
+				// an object of the correct type
+				obj := reflect.Indirect(reflect.New(t.Type().Elem()))
+
+				// write the appropriate value to the obj and catch any errors
+				if err := copy(obj, v.Index(i)); err != nil {
+					return err
+				}
+
+				// just append the value to the end
+				t.Set(reflect.Append(t, obj))
+			// otherwise it could be an array
+			case reflect.Array:
+				// set the index to the appropriate value
+				copy(t.Slice(i, i+1).Index(0), v.Index(i))
+			}
+		}
+	} else {
+		// set the value to the target
+		t.Set(v)
+	}
 
 	// we're done
 	return

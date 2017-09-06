@@ -55,24 +55,7 @@ func TestWrite_canWriteSlice(t *testing.T) {
 	WriteAnswer(&ptr, "", []string{"hello", "world"})
 
 	// make sure there are two entries
-	if len(ptr) != 2 {
-		// the test failed
-		t.Errorf("Incorrect number of entries in written list. Expected 2, found %v.", len(ptr))
-		// dont move on
-		return
-	}
-
-	// make sure the first entry is hello
-	if ptr[0] != "hello" {
-		// the test failed
-		t.Errorf("incorrect first value in written pointer. expected hello found %v.", ptr[0])
-	}
-
-	// make sure the second entry is world
-	if ptr[1] != "world" {
-		// the test failed
-		t.Errorf("incorrect second value in written pointer. expected world found %v.", ptr[0])
-	}
+	assert.Equal(t, []string{"hello", "world"}, ptr)
 }
 
 func TestWrite_recoversInvalidReflection(t *testing.T) {
@@ -152,6 +135,32 @@ func TestWrite_returnsErrorIfInvalidMapType(t *testing.T) {
 	if err == nil {
 		t.Error("Did not encounter error when writing to invalid map.")
 	}
+}
+
+func TestWrite_writesStringSliceToIntSlice(t *testing.T) {
+	// make a slice of int to write to
+	target := []int{}
+
+	// write the answer
+	err := WriteAnswer(&target, "name", []string{"1", "2", "3"})
+
+	// make sure there was no error
+	assert.Nil(t, err, "WriteSlice to Int Slice")
+	// and we got what we wanted
+	assert.Equal(t, []int{1, 2, 3}, target)
+}
+
+func TestWrite_writesStringArrayToIntArray(t *testing.T) {
+	// make an array of int to write to
+	target := [3]int{}
+
+	// write the answer
+	err := WriteAnswer(&target, "name", [3]string{"1", "2", "3"})
+
+	// make sure there was no error
+	assert.Nil(t, err, "WriteArray to Int Array")
+	// and we got what we wanted
+	assert.Equal(t, [3]int{1, 2, 3}, target)
 }
 
 func TestWriteAnswer_returnsErrWhenFieldNotFound(t *testing.T) {
