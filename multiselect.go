@@ -2,12 +2,11 @@ package survey
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"strings"
 
-	"github.com/AlecAivazis/survey/core"
-	"github.com/AlecAivazis/survey/terminal"
+	"gopkg.in/AlecAivazis/survey.v1/core"
+	"gopkg.in/AlecAivazis/survey.v1/terminal"
 )
 
 /*
@@ -170,7 +169,7 @@ func (m *MultiSelect) Prompt() (interface{}, error) {
 			break
 		}
 		if r == terminal.KeyInterrupt {
-			return "", fmt.Errorf("interrupt")
+			return "", terminal.InterruptErr
 		}
 		if r == terminal.KeyEndTransmission {
 			break

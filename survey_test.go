@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/AlecAivazis/survey/core"
 	"github.com/stretchr/testify/assert"
+	"gopkg.in/AlecAivazis/survey.v1/core"
 )
 
 func init() {
