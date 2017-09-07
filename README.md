@@ -63,6 +63,7 @@ func main() {
     1. [Confirm](#confirm)
     1. [Select](#select)
     1. [MultiSelect](#multiselect)
+    1. [Editor](#editor)
 1. [Validation](#validation)
     1. [Built-in Validators](#built-in-validators)
 1. [Help Text](#help-text)
@@ -167,6 +168,13 @@ change the global `survey.PageCount`, or set the `PageSize` field on the prompt:
 ```golang
 prompt := &survey.MultiSelect{..., PageSize: 10}
 ```
+
+## Editor
+
+Launches the user's preferred editor (defined by the $EDITOR environment variable) on a 
+temporary file . Once the user exits their editor, the contents of the temporary file are read in as 
+the result. If neither of those are present, notepad (on Windows) or vim (Linux or Mac) is used.
+
 
 ## Validation
 
