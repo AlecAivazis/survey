@@ -169,10 +169,10 @@ change the global `survey.PageCount`, or set the `PageSize` field on the prompt:
 prompt := &survey.MultiSelect{..., PageSize: 10}
 ```
 
-## Editor
+### Editor
 
 Launches the user's preferred editor (defined by the $EDITOR environment variable) on a 
-temporary file . Once the user exits their editor, the contents of the temporary file are read in as 
+temporary file. Once the user exits their editor, the contents of the temporary file are read in as 
 the result. If neither of those are present, notepad (on Windows) or vim (Linux or Mac) is used.
 
 
