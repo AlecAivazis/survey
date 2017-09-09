@@ -45,7 +45,7 @@ func TestConfirmRender(t *testing.T) {
 			"Test Confirm with help but help message is hidden",
 			Confirm{Message: "Is pizza your favorite food?", Help: "This is helpful"},
 			ConfirmTemplateData{},
-			fmt.Sprintf("%s Is pizza your favorite food? [%s for help] (y/N) ", core.QuestionIcon, core.HelpInputRune),
+			fmt.Sprintf("%s Is pizza your favorite food? [%s for help] (y/N) ", core.QuestionIcon, string(core.HelpInputRune)),
 		},
 		{
 			"Test Confirm help output with help message shown",
