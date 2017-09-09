@@ -12,14 +12,14 @@ var DisableColor = false
 var (
 	HelpInputRune = '?'
 
-	ErrorIcon    = "✘"
-	HelpIcon     = "ⓘ"
+	ErrorIcon    = "X"
+	HelpIcon     = "????"
 	QuestionIcon = "?"
 
-	MarkedOptionIcon   = "◉"
-	UnmarkedOptionIcon = "◯"
+	MarkedOptionIcon   = "[x]"
+	UnmarkedOptionIcon = "[ ]"
 
-	SelectFocusIcon = "❯"
+	SelectFocusIcon = ">"
 )
 
 var TemplateFuncs = map[string]interface{}{
