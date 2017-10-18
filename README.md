@@ -289,7 +289,7 @@ in `survey/core`:
 ## Versioning
 
 This project tries to maintain semantic GitHub releases as closely as possible. And relies on [gopkg.in](http://labix.org/gopkg.in)
-to maintain those releasees. Importing v1 of survey could look something like
+to maintain those releases. Importing v1 of survey could look something like
 
 ```golang
 package main

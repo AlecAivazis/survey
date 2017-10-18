@@ -1,6 +1,6 @@
 // +build !windows
 
-// The terminal mode manipluation code is derived heavily from:
+// The terminal mode manipulation code is derived heavily from:
 // https://github.com/golang/crypto/blob/master/ssh/terminal/util.go:
 // Copyright 2011 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
