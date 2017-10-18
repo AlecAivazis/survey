@@ -176,7 +176,7 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 			// leave the cursor where the user left it
 			CursorBack(len(line) - index - 1)
 
-			// accomodate the new letter in our counter
+			// accommodate the new letter in our counter
 			index++
 		}
 	}
