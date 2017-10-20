@@ -63,7 +63,7 @@ func CursorMove(x int, y int) {
 
 // CursorLocation returns the current location of the cursor in the terminal
 func CursorLocation() (*Coord, error) {
-	// print the escape sequence to recieve the position in our stdin
+	// print the escape sequence to receive the position in our stdin
 	fmt.Print("\x1b[6n")
 
 	// read from stdin to get the response
