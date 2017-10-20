@@ -61,13 +61,13 @@ func ComposeValidators(validators ...Validator) Validator {
 	return func(val interface{}) error {
 		// execute each validator
 		for _, validator := range validators {
-			// if the string is not valid
+			// if the answer's value is not valid
 			if err := validator(val); err != nil {
 				// return the error
 				return err
 			}
 		}
-		// we passed all validators, the string is valid
+		// we passed all validators, the answer is valid
 		return nil
 	}
 }
