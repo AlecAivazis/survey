@@ -20,7 +20,7 @@ var qs = []*survey.Question{
         Name:     "name",
         Prompt:   &survey.Input{Message: "What is your name?"},
         Validate: survey.Required,
-        Transform: survery.Title,
+        Transform: survey.Title,
     },
     {
         Name: "color",
