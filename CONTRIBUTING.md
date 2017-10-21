@@ -52,7 +52,7 @@ When submitting features, please add as many units tests as necessary to test bo
 
 Given the current implementation of the library functionality that is part of the prompt's output needs to be tested by recording an interaction and replaying that interaction with every change. The script being recorded should be committed to the `tests` directory. Bugs that are reported and reproduced should also get copied into this directory and recorded for future validation. This recording is done with a package called `autoplay`, created by one of `survey`'s maintainers.
 
-### Generate an autoplay test
+### Generating an autoplay test
 
 `Autoplay` will record an interaction with the terminal and generate a script which executes the recording against the current terminal session. To install `autoplay`, run: `go get github.com/coryb/autoplay github.com/kr/pty`.
 
