@@ -50,7 +50,7 @@ When submitting a contribution,
 
 When submitting features, please add as many units tests as necessary to test both positive and negative cases.
 
-Given the current implementation of the library, functionality that is part of the prompt's output needs to be tested by recording an interaction and replaying that interaction with every change. The script being recorded should be committed to the `tests` directory. Bugs that are reported and reproduced should also get copied into this directory and recorded for future validation. This recording is done with a package called `autoplay`, created by one of `survey`'s maintainers.
+Given the current implementation of the library, functionality that is part of the prompt's output needs to be tested by recording an interaction and replaying that interaction with every change. The script and its recording should be committed to the `tests` directory. Bugs that are reported and reproduced should also get copied into this directory and recorded for future validation. This recording is done with a package called `autoplay`, created by one of `survey`'s maintainers.
 
 ### Generating an autoplay test
 
