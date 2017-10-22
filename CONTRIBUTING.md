@@ -31,7 +31,7 @@ Bugs are tracked using the Github Issue tracker. When filing a bug, please remem
 
 ## Suggesting an API change
 
-If you have an idea, I'm more than happy to discuss it. Please open an issue labeled `Discussion` and we can work though it. In order to maintain some sense of stability, additions to the top-level API are taken just as seriously as changes that break it. Adding stuff is much easier than removing it.
+If you have an idea, I'm more than happy to discuss it. Please open an issue labeled `Discussion` and we can work through it. In order to maintain some sense of stability, additions to the top-level API are taken just as seriously as changes that break it. Adding stuff is much easier than removing it.
 
 ## Submitting a contribution
 
@@ -40,17 +40,17 @@ In order to maintain stability, most features get fully integrated in more than 
 When submitting a contribution,
   *  Provide a description of the feature or change
   *  Reference the ticket addressed by the PR if there is one
-  *  Following community standards, add comments for all exported members so that all necessary information is availible on godocs
+  *  Following community standards, add comments for all exported members so that all necessary information is available on godocs
   *  Remember to update the project README.md with changes to the high-level API
   *  Include both positive and negative unit tests (when applicable)
-  *  Contributions with visual ramifacations should be accompanied with an `autoplay` recording that will get verified on every PR. For more information on generating these recordings, see [Writing and Running Tests](#writing-and-running-tests)
+  *  Contributions with visual ramifications should be accompanied with an `autoplay` recording that will get verified on every PR. For more information on generating these recordings, see [Writing and Running Tests](#writing-and-running-tests)
 
 
 ## Writing and running tests
 
 When submitting features, please add as many units tests as necessary to test both positive and negative cases.
 
-Given the current implementation of the library functionality that is part of the prompt's output needs to be tested by recording an interaction and replaying that interaction with every change. The script being recorded should be committed to the `tests` directory. Bugs that are reported and reproduced should also get copied into this directory and recorded for future validation. This recording is done with a package called `autoplay`, created by one of `survey`'s maintainers.
+Given the current implementation of the library, functionality that is part of the prompt's output needs to be tested by recording an interaction and replaying that interaction with every change. The script being recorded should be committed to the `tests` directory. Bugs that are reported and reproduced should also get copied into this directory and recorded for future validation. This recording is done with a package called `autoplay`, created by one of `survey`'s maintainers.
 
 ### Generating an autoplay test
 
