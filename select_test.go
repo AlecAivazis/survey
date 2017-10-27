@@ -21,6 +21,12 @@ func TestSelectRender(t *testing.T) {
 		Options: []string{"foo", "bar", "baz", "buz"},
 		Default: "baz",
 	}
+	promptWithOther := Select{
+		Message: "Pick your word:",
+		Options: []string{"foo", "bar", "baz", "buz"},
+		Default: "baz",
+		Other:   true,
+	}
 
 	helpfulPrompt := prompt
 	helpfulPrompt.Help = "This is helpful"
@@ -69,6 +75,18 @@ func TestSelectRender(t *testing.T) {
   bar
 ❯ baz
   buz
+`,
+		},
+		{
+			"Test Select question output with other",
+			promptWithOther,
+			SelectTemplateData{SelectedIndex: 2, PageEntries: append(prompt.Options, "Other")},
+			`? Pick your word:
+  foo
+  bar
+❯ baz
+  buz
+  Other
 `,
 		},
 	}

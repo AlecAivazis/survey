@@ -21,6 +21,12 @@ func TestMultiSelectRender(t *testing.T) {
 		Options: []string{"foo", "bar", "baz", "buz"},
 		Default: []string{"bar", "buz"},
 	}
+	promptWithOther := MultiSelect{
+		Message: "Pick your words:",
+		Options: []string{"foo", "bar", "baz", "buz"},
+		Default: []string{"bar", "buz"},
+		Other:   true,
+	}
 
 	helpfulPrompt := prompt
 	helpfulPrompt.Help = "This is helpful"
@@ -85,6 +91,22 @@ func TestMultiSelectRender(t *testing.T) {
   ◉  bar
 ❯ ◯  baz
   ◉  buz
+`,
+		},
+		{
+			"Test MultiSelect question output with other",
+			promptWithOther,
+			MultiSelectTemplateData{
+				SelectedIndex: 2,
+				PageEntries:   append(prompt.Options, "Other"),
+				Checked:       map[string]bool{"bar": true, "buz": true},
+			},
+			`? Pick your words:
+  ◯  foo
+  ◉  bar
+❯ ◯  baz
+  ◉  buz
+  ◯  Other
 `,
 		},
 	}

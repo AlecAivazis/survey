@@ -29,6 +29,7 @@ type Select struct {
 	selectedIndex int
 	useDefault    bool
 	showingHelp   bool
+	Other         bool
 }
 
 // the data available to the templates when processing
@@ -58,9 +59,15 @@ var SelectQuestionTemplate = `
 
 // OnChange is called on every keypress.
 func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPos int, ok bool) {
+	// Create the choices array with other support
+	choices := s.Options
+	if s.Other {
+		choices = append(choices, "Other")
+	}
+
 	// if the user pressed the enter key
 	if key == terminal.KeyEnter {
-		return []rune(s.Options[s.selectedIndex]), 0, true
+		return []rune(choices[s.selectedIndex]), 0, true
 		// if the user pressed the up arrow
 	} else if key == terminal.KeyArrowUp {
 		s.useDefault = false
@@ -68,7 +75,7 @@ func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPo
 		// if we are at the top of the list
 		if s.selectedIndex == 0 {
 			// start from the button
-			s.selectedIndex = len(s.Options) - 1
+			s.selectedIndex = len(choices) - 1
 		} else {
 			// otherwise we are not at the top of the list so decrement the selected index
 			s.selectedIndex--
@@ -77,7 +84,7 @@ func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPo
 	} else if key == terminal.KeyArrowDown {
 		s.useDefault = false
 		// if we are at the bottom of the list
-		if s.selectedIndex == len(s.Options)-1 {
+		if s.selectedIndex == len(choices)-1 {
 			// start from the top
 			s.selectedIndex = 0
 		} else {
@@ -90,7 +97,7 @@ func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPo
 	}
 
 	// figure out the options and index to render
-	opts, idx := paginate(s.PageSize, s.Options, s.selectedIndex)
+	opts, idx := paginate(s.PageSize, choices, s.selectedIndex)
 
 	// render the options
 	s.Render(
@@ -104,12 +111,18 @@ func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPo
 	)
 
 	// if we are not pressing ent
-	return []rune(s.Options[s.selectedIndex]), 0, true
+	return []rune(choices[s.selectedIndex]), 0, true
 }
 
 func (s *Select) Prompt() (interface{}, error) {
+	// Create the choices array with other support
+	choices := s.Options
+	if s.Other {
+		choices = append(choices, "Other")
+	}
+
 	// if there are no options to render
-	if len(s.Options) == 0 {
+	if len(choices) == 0 {
 		// we failed
 		return "", errors.New("please provide options to select from")
 	}
@@ -119,7 +132,7 @@ func (s *Select) Prompt() (interface{}, error) {
 	// if there is a default
 	if s.Default != "" {
 		// find the choice
-		for i, opt := range s.Options {
+		for i, opt := range choices {
 			// if the option correponds to the default
 			if opt == s.Default {
 				// we found our initial value
@@ -133,7 +146,7 @@ func (s *Select) Prompt() (interface{}, error) {
 	s.selectedIndex = sel
 
 	// figure out the options and index to render
-	opts, idx := paginate(s.PageSize, s.Options, sel)
+	opts, idx := paginate(s.PageSize, choices, sel)
 
 	// ask the question
 	err := s.Render(
@@ -178,6 +191,16 @@ func (s *Select) Prompt() (interface{}, error) {
 	}
 
 	var val string
+
+	// If other is selected
+	if s.selectedIndex == len(choices)-1 {
+		prompt := &Input{
+			Message: "Other",
+		}
+		err := AskOne(prompt, &val, nil)
+		return val, err
+	}
+
 	// if we are supposed to use the default value
 	if s.useDefault {
 		// if there is a default value
@@ -186,12 +209,12 @@ func (s *Select) Prompt() (interface{}, error) {
 			val = s.Default
 		} else {
 			// there is no default value so use the first
-			val = s.Options[0]
+			val = choices[0]
 		}
 		// otherwise the selected index points to the value
 	} else {
 		// the
-		val = s.Options[s.selectedIndex]
+		val = choices[s.selectedIndex]
 	}
 
 	return val, err
