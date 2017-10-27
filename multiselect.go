@@ -30,6 +30,7 @@ type MultiSelect struct {
 	selectedIndex int
 	checked       map[string]bool
 	showingHelp   bool
+	Other         bool
 }
 
 // data available to the templates when processing
@@ -61,18 +62,24 @@ var MultiSelectQuestionTemplate = `
 
 // OnChange is called on every keypress.
 func (m *MultiSelect) OnChange(line []rune, pos int, key rune) (newLine []rune, newPos int, ok bool) {
+	// Create the choices array with other support
+	choices := m.Options
+	if m.Other {
+		choices = append(choices, "Other")
+	}
+
 	if key == terminal.KeyArrowUp {
 		// if we are at the top of the list
 		if m.selectedIndex == 0 {
 			// go to the bottom
-			m.selectedIndex = len(m.Options) - 1
+			m.selectedIndex = len(choices) - 1
 		} else {
 			// decrement the selected index
 			m.selectedIndex--
 		}
 	} else if key == terminal.KeyArrowDown {
 		// if we are at the bottom of the list
-		if m.selectedIndex == len(m.Options)-1 {
+		if m.selectedIndex == len(choices)-1 {
 			// start at the top
 			m.selectedIndex = 0
 		} else {
@@ -81,12 +88,12 @@ func (m *MultiSelect) OnChange(line []rune, pos int, key rune) (newLine []rune, 
 		}
 		// if the user pressed down and there is room to move
 	} else if key == terminal.KeySpace {
-		if old, ok := m.checked[m.Options[m.selectedIndex]]; !ok {
+		if old, ok := m.checked[choices[m.selectedIndex]]; !ok {
 			// otherwise just invert the current value
-			m.checked[m.Options[m.selectedIndex]] = true
+			m.checked[choices[m.selectedIndex]] = true
 		} else {
 			// otherwise just invert the current value
-			m.checked[m.Options[m.selectedIndex]] = !old
+			m.checked[choices[m.selectedIndex]] = !old
 		}
 		// only show the help message if we have one to show
 	} else if key == core.HelpInputRune && m.Help != "" {
@@ -94,7 +101,7 @@ func (m *MultiSelect) OnChange(line []rune, pos int, key rune) (newLine []rune, 
 	}
 
 	// paginate the options
-	opts, idx := paginate(m.PageSize, m.Options, m.selectedIndex)
+	opts, idx := paginate(m.PageSize, choices, m.selectedIndex)
 
 	// render the options
 	m.Render(
@@ -113,12 +120,18 @@ func (m *MultiSelect) OnChange(line []rune, pos int, key rune) (newLine []rune, 
 }
 
 func (m *MultiSelect) Prompt() (interface{}, error) {
+	// Create the choices array with other support
+	choices := m.Options
+	if m.Other {
+		choices = append(choices, "Other")
+	}
+
 	// compute the default state
 	m.checked = make(map[string]bool)
 	// if there is a default
 	if len(m.Default) > 0 {
 		for _, dflt := range m.Default {
-			for _, opt := range m.Options {
+			for _, opt := range choices {
 				// if the option correponds to the default
 				if opt == dflt {
 					// we found our initial value
@@ -131,7 +144,7 @@ func (m *MultiSelect) Prompt() (interface{}, error) {
 	}
 
 	// if there are no options to render
-	if len(m.Options) == 0 {
+	if len(choices) == 0 {
 		// we failed
 		return "", errors.New("please provide options to select from")
 	}
@@ -142,7 +155,7 @@ func (m *MultiSelect) Prompt() (interface{}, error) {
 	defer terminal.CursorShow()
 
 	// paginate the options
-	opts, idx := paginate(m.PageSize, m.Options, m.selectedIndex)
+	opts, idx := paginate(m.PageSize, choices, m.selectedIndex)
 
 	// ask the question
 	err := m.Render(
@@ -178,9 +191,25 @@ func (m *MultiSelect) Prompt() (interface{}, error) {
 	}
 
 	answers := []string{}
-	for _, option := range m.Options {
+	for _, option := range choices {
 		if val, ok := m.checked[option]; ok && val {
 			answers = append(answers, option)
+		}
+	}
+
+	for i, a := range answers {
+		if a == "Other" {
+			var val string
+			prompt := &Input{
+				Message: "Other",
+			}
+			err := AskOne(prompt, &val, nil)
+			if err != nil {
+				return "", nil
+			}
+			answers = append(answers[:i], answers[i+1:]...) // Delete "Other"
+			answers = append(answers, val)
+			break
 		}
 	}
 
