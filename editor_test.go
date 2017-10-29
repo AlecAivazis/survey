@@ -34,6 +34,12 @@ func TestEditorRender(t *testing.T) {
 			"? What is your favorite month: (April) [Enter to launch editor] ",
 		},
 		{
+			"Test Editor question output with HideDefault",
+			Editor{Message: "What is your favorite month:", Default: "April", HideDefault: true},
+			EditorTemplateData{},
+			"? What is your favorite month: [Enter to launch editor] ",
+		},
+		{
 			"Test Editor answer output",
 			Editor{Message: "What is your favorite month:"},
 			EditorTemplateData{Answer: "October", ShowAnswer: true},
