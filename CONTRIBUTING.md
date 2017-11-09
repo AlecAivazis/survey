@@ -19,7 +19,7 @@ This project and its contibutors are expected to uphold the [Go Community Code o
 
 ## Getting help
 
-Feel free to [open up an issue](https://github.com/AlecAivazis/survey/issues/new) on GitHub when asking a question so others will be able to find it. Please remember to tag the issue with the `Question` label so the maintainers can get to your question as soon as possible. If the question is urgent, feel free to reach out to @AlecAivazis directly in the gophers slack channel.
+Feel free to [open up an issue](https://github.com/AlecAivazis/survey/issues/new) on GitHub when asking a question so others will be able to find it. Please remember to tag the issue with the `Question` label so the maintainers can get to your question as soon as possible. If the question is urgent, feel free to reach out to `@AlecAivazis` directly in the gophers slack channel.
 
 ## How to file a bug report
 
