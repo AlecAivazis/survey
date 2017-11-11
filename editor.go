@@ -26,9 +26,11 @@ Response type is a string.
 */
 type Editor struct {
 	core.Renderer
-	Message string
-	Default string
-	Help    string
+	Message       string
+	Default       string
+	Help          string
+	HideDefault   bool
+	AppendDefault bool
 }
 
 // data available to the templates when processing
@@ -48,7 +50,7 @@ var EditorQuestionTemplate = `
   {{- color "cyan"}}{{.Answer}}{{color "reset"}}{{"\n"}}
 {{- else }}
   {{- if and .Help (not .ShowHelp)}}{{color "cyan"}}[{{ HelpInputRune }} for help]{{color "reset"}} {{end}}
-  {{- if .Default}}{{color "white"}}({{.Default}}) {{color "reset"}}{{end}}
+  {{- if and .Default (not .HideDefault)}}{{color "white"}}({{.Default}}) {{color "reset"}}{{end}}
   {{- color "cyan"}}[Enter to launch editor] {{color "reset"}}
 {{- end}}`
 
@@ -128,6 +130,14 @@ func (e *Editor) Prompt() (interface{}, error) {
 	if _, err := f.Write(bom); err != nil {
 		return "", err
 	}
+
+	// write default value
+	if e.Default != "" && e.AppendDefault {
+		if _, err := f.WriteString(e.Default); err != nil {
+			return "", err
+		}
+	}
+
 	// close the fd to prevent the editor unable to save file
 	if err := f.Close(); err != nil {
 		return "", err
@@ -153,7 +163,7 @@ func (e *Editor) Prompt() (interface{}, error) {
 	text := string(bytes.TrimPrefix(raw, bom))
 
 	// check length, return default value on empty
-	if len(text) == 0 {
+	if len(text) == 0 && !e.AppendDefault {
 		return e.Default, nil
 	}
 
