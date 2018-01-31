@@ -81,7 +81,7 @@ to see basic behavior:
 ```bash
 go get gopkg.in/AlecAivazis/survey.v1
 
-# ... navigate to the repo in your GOPATH
+cd $GOPATH/src/gopkg.in/AlecAivazis/survey.v1
 
 go run examples/simple.go
 go run examples/validation.go
