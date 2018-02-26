@@ -143,7 +143,7 @@ survey.AskOne(prompt, &color, nil)
 
 By default, the select prompt is limited to showing 7 options at a time
 and will paginate lists of options longer than that. To increase, you can either
-change the global `survey.PageCount`, or set the `PageSize` field on the prompt:
+change the global `survey.PageSize`, or set the `PageSize` field on the prompt:
 
 ```golang
 prompt := &survey.Select{..., PageSize: 10}
@@ -164,7 +164,7 @@ survey.AskOne(prompt, &days, nil)
 
 By default, the MultiSelect prompt is limited to showing 7 options at a time
 and will paginate lists of options longer than that. To increase, you can either
-change the global `survey.PageCount`, or set the `PageSize` field on the prompt:
+change the global `survey.PageSize`, or set the `PageSize` field on the prompt:
 
 ```golang
 prompt := &survey.MultiSelect{..., PageSize: 10}
