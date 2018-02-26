@@ -201,11 +201,11 @@ q := &survey.Question{
 `survey` comes prepackaged with a few validators to fit common situations. Currently these
 validators include:
 
-|    name      |   valid types   |       description                                             |
-|--------------|-----------------|---------------------------------------------------------------|
-| Required     |   any           |   Rejects zero values of the response type                    |
-| MinLength(n) |   string        |   Enforces that a response is at least the given length       |
-| MaxLength(n) |   string        |   Enforces that a response is no longer than the given length |
+|    name      |   valid types   |       description                                             |   notes            |
+|--------------|-----------------|---------------------------------------------------------------|--------------------|
+| Required     |   any           |   Rejects zero values of the response type                    |  Boolean values pass straight through since the zero value (false) is a valid response      |
+| MinLength(n) |   string        |   Enforces that a response is at least the given length       |         |
+| MaxLength(n) |   string        |   Enforces that a response is no longer than the given length |         |
 
 ## Help Text
 
