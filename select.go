@@ -61,8 +61,8 @@ func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPo
 	// if the user pressed the enter key
 	if key == terminal.KeyEnter {
 		return []rune(s.Options[s.selectedIndex]), 0, true
-		// if the user pressed the up arrow
-	} else if key == terminal.KeyArrowUp {
+		// if the user pressed the up arrow or 'k' to emulate vim
+	} else if key == terminal.KeyArrowUp || key == 'k' {
 		s.useDefault = false
 
 		// if we are at the top of the list
@@ -73,8 +73,8 @@ func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPo
 			// otherwise we are not at the top of the list so decrement the selected index
 			s.selectedIndex--
 		}
-		// if the user pressed down and there is room to move
-	} else if key == terminal.KeyArrowDown {
+		// if the user pressed down or 'j' to emulate vim
+	} else if key == terminal.KeyArrowDown || key == 'j' {
 		s.useDefault = false
 		// if we are at the bottom of the list
 		if s.selectedIndex == len(s.Options)-1 {
