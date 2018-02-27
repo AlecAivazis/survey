@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/AlecAivazis/survey.svg?branch=feature%2Fpretty)](https://travis-ci.org/AlecAivazis/survey)
 [![GoDoc](http://img.shields.io/badge/godoc-reference-5272B4.svg)](https://godoc.org/gopkg.in/AlecAivazis/survey.v1)
 
-A library for building interactive prompts. Heavily inspired by the great [inquirer.js](https://github.com/SBoudrias/Inquirer.js/).
+A library for building interactive prompts. 
 
 ![](https://zippy.gfycat.com/AmusingBossyArrowworm.gif)
 
