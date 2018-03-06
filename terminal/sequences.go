@@ -11,6 +11,8 @@ const (
 	KeyDelete          = '\x7f'
 	KeyInterrupt       = '\x03'
 	KeyEndTransmission = '\x04'
+	KeyDeleteWord      = '\x17' // Ctrl+W
+	KeyDeleteLine      = '\x18' // Ctrl+X
 )
 
 func soundBell() {
