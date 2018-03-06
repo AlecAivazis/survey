@@ -27,11 +27,12 @@ type MultiSelect struct {
 	Default       []string
 	Help          string
 	PageSize      int
+	VimMode       bool
+	FilterMessage string
+	filter        string
 	selectedIndex int
 	checked       map[string]bool
 	showingHelp   bool
-	filter        string
-	FilterMessage string
 }
 
 // data available to the templates when processing
@@ -66,7 +67,7 @@ func (m *MultiSelect) OnChange(line []rune, pos int, key rune) (newLine []rune, 
 	options := m.filterOptions()
 	oldFilter := m.filter
 
-	if key == terminal.KeyArrowUp {
+	if key == terminal.KeyArrowUp || (m.VimMode && key == 'k') {
 		// if we are at the top of the list
 		if m.selectedIndex == 0 {
 			// go to the bottom
@@ -75,7 +76,7 @@ func (m *MultiSelect) OnChange(line []rune, pos int, key rune) (newLine []rune, 
 			// decrement the selected index
 			m.selectedIndex--
 		}
-	} else if key == terminal.KeyArrowDown {
+	} else if key == terminal.KeyArrowDown || (m.VimMode && key == 'j') {
 		// if we are at the bottom of the list
 		if m.selectedIndex == len(options)-1 {
 			// start at the top
@@ -86,12 +87,14 @@ func (m *MultiSelect) OnChange(line []rune, pos int, key rune) (newLine []rune, 
 		}
 		// if the user pressed down and there is room to move
 	} else if key == terminal.KeySpace {
-		if old, ok := m.checked[options[m.selectedIndex]]; !ok {
-			// otherwise just invert the current value
-			m.checked[options[m.selectedIndex]] = true
-		} else {
-			// otherwise just invert the current value
-			m.checked[options[m.selectedIndex]] = !old
+		if m.selectedIndex < len(options) {
+			if old, ok := m.checked[options[m.selectedIndex]]; !ok {
+				// otherwise just invert the current value
+				m.checked[options[m.selectedIndex]] = true
+			} else {
+				// otherwise just invert the current value
+				m.checked[options[m.selectedIndex]] = !old
+			}
 		}
 		// only show the help message if we have one to show
 	} else if key == core.HelpInputRune && m.Help != "" {
@@ -113,6 +116,9 @@ func (m *MultiSelect) OnChange(line []rune, pos int, key rune) (newLine []rune, 
 	if oldFilter != m.filter {
 		// filter changed
 		options = m.filterOptions()
+		if len(options) > 0 && len(options) <= m.selectedIndex {
+			m.selectedIndex = len(options) - 1
+		}
 	}
 	// paginate the options
 
@@ -137,17 +143,20 @@ func (m *MultiSelect) OnChange(line []rune, pos int, key rune) (newLine []rune, 
 }
 
 func (m *MultiSelect) filterOptions() []string {
-	if m.filter == "" {
+	filter := strings.ToLower(m.filter)
+	if filter == "" {
 		return m.Options
 	}
 	answer := []string{}
 	for _, o := range m.Options {
-		if strings.Contains(o, m.filter) {
+		if strings.Contains(strings.ToLower(o), filter) {
 			answer = append(answer, o)
 		}
 	}
 	return answer
 }
+
+
 
 func (m *MultiSelect) Prompt() (interface{}, error) {
 	// compute the default state
