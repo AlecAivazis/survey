@@ -99,14 +99,21 @@ func (m *MultiSelect) OnChange(line []rune, pos int, key rune) (newLine []rune, 
 		// only show the help message if we have one to show
 	} else if key == core.HelpInputRune && m.Help != "" {
 		m.showingHelp = true
+	} else if key == terminal.KeyEscape {
+		if m.filter != "" {
+			m.filter = ""
+		} else {
+			m.VimMode = !m.VimMode
+		}
 	} else if key == terminal.KeyDeleteWord || key == terminal.KeyDeleteLine {
 		m.filter = ""
 	} else if key == terminal.KeyDelete || key == terminal.KeyBackspace {
 		if m.filter != "" {
 			m.filter = m.filter[0:len(m.filter)-1]
 		}
-	} else {
+	} else if key >= terminal.KeySpace {
 		m.filter += string(key)
+		m.VimMode = false
 	}
 
 	m.FilterMessage = ""
