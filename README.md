@@ -139,7 +139,8 @@ prompt := &survey.Select{
 survey.AskOne(prompt, &color, nil)
 ```
 
-The user can cycle through the options with the j and k keys to do down and up respectively.
+The user can filter for options by typing while the prompt is active. The user can also press `esc` to toggle 
+the ability cycle through the options with the j and k keys to do down and up respectively.
 
 By default, the select prompt is limited to showing 7 options at a time
 and will paginate lists of options longer than that. To increase, you can either
@@ -162,7 +163,8 @@ prompt := &survey.MultiSelect{
 survey.AskOne(prompt, &days, nil)
 ```
 
-The user can cycle through the options with the j and k keys to do down and up, respectively.
+The user can filter for options by typing while the prompt is active. The user can also press `esc` to toggle 
+the ability cycle through the options with the j and k keys to do down and up respectively.
 
 By default, the MultiSelect prompt is limited to showing 7 options at a time
 and will paginate lists of options longer than that. To increase, you can either
