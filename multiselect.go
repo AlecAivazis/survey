@@ -100,11 +100,7 @@ func (m *MultiSelect) OnChange(line []rune, pos int, key rune) (newLine []rune, 
 	} else if key == core.HelpInputRune && m.Help != "" {
 		m.showingHelp = true
 	} else if key == terminal.KeyEscape {
-		if m.filter != "" {
-			m.filter = ""
-		} else {
-			m.VimMode = !m.VimMode
-		}
+		m.VimMode = !m.VimMode
 	} else if key == terminal.KeyDeleteWord || key == terminal.KeyDeleteLine {
 		m.filter = ""
 	} else if key == terminal.KeyDelete || key == terminal.KeyBackspace {

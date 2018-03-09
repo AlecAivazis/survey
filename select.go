@@ -97,11 +97,7 @@ func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPo
 	} else if key == core.HelpInputRune && s.Help != "" {
 		s.showingHelp = true
 	} else if key == terminal.KeyEscape {
-		if s.filter != "" {
-			s.filter = ""
-		} else {
-			s.VimMode = !s.VimMode
-		}
+		s.VimMode = !s.VimMode
 	} else if key == terminal.KeyDeleteWord || key == terminal.KeyDeleteLine {
 		s.filter = ""
 	} else if key == terminal.KeyDelete || key == terminal.KeyBackspace {
