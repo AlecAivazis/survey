@@ -51,7 +51,7 @@ var SelectQuestionTemplate = `
 {{- color "default+hb"}}{{ .Message }}{{ .FilterMessage }}{{color "reset"}}
 {{- if .ShowAnswer}}{{color "cyan"}} {{.Answer}}{{color "reset"}}{{"\n"}}
 {{- else}}
-  {{- if and .Help (not .ShowHelp)}} {{color "cyan"}}[{{ HelpInputRune }} for help]{{color "reset"}}{{end}}
+  {{- "  "}}{{- color "cyan"}}[Use arrows to move, type to filter{{- if and .Help (not .ShowHelp)}}, {{ HelpInputRune }} for more help{{end}}]{{color "reset"}}
   {{- "\n"}}
   {{- range $ix, $choice := .PageEntries}}
     {{- if eq $ix $.SelectedIndex}}{{color "cyan+b"}}{{ SelectFocusIcon }} {{else}}{{color "default+hb"}}  {{end}}
@@ -102,7 +102,7 @@ func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPo
 		s.filter = ""
 	} else if key == terminal.KeyDelete || key == terminal.KeyBackspace {
 		if s.filter != "" {
-			s.filter = s.filter[0:len(s.filter)-1]
+			s.filter = s.filter[0 : len(s.filter)-1]
 		}
 	} else if key >= terminal.KeySpace {
 		s.filter += string(key)

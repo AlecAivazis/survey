@@ -52,7 +52,7 @@ var MultiSelectQuestionTemplate = `
 {{- color "default+hb"}}{{ .Message }}{{ .FilterMessage }}{{color "reset"}}
 {{- if .ShowAnswer}}{{color "cyan"}} {{.Answer}}{{color "reset"}}{{"\n"}}
 {{- else }}
-  {{- if and .Help (not .ShowHelp)}} {{color "cyan"}}[{{ HelpInputRune }} for help]{{color "reset"}}{{end}}
+	{{- "  "}}{{- color "cyan"}}[Use arrows to move, type to filter{{- if and .Help (not .ShowHelp)}}, {{ HelpInputRune }} for more help{{end}}]{{color "reset"}}
   {{- "\n"}}
   {{- range $ix, $option := .PageEntries}}
     {{- if eq $ix $.SelectedIndex}}{{color "cyan"}}{{ SelectFocusIcon }}{{color "reset"}}{{else}} {{end}}
@@ -105,7 +105,7 @@ func (m *MultiSelect) OnChange(line []rune, pos int, key rune) (newLine []rune, 
 		m.filter = ""
 	} else if key == terminal.KeyDelete || key == terminal.KeyBackspace {
 		if m.filter != "" {
-			m.filter = m.filter[0:len(m.filter)-1]
+			m.filter = m.filter[0 : len(m.filter)-1]
 		}
 	} else if key >= terminal.KeySpace {
 		m.filter += string(key)
@@ -158,8 +158,6 @@ func (m *MultiSelect) filterOptions() []string {
 	}
 	return answer
 }
-
-
 
 func (m *MultiSelect) Prompt() (interface{}, error) {
 	// compute the default state
