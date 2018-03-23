@@ -18,10 +18,10 @@ var simpleQs = []*survey.Question{
 	},
 	{
 		Name: "color",
-		Prompt: &survey.Select{
-			Message: "Choose a color:",
-			Options: []string{"red", "blue", "green"},
-		},
+		Prompt: survey.NewSingleSelect().SetMessage("select1:").
+			AddOption("red", nil, false).
+			AddOption("blue", nil, false).
+			AddOption("green", nil, false),
 		Validate: survey.Required,
 	},
 }
@@ -29,7 +29,7 @@ var simpleQs = []*survey.Question{
 func main() {
 	answers := struct {
 		Name  string
-		Color string
+		Color *survey.Option
 	}{}
 
 	// ask the question

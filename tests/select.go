@@ -5,65 +5,75 @@ import (
 	"gopkg.in/AlecAivazis/survey.v1/tests/util"
 )
 
-var answer = ""
+var answer = &survey.Option{}
 
 var goodTable = []TestUtil.TestTableEntry{
 	{
-		"standard", &survey.Select{
-			Message: "Choose a color:",
-			Options: []string{"red", "blue", "green"},
-		}, &answer,
+		"standard",
+		survey.NewSingleSelect().SetMessage("Choose a color:").
+			AddOption("red", nil, false).
+			AddOption("blue", nil, false).
+			AddOption("green", nil, false),
+		&answer,
 	},
 	{
-		"short", &survey.Select{
-			Message: "Choose a color:",
-			Options: []string{"red", "blue"},
-		}, &answer,
+		"short",
+		survey.NewSingleSelect().SetMessage("Choose a color:").
+			AddOption("red", nil, false).
+			AddOption("blue", nil, false),
+		&answer,
 	},
 	{
-		"default", &survey.Select{
-			Message: "Choose a color (should default blue):",
-			Options: []string{"red", "blue", "green"},
-			Default: "blue",
-		}, &answer,
+		"default",
+		survey.NewSingleSelect().SetMessage("Choose a color:").
+			AddOption("red", nil, false).
+			AddOption("blue", nil, true).
+			AddOption("green", nil, false),
+		&answer,
 	},
 	{
-		"one", &survey.Select{
-			Message: "Choose one:",
-			Options: []string{"hello"},
-		}, &answer,
+		"one",
+		survey.NewSingleSelect().SetMessage("Choose one:").
+			AddOption("hello", nil, false),
+		&answer,
 	},
 	{
-		"no help, type ?", &survey.Select{
-			Message: "Choose a color:",
-			Options: []string{"red", "blue"},
-		}, &answer,
+		"no help, type ?",
+		survey.NewSingleSelect().SetMessage("Choose a color:").
+			AddOption("red", nil, false).
+			AddOption("blue", nil, false),
+		&answer,
 	},
 	{
-		"passes through bottom", &survey.Select{
-			Message: "Choose one:",
-			Options: []string{"red", "blue"},
-		}, &answer,
+		"passes through bottom",
+		survey.NewSingleSelect().SetMessage("Choose a color:").
+			AddOption("red", nil, false).
+			AddOption("blue", nil, false),
+		&answer,
 	},
 	{
-		"passes through top", &survey.Select{
-			Message: "Choose one:",
-			Options: []string{"red", "blue"},
-		}, &answer,
+		"passes through top",
+		survey.NewSingleSelect().SetMessage("Choose a color:").
+			AddOption("red", nil, false).
+			AddOption("blue", nil, false),
+		&answer,
 	},
 	{
-		"can navigate with j/k", &survey.Select{
-			Message: "Choose one:",
-			Options: []string{"red", "blue", "green"},
-		}, &answer,
+		"can navigate with j/k",
+		survey.NewSingleSelect().SetMessage("Choose a color:").
+			AddOption("red", nil, false).
+			AddOption("blue", nil, false).
+			AddOption("green", nil, false).
+			SetVimMode(true),
+		&answer,
 	},
 }
 
 var badTable = []TestUtil.TestTableEntry{
 	{
-		"no options", &survey.Select{
-			Message: "Choose one:",
-		}, &answer,
+		"no options",
+		survey.NewSingleSelect().SetMessage("Choose one:"),
+		&answer,
 	},
 }
 

@@ -8,47 +8,51 @@ import (
 var (
 	confirmAns     = false
 	inputAns       = ""
-	multiselectAns = []string{}
-	selectAns      = ""
+	multiselectAns = make(survey.Options, 0)
+	selectAns      = &survey.Option{}
 	passwordAns    = ""
+	goodTable = []TestUtil.TestTableEntry{
+		{
+			"confirm", &survey.Confirm{
+				Message: "Is it raining?",
+				Help:    "Go outside, if your head becomes wet the answer is probably 'yes'",
+			}, &confirmAns,
+		},
+		{
+			"input", &survey.Input{
+				Message: "What is your phone number:",
+				Help:    "Phone number should include the area code, parentheses optional",
+			}, &inputAns,
+		},
+		{
+			"multi-select",
+			survey.NewMultiSelect().SetMessage("What days are you available:").
+				SetHelp("We are closed weekends and avaibility is limited on Wednesday").
+				AddOption("Monday", nil, true).
+				AddOption("Tuesday", nil, true).
+				AddOption("Wednesday", nil, false).
+				AddOption("Thursday", nil, true).
+				AddOption("Friday", nil, true),
+			&multiselectAns,
+		},
+		{
+			"select",
+			survey.NewSingleSelect().SetMessage("Choose a color:").
+				SetHelp("Blue is the best color, but it is your choice").
+				AddOption("red", nil, false).
+				AddOption("blue", nil, true).
+				AddOption("green", nil, false),
+			&selectAns,
+		},
+		{
+			"password", &survey.Password{
+				Message: "Enter a secret:",
+				Help:    "Don't really enter a secret, this is just for testing",
+			}, &passwordAns,
+		},
+	}
 )
 
-var goodTable = []TestUtil.TestTableEntry{
-	{
-		"confirm", &survey.Confirm{
-			Message: "Is it raining?",
-			Help:    "Go outside, if your head becomes wet the answer is probably 'yes'",
-		}, &confirmAns,
-	},
-	{
-		"input", &survey.Input{
-			Message: "What is your phone number:",
-			Help:    "Phone number should include the area code, parentheses optional",
-		}, &inputAns,
-	},
-	{
-		"select", &survey.MultiSelect{
-			Message: "What days are you available:",
-			Help:    "We are closed weekends and avaibility is limited on Wednesday",
-			Options: []string{"Monday", "Tuesday", "Wednesday", "Thursday", "Friday"},
-			Default: []string{"Monday", "Tuesday", "Thursday", "Friday"},
-		}, &multiselectAns,
-	},
-	{
-		"select", &survey.Select{
-			Message: "Choose a color:",
-			Help:    "Blue is the best color, but it is your choice",
-			Options: []string{"red", "blue", "green"},
-			Default: "blue",
-		}, &selectAns,
-	},
-	{
-		"password", &survey.Password{
-			Message: "Enter a secret:",
-			Help:    "Don't really enter a secret, this is just for testing",
-		}, &passwordAns,
-	},
-}
 
 func main() {
 	TestUtil.RunTable(goodTable)
