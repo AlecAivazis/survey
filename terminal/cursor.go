@@ -60,6 +60,16 @@ func CursorHide() {
 func CursorMove(x int, y int) {
 	fmt.Printf("\x1b[%d;%df", x, y)
 }
+// CursorSave saves the current position
+func CursorSave() {
+	fmt.Print("\x1b7")
+}
+
+// CursorSave restores the current position of the cursor
+func CursorRestore() {
+	fmt.Print("\x1b8")
+}
+
 
 // CursorLocation returns the current location of the cursor in the terminal
 func CursorLocation() (*Coord, error) {
@@ -101,6 +111,14 @@ func CursorLocation() (*Coord, error) {
 
 	// it didn't work so return an error
 	return nil, fmt.Errorf("could not compute the cursor position using ascii escape sequences")
+}
+
+func (cur Coord) CursorIsAtLineEnd(size *Coord) bool{
+	return cur.X == size.X
+}
+
+func (cur Coord) CursorIsAtLineBegin() bool{
+	return cur.X == 1
 }
 
 // Size returns the height and width of the terminal.
