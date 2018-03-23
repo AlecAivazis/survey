@@ -11,11 +11,15 @@ import (
 MultiSelect is a prompt that presents a list of various options to the user
 for them to select using the arrow keys and enter. Response type is a slice of strings.
 
-	days := []string{}
-	prompt := &survey.MultiSelect{
-		Message: "What days do you prefer:",
-		Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
-	}
+	days := make(survey.Options, 0)
+	prompt := survey.NewMultiSelect().SetMessage("What days do you prefer:").
+			AddOption("Sunday", nil, false).
+			AddOption("Monday", nil, false).
+			AddOption("Tuesday", nil, false).
+			AddOption("Wednesday", nil, false).
+			AddOption("Thursday", nil, false).
+			AddOption("Friday", nil, false).
+			AddOption("Saturday", nil, false)
 	survey.AskOne(prompt, &days, nil)
 */
 type MultiSelect struct {
@@ -38,12 +42,16 @@ func NewMultiSelect() *MultiSelect {
 AddOption is a method to add an option to the selection and specify if it is the default value ot not
 This returns a Selection interface to allow chaining of these method calls
 
-	color := &survey.Option{}
-	prompt := survey.NewSingleSelect().SetMessage("Select Color:").
-			AddOption("red", nil, false).
-			AddOption("blue", nil, false).
-			AddOption("green", nil, false)
-	survey.AskOne(prompt, &color, nil)
+	days := make(survey.Options, 0)
+	prompt := survey.NewMultiSelect().SetMessage("What days do you prefer:").
+			AddOption("Sunday", nil, false).
+			AddOption("Monday", nil, false).
+			AddOption("Tuesday", nil, false).
+			AddOption("Wednesday", nil, false).
+			AddOption("Thursday", nil, false).
+			AddOption("Friday", nil, false).
+			AddOption("Saturday", nil, false)
+	survey.AskOne(prompt, &days, nil)
  */
 func (s *MultiSelect) AddOption(display string, value interface{}, defaultOption bool) Selection {
 	if value == nil {

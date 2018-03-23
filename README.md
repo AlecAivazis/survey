@@ -25,11 +25,10 @@ var qs = []*survey.Question{
     },
     {
         Name: "color",
-        Prompt: &survey.Select{
-            Message: "Choose a color:",
-            Options: []string{"red", "blue", "green"},
-            Default: "red",
-        },
+        Prompt: survey.NewSingleSelect().SetMessage("Choose a Color:").
+            AddOption("red", nil, true).
+            AddOption("blue", nil, false).
+            AddOption("green", nil, false),
     },
     {
         Name: "age",
@@ -41,7 +40,7 @@ func main() {
     // the answers will be written to this struct
     answers := struct {
         Name          string                  // survey will match the question and field names
-        FavoriteColor string `survey:"color"` // or you can tag fields to match a specific name
+        FavoriteColor *survey.Option `survey:"color"` // or you can tag fields to match a specific name
         Age           int                     // if the types don't match exactly, survey will try to convert for you
     }{}
 
@@ -126,28 +125,48 @@ prompt := &survey.Confirm{
 survey.AskOne(prompt, &name, nil)
 ```
 
-### Select
-
-<img src="https://media.giphy.com/media/3oKIPxigmMu5YqpUPK/giphy.gif" width="400px"/>
+### Selection
+All of the selection prompts have a `SetHelp` field which can be defined to provide more information to your users:
 
 ```golang
-color := ""
-prompt := &survey.Select{
-    Message: "Choose a color:",
-    Options: []string{"red", "blue", "green"},
-}
-survey.AskOne(prompt, &color, nil)
+prompt.SetHelp("This is the help message shown")
 ```
 
-The user can filter for options by typing while the prompt is active. The user can also press `esc` to toggle 
-the ability cycle through the options with the j and k keys to do down and up respectively.
+The user can filter for options by typing while the prompt is active, and you can display a custom help message while filtering.
+```golang
+prompt.SetFilterMessage("You are now filtering the list")
+```
 
-By default, the select prompt is limited to showing 7 options at a time
+The user can also press `esc` to toggle the ability cycle through the options with the j and k keys to do down and up respectively.
+Or you can enable it in code.
+```golang
+prompt.SetVimMode(true)
+```
+
+By default, the Selection prompt is limited to showing 7 options at a time
 and will paginate lists of options longer than that. To increase, you can either
 change the global `survey.PageSize`, or set the `PageSize` field on the prompt:
 
 ```golang
-prompt := &survey.Select{..., PageSize: 10}
+prompt.SetPageSize(10)
+```
+
+#### Select
+
+<img src="https://media.giphy.com/media/3oKIPxigmMu5YqpUPK/giphy.gif" width="400px"/>
+
+```golang
+type colorDetail struct {
+	Name string
+	Hex string
+	WikiLink string
+}
+color := &survey.Option{}
+prompt := survey.NewSingleSelect().SetMessage("Select Color:").
+			AddOption("red", &colorDetail{"Red", "FF0000", "https://en.wikipedia.org/wiki/Red"}, false).
+			AddOption("blue", &colorDetail{"Blue", "0000FF", "https://en.wikipedia.org/wiki/Blue"}, false).
+			AddOption("green", &colorDetail{"Green", "00FF00", "https://en.wikipedia.org/wiki/Green"}, true),
+survey.AskOne(prompt, &color, nil)
 ```
 
 ### MultiSelect
@@ -155,23 +174,16 @@ prompt := &survey.Select{..., PageSize: 10}
 <img src="https://media.giphy.com/media/3oKIP8lHYFtGeQDH0c/giphy.gif" width="400px"/>
 
 ```golang
-days := []string{}
-prompt := &survey.MultiSelect{
-    Message: "What days do you prefer:",
-    Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
-}
+days := make(survey.Options, 0)
+prompt := survey.NewMultiSelect().SetMessage("What days do you prefer:").
+        AddOption("Sunday", nil, true).
+        AddOption("Monday", nil, false).
+        AddOption("Tuesday", nil, false).
+        AddOption("Wednesday", nil, false).
+        AddOption("Thursday", nil, false).
+        AddOption("Friday", nil, true).
+        AddOption("Saturday", nil, true)
 survey.AskOne(prompt, &days, nil)
-```
-
-The user can filter for options by typing while the prompt is active. The user can also press `esc` to toggle 
-the ability cycle through the options with the j and k keys to do down and up respectively.
-
-By default, the MultiSelect prompt is limited to showing 7 options at a time
-and will paginate lists of options longer than that. To increase, you can either
-change the global `survey.PageSize`, or set the `PageSize` field on the prompt:
-
-```golang
-prompt := &survey.MultiSelect{..., PageSize: 10}
 ```
 
 ### Editor

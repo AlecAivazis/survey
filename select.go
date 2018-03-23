@@ -48,7 +48,7 @@ AddOption is a method to add an option to the selection and specify if it is the
 This returns a Selection interface to allow chaining of these method calls
 
 	color := &survey.Option{}
-	prompt := survey.NewSingleSelect().SetMessage("Select Color:").
+	prompt := survey.NewSingleSelect().SetMessage("Choose a Color:").
 			AddOption("red", nil, false).
 			AddOption("blue", nil, false).
 			AddOption("green", nil, false)
