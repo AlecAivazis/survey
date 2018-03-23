@@ -6,6 +6,7 @@ import (
 	"math"
 	"strings"
 	"os"
+	"errors"
 )
 
 /*

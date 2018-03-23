@@ -156,17 +156,88 @@ prompt.SetPageSize(10)
 <img src="https://media.giphy.com/media/3oKIPxigmMu5YqpUPK/giphy.gif" width="400px"/>
 
 ```golang
-type colorDetail struct {
-	Name string
-	Hex string
-	WikiLink string
-}
 color := &survey.Option{}
 prompt := survey.NewSingleSelect().SetMessage("Select Color:").
-			AddOption("red", &colorDetail{"Red", "FF0000", "https://en.wikipedia.org/wiki/Red"}, false).
-			AddOption("blue", &colorDetail{"Blue", "0000FF", "https://en.wikipedia.org/wiki/Blue"}, false).
-			AddOption("green", &colorDetail{"Green", "00FF00", "https://en.wikipedia.org/wiki/Green"}, true),
+			AddOption("red", nil, false).
+			AddOption("blue", nil, false).
+			AddOption("green", nil, true),
 survey.AskOne(prompt, &color, nil)
+```
+
+A more complex example that uses the interface Value for the Options
+```golang
+
+type user struct {
+	ID int `json:"id"`
+	Name string `json:"name"`
+	Username string `json:"username"`
+	Email string `json:"email"`
+	Address *address `json:"address"`
+}
+
+type address struct {
+	Street string `json:"street"`
+	Suite string `json:"suite"`
+	City string `json:"city"`
+	Zip string `json:"zipcode"`
+}
+type users = []*user
+
+// the questions to ask
+var userPrompt = survey.NewSingleSelect().SetMessage("Select User:")
+var simpleQs = []*survey.Question{
+	{
+		Name: "user",
+		Prompt: userPrompt,
+		Validate: survey.Required,
+	},
+}
+
+func init() {
+	var (
+		userData []byte
+		request *http.Request
+		response *http.Response
+		err error
+	)
+	httpClient := &http.Client{Timeout: 5*time.Second}
+	if request, err = http.NewRequest("GET", "https://jsonplaceholder.typicode.com/users", nil); err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+	if response, err = httpClient.Do(request); err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+	defer response.Body.Close()
+	userData, err = ioutil.ReadAll(response.Body)
+	var us users
+	if err = json.Unmarshal(userData, &us); err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+
+	for _, _user := range us {
+		userPrompt.AddOption(_user.Username, _user, false)
+	}
+
+}
+func main() {
+	answers := struct {
+		User *survey.Option
+	}{}
+
+	// ask the question
+	err := survey.Ask(simpleQs, &answers)
+
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+	_user := answers.User.Value.(*user)
+	// Do something with the user that was selected
+	...
+}
 ```
 
 ### MultiSelect
