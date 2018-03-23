@@ -17,22 +17,21 @@ var simpleQs = []*survey.Question{
 	},
 	{
 		Name: "color",
-		Prompt: &survey.Select{
-			Message: "Choose a color:",
-			Options: []string{"red", "blue", "green", "yellow"},
-			Default: "yellow",
-		},
+		Prompt: survey.NewSingleSelect().SetMessage("Choose a color:").
+			AddOption("red", nil, false).
+			AddOption("blue", nil, false).
+			AddOption("green", nil, false).
+			AddOption("yellow", nil, true),
 		Validate: survey.Required,
 	},
 }
-
 func main() {
 
 	fmt.Println("Asking many.")
 	// a place to store the answers
 	ans := struct {
 		Name  string
-		Color string
+		Color *survey.Option
 	}{}
 	err := survey.Ask(simpleQs, &ans)
 	if err != nil {

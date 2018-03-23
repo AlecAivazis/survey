@@ -10,28 +10,25 @@ import (
 var simpleQs = []*survey.Question{
 	{
 		Name: "letter",
-		Prompt: &survey.Select{
-			Message: "Choose a letter:",
-			Options: []string{
-				"a",
-				"b",
-				"c",
-				"d",
-				"e",
-				"f",
-				"g",
-				"h",
-				"i",
-				"j",
-			},
-		},
+		Prompt: survey.NewSingleSelect().
+			SetMessage("Choose a letter:").
+			AddOption("a", nil, false).
+			AddOption("b", nil, false).
+			AddOption("c", nil, false).
+			AddOption("d", nil, false).
+			AddOption("e", nil, false).
+			AddOption("f", nil, false).
+			AddOption("g", nil, false).
+			AddOption("h", nil, false).
+			AddOption("i", nil, false).
+			AddOption("j", nil, false),
 		Validate: survey.Required,
 	},
 }
 
 func main() {
 	answers := struct {
-		Letter string
+		Letter *survey.Option
 	}{}
 
 	// ask the question

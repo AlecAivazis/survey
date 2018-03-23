@@ -3,8 +3,6 @@ package survey
 import (
 	"errors"
 	"os"
-	"strings"
-
 	"gopkg.in/AlecAivazis/survey.v1/core"
 	"gopkg.in/AlecAivazis/survey.v1/terminal"
 )
@@ -21,45 +19,86 @@ for them to select using the arrow keys and enter. Response type is a slice of s
 	survey.AskOne(prompt, &days, nil)
 */
 type MultiSelect struct {
-	core.Renderer
-	Message       string
-	Options       []string
-	Default       []string
-	Help          string
-	PageSize      int
-	VimMode       bool
+	*Select
+	Default       Options
 	FilterMessage string
-	filter        string
-	selectedIndex int
 	checked       map[string]bool
-	showingHelp   bool
 }
+
+func NewMultiSelect() *MultiSelect {
+	return &MultiSelect{
+		Select: NewSingleSelect(),
+		Default: make(Options, 0),
+	}
+}
+
+func (s *MultiSelect) AddOption(display string, value interface{}, defaultOption bool) Selection {
+	if value == nil {
+		value = display
+	}
+	opt := createOption(display, value)
+	s.Options = append(s.Options, opt)
+	if defaultOption {
+		s.Default = append(s.Default, opt)
+	}
+	return s
+}
+
+func (s *MultiSelect) SetMessage(msg string) Selection {
+	s.Message = msg
+	return s
+}
+
+func (s *MultiSelect) SetHelp(help string) Selection {
+	s.Help = help
+	return s
+}
+
+func (s *MultiSelect) SetFilterMessage(msg string) Selection {
+	s.FilterMessage = msg
+	return s
+}
+
+func (s *MultiSelect) SetVimMode(vimMode bool) Selection {
+	s.VimMode = vimMode
+	return s
+}
+
+func (s *MultiSelect) SetPageSize(pageSize int) Selection {
+	s.PageSize = pageSize
+	return s
+}
+
 
 // data available to the templates when processing
 type MultiSelectTemplateData struct {
 	MultiSelect
-	Answer        string
+	Answer        Options
 	ShowAnswer    bool
 	Checked       map[string]bool
 	SelectedIndex int
 	ShowHelp      bool
-	PageEntries   []string
+	PageEntries   Options
 }
 
 var MultiSelectQuestionTemplate = `
 {{- if .ShowHelp }}{{- color "cyan"}}{{ HelpIcon }} {{ .Help }}{{color "reset"}}{{"\n"}}{{end}}
 {{- color "green+hb"}}{{ QuestionIcon }} {{color "reset"}}
 {{- color "default+hb"}}{{ .Message }}{{ .FilterMessage }}{{color "reset"}}
-{{- if .ShowAnswer}}{{color "cyan"}} {{.Answer}}{{color "reset"}}{{"\n"}}
+{{- if .ShowAnswer}} {{color "cyan"}} 
+	{{- range $ix, $answer := .Answer}}
+		{{- if ne $ix 0 }}{{- ", "}}{{- end}}
+		{{- $answer.Display }}
+	{{- end}}{{- color "reset"}}{{- "\n"}}
 {{- else }}
-	{{- "  "}}{{- color "cyan"}}[Use arrows to move, type to filter{{- if and .Help (not .ShowHelp)}}, {{ HelpInputRune }} for more help{{end}}]{{color "reset"}}
-  {{- "\n"}}
-  {{- range $ix, $option := .PageEntries}}
-    {{- if eq $ix $.SelectedIndex}}{{color "cyan"}}{{ SelectFocusIcon }}{{color "reset"}}{{else}} {{end}}
-    {{- if index $.Checked $option}}{{color "green"}} {{ MarkedOptionIcon }} {{else}}{{color "default+hb"}} {{ UnmarkedOptionIcon }} {{end}}
-    {{- color "reset"}}
-    {{- " "}}{{$option}}{{"\n"}}
-  {{- end}}
+  	{{- "  "}}{{- color "cyan"}}[Use arrows to move, type to filter{{- if and .Help (not .ShowHelp)}}, {{ HelpInputRune }} for more help{{end}}]{{color "reset"}}
+  	{{- "\n"}}
+  	{{- range $ix, $option := .PageEntries}}
+    	{{- if eq $ix $.SelectedIndex}}{{color "cyan"}}{{ SelectFocusIcon }}{{color "reset"}}{{else}} {{end}}
+    	{{- if index $.Checked $option.Display}}{{color "green"}} {{ MarkedOptionIcon }} {{else}}{{color "default+hb"}} {{ UnmarkedOptionIcon }} {{end}}
+    	{{- color "reset"}}
+    	{{- " "}}{{$option.Display}}{{"\n"}}
+  	{{- end}}
 {{- end}}`
 
 // OnChange is called on every keypress.
@@ -88,12 +127,12 @@ func (m *MultiSelect) OnChange(line []rune, pos int, key rune) (newLine []rune, 
 		// if the user pressed down and there is room to move
 	} else if key == terminal.KeySpace {
 		if m.selectedIndex < len(options) {
-			if old, ok := m.checked[options[m.selectedIndex]]; !ok {
+			if old, ok := m.checked[options[m.selectedIndex].Display]; !ok {
 				// otherwise just invert the current value
-				m.checked[options[m.selectedIndex]] = true
+				m.checked[options[m.selectedIndex].Display] = true
 			} else {
 				// otherwise just invert the current value
-				m.checked[options[m.selectedIndex]] = !old
+				m.checked[options[m.selectedIndex].Display] = !old
 			}
 		}
 		// only show the help message if we have one to show
@@ -127,7 +166,7 @@ func (m *MultiSelect) OnChange(line []rune, pos int, key rune) (newLine []rune, 
 
 	// TODO if we have started filtering and were looking at the end of a list
 	// and we have modified the filter then we should move the page back!
-	opts, idx := paginate(m.PageSize, options, m.selectedIndex)
+	opts, idx := m.Paginate(options)
 
 	// render the options
 	m.Render(
@@ -145,20 +184,6 @@ func (m *MultiSelect) OnChange(line []rune, pos int, key rune) (newLine []rune, 
 	return line, 0, true
 }
 
-func (m *MultiSelect) filterOptions() []string {
-	filter := strings.ToLower(m.filter)
-	if filter == "" {
-		return m.Options
-	}
-	answer := []string{}
-	for _, o := range m.Options {
-		if strings.Contains(strings.ToLower(o), filter) {
-			answer = append(answer, o)
-		}
-	}
-	return answer
-}
-
 func (m *MultiSelect) Prompt() (interface{}, error) {
 	// compute the default state
 	m.checked = make(map[string]bool)
@@ -169,7 +194,7 @@ func (m *MultiSelect) Prompt() (interface{}, error) {
 				// if the option correponds to the default
 				if opt == dflt {
 					// we found our initial value
-					m.checked[opt] = true
+					m.checked[opt.Display] = true
 					// stop looking
 					break
 				}
@@ -184,7 +209,7 @@ func (m *MultiSelect) Prompt() (interface{}, error) {
 	}
 
 	// paginate the options
-	opts, idx := paginate(m.PageSize, m.Options, m.selectedIndex)
+	opts, idx := m.Paginate(m.Options)
 
 	// hide the cursor
 	terminal.CursorHide()
@@ -227,9 +252,9 @@ func (m *MultiSelect) Prompt() (interface{}, error) {
 	m.filter = ""
 	m.FilterMessage = ""
 
-	answers := []string{}
+	answers := make(Options, 0)
 	for _, option := range m.Options {
-		if val, ok := m.checked[option]; ok && val {
+		if val, ok := m.checked[option.Display]; ok && val {
 			answers = append(answers, option)
 		}
 	}
@@ -246,7 +271,7 @@ func (m *MultiSelect) Cleanup(val interface{}) error {
 			MultiSelect:   *m,
 			SelectedIndex: m.selectedIndex,
 			Checked:       m.checked,
-			Answer:        strings.Join(val.([]string), ", "),
+			Answer:        val.(Options),
 			ShowAnswer:    true,
 		},
 	)

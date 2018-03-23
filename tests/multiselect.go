@@ -5,42 +5,55 @@ import (
 	"gopkg.in/AlecAivazis/survey.v1/tests/util"
 )
 
-var answer = []string{}
-
 var table = []TestUtil.TestTableEntry{
 	{
-		"standard", &survey.MultiSelect{
-			Message: "What days do you prefer:",
-			Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
-		}, &answer,
+		"standard",
+		survey.NewMultiSelect().SetMessage("What days do you prefer:").
+			AddOption("Sunday", nil, false).
+			AddOption("Monday", nil, false).
+			AddOption("Tuesday", nil, false).
+			AddOption("Wednesday", nil, false).
+			AddOption("Thursday", nil, false).
+			AddOption("Friday", nil, false).
+			AddOption("Saturday", nil, false),
+		&survey.Options{},
 	},
 	{
-		"default (sunday, tuesday)", &survey.MultiSelect{
-			Message: "What days do you prefer:",
-			Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
-			Default: []string{"Sunday", "Tuesday"},
-		}, &answer,
+		"default (sunday, tuesday)",
+		survey.NewMultiSelect().SetMessage("What days do you prefer:").
+			AddOption("Sunday", nil, true).
+			AddOption("Monday", nil, false).
+			AddOption("Tuesday", nil, true).
+			AddOption("Wednesday", nil, false).
+			AddOption("Thursday", nil, false).
+			AddOption("Friday", nil, false).
+			AddOption("Saturday", nil, false),
+		&survey.Options{},
 	},
 	{
-		"default not found", &survey.MultiSelect{
-			Message: "What days do you prefer:",
-			Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
-			Default: []string{"Sundayaa"},
-		}, &answer,
+		"no help - type ?",
+		survey.NewMultiSelect().SetMessage("What days do you prefer:").
+			AddOption("Sunday", nil, false).
+			AddOption("Monday", nil, false).
+			AddOption("Tuesday", nil, false).
+			AddOption("Wednesday", nil, false).
+			AddOption("Thursday", nil, false).
+			AddOption("Friday", nil, false).
+			AddOption("Saturday", nil, false),
+		&survey.Options{},
 	},
 	{
-		"no help - type ?", &survey.MultiSelect{
-			Message: "What days do you prefer:",
-			Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
-			Default: []string{"Sundayaa"},
-		}, &answer,
-	},
-	{
-		"can navigate with j/k", &survey.MultiSelect{
-			Message: "What days do you prefer:",
-			Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
-			Default: []string{"Sundayaa"},
-		}, &answer,
+		"can navigate with j/k",
+		survey.NewMultiSelect().SetMessage("What days do you prefer:").
+			AddOption("Sunday", nil, false).
+			AddOption("Monday", nil, false).
+			AddOption("Tuesday", nil, false).
+			AddOption("Wednesday", nil, false).
+			AddOption("Thursday", nil, false).
+			AddOption("Friday", nil, false).
+			AddOption("Saturday", nil, false).
+			SetVimMode(true),
+		&survey.Options{},
 	},
 }
 

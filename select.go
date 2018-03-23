@@ -7,6 +7,7 @@ import (
 
 	"gopkg.in/AlecAivazis/survey.v1/core"
 	"gopkg.in/AlecAivazis/survey.v1/terminal"
+	"math"
 )
 
 /*
@@ -20,11 +21,22 @@ for them to select using the arrow keys and enter. Response type is a string.
 	}
 	survey.AskOne(prompt, &color, nil)
 */
+
+func NewSingleSelect() *Select {
+	return &Select{
+		Options: make(Options, 0),
+	}
+}
+
+func createOption(display string, value interface{}) *Option {
+	return &Option{display, value}
+}
+
 type Select struct {
 	core.Renderer
 	Message       string
-	Options       []string
-	Default       string
+	Options       Options
+	Default       *Option
 	Help          string
 	PageSize      int
 	VimMode       bool
@@ -35,12 +47,86 @@ type Select struct {
 	showingHelp   bool
 }
 
+func (s *Select) AddOption(display string, value interface{}, defaultOption bool) Selection {
+	opt := createOption(display, value)
+	s.Options = append(s.Options, opt)
+	if defaultOption {
+		s.Default = opt
+	}
+	return s
+}
+
+func (s *Select) SetMessage(msg string) Selection {
+	s.Message = msg
+	return s
+}
+
+func (s *Select) SetHelp(help string) Selection {
+	s.Help = help
+	return s
+}
+
+func (s *Select) SetFilterMessage(msg string) Selection {
+	s.FilterMessage = msg
+	return s
+}
+
+func (s *Select) SetVimMode(vimMode bool) Selection {
+	s.VimMode = vimMode
+	return s
+}
+
+func (s *Select) SetPageSize(pageSize int) Selection {
+	s.PageSize = pageSize
+	return s
+}
+
+// paginate returns a single page of choices given the page size, the total list of
+// possible choices, and the current selected index in the total list.
+func (s *Select) Paginate(choices Options) (Options, int) {
+	if s.PageSize == 0 {
+		s.PageSize = PageSize
+	}
+
+	var start, end, max, cursor int
+	max = len(choices)
+	if max < s.PageSize {
+		// if we dont have enough options to fill a page
+		start = 0
+		end = max
+		cursor = s.selectedIndex
+	} else if s.selectedIndex < s.PageSize/2 {
+		// if we are in the first half page
+		start = 0
+		end = s.PageSize
+		cursor = s.selectedIndex
+	} else if max-s.selectedIndex-1 < s.PageSize/2 {
+		// if we are in the last half page
+		start = max - s.PageSize
+		end = max
+		cursor = s.selectedIndex - start
+	} else {
+		// somewhere in the middle
+		above := s.PageSize / 2
+		below := s.PageSize - above
+
+		cursor = s.PageSize / 2
+		start = s.selectedIndex - above
+		end = s.selectedIndex + below
+	}
+	end = int(math.Min(float64(end), float64(max)))
+
+	// return the subset we care about and the index
+	return choices[start:end], cursor
+}
+
+
 // the data available to the templates when processing
 type SelectTemplateData struct {
 	Select
-	PageEntries   []string
+	PageEntries   Options
 	SelectedIndex int
-	Answer        string
+	Answer        *Option
 	ShowAnswer    bool
 	ShowHelp      bool
 }
@@ -49,13 +135,13 @@ var SelectQuestionTemplate = `
 {{- if .ShowHelp }}{{- color "cyan"}}{{ HelpIcon }} {{ .Help }}{{color "reset"}}{{"\n"}}{{end}}
 {{- color "green+hb"}}{{ QuestionIcon }} {{color "reset"}}
 {{- color "default+hb"}}{{ .Message }}{{ .FilterMessage }}{{color "reset"}}
-{{- if .ShowAnswer}}{{color "cyan"}} {{.Answer}}{{color "reset"}}{{"\n"}}
+{{- if .ShowAnswer}} {{ color "cyan"}}{{.Answer.Display}}{{color "reset"}}{{"\n"}}
 {{- else}}
   {{- "  "}}{{- color "cyan"}}[Use arrows to move, type to filter{{- if and .Help (not .ShowHelp)}}, {{ HelpInputRune }} for more help{{end}}]{{color "reset"}}
   {{- "\n"}}
   {{- range $ix, $choice := .PageEntries}}
     {{- if eq $ix $.SelectedIndex}}{{color "cyan+b"}}{{ SelectFocusIcon }} {{else}}{{color "default+hb"}}  {{end}}
-    {{- $choice}}
+    {{- $choice.Display }}
     {{- color "reset"}}{{"\n"}}
   {{- end}}
 {{- end}}`
@@ -68,7 +154,7 @@ func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPo
 	// if the user pressed the enter key
 	if key == terminal.KeyEnter {
 		if s.selectedIndex < len(options) {
-			return []rune(options[s.selectedIndex]), 0, true
+			return []rune(options[s.selectedIndex].Display), 0, true
 		}
 		// if the user pressed the up arrow or 'k' to emulate vim
 	} else if key == terminal.KeyArrowUp || (s.VimMode && key == 'k') {
@@ -125,7 +211,7 @@ func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPo
 
 	// TODO if we have started filtering and were looking at the end of a list
 	// and we have modified the filter then we should move the page back!
-	opts, idx := paginate(s.PageSize, options, s.selectedIndex)
+	opts, idx := s.Paginate(options)
 
 	// render the options
 	s.Render(
@@ -142,17 +228,17 @@ func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPo
 	if len(options) <= s.selectedIndex {
 		return []rune{}, 0, false
 	}
-	return []rune(options[s.selectedIndex]), 0, true
+	return []rune(options[s.selectedIndex].Display), 0, true
 }
 
-func (s *Select) filterOptions() []string {
+func (s *Select) filterOptions() Options {
 	filter := strings.ToLower(s.filter)
 	if filter == "" {
 		return s.Options
 	}
-	answer := []string{}
+	answer := make(Options, 0)
 	for _, o := range s.Options {
-		if strings.Contains(strings.ToLower(o), filter) {
+		if strings.Contains(strings.ToLower(o.Display), filter) {
 			answer = append(answer, o)
 		}
 	}
@@ -169,7 +255,7 @@ func (s *Select) Prompt() (interface{}, error) {
 	// start off with the first option selected
 	sel := 0
 	// if there is a default
-	if s.Default != "" {
+	if s.Default != nil {
 		// find the choice
 		for i, opt := range s.Options {
 			// if the option correponds to the default
@@ -185,7 +271,7 @@ func (s *Select) Prompt() (interface{}, error) {
 	s.selectedIndex = sel
 
 	// figure out the options and index to render
-	opts, idx := paginate(s.PageSize, s.Options, sel)
+	opts, idx := s.Paginate(s.Options)
 
 	// ask the question
 	err := s.Render(
@@ -232,11 +318,11 @@ func (s *Select) Prompt() (interface{}, error) {
 	s.filter = ""
 	s.FilterMessage = ""
 
-	var val string
+	var val *Option
 	// if we are supposed to use the default value
 	if s.useDefault || s.selectedIndex >= len(options) {
 		// if there is a default value
-		if s.Default != "" {
+		if s.Default != nil {
 			// use the default value
 			val = s.Default
 		} else if len(options) > 0 {
@@ -245,7 +331,6 @@ func (s *Select) Prompt() (interface{}, error) {
 		}
 		// otherwise the selected index points to the value
 	} else if s.selectedIndex < len(options) {
-		// the
 		val = options[s.selectedIndex]
 	}
 	return val, err
@@ -256,7 +341,7 @@ func (s *Select) Cleanup(val interface{}) error {
 		SelectQuestionTemplate,
 		SelectTemplateData{
 			Select:     *s,
-			Answer:     val.(string),
+			Answer:     val.(*Option),
 			ShowAnswer: true,
 		},
 	)

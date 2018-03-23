@@ -91,7 +91,7 @@ func main() {
 	expect("\x1b[1F\x1b[0G\x1b[2K\x1b[1F\x1b[2K\x1b[1;92m? \x1b[0m\x1b[1;99mWhat is your phone number: \x1b[0m\x1b[36m123-123-1234\x1b[0m\r\n", buf)
 	expect("Answered 123-123-1234.\r\n", buf)
 	expect("---------------------\r\n", buf)
-	expect("select\r\n", buf)
+	expect("multi-select\r\n", buf)
 	expect("\x1b[?25l\x1b[0G\x1b[2K\x1b[1;92m? \x1b[0m\x1b[1;99mWhat days are you available:\x1b[0m \x1b[36m[? for help]\x1b[0m\r\n", buf)
 	expect("\x1b[36m❯\x1b[0m\x1b[32m ◉ \x1b[0m Monday\r\n", buf)
 	expect(" \x1b[32m ◉ \x1b[0m Tuesday\r\n", buf)
