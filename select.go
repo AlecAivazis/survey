@@ -1,37 +1,24 @@
 package survey
 
 import (
-	"errors"
-	"os"
-	"strings"
-
 	"gopkg.in/AlecAivazis/survey.v1/core"
 	"gopkg.in/AlecAivazis/survey.v1/terminal"
 	"math"
+	"strings"
+	"os"
 )
 
 /*
 Select is a prompt that presents a list of various options to the user
 for them to select using the arrow keys and enter. Response type is a string.
 
-	color := ""
-	prompt := &survey.Select{
-		Message: "Choose a color:",
-		Options: []string{"red", "blue", "green"},
-	}
+	color := &survey.Option{}
+	prompt := survey.NewSingleSelect().SetMessage("Select Color:").
+			AddOption("red", nil, false).
+			AddOption("blue", nil, false).
+			AddOption("green", nil, false)
 	survey.AskOne(prompt, &color, nil)
 */
-
-func NewSingleSelect() *Select {
-	return &Select{
-		Options: make(Options, 0),
-	}
-}
-
-func createOption(display string, value interface{}) *Option {
-	return &Option{display, value}
-}
-
 type Select struct {
 	core.Renderer
 	Message       string
@@ -47,8 +34,32 @@ type Select struct {
 	showingHelp   bool
 }
 
+/*
+NewSingleSelect is a shortcut method to get a Select prompt
+ */
+func NewSingleSelect() *Select {
+	return &Select{
+		Options: make(Options, 0),
+	}
+}
+
+/*
+AddOption is a method to add an option to the selection and specify if it is the default value ot not
+This returns a Selection interface to allow chaining of these method calls
+
+	color := &survey.Option{}
+	prompt := survey.NewSingleSelect().SetMessage("Select Color:").
+			AddOption("red", nil, false).
+			AddOption("blue", nil, false).
+			AddOption("green", nil, false)
+	survey.AskOne(prompt, &color, nil)
+ */
 func (s *Select) AddOption(display string, value interface{}, defaultOption bool) Selection {
-	opt := createOption(display, value)
+	if value == nil {
+		value = display
+	}
+
+	opt := &Option{display, value}
 	s.Options = append(s.Options, opt)
 	if defaultOption {
 		s.Default = opt
@@ -56,32 +67,52 @@ func (s *Select) AddOption(display string, value interface{}, defaultOption bool
 	return s
 }
 
+/*
+SetMessage is a method to set the prompt message for a selection
+This returns a Selection interface to allow chaining of these method calls
+ */
 func (s *Select) SetMessage(msg string) Selection {
 	s.Message = msg
 	return s
 }
 
+/*
+SetHelp is a method to set the prompt help message for a selection
+This returns a Selection interface to allow chaining of these method calls
+ */
 func (s *Select) SetHelp(help string) Selection {
 	s.Help = help
 	return s
 }
 
+/*
+SetFilterMessage is a method to set the prompt filter message for a selection
+This returns a Selection interface to allow chaining of these method calls
+ */
 func (s *Select) SetFilterMessage(msg string) Selection {
 	s.FilterMessage = msg
 	return s
 }
 
+/*
+SetVimMode is a method to turn on or off VimMode
+This returns a Selection interface to allow chaining of these method calls
+ */
 func (s *Select) SetVimMode(vimMode bool) Selection {
 	s.VimMode = vimMode
 	return s
 }
 
+/*
+SetVimMode is a method to turn on or off VimMode
+This returns a Selection interface to allow chaining of these method calls
+ */
 func (s *Select) SetPageSize(pageSize int) Selection {
 	s.PageSize = pageSize
 	return s
 }
 
-// paginate returns a single page of choices given the page size, the total list of
+// Paginate returns a single page of choices given the page size, the total list of
 // possible choices, and the current selected index in the total list.
 func (s *Select) Paginate(choices Options) (Options, int) {
 	if s.PageSize == 0 {

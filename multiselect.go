@@ -21,10 +21,12 @@ for them to select using the arrow keys and enter. Response type is a slice of s
 type MultiSelect struct {
 	*Select
 	Default       Options
-	FilterMessage string
 	checked       map[string]bool
 }
 
+/*
+NewMultiSelect is a shortcut method to get a MultiSelect prompt
+ */
 func NewMultiSelect() *MultiSelect {
 	return &MultiSelect{
 		Select: NewSingleSelect(),
@@ -32,11 +34,23 @@ func NewMultiSelect() *MultiSelect {
 	}
 }
 
+/*
+AddOption is a method to add an option to the selection and specify if it is the default value ot not
+This returns a Selection interface to allow chaining of these method calls
+
+	color := &survey.Option{}
+	prompt := survey.NewSingleSelect().SetMessage("Select Color:").
+			AddOption("red", nil, false).
+			AddOption("blue", nil, false).
+			AddOption("green", nil, false)
+	survey.AskOne(prompt, &color, nil)
+ */
 func (s *MultiSelect) AddOption(display string, value interface{}, defaultOption bool) Selection {
 	if value == nil {
 		value = display
 	}
-	opt := createOption(display, value)
+
+	opt := &Option{display, value}
 	s.Options = append(s.Options, opt)
 	if defaultOption {
 		s.Default = append(s.Default, opt)
@@ -44,26 +58,47 @@ func (s *MultiSelect) AddOption(display string, value interface{}, defaultOption
 	return s
 }
 
+
+/*
+SetMessage is a method to set the prompt message for a selection
+This returns a Selection interface to allow chaining of these method calls
+ */
 func (s *MultiSelect) SetMessage(msg string) Selection {
 	s.Message = msg
 	return s
 }
 
+/*
+SetHelp is a method to set the prompt help message for a selection
+This returns a Selection interface to allow chaining of these method calls
+ */
 func (s *MultiSelect) SetHelp(help string) Selection {
 	s.Help = help
 	return s
 }
 
+/*
+SetFilterMessage is a method to set the prompt filter message for a selection
+This returns a Selection interface to allow chaining of these method calls
+ */
 func (s *MultiSelect) SetFilterMessage(msg string) Selection {
 	s.FilterMessage = msg
 	return s
 }
 
+/*
+SetVimMode is a method to turn on or off VimMode
+This returns a Selection interface to allow chaining of these method calls
+ */
 func (s *MultiSelect) SetVimMode(vimMode bool) Selection {
 	s.VimMode = vimMode
 	return s
 }
 
+/*
+SetVimMode is a method to turn on or off VimMode
+This returns a Selection interface to allow chaining of these method calls
+ */
 func (s *MultiSelect) SetPageSize(pageSize int) Selection {
 	s.PageSize = pageSize
 	return s
