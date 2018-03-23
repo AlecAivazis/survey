@@ -176,6 +176,7 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 				index--
 			}
 			continue
+		// user pressed end
 		} else if r == SpecialKeyEnd {
 			for index != len(line) {
 				if cursorCurrent.CursorIsAtLineEnd(terminalSize){
@@ -190,6 +191,7 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 				index++
 			}
 			continue
+		// user pressed forward delete key
 		} else if r == SpecialKeyDelete {
 			// if index at the end of the line nothing to delete
 			if index != len(line){
@@ -242,39 +244,34 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 			// save the current position of the cursor
 			CursorSave()
 
-			// visually insert the character by deleting the rest of the line
 			EraseLine(ERASE_LINE_END)
-			// print the rest of the word after
+
+			// remove the symbol after the cursor
+			// print the updated line
 			for _, char := range line[index:] {
-				// print characters to the new line appropriately
-				if  cursorCurrent.X == terminalSize.X {
-					CursorNextLine(1)
-					EraseLine(ERASE_LINE_END)
-					cursorCurrent.Y++
-					cursorCurrent.X = 1
-				}
-				// if we don't need to mask the input
-				if mask == 0 {
-					// just print the character the user pressed
-					Printf("%c", char)
+				EraseLine(ERASE_LINE_END)
+				if mask == 0{
+				Printf("%c", char)
 				} else {
-					// otherwise print the mask we were given
 					Printf("%c", mask)
 				}
-				cursorCurrent.X++
 			}
-			// leave the cursor where the user left it
+			// erase what's left on last line
+			Printf("\x1bE")
+			EraseLine(ERASE_LINE_END)
+
+			// restore cursor
 			CursorRestore()
 			cursorCurrent, _ = CursorLocation()
-			if cursorCurrent.X == terminalSize.X {
+
+			if cursorCurrent.CursorIsAtLineEnd(terminalSize) {
 				CursorNextLine(1)
-				//fmt.Print(len(line), "index", index)
 			} else {
 				CursorForward(1)
 			}
-
 			// increment the index
 			index++
+
 		}
 	}
 }

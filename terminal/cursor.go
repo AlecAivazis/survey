@@ -127,6 +127,8 @@ func Size() (*Coord, error) {
 	// of the terminal, ask for the current location and then move the
 	// cursor back where we started
 
+	// hide the cursor
+	CursorHide()
 	// save the current location of the cursor
 	origin, err := CursorLocation()
 	if err != nil {
@@ -146,6 +148,8 @@ func Size() (*Coord, error) {
 	CursorUp(int(bottom.Y - origin.Y))
 	CursorHorizontalAbsolute(int(origin.X))
 
+	// show the cursor
+	CursorShow()
 	// sice the bottom was calcuated in the lower right corner, it
 	// is the dimensions we are looking for
 	return bottom, nil
