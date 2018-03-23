@@ -22,8 +22,12 @@ func TestSelectRender(t *testing.T) {
 		AddOption("baz", nil, true).
 		AddOption("buz", nil, false)
 
-	helpfulPrompt := prompt
-	helpfulPrompt.SetHelp("This is helpful")
+	helpfulPrompt := NewSingleSelect()
+	helpfulPrompt.SetMessage("Pick your word:").
+		AddOption("foo", nil, false).
+		AddOption("bar", nil, false).
+		AddOption("baz", nil, true).
+		AddOption("buz", nil, false).SetHelp("This is helpful")
 
 	tests := []struct {
 		title    string
@@ -100,8 +104,12 @@ func TestSelectInterfaceValues(t *testing.T) {
 		AddOption("baz", value{"baz", 100}, true).
 		AddOption("buz", value{"buz", 999}, false)
 
-	helpfulPrompt := prompt
-	helpfulPrompt.SetHelp("This is helpful")
+	helpfulPrompt := NewSingleSelect()
+	helpfulPrompt.SetMessage("Pick your word:").
+		AddOption("foo", value{"foo", 0}, false).
+		AddOption("bar", value{"bar", 5}, false).
+		AddOption("baz", value{"baz", 100}, true).
+		AddOption("buz", value{"buz", 999}, false).SetHelp("This is helpful")
 
 	tests := []struct {
 		title    string

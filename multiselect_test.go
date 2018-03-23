@@ -22,8 +22,12 @@ func TestMultiSelectRender(t *testing.T) {
 		AddOption("baz", nil, false).
 		AddOption("buz", nil, true)
 
-	helpfulPrompt := prompt
-	helpfulPrompt.SetHelp("This is helpful")
+	helpfulPrompt := NewMultiSelect()
+	helpfulPrompt.SetMessage("Pick your words:").
+		AddOption("foo", nil, false).
+		AddOption("bar", nil, true).
+		AddOption("baz", nil, false).
+		AddOption("buz", nil, true).SetHelp("This is helpful")
 
 	tests := []struct {
 		title    string
@@ -117,8 +121,12 @@ func TestMultiSelectInterfaceValues(t *testing.T) {
 		AddOption("baz", value{"baz", 100}, false).
 		AddOption("buz", value{"buz", 999}, true)
 
-	helpfulPrompt := prompt
-	helpfulPrompt.SetHelp("This is helpful")
+	helpfulPrompt := NewMultiSelect()
+	helpfulPrompt.SetMessage("Pick your words:").
+		AddOption("foo", value{"foo", 0}, false).
+		AddOption("bar", value{"bar", 5}, true).
+		AddOption("baz", value{"baz", 100}, false).
+		AddOption("buz", value{"buz", 999}, true).SetHelp("This is helpful")
 
 	tests := []struct {
 		title    string
