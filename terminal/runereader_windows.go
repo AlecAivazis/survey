@@ -108,7 +108,6 @@ func (rr *RuneReader) ReadRune() (rune, int, error) {
 		if key.wdControlKeyState&(LEFT_CTRL_PRESSED|RIGHT_CTRL_PRESSED) != 0 && key.unicodeChar == 'C' {
 			return KeyInterrupt, bytesRead, nil
 		}
-
 		// not a normal character so look up the input sequence from the
 		// virtual key code mappings (VK_*)
 		if key.unicodeChar == 0 {

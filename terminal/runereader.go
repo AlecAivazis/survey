@@ -42,7 +42,6 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 			// we're done processing the input
 			return line, nil
 		}
-
 		// if the user interrupts (ie with ctrl+c)
 		if r == KeyInterrupt {
 			// go to the beginning of the next line
@@ -90,8 +89,8 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 						Printf("%c", char)
 
 					}
-					// erase what's left from last print
-					Printf("\x1bE")
+					// erase what's left over from last print
+					CursorNextLine(1)
 					EraseLine(ERASE_LINE_END)
 
 					// restore cursor
@@ -121,7 +120,7 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 			if index > 0 {
 				//move the cursor to the prev line if necessary
 				if cursorCurrent.CursorIsAtLineBegin() {
-					CursorUp(1)
+					CursorPreviousLine(1)
 					CursorForward(int(terminalSize.X))
 				} else {
 					CursorBack(1)
@@ -181,7 +180,7 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 			for index != len(line) {
 				if cursorCurrent.CursorIsAtLineEnd(terminalSize){
 					CursorNextLine(1)
-					cursorCurrent.X = 1
+					cursorCurrent.X = COORDINATE_SYSTEM_BEGIN
 					cursorCurrent.Y++
 
 				} else {
@@ -204,7 +203,7 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 					Printf("%c", char)
 				}
 				// erase what's left on last line
-				Printf("\x1bE")
+				CursorNextLine(1)
 				EraseLine(ERASE_LINE_END)
 
 				// restore cursor
@@ -251,13 +250,13 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 			for _, char := range line[index:] {
 				EraseLine(ERASE_LINE_END)
 				if mask == 0{
-				Printf("%c", char)
+					Printf("%c", char)
 				} else {
 					Printf("%c", mask)
 				}
 			}
 			// erase what's left on last line
-			Printf("\x1bE")
+			CursorNextLine(1)
 			EraseLine(ERASE_LINE_END)
 
 			// restore cursor
