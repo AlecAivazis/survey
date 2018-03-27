@@ -24,7 +24,9 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 	index := 0
 
 	// we get the terminal width and height (if resized after this point the property might become invalid)
+	CursorSave()
 	terminalSize, _ := Size()
+	CursorRestore()
 	for {
 		// wait for some input
 		r, _, err := rr.ReadRune()
@@ -33,11 +35,28 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 		}
 		// we set the current location of the cursor and update it by every key press
 		cursorCurrent, err := CursorLocation()
-
 		// if the user pressed enter or some other newline/termination like ctrl+d
 		if r == '\r' || r == '\n' || r == KeyEndTransmission {
 			// go to the beginning of the next line
-			Print("\r\n")
+
+			// delete what's printed out on the console screen (cleanup)
+			for index > 0 {
+				if cursorCurrent.CursorIsAtLineBegin() {
+					EraseLine(ERASE_LINE_END)
+					CursorPreviousLine(1)
+					CursorForward(int(terminalSize.X))
+					cursorCurrent.X = terminalSize.X
+					cursorCurrent.Y--
+
+				} else {
+					CursorBack(1)
+					cursorCurrent.X--
+				}
+				index--
+			}
+
+
+			Print("\r")
 
 			// we're done processing the input
 			return line, nil
@@ -90,9 +109,10 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 
 					}
 					// erase what's left over from last print
-					CursorNextLine(1)
-					EraseLine(ERASE_LINE_END)
-
+					if cursorCurrent.Y < terminalSize.Y {
+						CursorNextLine(1)
+						EraseLine(ERASE_LINE_END)
+					}
 					// restore cursor
 					CursorRestore()
 					if cursorCurrent.CursorIsAtLineBegin(){
@@ -203,9 +223,10 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 					Printf("%c", char)
 				}
 				// erase what's left on last line
-				CursorNextLine(1)
-				EraseLine(ERASE_LINE_END)
-
+				if cursorCurrent.Y < terminalSize.Y {
+					CursorNextLine(1)
+					EraseLine(ERASE_LINE_END)
+				}
 				// restore cursor
 				CursorRestore()
 				if len(line) == 0 || index == len(line){
@@ -242,9 +263,7 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 			line = append(line[:index], append([]rune{r}, line[index:]...)...)
 			// save the current position of the cursor
 			CursorSave()
-
 			EraseLine(ERASE_LINE_END)
-
 			// remove the symbol after the cursor
 			// print the updated line
 			for _, char := range line[index:] {
@@ -254,13 +273,18 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 				} else {
 					Printf("%c", mask)
 				}
+				cursorCurrent.X++
 			}
 			// erase what's left on last line
-			CursorNextLine(1)
-			EraseLine(ERASE_LINE_END)
-
+			if cursorCurrent.CursorIsAtLineEnd(terminalSize) && cursorCurrent.Y == terminalSize.Y {
+				Println()
+				CursorRestore()
+				CursorUp(int(terminalSize.Y - cursorCurrent.Y))
+				continue
+			} else {
 			// restore cursor
 			CursorRestore()
+			}
 			cursorCurrent, _ = CursorLocation()
 
 			if cursorCurrent.CursorIsAtLineEnd(terminalSize) {
@@ -271,6 +295,6 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 			// increment the index
 			index++
 
+			}
 		}
-	}
 }
