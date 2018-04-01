@@ -37,7 +37,6 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 		cursorCurrent, err := CursorLocation()
 		// if the user pressed enter or some other newline/termination like ctrl+d
 		if r == '\r' || r == '\n' || r == KeyEndTransmission {
-			// go to the beginning of the next line
 
 			// delete what's printed out on the console screen (cleanup)
 			for index > 0 {
@@ -54,10 +53,8 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 				}
 				index--
 			}
-
-
-			Print("\r")
-
+			// move the cursor the a new line
+			CursorNextLine(1)
 			// we're done processing the input
 			return line, nil
 		}
@@ -275,18 +272,20 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 				}
 				cursorCurrent.X++
 			}
-			// erase what's left on last line
+			// if we are at the last line, we want to visually insert a new line and append to it.
 			if cursorCurrent.CursorIsAtLineEnd(terminalSize) && cursorCurrent.Y == terminalSize.Y {
+				// add a new line to the terminal
 				Println()
+				// restore the position of the cursor horizontally
 				CursorRestore()
-				CursorUp(int(terminalSize.Y - cursorCurrent.Y))
-				continue
+				// restore the position of the cursor vertically
+				CursorUp(1)
 			} else {
 			// restore cursor
 			CursorRestore()
 			}
+			// check if cursor needs to move to next line
 			cursorCurrent, _ = CursorLocation()
-
 			if cursorCurrent.CursorIsAtLineEnd(terminalSize) {
 				CursorNextLine(1)
 			} else {

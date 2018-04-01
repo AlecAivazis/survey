@@ -119,7 +119,7 @@ func (cur Coord) CursorIsAtLineEnd(size *Coord) bool{
 }
 
 func (cur Coord) CursorIsAtLineBegin() bool{
-	return cur.X == 1
+	return cur.X == COORDINATE_SYSTEM_BEGIN
 }
 
 // Size returns the height and width of the terminal.
