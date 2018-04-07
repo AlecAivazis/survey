@@ -5,9 +5,11 @@ import (
 	"syscall"
 	"unsafe"
 )
+
 var COORDINATE_SYSTEM_BEGIN Short = 0
 // shared variable to save the cursor location from CursorSave()
 var cursorLoc Coord
+
 func CursorUp(n int) {
 	cursorMove(0, n)
 }
@@ -35,11 +37,11 @@ func CursorRestore() {
 	procSetConsoleCursorPosition.Call(uintptr(handle), uintptr(*(*int32)(unsafe.Pointer(&cursorLoc))))
 }
 
-func (cur Coord) CursorIsAtLineEnd(size *Coord) bool{
+func (cur Coord) CursorIsAtLineEnd(size *Coord) bool {
 	return cur.X == size.X
 }
 
-func (cur Coord) CursorIsAtLineBegin() bool{
+func (cur Coord) CursorIsAtLineBegin() bool {
 	return cur.X == 0
 }
 
