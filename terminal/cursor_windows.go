@@ -70,7 +70,7 @@ func CursorPreviousLine(n int) {
 
 // for comparability purposes between windows
 // in windows we don't have to print out a new line
-func CursorMoveNextLine() {
+func CursorMoveNextLine(cur *Coord, terminalSize *Coord) {
 	CursorNextLine(1)
 }
 

@@ -74,8 +74,10 @@ func CursorRestore() {
 
 // for comparability purposes between windows
 // in unix we need to print out a new line on some terminals
-func CursorMoveNextLine() {
-	Println()
+func CursorMoveNextLine(cur *Coord, terminalSize *Coord) {
+	if cur.Y == terminalSize.Y {
+		Println()
+	}
 	CursorNextLine(1)
 }
 

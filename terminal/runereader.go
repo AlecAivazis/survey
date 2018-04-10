@@ -62,7 +62,7 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 				index--
 			}
 			// move the cursor the a new line
-			CursorMoveNextLine()
+			CursorMoveNextLine(cursorCurrent, terminalSize)
 
 			// we're done processing the input
 			return line, nil
