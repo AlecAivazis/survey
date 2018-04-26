@@ -2,7 +2,6 @@ package survey
 
 import (
 	"errors"
-	"os"
 	"strings"
 
 	"gopkg.in/AlecAivazis/survey.v1/core"
@@ -206,7 +205,7 @@ func (m *MultiSelect) Prompt() (interface{}, error) {
 		return "", err
 	}
 
-	rr := terminal.NewRuneReader(os.Stdin)
+	rr := terminal.NewStdRuneReader()
 	rr.SetTermMode()
 	defer rr.RestoreTermMode()
 

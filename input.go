@@ -1,8 +1,6 @@
 package survey
 
 import (
-	"os"
-
 	"gopkg.in/AlecAivazis/survey.v1/core"
 	"gopkg.in/AlecAivazis/survey.v1/terminal"
 )
@@ -53,7 +51,7 @@ func (i *Input) Prompt() (interface{}, error) {
 	}
 
 	// start reading runes from the standard in
-	rr := terminal.NewRuneReader(os.Stdin)
+	rr := terminal.NewStdRuneReader()
 	rr.SetTermMode()
 	defer rr.RestoreTermMode()
 

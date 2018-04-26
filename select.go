@@ -2,7 +2,6 @@ package survey
 
 import (
 	"errors"
-	"os"
 	"strings"
 
 	"gopkg.in/AlecAivazis/survey.v1/core"
@@ -208,7 +207,7 @@ func (s *Select) Prompt() (interface{}, error) {
 	// by default, use the default value
 	s.useDefault = true
 
-	rr := terminal.NewRuneReader(os.Stdin)
+	rr := terminal.NewStdRuneReader()
 	rr.SetTermMode()
 	defer rr.RestoreTermMode()
 	// start waiting for input

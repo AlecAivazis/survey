@@ -11,6 +11,10 @@ type RuneReader struct {
 	state runeReaderState
 }
 
+func NewStdRuneRender() *RuneReader {
+	return NewRuneReader(Stdin)
+}
+
 func NewRuneReader(input *os.File) *RuneReader {
 	return &RuneReader{
 		Input: input,
