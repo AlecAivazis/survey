@@ -1,8 +1,6 @@
 package survey
 
 import (
-	"os"
-
 	"gopkg.in/AlecAivazis/survey.v1/core"
 	"gopkg.in/AlecAivazis/survey.v1/terminal"
 )
@@ -44,7 +42,7 @@ func (p *Password) Prompt() (line interface{}, err error) {
 		return "", err
 	}
 
-	rr := terminal.NewRuneReader(os.Stdin)
+	rr := newRuneReader()
 	rr.SetTermMode()
 	defer rr.RestoreTermMode()
 

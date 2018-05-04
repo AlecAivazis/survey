@@ -5,13 +5,18 @@ package terminal
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"os"
 	"regexp"
 	"strconv"
 	"strings"
 )
 
-var COORDINATE_SYSTEM_BEGIN Short = 1
+var (
+	COORDINATE_SYSTEM_BEGIN Short     = 1
+	Stdin                   io.Reader = os.Stdin
+)
+
 // CursorUp moves the cursor n cells to up.
 func CursorUp(n int) {
 	fmt.Printf("\x1b[%dA", n)
@@ -87,7 +92,7 @@ func CursorLocation() (*Coord, error) {
 	fmt.Print("\x1b[6n")
 
 	// read from stdin to get the response
-	reader := bufio.NewReader(os.Stdin)
+	reader := bufio.NewReader(Stdin)
 	// spec says we read 'til R, so do that
 	text, err := reader.ReadSlice('R')
 	if err != nil {

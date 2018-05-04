@@ -2,7 +2,6 @@ package survey
 
 import (
 	"fmt"
-	"os"
 	"regexp"
 
 	"gopkg.in/AlecAivazis/survey.v1/core"
@@ -50,7 +49,7 @@ func yesNo(t bool) string {
 }
 
 func (c *Confirm) getBool(showHelp bool) (bool, error) {
-	rr := terminal.NewRuneReader(os.Stdin)
+	rr := newRuneReader()
 	rr.SetTermMode()
 	defer rr.RestoreTermMode()
 	// start waiting for input

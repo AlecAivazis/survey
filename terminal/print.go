@@ -4,10 +4,6 @@ import (
 	"fmt"
 )
 
-var (
-	Stdout = NewAnsiStdout()
-)
-
 // Print prints given arguments with escape sequence conversion for windows.
 func Print(a ...interface{}) (n int, err error) {
 	return fmt.Fprint(Stdout, a...)

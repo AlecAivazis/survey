@@ -1,12 +1,12 @@
 package terminal
 
 import (
-	"os"
 	"syscall"
 	"unsafe"
 )
 
 var COORDINATE_SYSTEM_BEGIN Short = 0
+
 // shared variable to save the cursor location from CursorSave()
 var cursorLoc Coord
 
@@ -32,7 +32,7 @@ func CursorSave() {
 }
 
 func CursorRestore() {
-	handle := syscall.Handle(os.Stdout.Fd())
+	handle := syscall.Handle(Stdout.Fd())
 	// restore it to the original position
 	procSetConsoleCursorPosition.Call(uintptr(handle), uintptr(*(*int32)(unsafe.Pointer(&cursorLoc))))
 }
@@ -46,7 +46,7 @@ func (cur Coord) CursorIsAtLineBegin() bool {
 }
 
 func cursorMove(x int, y int) {
-	handle := syscall.Handle(os.Stdout.Fd())
+	handle := syscall.Handle(Stdout.Fd())
 
 	var csbi consoleScreenBufferInfo
 	procGetConsoleScreenBufferInfo.Call(uintptr(handle), uintptr(unsafe.Pointer(&csbi)))
@@ -75,7 +75,7 @@ func CursorMoveNextLine(cur Coord, terminalSize *Coord) {
 }
 
 func CursorHorizontalAbsolute(x int) {
-	handle := syscall.Handle(os.Stdout.Fd())
+	handle := syscall.Handle(Stdout.Fd())
 
 	var csbi consoleScreenBufferInfo
 	procGetConsoleScreenBufferInfo.Call(uintptr(handle), uintptr(unsafe.Pointer(&csbi)))
@@ -92,7 +92,7 @@ func CursorHorizontalAbsolute(x int) {
 }
 
 func CursorShow() {
-	handle := syscall.Handle(os.Stdout.Fd())
+	handle := syscall.Handle(Stdout.Fd())
 
 	var cci consoleCursorInfo
 	procGetConsoleCursorInfo.Call(uintptr(handle), uintptr(unsafe.Pointer(&cci)))
@@ -102,7 +102,7 @@ func CursorShow() {
 }
 
 func CursorHide() {
-	handle := syscall.Handle(os.Stdout.Fd())
+	handle := syscall.Handle(Stdout.Fd())
 
 	var cci consoleCursorInfo
 	procGetConsoleCursorInfo.Call(uintptr(handle), uintptr(unsafe.Pointer(&cci)))
@@ -112,7 +112,7 @@ func CursorHide() {
 }
 
 func CursorLocation() (Coord, error) {
-	handle := syscall.Handle(os.Stdout.Fd())
+	handle := syscall.Handle(Stdout.Fd())
 
 	var csbi consoleScreenBufferInfo
 	procGetConsoleScreenBufferInfo.Call(uintptr(handle), uintptr(unsafe.Pointer(&csbi)))
@@ -121,7 +121,7 @@ func CursorLocation() (Coord, error) {
 }
 
 func Size() (*Coord, error) {
-	handle := syscall.Handle(os.Stdout.Fd())
+	handle := syscall.Handle(Stdout.Fd())
 
 	var csbi consoleScreenBufferInfo
 	procGetConsoleScreenBufferInfo.Call(uintptr(handle), uintptr(unsafe.Pointer(&csbi)))

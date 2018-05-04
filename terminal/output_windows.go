@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"os"
 	"strconv"
 	"strings"
 	"syscall"
@@ -46,7 +45,7 @@ type Writer struct {
 
 func NewAnsiStdout() io.Writer {
 	var csbi consoleScreenBufferInfo
-	out := os.Stdout
+	out := Stdout
 	if !isatty.IsTerminal(out.Fd()) {
 		return out
 	}
@@ -57,7 +56,7 @@ func NewAnsiStdout() io.Writer {
 
 func NewAnsiStderr() io.Writer {
 	var csbi consoleScreenBufferInfo
-	out := os.Stderr
+	out := Stderr
 	if !isatty.IsTerminal(out.Fd()) {
 		return out
 	}
