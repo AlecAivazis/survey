@@ -207,7 +207,7 @@ func (s *Select) Prompt() (interface{}, error) {
 	// by default, use the default value
 	s.useDefault = true
 
-	rr := terminal.NewStdRuneReader()
+	rr := newRuneReader()
 	rr.SetTermMode()
 	defer rr.RestoreTermMode()
 	// start waiting for input

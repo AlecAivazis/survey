@@ -42,7 +42,7 @@ func (p *Password) Prompt() (line interface{}, err error) {
 		return "", err
 	}
 
-	rr := terminal.NewStdRuneRender()
+	rr := newRuneReader()
 	rr.SetTermMode()
 	defer rr.RestoreTermMode()
 

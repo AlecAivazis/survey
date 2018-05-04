@@ -2,12 +2,16 @@ package survey
 
 import (
 	"errors"
+	"os"
 
 	"gopkg.in/AlecAivazis/survey.v1/core"
+	"gopkg.in/AlecAivazis/survey.v1/terminal"
 )
 
 // PageSize is the default maximum number of items to show in select/multiselect prompts
 var PageSize = 7
+
+var Stdin = os.Stdin
 
 // Validator is a function passed to a Question after a user has provided a response.
 // If the function returns an error, then the user will be prompted again for another
@@ -195,4 +199,8 @@ func paginate(page int, choices []string, sel int) ([]string, int) {
 
 	// return the subset we care about and the index
 	return choices[start:end], cursor
+}
+
+func newRuneReader() *terminal.RuneReader {
+	return terminal.NewRuneReader(Stdin)
 }

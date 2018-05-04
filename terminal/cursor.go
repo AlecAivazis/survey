@@ -5,12 +5,17 @@ package terminal
 import (
 	"bufio"
 	"fmt"
+	"io"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
 )
 
-var COORDINATE_SYSTEM_BEGIN Short = 1
+var (
+	COORDINATE_SYSTEM_BEGIN Short     = 1
+	Stdin                   io.Reader = os.Stdin
+)
 
 // CursorUp moves the cursor n cells to up.
 func CursorUp(n int) {

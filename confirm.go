@@ -49,7 +49,7 @@ func yesNo(t bool) string {
 }
 
 func (c *Confirm) getBool(showHelp bool) (bool, error) {
-	rr := terminal.NewStdRuneReader()
+	rr := newRuneReader()
 	rr.SetTermMode()
 	defer rr.RestoreTermMode()
 	// start waiting for input

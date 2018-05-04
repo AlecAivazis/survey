@@ -81,7 +81,7 @@ func (e *Editor) Prompt() (interface{}, error) {
 	}
 
 	// start reading runes from the standard in
-	rr := terminal.NewStdRuneReader()
+	rr := newRuneReader()
 	rr.SetTermMode()
 	defer rr.RestoreTermMode()
 

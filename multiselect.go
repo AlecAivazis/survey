@@ -205,7 +205,7 @@ func (m *MultiSelect) Prompt() (interface{}, error) {
 		return "", err
 	}
 
-	rr := terminal.NewStdRuneReader()
+	rr := newRuneReader()
 	rr.SetTermMode()
 	defer rr.RestoreTermMode()
 
