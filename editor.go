@@ -29,6 +29,7 @@ type Editor struct {
 	Message       string
 	Default       string
 	Help          string
+	Editor        string
 	HideDefault   bool
 	AppendDefault bool
 }
@@ -144,6 +145,9 @@ func (e *Editor) Prompt() (interface{}, error) {
 	}
 
 	// open the editor
+	if e.Editor != nil {
+		editor = e.Editor
+	}
 	cmd := exec.Command(editor, f.Name())
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
