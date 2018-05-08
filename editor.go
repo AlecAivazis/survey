@@ -145,7 +145,7 @@ func (e *Editor) Prompt() (interface{}, error) {
 	}
 
 	// open the editor
-	if e.Editor != nil {
+	if e.Editor != "" {
 		editor = e.Editor
 	}
 	cmd := exec.Command(editor, f.Name())
