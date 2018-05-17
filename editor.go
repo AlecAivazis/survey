@@ -144,10 +144,12 @@ func (e *Editor) Prompt() (interface{}, error) {
 		return "", err
 	}
 
-	// open the editor
+	// check is input editor exist
 	if e.Editor != "" {
 		editor = e.Editor
 	}
+	
+	// open the editor
 	cmd := exec.Command(editor, f.Name())
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
