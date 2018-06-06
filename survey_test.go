@@ -3,14 +3,203 @@ package survey
 import (
 	"fmt"
 	"testing"
+	"time"
 
+	expect "github.com/Netflix/go-expect"
+	"github.com/hinshun/vt10x"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gopkg.in/AlecAivazis/survey.v1/core"
+	"gopkg.in/AlecAivazis/survey.v1/terminal"
 )
 
 func init() {
 	// disable color output for all prompts to simplify testing
 	core.DisableColor = true
+}
+
+func Stdio(c *expect.Console) terminal.Stdio {
+	return terminal.Stdio{c.Tty(), c.Tty(), c.Tty()}
+}
+
+func NewTestConsole(t *testing.T, opts ...expect.ConsoleOpt) (*expect.Console, error) {
+	tw, err := expect.NewTestWriter(t)
+	if err != nil {
+		return nil, err
+	}
+
+	return vt10x.NewVT10XConsole(append(opts, expect.WithStdout(tw))...)
+}
+
+type PromptTest struct {
+	name      string
+	prompt    Prompt
+	procedure func(*expect.Console)
+	expected  interface{}
+}
+
+func RunPromptTest(t *testing.T, test PromptTest) {
+	var answer interface{}
+	RunTest(t, test.procedure, func(stdio terminal.Stdio) error {
+		var err error
+		if p, ok := test.prompt.(wantsStdio); ok {
+			p.WithStdio(stdio)
+		}
+		answer, err = test.prompt.Prompt()
+		return err
+	})
+	require.Equal(t, test.expected, answer)
+}
+
+func TestAsk(t *testing.T) {
+	tests := []struct {
+		name      string
+		questions []*Question
+		procedure func(*expect.Console)
+		expected  map[string]interface{}
+	}{
+		{
+			"Test Ask for all prompts",
+			[]*Question{
+				{
+					Name: "pizza",
+					Prompt: &Confirm{
+						Message: "Is pizza your favorite food?",
+					},
+				},
+				{
+					Name: "commit-message",
+					Prompt: &Editor{
+						Message: "Edit git commit message",
+					},
+				},
+				{
+					Name: "name",
+					Prompt: &Input{
+						Message: "What is your name?",
+					},
+				},
+				{
+					Name: "day",
+					Prompt: &MultiSelect{
+						Message: "What days do you prefer:",
+						Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
+					},
+				},
+				{
+					Name: "password",
+					Prompt: &Password{
+						Message: "Please type your password",
+					},
+				},
+				{
+					Name: "color",
+					Prompt: &Select{
+						Message: "Choose a color:",
+						Options: []string{"red", "blue", "green", "yellow"},
+					},
+				},
+			},
+			func(c *expect.Console) {
+				// Confirm
+				c.ExpectString("Is pizza your favorite food? (y/N)")
+				c.SendLine("Y")
+
+				// Editor
+				c.ExpectString("Edit git commit message [Enter to launch editor]")
+				c.SendLine("")
+				go func() {
+					time.Sleep(time.Millisecond)
+					c.Send("iAdd editor prompt tests\x1b")
+					c.SendLine(":wq!")
+				}()
+
+				// Input
+				c.ExpectString("What is your name?")
+				c.SendLine("Johnny Appleseed")
+
+				// MultiSelect
+				c.ExpectString("What days do you prefer:  [Use arrows to move, type to filter]")
+				// Select Monday.
+				c.Send("\x1b[B ")
+				// Select Wednesday.
+				c.Send("\x1b[B\x1b[B ")
+				c.SendLine("")
+
+				// Password
+				c.ExpectString("Please type your password")
+				c.Send("secret")
+				c.SendLine("")
+
+				// Select
+				c.ExpectString("Choose a color:  [Use arrows to move, type to filter]")
+				c.SendLine("yellow")
+				c.ExpectEOF()
+			},
+			map[string]interface{}{
+				"pizza":          true,
+				"commit-message": "Add editor prompt tests\n",
+				"name":           "Johnny Appleseed",
+				"day":            []string{"Monday", "Wednesday"},
+				"password":       "secret",
+				"color":          "yellow",
+			},
+		},
+		{
+			"Test Ask with validate survey.Required",
+			[]*Question{
+				{
+					Name: "name",
+					Prompt: &Input{
+						Message: "What is your name?",
+					},
+					Validate: Required,
+				},
+			},
+			func(c *expect.Console) {
+				c.ExpectString("What is your name?")
+				c.SendLine("")
+				c.ExpectString("Sorry, your reply was invalid: Value is required")
+				c.SendLine("Johnny Appleseed")
+				c.ExpectEOF()
+			},
+			map[string]interface{}{
+				"name": "Johnny Appleseed",
+			},
+		},
+		{
+			"Test Ask with transformer survey.ToLower",
+			[]*Question{
+				{
+					Name: "name",
+					Prompt: &Input{
+						Message: "What is your name?",
+					},
+					Transform: ToLower,
+				},
+			},
+			func(c *expect.Console) {
+				c.ExpectString("What is your name?")
+				c.SendLine("Johnny Appleseed")
+				c.ExpectEOF()
+			},
+			map[string]interface{}{
+				"name": "johnny appleseed",
+			},
+		},
+	}
+
+	for _, test := range tests {
+		// Capture range variable.
+		test := test
+		t.Run(test.name, func(t *testing.T) {
+			answers := make(map[string]interface{})
+			RunTest(t, test.procedure, func(stdio terminal.Stdio) error {
+				return Ask(test.questions, &answers, WithStdio(stdio.In, stdio.Out, stdio.Err))
+			})
+			require.Equal(t, test.expected, answers)
+		})
+	}
 }
 
 func TestValidationError(t *testing.T) {

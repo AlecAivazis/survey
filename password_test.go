@@ -3,6 +3,7 @@ package survey
 import (
 	"testing"
 
+	expect "github.com/Netflix/go-expect"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/AlecAivazis/survey.v1/core"
 )
@@ -49,5 +50,45 @@ func TestPasswordRender(t *testing.T) {
 		)
 		assert.Nil(t, err, test.title)
 		assert.Equal(t, test.expected, actual, test.title)
+	}
+}
+
+func TestPasswordPrompt(t *testing.T) {
+	tests := []PromptTest{
+		{
+			"Test Password prompt interaction",
+			&Password{
+				Message: "Please type your password",
+			},
+			func(c *expect.Console) {
+				c.ExpectString("Please type your password")
+				c.Send("secret")
+				c.SendLine("")
+				c.ExpectEOF()
+			},
+			"secret",
+		},
+		{
+			"Test Password prompt interaction with help",
+			&Password{
+				Message: "Please type your password",
+				Help:    "It's a secret",
+			},
+			func(c *expect.Console) {
+				c.ExpectString("Please type your password")
+				c.SendLine("?")
+				c.ExpectString("It's a secret")
+				c.Send("secret")
+				c.SendLine("")
+				c.ExpectEOF()
+			},
+			"secret",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			RunPromptTest(t, test)
+		})
 	}
 }

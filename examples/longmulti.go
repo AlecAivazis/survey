@@ -262,7 +262,6 @@ var multiQs = []*survey.Question{
 	},
 }
 
-
 func main() {
 	answers := []string{}
 
