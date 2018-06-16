@@ -8,7 +8,6 @@ import (
 
 	expect "github.com/Netflix/go-expect"
 	"github.com/hinshun/vt10x"
-	"github.com/kr/pty"
 	"github.com/stretchr/testify/require"
 	"gopkg.in/AlecAivazis/survey.v1/terminal"
 )
@@ -16,20 +15,9 @@ import (
 func RunTest(t *testing.T, procedure func(*expect.Console), test func(terminal.Stdio) error) {
 	t.Parallel()
 
-	// Create a psuedoterminal for the virtual terminal's tty.
-	ptm, pts, err := pty.Open()
-	require.Nil(t, err)
-
-	// Multiplex stdin/stdout to a virtual terminal to respond to ANSI escape
-	// sequences (i.e. cursor position report).
-	var state vt10x.State
-	term, err := vt10x.Create(&state, pts)
-	require.Nil(t, err)
-
 	// Multiplex output to a buffer as well for the raw bytes.
 	buf := new(bytes.Buffer)
-
-	c, err := expect.NewConsole(expect.WithStdin(ptm), expect.WithStdout(term, buf), expect.WithCloser(pts, ptm, term))
+	c, state, err := vt10x.NewVT10XConsole(expect.WithStdout(buf))
 	require.Nil(t, err)
 	defer c.Close()
 

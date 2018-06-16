@@ -303,48 +303,56 @@ import "gopkg.in/AlecAivazis/survey.v1"
 
 ## Testing
 
-Integration tests for survey uses [go-expect](https://github.com/Netflix/go-expect) to expect a
-match on stdout and respond on stdin. Since `os.Stdout` in a `go test` process is not a TTY, you
-need a way to interpret terminal / ANSI escape sequences for things like `CursorLocation`. The
-stdin/stdout handled by `go-expect` is also multiplexed to a [virtual terminal](https://github.com/hinshun/vt10x).
+You can test your program's interactive prompts using [go-expect](https://github.com/Netflix/go-expect). The library
+can be used to expect a match on stdout and respond on stdin. Since `os.Stdout` in a `go test` process is not a TTY,
+if you are manipulating the cursor or using `survey`, you will need a way to interpret terminal / ANSI escape sequences
+for things like `CursorLocation`. `vt10x.NewVT10XConsole` will create a `go-expect` console that also multiplexes
+stdio to an in-memory [virtual terminal](https://github.com/hinshun/vt10x).
 
-You can add a prompt test by specifying a few fields to the test table:
+For example, you can test a binary utilizing `survey` by connecting the Console's tty to a subprocess's stdio. 
 
 ```go
-{
-  "Test Input prompt interaction and prompt for help", // Name of the test.
-  &Input{                                              // An implementation of the survey.Prompt interface.
-    Message: "What is your name?",
-  },
-  func(c *expect.Console) {                           // An expect procedure. You can expect strings / regexps and
-    c.ExpectString("What is your name?")              // write back strings / bytes to its psuedoterminal for survey.
+func TestCLI(t *testing.T) {
+  // Multiplex stdin/stdout to a virtual terminal to respond to ANSI escape
+  // sequences (i.e. cursor position report).
+	c, state, err := vt10x.NewVT10XConsole()
+	require.Nil(t, err)
+  defer c.Close()
+
+  donec := make(chan struct{})
+  go func() {
+    defer close(donec)
+    c.ExpectString("What is your name?")
     c.SendLine("Johnny Appleseed")
-    c.ExpectEOF()                                     // Nothing is read from the tty without an expect, and once an
-                                                      // expectation is met, no further bytes are read. End your
-                                                      // procedure with `c.ExpectEOF()` to read until survey finishes.
-  },
-  "Johnny Appleseed",                                 // The expected result.
+    c.ExpectEOF()
+  }()
+
+  cmd := exec.Command("your-cli")
+  cmd.Stdin = c.Tty()
+  cmd.Stdout = c.Tty()
+  cmd.Stderr = c.Tty()
+
+  err = cmd.Run()
+  require.Nil(t, err)
+
+  // Close the slave end of the pty, and read the remaining bytes from the master end.
+  c.Tty().Close()
+  <-donec
+
+  // Dump the terminal's screen.
+  t.Log(expect.StripTrailingEmptyLines(state.String()))
 }
 ```
 
-If you want to write your own `go-expect` test from scratch, you'll need to instantiate a virtual terminal,
-multiplex it into an `*expect.Console`, and hook up its tty with survey's optional stdio. Please see `go-expect`
-[documentation](https://godoc.org/github.com/Netflix/go-expect) for more detail.
+If your application is decoupled from `os.Stdout` and `os.Stdin`, you can even test through the tty alone.
+`survey` itself is tested in this manner.
 
 ```go
-func TestExpect(t *testing.T) {
-  // Create a psuedoterminal for the virtual terminal's tty.
-  ptm, pts, err := pty.Open()
-  require.Nil(t, err)
-
+func TestCLI(t *testing.T) {
   // Multiplex stdin/stdout to a virtual terminal to respond to ANSI escape
   // sequences (i.e. cursor position report).
-  var state vt10x.State
-  term, err := vt10x.Create(&state, pts)
-  require.Nil(t, err)
-
-  c, err := expect.NewConsole(expect.WithStdin(ptm), expect.WithStdout(term), expect.WithCloser(pts, ptm, term))
-  require.Nil(t, err)
+	c, state, err := vt10x.NewVT10XConsole()
+	require.Nil(t, err)
   defer c.Close()
 
   donec := make(chan struct{})

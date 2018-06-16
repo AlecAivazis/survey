@@ -17,7 +17,7 @@
   branch = "master"
   name = "github.com/hinshun/vt10x"
   packages = ["."]
-  revision = "32c515821ede766424a5c38d6db167a279ee40b7"
+  revision = "1954e646417484a2a687ea344edade2c2b6523c8"
 
 [[projects]]
   name = "github.com/kr/pty"
@@ -67,6 +67,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "ac4edad273813197e3b158ca0245eca73749ee9d87c061c6de51e149f5911389"
+  inputs-digest = "d9de26369f5ab6ec0786daa907bd042f189d5fd3e9dda6acdbe098ed505e19b3"
   solver-name = "gps-cdcl"
   solver-version = 1

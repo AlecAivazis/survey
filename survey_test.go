@@ -6,7 +6,6 @@ import (
 	"time"
 
 	expect "github.com/Netflix/go-expect"
-	"github.com/hinshun/vt10x"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gopkg.in/AlecAivazis/survey.v1/core"
@@ -20,15 +19,6 @@ func init() {
 
 func Stdio(c *expect.Console) terminal.Stdio {
 	return terminal.Stdio{c.Tty(), c.Tty(), c.Tty()}
-}
-
-func NewTestConsole(t *testing.T, opts ...expect.ConsoleOpt) (*expect.Console, error) {
-	tw, err := expect.NewTestWriter(t)
-	if err != nil {
-		return nil, err
-	}
-
-	return vt10x.NewVT10XConsole(append(opts, expect.WithStdout(tw))...)
 }
 
 type PromptTest struct {
