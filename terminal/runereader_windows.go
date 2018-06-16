@@ -18,13 +18,13 @@ const (
 
 	// key codes for arrow keys
 	// https://msdn.microsoft.com/en-us/library/windows/desktop/dd375731(v=vs.85).aspx
-	VK_DELETE= 0x2E
-	VK_END   = 0x23
-	VK_HOME  = 0x24
-	VK_LEFT  = 0x25
-	VK_UP    = 0x26
-	VK_RIGHT = 0x27
-	VK_DOWN  = 0x28
+	VK_DELETE = 0x2E
+	VK_END    = 0x23
+	VK_HOME   = 0x24
+	VK_LEFT   = 0x25
+	VK_UP     = 0x26
+	VK_RIGHT  = 0x27
+	VK_DOWN   = 0x28
 
 	RIGHT_CTRL_PRESSED = 0x0004
 	LEFT_CTRL_PRESSED  = 0x0008

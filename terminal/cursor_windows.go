@@ -7,6 +7,7 @@ import (
 )
 
 var COORDINATE_SYSTEM_BEGIN Short = 0
+
 // shared variable to save the cursor location from CursorSave()
 var cursorLoc Coord
 

@@ -12,6 +12,7 @@ import (
 )
 
 var COORDINATE_SYSTEM_BEGIN Short = 1
+
 // CursorUp moves the cursor n cells to up.
 func CursorUp(n int) {
 	fmt.Printf("\x1b[%dA", n)
