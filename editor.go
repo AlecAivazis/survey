@@ -148,7 +148,7 @@ func (e *Editor) Prompt() (interface{}, error) {
 	if e.Editor != "" {
 		editor = e.Editor
 	}
-	
+
 	// open the editor
 	cmd := exec.Command(editor, f.Name())
 	cmd.Stdin = os.Stdin
