@@ -121,10 +121,12 @@ func TestAsk(t *testing.T) {
 				// MultiSelect
 				c.ExpectString("What days do you prefer:  [Use arrows to move, type to filter]")
 				// Select Monday.
-				c.Send("\x1b[B ")
+				c.Send(string(terminal.KeyArrowDown))
+				c.Send(" ")
 				// Select Wednesday.
-				c.Send("\x1b[B\x1b[B ")
-				c.SendLine("")
+				c.Send(string(terminal.KeyArrowDown))
+				c.Send(string(terminal.KeyArrowDown))
+				c.SendLine(" ")
 
 				// Password
 				c.ExpectString("Please type your password")

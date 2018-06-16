@@ -107,7 +107,7 @@ func TestSelectPrompt(t *testing.T) {
 			func(c *expect.Console) {
 				c.ExpectString("Choose a color:")
 				// Select blue.
-				c.SendLine("\x1b[B")
+				c.SendLine(string(terminal.KeyArrowDown))
 				c.ExpectEOF()
 			},
 			"blue",
@@ -137,7 +137,7 @@ func TestSelectPrompt(t *testing.T) {
 			func(c *expect.Console) {
 				c.ExpectString("Choose a color:")
 				// Select red.
-				c.SendLine("\x1b[A")
+				c.SendLine(string(terminal.KeyArrowUp))
 				c.ExpectEOF()
 			},
 			"red",
@@ -169,7 +169,7 @@ func TestSelectPrompt(t *testing.T) {
 			func(c *expect.Console) {
 				c.ExpectString("Choose a color:")
 				// Select green.
-				c.SendLine("\x1b[A")
+				c.SendLine(string(terminal.KeyArrowUp))
 				c.ExpectEOF()
 			},
 			"green",
@@ -200,7 +200,7 @@ func TestSelectPrompt(t *testing.T) {
 				// Filter down to red and green.
 				c.Send("re")
 				// Select green.
-				c.SendLine("\x1b[B")
+				c.SendLine(string(terminal.KeyArrowDown))
 				c.ExpectEOF()
 			},
 			"green",

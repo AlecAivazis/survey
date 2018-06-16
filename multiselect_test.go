@@ -123,8 +123,8 @@ func TestMultiSelectPrompt(t *testing.T) {
 			func(c *expect.Console) {
 				c.ExpectString("What days do you prefer:  [Use arrows to move, type to filter]")
 				// Select Monday.
-				c.Send("\x1b[B ")
-				c.SendLine("")
+				c.Send(string(terminal.KeyArrowDown))
+				c.SendLine(" ")
 				c.ExpectEOF()
 			},
 			[]string{"Monday"},
@@ -153,8 +153,9 @@ func TestMultiSelectPrompt(t *testing.T) {
 			func(c *expect.Console) {
 				c.ExpectString("What days do you prefer:  [Use arrows to move, type to filter]")
 				// Deselect Tuesday.
-				c.Send("\x1b[B\x1b[B ")
-				c.SendLine("")
+				c.Send(string(terminal.KeyArrowDown))
+				c.Send(string(terminal.KeyArrowDown))
+				c.SendLine(" ")
 				c.ExpectEOF()
 			},
 			[]string{"Thursday"},
@@ -171,7 +172,7 @@ func TestMultiSelectPrompt(t *testing.T) {
 				c.Send("?")
 				c.ExpectString("Saturday is best")
 				// Select Saturday
-				c.Send("\x1b[A")
+				c.Send(string(terminal.KeyArrowUp))
 				c.SendLine(" ")
 				c.ExpectEOF()
 			},
@@ -187,8 +188,8 @@ func TestMultiSelectPrompt(t *testing.T) {
 			func(c *expect.Console) {
 				c.ExpectString("What days do you prefer:  [Use arrows to move, type to filter]")
 				// Select Monday.
-				c.Send("\x1b[B ")
-				c.SendLine("")
+				c.Send(string(terminal.KeyArrowDown))
+				c.SendLine(" ")
 				c.ExpectEOF()
 			},
 			[]string{"Monday"},

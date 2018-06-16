@@ -49,5 +49,5 @@ func RunTest(t *testing.T, procedure func(*expect.Console), test func(terminal.S
 	t.Logf("Raw output: %q", buf.String())
 
 	// Dump the terminal's screen.
-	t.Log(expect.StripTrailingEmptyLines(state.String()))
+	t.Logf("\n%s", expect.StripTrailingEmptyLines(state.String()))
 }
