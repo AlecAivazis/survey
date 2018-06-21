@@ -2,8 +2,11 @@ package survey
 
 import (
 	"bytes"
+	"io"
+	"os"
 	"testing"
 
+	expect "github.com/Netflix/go-expect"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/AlecAivazis/survey.v1/core"
 	"gopkg.in/AlecAivazis/survey.v1/terminal"
@@ -68,17 +71,86 @@ func TestInputRender(t *testing.T) {
 		},
 	}
 
-	outputBuffer := bytes.NewBufferString("")
-	terminal.Stdout = outputBuffer
-
 	for _, test := range tests {
-		outputBuffer.Reset()
+		r, w, err := os.Pipe()
+		assert.Nil(t, err, test.title)
+
+		test.prompt.WithStdio(terminal.Stdio{Out: w})
 		test.data.Input = test.prompt
-		err := test.prompt.Render(
+		err = test.prompt.Render(
 			InputQuestionTemplate,
 			test.data,
 		)
 		assert.Nil(t, err, test.title)
-		assert.Equal(t, test.expected, outputBuffer.String(), test.title)
+
+		w.Close()
+		var buf bytes.Buffer
+		io.Copy(&buf, r)
+
+		assert.Contains(t, buf.String(), test.expected, test.title)
+	}
+}
+
+func TestInputPrompt(t *testing.T) {
+	tests := []PromptTest{
+		{
+			"Test Input prompt interaction",
+			&Input{
+				Message: "What is your name?",
+			},
+			func(c *expect.Console) {
+				c.ExpectString("What is your name?")
+				c.SendLine("Larry Bird")
+				c.ExpectEOF()
+			},
+			"Larry Bird",
+		},
+		{
+			"Test Input prompt interaction with default",
+			&Input{
+				Message: "What is your name?",
+				Default: "Johnny Appleseed",
+			},
+			func(c *expect.Console) {
+				c.ExpectString("What is your name?")
+				c.SendLine("")
+				c.ExpectEOF()
+			},
+			"Johnny Appleseed",
+		},
+		{
+			"Test Input prompt interaction overriding default",
+			&Input{
+				Message: "What is your name?",
+				Default: "Johnny Appleseed",
+			},
+			func(c *expect.Console) {
+				c.ExpectString("What is your name?")
+				c.SendLine("Larry Bird")
+				c.ExpectEOF()
+			},
+			"Larry Bird",
+		},
+		{
+			"Test Input prompt interaction and prompt for help",
+			&Input{
+				Message: "What is your name?",
+				Help:    "It might be Satoshi Nakamoto",
+			},
+			func(c *expect.Console) {
+				c.ExpectString("What is your name?")
+				c.SendLine("?")
+				c.ExpectString("It might be Satoshi Nakamoto")
+				c.SendLine("Satoshi Nakamoto")
+				c.ExpectEOF()
+			},
+			"Satoshi Nakamoto",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			RunPromptTest(t, test)
+		})
 	}
 }

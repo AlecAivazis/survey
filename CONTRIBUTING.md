@@ -43,17 +43,36 @@ When submitting a contribution,
   *  Following community standards, add comments for all exported members so that all necessary information is available on godocs
   *  Remember to update the project README.md with changes to the high-level API
   *  Include both positive and negative unit tests (when applicable)
-  *  Contributions with visual ramifications should be accompanied with an `autoplay` recording that will get verified on every PR. For more information on generating these recordings, see [Writing and Running Tests](#writing-and-running-tests)
+  *  Contributions with visual ramifications or interaction changes should be accompanied with the appropriate `go-expect` tests. For more information on writing these tests, see [Writing and Running Tests](#writing-and-running-tests)
 
 
 ## Writing and running tests
 
 When submitting features, please add as many units tests as necessary to test both positive and negative cases.
 
-Given the current implementation of the library, functionality that is part of the prompt's output needs to be tested by recording an interaction and replaying that interaction with every change. The script and its recording should be committed to the `tests` directory. Bugs that are reported and reproduced should also get copied into this directory and recorded for future validation. This recording is done with a package called `autoplay`, created by one of `survey`'s maintainers.
+Integration tests for survey uses [go-expect](https://github.com/Netflix/go-expect) to expect a match on stdout and respond on stdin. Since `os.Stdout` in a `go test` process is not a TTY, you need a way to interpret terminal / ANSI escape sequences for things like `CursorLocation`. The stdin/stdout handled by `go-expect` is also multiplexed to a [virtual terminal](https://github.com/hinshun/vt10x).
 
-### Generating an autoplay test
+For example, you can extend the tests for Input by specifying the following test case:
 
-`Autoplay` will record an interaction with the terminal and generate a script which executes the recording against the current terminal session. To install `autoplay`, run: `go get github.com/coryb/autoplay github.com/kr/pty`.
+```go
+{
+  "Test Input prompt interaction",       // Name of the test.
+  &Input{                                // An implementation of the survey.Prompt interface.
+    Message: "What is your name?",
+  },
+  func(c *expect.Console) {              // An expect procedure. You can expect strings / regexps and
+    c.ExpectString("What is your name?") // write back strings / bytes to its psuedoterminal for survey.
+    c.SendLine("Johnny Appleseed")
+    c.ExpectEOF()                        // Nothing is read from the tty without an expect, and once an
+                                         // expectation is met, no further bytes are read. End your
+                                         // procedure with `c.ExpectEOF()` to read until survey finishes.
+  },
+  "Johnny Appleseed",                    // The expected result.
+}
+```
 
-Once you have everything installed, navigate to the `tests/` directory and add a file with your test. I suggest running it first manually to ensure it behaves as you expect. Then, run `autoplay -n autoplay/<test name>.go go run <test name>.go`. Once the script is running, you should be greeted with whatever prompt you are testing. Interact with the terminal like normal, performing any sort of interaction that you want to verify. When the process ends, so will the recording and you should find a new file in `tests/autoplay/` with the recording. Commit this to the project alongside your PR.
+If you want to write your own `go-expect` test from scratch, you'll need to instantiate a virtual terminal,
+multiplex it into an `*expect.Console`, and hook up its tty with survey's optional stdio. Please see `go-expect`
+[documentation](https://godoc.org/github.com/Netflix/go-expect) for more detail.
+
+

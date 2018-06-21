@@ -19,9 +19,9 @@ var table = []TestUtil.TestTableEntry{
 	},
 	{
 		"Home, End Button test in random location", &survey.Input{Message: "Hello world"}, &val,
-	},{
+	}, {
 		"Delete and forward delete test at random location (test if screen overflows)", &survey.Input{Message: "Hello world"}, &val,
-	},{
+	}, {
 		"Moving around lines with left & right arrow keys", &survey.Input{Message: "Hello world"}, &val,
 	},
 }

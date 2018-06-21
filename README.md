@@ -73,6 +73,7 @@ func main() {
 1. [Custom Types](#custom-types)
 1. [Customizing Output](#customizing-output)
 1. [Versioning](#versioning)
+1. [Testing](#testing)
 
 ## Examples
 
@@ -298,4 +299,84 @@ to maintain those releases. Importing version 1 of survey would look like:
 package main
 
 import "gopkg.in/AlecAivazis/survey.v1"
+```
+
+## Testing
+
+You can test your program's interactive prompts using [go-expect](https://github.com/Netflix/go-expect). The library
+can be used to expect a match on stdout and respond on stdin. Since `os.Stdout` in a `go test` process is not a TTY,
+if you are manipulating the cursor or using `survey`, you will need a way to interpret terminal / ANSI escape sequences
+for things like `CursorLocation`. `vt10x.NewVT10XConsole` will create a `go-expect` console that also multiplexes
+stdio to an in-memory [virtual terminal](https://github.com/hinshun/vt10x).
+
+For example, you can test a binary utilizing `survey` by connecting the Console's tty to a subprocess's stdio. 
+
+```go
+func TestCLI(t *testing.T) {
+  // Multiplex stdin/stdout to a virtual terminal to respond to ANSI escape
+  // sequences (i.e. cursor position report).
+	c, state, err := vt10x.NewVT10XConsole()
+	require.Nil(t, err)
+  defer c.Close()
+
+  donec := make(chan struct{})
+  go func() {
+    defer close(donec)
+    c.ExpectString("What is your name?")
+    c.SendLine("Johnny Appleseed")
+    c.ExpectEOF()
+  }()
+
+  cmd := exec.Command("your-cli")
+  cmd.Stdin = c.Tty()
+  cmd.Stdout = c.Tty()
+  cmd.Stderr = c.Tty()
+
+  err = cmd.Run()
+  require.Nil(t, err)
+
+  // Close the slave end of the pty, and read the remaining bytes from the master end.
+  c.Tty().Close()
+  <-donec
+
+  // Dump the terminal's screen.
+  t.Log(expect.StripTrailingEmptyLines(state.String()))
+}
+```
+
+If your application is decoupled from `os.Stdout` and `os.Stdin`, you can even test through the tty alone.
+`survey` itself is tested in this manner.
+
+```go
+func TestCLI(t *testing.T) {
+  // Multiplex stdin/stdout to a virtual terminal to respond to ANSI escape
+  // sequences (i.e. cursor position report).
+	c, state, err := vt10x.NewVT10XConsole()
+	require.Nil(t, err)
+  defer c.Close()
+
+  donec := make(chan struct{})
+  go func() {
+    defer close(donec)
+    c.ExpectString("What is your name?")
+    c.SendLine("Johnny Appleseed")
+    c.ExpectEOF()
+  }()
+
+  prompt := &Input{
+    Message: "What is your name?",
+  }
+  prompt.WithStdio(Stdio(c))
+
+  answer, err := prompt.Prompt()
+  require.Nil(t, err)
+  require.Equal(t, "Johnny Appleseed", answer)
+
+  // Close the slave end of the pty, and read the remaining bytes from the master end.
+  c.Tty().Close()
+  <-donec
+
+  // Dump the terminal's screen.
+  t.Log(expect.StripTrailingEmptyLines(state.String()))
+}
 ```
