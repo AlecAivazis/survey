@@ -313,34 +313,34 @@ For example, you can test a binary utilizing `survey` by connecting the Console'
 
 ```go
 func TestCLI(t *testing.T) {
-  // Multiplex stdin/stdout to a virtual terminal to respond to ANSI escape
-  // sequences (i.e. cursor position report).
-	c, state, err := vt10x.NewVT10XConsole()
+ 	// Multiplex stdin/stdout to a virtual terminal to respond to ANSI escape
+ 	// sequences (i.e. cursor position report).
+ 	c, state, err := vt10x.NewVT10XConsole()
 	require.Nil(t, err)
-  defer c.Close()
+	defer c.Close()
 
-  donec := make(chan struct{})
-  go func() {
-    defer close(donec)
-    c.ExpectString("What is your name?")
-    c.SendLine("Johnny Appleseed")
-    c.ExpectEOF()
-  }()
+	donec := make(chan struct{})
+	go func() {
+		defer close(donec)
+    		c.ExpectString("What is your name?")
+    		c.SendLine("Johnny Appleseed")
+    		c.ExpectEOF()
+  	}()
 
-  cmd := exec.Command("your-cli")
-  cmd.Stdin = c.Tty()
-  cmd.Stdout = c.Tty()
-  cmd.Stderr = c.Tty()
+	cmd := exec.Command("your-cli")
+  	cmd.Stdin = c.Tty()
+  	cmd.Stdout = c.Tty()
+  	cmd.Stderr = c.Tty()
 
-  err = cmd.Run()
-  require.Nil(t, err)
+  	err = cmd.Run()
+  	require.Nil(t, err)
 
-  // Close the slave end of the pty, and read the remaining bytes from the master end.
-  c.Tty().Close()
-  <-donec
+  	// Close the slave end of the pty, and read the remaining bytes from the master end.
+  	c.Tty().Close()
+  	<-donec
 
-  // Dump the terminal's screen.
-  t.Log(expect.StripTrailingEmptyLines(state.String()))
+  	// Dump the terminal's screen.
+  	t.Log(expect.StripTrailingEmptyLines(state.String()))
 }
 ```
 
@@ -349,34 +349,34 @@ If your application is decoupled from `os.Stdout` and `os.Stdin`, you can even t
 
 ```go
 func TestCLI(t *testing.T) {
-  // Multiplex stdin/stdout to a virtual terminal to respond to ANSI escape
-  // sequences (i.e. cursor position report).
+  	// Multiplex stdin/stdout to a virtual terminal to respond to ANSI escape
+  	// sequences (i.e. cursor position report).
 	c, state, err := vt10x.NewVT10XConsole()
 	require.Nil(t, err)
-  defer c.Close()
+  	defer c.Close()
 
-  donec := make(chan struct{})
-  go func() {
-    defer close(donec)
-    c.ExpectString("What is your name?")
-    c.SendLine("Johnny Appleseed")
-    c.ExpectEOF()
-  }()
+  	donec := make(chan struct{})
+	go func() {
+    		defer close(donec)
+    		c.ExpectString("What is your name?")
+    		c.SendLine("Johnny Appleseed")
+    		c.ExpectEOF()
+	}()
 
-  prompt := &Input{
-    Message: "What is your name?",
-  }
-  prompt.WithStdio(Stdio(c))
+  	prompt := &Input{
+    		Message: "What is your name?",
+  	}
+  	prompt.WithStdio(Stdio(c))
 
-  answer, err := prompt.Prompt()
-  require.Nil(t, err)
-  require.Equal(t, "Johnny Appleseed", answer)
+  	answer, err := prompt.Prompt()
+  	require.Nil(t, err)
+  	require.Equal(t, "Johnny Appleseed", answer)
 
-  // Close the slave end of the pty, and read the remaining bytes from the master end.
-  c.Tty().Close()
-  <-donec
+  	// Close the slave end of the pty, and read the remaining bytes from the master end.
+  	c.Tty().Close()
+  	<-donec
 
-  // Dump the terminal's screen.
-  t.Log(expect.StripTrailingEmptyLines(state.String()))
+  	// Dump the terminal's screen.
+  	t.Log(expect.StripTrailingEmptyLines(state.String()))
 }
 ```
