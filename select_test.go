@@ -214,7 +214,7 @@ func TestSelectPrompt(t *testing.T) {
 			},
 			func(c *expect.Console) {
 				c.ExpectString("Choose a color:")
-				// Filter down to red and green.
+				// Make sure only red is showing
 				c.SendLine("red")
 				c.ExpectEOF()
 			},
