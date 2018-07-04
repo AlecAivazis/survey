@@ -205,6 +205,21 @@ func TestSelectPrompt(t *testing.T) {
 			},
 			"green",
 		},
+		{
+			"Can select the first result in a filtered list if there is a default",
+			&Select{
+				Message: "Choose a color:",
+				Options: []string{"red", "blue", "green"},
+				Default: "blue",
+			},
+			func(c *expect.Console) {
+				c.ExpectString("Choose a color:")
+				// Make sure only red is showing
+				c.SendLine("red")
+				c.ExpectEOF()
+			},
+			"red",
+		},
 	}
 
 	for _, test := range tests {
