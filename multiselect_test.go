@@ -2,8 +2,10 @@ package survey
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"os"
+	"strings"
 	"testing"
 
 	expect "github.com/Netflix/go-expect"
@@ -42,12 +44,16 @@ func TestMultiSelectRender(t *testing.T) {
 				PageEntries:   prompt.Options,
 				Checked:       map[string]bool{"bar": true, "buz": true},
 			},
-			`? Pick your words:  [Use arrows to move, type to filter]
-  ◯  foo
-  ◉  bar
-❯ ◯  baz
-  ◉  buz
-`,
+			strings.Join(
+				[]string{
+					fmt.Sprintf("%s Pick your words:  [Use arrows to move, type to filter]", core.QuestionIcon),
+					fmt.Sprintf("  %s  foo", core.UnmarkedOptionIcon),
+					fmt.Sprintf("  %s  bar", core.MarkedOptionIcon),
+					fmt.Sprintf("%s %s  baz", core.SelectFocusIcon, core.UnmarkedOptionIcon),
+					fmt.Sprintf("  %s  buz\n", core.MarkedOptionIcon),
+				},
+				"\n",
+			),
 		},
 		{
 			"Test MultiSelect answer output",
@@ -56,7 +62,7 @@ func TestMultiSelectRender(t *testing.T) {
 				Answer:     "foo, buz",
 				ShowAnswer: true,
 			},
-			"? Pick your words: foo, buz\n",
+			fmt.Sprintf("%s Pick your words: foo, buz\n", core.QuestionIcon),
 		},
 		{
 			"Test MultiSelect question output with help hidden",
@@ -66,12 +72,16 @@ func TestMultiSelectRender(t *testing.T) {
 				PageEntries:   prompt.Options,
 				Checked:       map[string]bool{"bar": true, "buz": true},
 			},
-			`? Pick your words:  [Use arrows to move, type to filter, ? for more help]
-  ◯  foo
-  ◉  bar
-❯ ◯  baz
-  ◉  buz
-`,
+			strings.Join(
+				[]string{
+					fmt.Sprintf("%s Pick your words:  [Use arrows to move, type to filter, %s for more help]", core.QuestionIcon, string(core.HelpInputRune)),
+					fmt.Sprintf("  %s  foo", core.UnmarkedOptionIcon),
+					fmt.Sprintf("  %s  bar", core.MarkedOptionIcon),
+					fmt.Sprintf("%s %s  baz", core.SelectFocusIcon, core.UnmarkedOptionIcon),
+					fmt.Sprintf("  %s  buz\n", core.MarkedOptionIcon),
+				},
+				"\n",
+			),
 		},
 		{
 			"Test MultiSelect question output with help shown",
@@ -82,13 +92,17 @@ func TestMultiSelectRender(t *testing.T) {
 				Checked:       map[string]bool{"bar": true, "buz": true},
 				ShowHelp:      true,
 			},
-			`ⓘ This is helpful
-? Pick your words:  [Use arrows to move, type to filter]
-  ◯  foo
-  ◉  bar
-❯ ◯  baz
-  ◉  buz
-`,
+			strings.Join(
+				[]string{
+					fmt.Sprintf("%s This is helpful", core.HelpIcon),
+					fmt.Sprintf("%s Pick your words:  [Use arrows to move, type to filter]", core.QuestionIcon),
+					fmt.Sprintf("  %s  foo", core.UnmarkedOptionIcon),
+					fmt.Sprintf("  %s  bar", core.MarkedOptionIcon),
+					fmt.Sprintf("%s %s  baz", core.SelectFocusIcon, core.UnmarkedOptionIcon),
+					fmt.Sprintf("  %s  buz\n", core.MarkedOptionIcon),
+				},
+				"\n",
+			),
 		},
 	}
 

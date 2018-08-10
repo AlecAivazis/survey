@@ -2,8 +2,10 @@ package survey
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"os"
+	"strings"
 	"testing"
 
 	expect "github.com/Netflix/go-expect"
@@ -38,41 +40,53 @@ func TestSelectRender(t *testing.T) {
 			"Test Select question output",
 			prompt,
 			SelectTemplateData{SelectedIndex: 2, PageEntries: prompt.Options},
-			`? Pick your word:  [Use arrows to move, type to filter]
-  foo
-  bar
-❯ baz
-  buz
-`,
+			strings.Join(
+				[]string{
+					fmt.Sprintf("%s Pick your word:  [Use arrows to move, type to filter]", core.QuestionIcon),
+					"  foo",
+					"  bar",
+					fmt.Sprintf("%s baz", core.SelectFocusIcon),
+					"  buz\n",
+				},
+				"\n",
+			),
 		},
 		{
 			"Test Select answer output",
 			prompt,
 			SelectTemplateData{Answer: "buz", ShowAnswer: true, PageEntries: prompt.Options},
-			"? Pick your word: buz\n",
+			fmt.Sprintf("%s Pick your word: buz\n", core.QuestionIcon),
 		},
 		{
 			"Test Select question output with help hidden",
 			helpfulPrompt,
 			SelectTemplateData{SelectedIndex: 2, PageEntries: prompt.Options},
-			`? Pick your word:  [Use arrows to move, type to filter, ? for more help]
-  foo
-  bar
-❯ baz
-  buz
-`,
+			strings.Join(
+				[]string{
+					fmt.Sprintf("%s Pick your word:  [Use arrows to move, type to filter, %s for more help]", core.QuestionIcon, string(core.HelpInputRune)),
+					"  foo",
+					"  bar",
+					fmt.Sprintf("%s baz", core.SelectFocusIcon),
+					"  buz\n",
+				},
+				"\n",
+			),
 		},
 		{
 			"Test Select question output with help shown",
 			helpfulPrompt,
 			SelectTemplateData{SelectedIndex: 2, ShowHelp: true, PageEntries: prompt.Options},
-			`ⓘ This is helpful
-? Pick your word:  [Use arrows to move, type to filter]
-  foo
-  bar
-❯ baz
-  buz
-`,
+			strings.Join(
+				[]string{
+					fmt.Sprintf("%s This is helpful", core.HelpIcon),
+					fmt.Sprintf("%s Pick your word:  [Use arrows to move, type to filter]", core.QuestionIcon),
+					"  foo",
+					"  bar",
+					fmt.Sprintf("%s baz", core.SelectFocusIcon),
+					"  buz\n",
+				},
+				"\n",
+			),
 		},
 	}
 

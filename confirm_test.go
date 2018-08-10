@@ -2,6 +2,7 @@ package survey
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"os"
 	"testing"
@@ -29,32 +30,31 @@ func TestConfirmRender(t *testing.T) {
 			"Test Confirm question output with default true",
 			Confirm{Message: "Is pizza your favorite food?", Default: true},
 			ConfirmTemplateData{},
-			`? Is pizza your favorite food? (Y/n) `,
+			fmt.Sprintf("%s Is pizza your favorite food? (Y/n) ", core.QuestionIcon),
 		},
 		{
 			"Test Confirm question output with default false",
 			Confirm{Message: "Is pizza your favorite food?", Default: false},
 			ConfirmTemplateData{},
-			`? Is pizza your favorite food? (y/N) `,
+			fmt.Sprintf("%s Is pizza your favorite food? (y/N) ", core.QuestionIcon),
 		},
 		{
 			"Test Confirm answer output",
 			Confirm{Message: "Is pizza your favorite food?"},
 			ConfirmTemplateData{Answer: "Yes"},
-			"? Is pizza your favorite food? Yes\n",
+			fmt.Sprintf("%s Is pizza your favorite food? Yes\n", core.QuestionIcon),
 		},
 		{
 			"Test Confirm with help but help message is hidden",
 			Confirm{Message: "Is pizza your favorite food?", Help: "This is helpful"},
 			ConfirmTemplateData{},
-			"? Is pizza your favorite food? [? for help] (y/N) ",
+			fmt.Sprintf("%s Is pizza your favorite food? [%s for help] (y/N) ", core.QuestionIcon, string(core.HelpInputRune)),
 		},
 		{
 			"Test Confirm help output with help message shown",
 			Confirm{Message: "Is pizza your favorite food?", Help: "This is helpful"},
 			ConfirmTemplateData{ShowHelp: true},
-			`ⓘ This is helpful
-? Is pizza your favorite food? (y/N) `,
+			fmt.Sprintf("%s This is helpful\n%s Is pizza your favorite food? (y/N) ", core.HelpIcon, core.QuestionIcon),
 		},
 	}
 
@@ -125,7 +125,12 @@ func TestConfirmPrompt(t *testing.T) {
 				Help:    "It probably is",
 			},
 			func(c *expect.Console) {
-				c.ExpectString("Is pizza your favorite food? [? for help] (y/N)")
+				c.ExpectString(
+					fmt.Sprintf(
+						"Is pizza your favorite food? [%s for help] (y/N)",
+						string(core.HelpInputRune),
+					),
+				)
 				c.SendLine("?")
 				c.ExpectString("It probably is")
 				c.SendLine("Y")
