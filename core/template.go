@@ -11,16 +11,26 @@ import (
 var DisableColor = false
 
 var (
+	// HelpInputRune is the rune which the user should enter to trigger
+	// more detailed question help
 	HelpInputRune = '?'
 
-	ErrorIcon    = "✘"
-	HelpIcon     = "ⓘ"
+	// ErrorIcon will be be shown before an error
+	ErrorIcon = "X"
+
+	// HelpIcon will be shown before more detailed question help
+	HelpIcon = "????"
+	// QuestionIcon will be shown before a question Message
 	QuestionIcon = "?"
 
-	MarkedOptionIcon   = "◉"
-	UnmarkedOptionIcon = "◯"
+	// MarkedOptionIcon will be prepended before a selected multiselect option
+	MarkedOptionIcon = "[x]"
+	// UnmarkedOptionIcon will be prepended before an unselected multiselect option
+	UnmarkedOptionIcon = "[ ]"
 
-	SelectFocusIcon = "❯"
+	// SelectFocusIcon is prepended to an option to signify the user is
+	// currently focusing that option
+	SelectFocusIcon = ">"
 )
 
 var TemplateFuncs = map[string]interface{}{
