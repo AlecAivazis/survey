@@ -2,6 +2,7 @@ package survey
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"os"
 	"os/exec"
@@ -30,51 +31,49 @@ func TestEditorRender(t *testing.T) {
 			"Test Editor question output without default",
 			Editor{Message: "What is your favorite month:"},
 			EditorTemplateData{},
-			"? What is your favorite month: [Enter to launch editor] ",
+			fmt.Sprintf("%s What is your favorite month: [Enter to launch editor] ", core.QuestionIcon),
 		},
 		{
 			"Test Editor question output with default",
 			Editor{Message: "What is your favorite month:", Default: "April"},
 			EditorTemplateData{},
-			"? What is your favorite month: (April) [Enter to launch editor] ",
+			fmt.Sprintf("%s What is your favorite month: (April) [Enter to launch editor] ", core.QuestionIcon),
 		},
 		{
 			"Test Editor question output with HideDefault",
 			Editor{Message: "What is your favorite month:", Default: "April", HideDefault: true},
 			EditorTemplateData{},
-			"? What is your favorite month: [Enter to launch editor] ",
+			fmt.Sprintf("%s What is your favorite month: [Enter to launch editor] ", core.QuestionIcon),
 		},
 		{
 			"Test Editor answer output",
 			Editor{Message: "What is your favorite month:"},
 			EditorTemplateData{Answer: "October", ShowAnswer: true},
-			"? What is your favorite month: October\n",
+			fmt.Sprintf("%s What is your favorite month: October\n", core.QuestionIcon),
 		},
 		{
 			"Test Editor question output without default but with help hidden",
 			Editor{Message: "What is your favorite month:", Help: "This is helpful"},
 			EditorTemplateData{},
-			"? What is your favorite month: [? for help] [Enter to launch editor] ",
+			fmt.Sprintf("%s What is your favorite month: [%s for help] [Enter to launch editor] ", core.QuestionIcon, string(core.HelpInputRune)),
 		},
 		{
 			"Test Editor question output with default and with help hidden",
 			Editor{Message: "What is your favorite month:", Default: "April", Help: "This is helpful"},
 			EditorTemplateData{},
-			"? What is your favorite month: [? for help] (April) [Enter to launch editor] ",
+			fmt.Sprintf("%s What is your favorite month: [%s for help] (April) [Enter to launch editor] ", core.QuestionIcon, string(core.HelpInputRune)),
 		},
 		{
 			"Test Editor question output without default but with help shown",
 			Editor{Message: "What is your favorite month:", Help: "This is helpful"},
 			EditorTemplateData{ShowHelp: true},
-			`ⓘ This is helpful
-? What is your favorite month: [Enter to launch editor] `,
+			fmt.Sprintf("%s This is helpful\n%s What is your favorite month: [Enter to launch editor] ", core.HelpIcon, core.QuestionIcon),
 		},
 		{
 			"Test Editor question output with default and with help shown",
 			Editor{Message: "What is your favorite month:", Default: "April", Help: "This is helpful"},
 			EditorTemplateData{ShowHelp: true},
-			`ⓘ This is helpful
-? What is your favorite month: (April) [Enter to launch editor] `,
+			fmt.Sprintf("%s This is helpful\n%s What is your favorite month: (April) [Enter to launch editor] ", core.HelpIcon, core.QuestionIcon),
 		},
 	}
 
@@ -178,7 +177,12 @@ func TestEditorPrompt(t *testing.T) {
 				Help:    "Describe your git commit",
 			},
 			func(c *expect.Console) {
-				c.ExpectString("Edit git commit message [? for help] [Enter to launch editor]")
+				c.ExpectString(
+					fmt.Sprintf(
+						"Edit git commit message [%s for help] [Enter to launch editor]",
+						string(core.HelpInputRune),
+					),
+				)
 				c.SendLine("?")
 				c.ExpectString("Describe your git commit")
 				c.SendLine("")
