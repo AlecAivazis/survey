@@ -211,6 +211,22 @@ func TestEditorPrompt(t *testing.T) {
 			},
 			"",
 		},
+		{
+			"Test Editor prompt interaction with editor args",
+			&Editor{
+				Editor:  "vi --",
+				Message: "Edit git commit message",
+			},
+			func(c *expect.Console) {
+				c.ExpectString("Edit git commit message [Enter to launch editor]")
+				c.SendLine("")
+				go c.ExpectEOF()
+				time.Sleep(time.Millisecond)
+				c.Send("iAdd editor prompt tests\x1b")
+				c.SendLine(":wq!")
+			},
+			"Add editor prompt tests\n",
+		},
 	}
 
 	for _, test := range tests {
