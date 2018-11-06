@@ -27,6 +27,7 @@ type MultiSelect struct {
 	Help          string
 	PageSize      int
 	VimMode       bool
+	ClearOnSelect bool
 	FilterMessage string
 	filter        string
 	selectedIndex int
@@ -93,6 +94,9 @@ func (m *MultiSelect) OnChange(line []rune, pos int, key rune) (newLine []rune, 
 			} else {
 				// otherwise just invert the current value
 				m.checked[options[m.selectedIndex]] = !old
+			}
+			if m.ClearOnSelect {
+				m.filter = ""
 			}
 		}
 		// only show the help message if we have one to show
