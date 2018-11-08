@@ -245,6 +245,27 @@ func TestMultiSelectPrompt(t *testing.T) {
 			},
 			[]string{"Tuesday"},
 		},
+		{
+			"Test MultiSelect clears input on select",
+			&MultiSelect{
+				Message: "What days do you prefer:",
+				Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
+			},
+			func(c *expect.Console) {
+				c.ExpectString("What days do you prefer:  [Use arrows to move, type to filter]")
+				// Filter down to Tuesday.
+				c.Send("Tues")
+				// Select Tuesday.
+				c.Send(" ")
+				// Filter down to Tuesday.
+				c.Send("Tues")
+				// Deselect Tuesday.
+				c.Send(" ")
+				c.SendLine("")
+				c.ExpectEOF()
+			},
+			[]string{},
+		},
 	}
 
 	for _, test := range tests {
