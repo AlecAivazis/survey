@@ -39,6 +39,10 @@ var InputQuestionTemplate = `
   {{- if .Default}}{{color "white"}}({{.Default}}) {{color "reset"}}{{end}}
 {{- end}}`
 
+func (*Input) NeedAnswer() bool {
+	return true
+}
+
 func (i *Input) Prompt() (interface{}, error) {
 	// render the template
 	err := i.Render(

@@ -15,6 +15,10 @@ type Confirm struct {
 	Help    string
 }
 
+func (*Confirm) NeedAnswer() bool {
+	return true
+}
+
 // data available to the templates when processing
 type ConfirmTemplateData struct {
 	Confirm

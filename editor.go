@@ -7,7 +7,7 @@ import (
 	"os/exec"
 	"runtime"
 
-	shellquote "github.com/kballard/go-shellquote"
+	"github.com/kballard/go-shellquote"
 	"gopkg.in/AlecAivazis/survey.v1/core"
 	"gopkg.in/AlecAivazis/survey.v1/terminal"
 )
@@ -70,6 +70,10 @@ func init() {
 	} else if e := os.Getenv("EDITOR"); e != "" {
 		editor = e
 	}
+}
+
+func (*Editor) NeedAnswer() bool {
+	return true
 }
 
 func (e *Editor) Prompt() (interface{}, error) {

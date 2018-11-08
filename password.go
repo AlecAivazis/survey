@@ -84,3 +84,7 @@ func (p *Password) Prompt() (line interface{}, err error) {
 func (prompt *Password) Cleanup(val interface{}) error {
 	return nil
 }
+
+func (*Password) NeedAnswer() bool {
+	return true
+}

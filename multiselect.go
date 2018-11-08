@@ -158,6 +158,10 @@ func (m *MultiSelect) filterOptions() []string {
 	return answer
 }
 
+func (*MultiSelect) NeedAnswer() bool {
+	return true
+}
+
 func (m *MultiSelect) Prompt() (interface{}, error) {
 	// compute the default state
 	m.checked = make(map[string]bool)

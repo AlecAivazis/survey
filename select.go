@@ -269,3 +269,7 @@ func (s *Select) Cleanup(val interface{}) error {
 		},
 	)
 }
+
+func (s *Select) NeedAnswer() bool {
+	return true
+}

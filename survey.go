@@ -47,6 +47,7 @@ type Prompt interface {
 	Prompt() (interface{}, error)
 	Cleanup(interface{}) error
 	Error(error) error
+	NeedAnswer() bool
 }
 
 // AskOpt allows setting optional ask options.
@@ -126,8 +127,15 @@ func Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
 		}
 	}
 
+	needAnswer := true
+	for _, q := range qs {
+		if p, ok := q.Prompt.(Prompt); ok {
+			needAnswer = needAnswer && p.NeedAnswer()
+		}
+	}
+
 	// if we weren't passed a place to record the answers
-	if response == nil {
+	if needAnswer && response == nil {
 		// we can't go any further
 		return errors.New("cannot call Ask() with a nil reference to record the answers")
 	}
@@ -144,6 +152,10 @@ func Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
 		// if there was a problem
 		if err != nil {
 			return err
+		}
+
+		if !q.Prompt.NeedAnswer() {
+			continue
 		}
 
 		// if there is a validate handler for this question

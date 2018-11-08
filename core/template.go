@@ -31,6 +31,9 @@ var (
 	// SelectFocusIcon is prepended to an option to signify the user is
 	// currently focusing that option
 	SelectFocusIcon = ">"
+
+	// TextIcon will be be shown before an text
+	TextIcon = "!"
 )
 
 /*
@@ -78,6 +81,9 @@ var TemplateFuncs = map[string]interface{}{
 	},
 	"SelectFocusIcon": func() string {
 		return SelectFocusIcon
+	},
+	"TextIcon": func() string {
+		return TextIcon
 	},
 }
 
