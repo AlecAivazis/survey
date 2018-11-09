@@ -1,4 +1,4 @@
-module github.com/rmfish/survey
+module gopkg.in/AlecAivazis/survey.v1
 
 require (
 	github.com/Netflix/go-expect v0.0.0-20180615182759-c93bf25de8e8
