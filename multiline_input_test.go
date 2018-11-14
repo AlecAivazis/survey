@@ -30,13 +30,13 @@ func TestMultilineInputRender(t *testing.T) {
 			"Test MultilineInput question output without default",
 			MultilineInput{Message: "What is your favorite month:"},
 			MultilineInputTemplateData{},
-			fmt.Sprintf("%s What is your favorite month: [Empty line to finish]", core.QuestionIcon),
+			fmt.Sprintf("%s What is your favorite month: [Enter 2 empty lines to finish]", core.QuestionIcon),
 		},
 		{
 			"Test MultilineInput question output with default",
 			MultilineInput{Message: "What is your favorite month:", Default: "April"},
 			MultilineInputTemplateData{},
-			fmt.Sprintf("%s What is your favorite month: (April) [Empty line to finish]", core.QuestionIcon),
+			fmt.Sprintf("%s What is your favorite month: (April) [Enter 2 empty lines to finish]", core.QuestionIcon),
 		},
 		{
 			"Test MultilineInput answer output",
@@ -48,25 +48,25 @@ func TestMultilineInputRender(t *testing.T) {
 			"Test MultilineInput question output without default but with help hidden",
 			MultilineInput{Message: "What is your favorite month:", Help: "This is helpful"},
 			MultilineInputTemplateData{},
-			fmt.Sprintf("%s What is your favorite month: [Empty line to finish]", string(core.HelpInputRune)),
+			fmt.Sprintf("%s What is your favorite month: [Enter 2 empty lines to finish]", string(core.HelpInputRune)),
 		},
 		{
 			"Test MultilineInput question output with default and with help hidden",
 			MultilineInput{Message: "What is your favorite month:", Default: "April", Help: "This is helpful"},
 			MultilineInputTemplateData{},
-			fmt.Sprintf("%s What is your favorite month: (April) [Empty line to finish]", string(core.HelpInputRune)),
+			fmt.Sprintf("%s What is your favorite month: (April) [Enter 2 empty lines to finish]", string(core.HelpInputRune)),
 		},
 		{
 			"Test MultilineInput question output without default but with help shown",
 			MultilineInput{Message: "What is your favorite month:", Help: "This is helpful"},
 			MultilineInputTemplateData{ShowHelp: true},
-			fmt.Sprintf("%s This is helpful\n%s What is your favorite month: [Empty line to finish]", core.HelpIcon, core.QuestionIcon),
+			fmt.Sprintf("%s This is helpful\n%s What is your favorite month: [Enter 2 empty lines to finish]", core.HelpIcon, core.QuestionIcon),
 		},
 		{
 			"Test MultilineInput question output with default and with help shown",
 			MultilineInput{Message: "What is your favorite month:", Default: "April", Help: "This is helpful"},
 			MultilineInputTemplateData{ShowHelp: true},
-			fmt.Sprintf("%s This is helpful\n%s What is your favorite month: (April) [Empty line to finish]", core.HelpIcon, core.QuestionIcon),
+			fmt.Sprintf("%s This is helpful\n%s What is your favorite month: (April) [Enter 2 empty lines to finish]", core.HelpIcon, core.QuestionIcon),
 		},
 	}
 
