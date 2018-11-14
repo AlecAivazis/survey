@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"gopkg.in/AlecAivazis/survey.v1/core"
+	"gopkg.in/AlecAivazis/survey.v1/terminal"
 )
 
 type MultilineInput struct {
@@ -67,8 +68,9 @@ func (i *MultilineInput) Prompt() (interface{}, error) {
 			if emptyOnce {
 				numLines := len(multiline) + 2
 				cursor.PreviousLine(numLines)
-				for i := 0; i < numLines; i++ {
-					fmt.Println("\033[K")
+				for j := 0; j < numLines; j++ {
+					terminal.EraseLine(i.Stdio().Out, terminal.ERASE_LINE_ALL)
+					cursor.NextLine(1)
 				}
 				cursor.PreviousLine(numLines)
 				break
