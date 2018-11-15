@@ -42,7 +42,7 @@ func TestMultilineInputRender(t *testing.T) {
 			"Test MultilineInput answer output",
 			MultilineInput{Message: "What is your favorite month:"},
 			MultilineInputTemplateData{Answer: "October", ShowAnswer: true},
-			fmt.Sprintf("%s What is your favorite month: October\n", core.QuestionIcon),
+			fmt.Sprintf("%s What is your favorite month: \nOctober\n", core.QuestionIcon),
 		},
 		{
 			"Test MultilineInput question output without default but with help hidden",
