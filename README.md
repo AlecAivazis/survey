@@ -5,7 +5,7 @@
 
 A library for building interactive prompts. 
 
-<img width="500" src="https://thumbs.gfycat.com/VillainousGraciousKouprey-size_restricted.gif"/>
+<img width="550" src="https://thumbs.gfycat.com/VillainousGraciousKouprey-size_restricted.gif"/>
 
 ```go
 package main
@@ -93,7 +93,7 @@ go run examples/validation.go
 
 ### Input
 
-<img src="https://media.giphy.com/media/3og0IxS8JsuD9Z8syA/giphy.gif" width="400px"/>
+<img src="https://thumbs.gfycat.com/LankyBlindAmericanpainthorse-size_restricted.gif" width="400px"/>
 
 ```golang
 name := ""
@@ -105,7 +105,7 @@ survey.AskOne(prompt, &name, nil)
 
 ### Password
 
-<img src="https://media.giphy.com/media/26FmQr6mUivkq71GE/giphy.gif" width="400px" />
+<img src="https://thumbs.gfycat.com/CompassionateSevereHypacrosaurus-size_restricted.gif" width="400px" />
 
 ```golang
 password := ""
@@ -117,7 +117,7 @@ survey.AskOne(prompt, &password, nil)
 
 ### Confirm
 
-<img src="https://media.giphy.com/media/3oKIPgsUmTp4m3eo4E/giphy.gif" width="400px"/>
+<img src="https://thumbs.gfycat.com/UnkemptCarefulGermanpinscher-size_restricted.gif" width="400px"/>
 
 ```golang
 name := false
@@ -129,7 +129,7 @@ survey.AskOne(prompt, &name, nil)
 
 ### Select
 
-<img src="https://media.giphy.com/media/3oKIPxigmMu5YqpUPK/giphy.gif" width="400px"/>
+<img src="https://thumbs.gfycat.com/GrimFilthyAmazonparrot-size_restricted.gif" width="450px"/>
 
 ```golang
 color := ""
@@ -153,7 +153,7 @@ prompt := &survey.Select{..., PageSize: 10}
 
 ### MultiSelect
 
-<img src="https://media.giphy.com/media/3oKIP8lHYFtGeQDH0c/giphy.gif" width="400px"/>
+<img src="https://thumbs.gfycat.com/SharpTameAntelope-size_restricted.gif" width="450px"/>
 
 ```golang
 days := []string{}
