@@ -283,12 +283,12 @@ in `survey/core`:
 
 | name               | default | description                                                   |
 | ------------------ | ------- | ------------------------------------------------------------- |
-| ErrorIcon          | ✘       | Before an error                                               |
-| HelpIcon           | ⓘ       | Before help text                                              |
+| ErrorIcon          | X       | Before an error                                               |
+| HelpIcon           | i       | Before help text                                              |
 | QuestionIcon       | ?       | Before the message of a prompt                                |
-| SelectFocusIcon    | ❯       | Marks the current focus in `Select` and `MultiSelect` prompts |
-| MarkedOptionIcon   | ◉       | Marks a chosen selection in a `MultiSelect` prompt            |
-| UnmarkedOptionIcon | ◯       | Marks an unselected option in a `MultiSelect` prompt          |
+| SelectFocusIcon    | >       | Marks the current focus in `Select` and `MultiSelect` prompts |
+| UnmarkedOptionIcon | [ ]     | Marks an unselected option in a `MultiSelect` prompt          |
+| MarkedOptionIcon   | [x]     | Marks a chosen selection in a `MultiSelect` prompt            |
 
 ## Versioning
 
