@@ -215,7 +215,7 @@ validators include:
 
 All of the prompts have a `Help` field which can be defined to provide more information to your users:
 
-<img src="https://media.giphy.com/media/l1KVbc5CehW6r7pss/giphy.gif" width="400px" style="margin-top: 8px"/>
+<img src="https://thumbs.gfycat.com/CloudyRemorsefulFossa-size_restricted.gif" width="400px" style="margin-top: 8px"/>
 
 ```golang
 &survey.Input{
