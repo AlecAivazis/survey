@@ -5,7 +5,7 @@
 
 A library for building interactive prompts. 
 
-![](https://zippy.gfycat.com/AmusingBossyArrowworm.gif)
+<img width="500" src="https://thumbs.gfycat.com/VillainousGraciousKouprey-size_restricted.gif"/>
 
 ```go
 package main
