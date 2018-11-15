@@ -19,7 +19,7 @@ var (
 	ErrorIcon = "X"
 
 	// HelpIcon will be shown before more detailed question help
-	HelpIcon = "????"
+	HelpIcon = "?"
 	// QuestionIcon will be shown before a question Message
 	QuestionIcon = "?"
 
