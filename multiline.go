@@ -8,7 +8,7 @@ import (
 	"gopkg.in/AlecAivazis/survey.v1/terminal"
 )
 
-type MultilineInput struct {
+type Multiline struct {
 	core.Renderer
 	Message string
 	Default string
@@ -16,15 +16,15 @@ type MultilineInput struct {
 }
 
 // data available to the templates when processing
-type MultilineInputTemplateData struct {
-	MultilineInput
+type MultilineTemplateData struct {
+	Multiline
 	Answer     string
 	ShowAnswer bool
 	ShowHelp   bool
 }
 
 // Templates with Color formatting. See Documentation: https://github.com/mgutz/ansi#style-format
-var MultilineInputQuestionTemplate = `
+var MultilineQuestionTemplate = `
 {{- if .ShowHelp }}{{- color "cyan"}}{{ HelpIcon }} {{ .Help }}{{color "reset"}}{{"\n"}}{{end}}
 {{- color "green+hb"}}{{ QuestionIcon }} {{color "reset"}}
 {{- color "default+hb"}}{{ .Message }} {{color "reset"}}
@@ -35,11 +35,11 @@ var MultilineInputQuestionTemplate = `
   {{- color "cyan"}}[Enter 2 empty lines to finish]{{color "reset"}}
 {{- end}}`
 
-func (i *MultilineInput) Prompt() (interface{}, error) {
+func (i *Multiline) Prompt() (interface{}, error) {
 	// render the template
 	err := i.Render(
-		MultilineInputQuestionTemplate,
-		MultilineInputTemplateData{MultilineInput: *i},
+		MultilineQuestionTemplate,
+		MultilineTemplateData{Multiline: *i},
 	)
 	if err != nil {
 		return "", err
@@ -95,9 +95,9 @@ func (i *MultilineInput) Prompt() (interface{}, error) {
 	return val, err
 }
 
-func (i *MultilineInput) Cleanup(val interface{}) error {
+func (i *Multiline) Cleanup(val interface{}) error {
 	return i.Render(
-		MultilineInputQuestionTemplate,
-		MultilineInputTemplateData{MultilineInput: *i, Answer: val.(string), ShowAnswer: true},
+		MultilineQuestionTemplate,
+		MultilineTemplateData{Multiline: *i, Answer: val.(string), ShowAnswer: true},
 	)
 }

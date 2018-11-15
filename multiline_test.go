@@ -18,54 +18,54 @@ func init() {
 	core.DisableColor = true
 }
 
-func TestMultilineInputRender(t *testing.T) {
+func TestMultilineRender(t *testing.T) {
 
 	tests := []struct {
 		title    string
-		prompt   MultilineInput
-		data     MultilineInputTemplateData
+		prompt   Multiline
+		data     MultilineTemplateData
 		expected string
 	}{
 		{
-			"Test MultilineInput question output without default",
-			MultilineInput{Message: "What is your favorite month:"},
-			MultilineInputTemplateData{},
+			"Test Multiline question output without default",
+			Multiline{Message: "What is your favorite month:"},
+			MultilineTemplateData{},
 			fmt.Sprintf("%s What is your favorite month: [Enter 2 empty lines to finish]", core.QuestionIcon),
 		},
 		{
-			"Test MultilineInput question output with default",
-			MultilineInput{Message: "What is your favorite month:", Default: "April"},
-			MultilineInputTemplateData{},
+			"Test Multiline question output with default",
+			Multiline{Message: "What is your favorite month:", Default: "April"},
+			MultilineTemplateData{},
 			fmt.Sprintf("%s What is your favorite month: (April) [Enter 2 empty lines to finish]", core.QuestionIcon),
 		},
 		{
-			"Test MultilineInput answer output",
-			MultilineInput{Message: "What is your favorite month:"},
-			MultilineInputTemplateData{Answer: "October", ShowAnswer: true},
+			"Test Multiline answer output",
+			Multiline{Message: "What is your favorite month:"},
+			MultilineTemplateData{Answer: "October", ShowAnswer: true},
 			fmt.Sprintf("%s What is your favorite month: \nOctober\n", core.QuestionIcon),
 		},
 		{
-			"Test MultilineInput question output without default but with help hidden",
-			MultilineInput{Message: "What is your favorite month:", Help: "This is helpful"},
-			MultilineInputTemplateData{},
+			"Test Multiline question output without default but with help hidden",
+			Multiline{Message: "What is your favorite month:", Help: "This is helpful"},
+			MultilineTemplateData{},
 			fmt.Sprintf("%s What is your favorite month: [Enter 2 empty lines to finish]", string(core.HelpInputRune)),
 		},
 		{
-			"Test MultilineInput question output with default and with help hidden",
-			MultilineInput{Message: "What is your favorite month:", Default: "April", Help: "This is helpful"},
-			MultilineInputTemplateData{},
+			"Test Multiline question output with default and with help hidden",
+			Multiline{Message: "What is your favorite month:", Default: "April", Help: "This is helpful"},
+			MultilineTemplateData{},
 			fmt.Sprintf("%s What is your favorite month: (April) [Enter 2 empty lines to finish]", string(core.HelpInputRune)),
 		},
 		{
-			"Test MultilineInput question output without default but with help shown",
-			MultilineInput{Message: "What is your favorite month:", Help: "This is helpful"},
-			MultilineInputTemplateData{ShowHelp: true},
+			"Test Multiline question output without default but with help shown",
+			Multiline{Message: "What is your favorite month:", Help: "This is helpful"},
+			MultilineTemplateData{ShowHelp: true},
 			fmt.Sprintf("%s This is helpful\n%s What is your favorite month: [Enter 2 empty lines to finish]", core.HelpIcon, core.QuestionIcon),
 		},
 		{
-			"Test MultilineInput question output with default and with help shown",
-			MultilineInput{Message: "What is your favorite month:", Default: "April", Help: "This is helpful"},
-			MultilineInputTemplateData{ShowHelp: true},
+			"Test Multiline question output with default and with help shown",
+			Multiline{Message: "What is your favorite month:", Default: "April", Help: "This is helpful"},
+			MultilineTemplateData{ShowHelp: true},
 			fmt.Sprintf("%s This is helpful\n%s What is your favorite month: (April) [Enter 2 empty lines to finish]", core.HelpIcon, core.QuestionIcon),
 		},
 	}
@@ -75,9 +75,9 @@ func TestMultilineInputRender(t *testing.T) {
 		assert.Nil(t, err, test.title)
 
 		test.prompt.WithStdio(terminal.Stdio{Out: w})
-		test.data.MultilineInput = test.prompt
+		test.data.Multiline = test.prompt
 		err = test.prompt.Render(
-			MultilineInputQuestionTemplate,
+			MultilineQuestionTemplate,
 			test.data,
 		)
 		assert.Nil(t, err, test.title)
@@ -90,11 +90,11 @@ func TestMultilineInputRender(t *testing.T) {
 	}
 }
 
-func TestMultilineInputPrompt(t *testing.T) {
+func TestMultilinePrompt(t *testing.T) {
 	tests := []PromptTest{
 		{
-			"Test MultilineInput prompt interaction",
-			&MultilineInput{
+			"Test Multiline prompt interaction",
+			&Multiline{
 				Message: "What is your name?",
 			},
 			func(c *expect.Console) {
@@ -105,8 +105,8 @@ func TestMultilineInputPrompt(t *testing.T) {
 			"Larry Bird\nI guess...\nnot sure",
 		},
 		{
-			"Test MultilineInput prompt interaction with default",
-			&MultilineInput{
+			"Test Multiline prompt interaction with default",
+			&Multiline{
 				Message: "What is your name?",
 				Default: "Johnny Appleseed",
 			},
@@ -118,8 +118,8 @@ func TestMultilineInputPrompt(t *testing.T) {
 			"Johnny Appleseed",
 		},
 		{
-			"Test MultilineInput prompt interaction overriding default",
-			&MultilineInput{
+			"Test Multiline prompt interaction overriding default",
+			&Multiline{
 				Message: "What is your name?",
 				Default: "Johnny Appleseed",
 			},
@@ -131,8 +131,8 @@ func TestMultilineInputPrompt(t *testing.T) {
 			"Larry Bird",
 		},
 		{
-			"Test MultilineInput does not implement help interaction",
-			&MultilineInput{
+			"Test Multiline does not implement help interaction",
+			&Multiline{
 				Message: "What is your name?",
 				Help:    "It might be Satoshi Nakamoto",
 			},
