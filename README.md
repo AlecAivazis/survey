@@ -5,7 +5,7 @@
 
 A library for building interactive prompts. 
 
-![](https://zippy.gfycat.com/AmusingBossyArrowworm.gif)
+<img width="550" src="https://thumbs.gfycat.com/VillainousGraciousKouprey-size_restricted.gif"/>
 
 ```go
 package main
@@ -94,7 +94,7 @@ go run examples/validation.go
 
 ### Input
 
-<img src="https://media.giphy.com/media/3og0IxS8JsuD9Z8syA/giphy.gif" width="400px"/>
+<img src="https://thumbs.gfycat.com/LankyBlindAmericanpainthorse-size_restricted.gif" width="400px"/>
 
 ```golang
 name := ""
@@ -118,7 +118,7 @@ survey.AskOne(prompt, &text, nil)
 
 ### Password
 
-<img src="https://media.giphy.com/media/26FmQr6mUivkq71GE/giphy.gif" width="400px" />
+<img src="https://thumbs.gfycat.com/CompassionateSevereHypacrosaurus-size_restricted.gif" width="400px" />
 
 ```golang
 password := ""
@@ -130,7 +130,7 @@ survey.AskOne(prompt, &password, nil)
 
 ### Confirm
 
-<img src="https://media.giphy.com/media/3oKIPgsUmTp4m3eo4E/giphy.gif" width="400px"/>
+<img src="https://thumbs.gfycat.com/UnkemptCarefulGermanpinscher-size_restricted.gif" width="400px"/>
 
 ```golang
 name := false
@@ -142,7 +142,7 @@ survey.AskOne(prompt, &name, nil)
 
 ### Select
 
-<img src="https://media.giphy.com/media/3oKIPxigmMu5YqpUPK/giphy.gif" width="400px"/>
+<img src="https://thumbs.gfycat.com/GrimFilthyAmazonparrot-size_restricted.gif" width="450px"/>
 
 ```golang
 color := ""
@@ -166,7 +166,7 @@ prompt := &survey.Select{..., PageSize: 10}
 
 ### MultiSelect
 
-<img src="https://media.giphy.com/media/3oKIP8lHYFtGeQDH0c/giphy.gif" width="400px"/>
+<img src="https://thumbs.gfycat.com/SharpTameAntelope-size_restricted.gif" width="450px"/>
 
 ```golang
 days := []string{}
@@ -228,7 +228,7 @@ validators include:
 
 All of the prompts have a `Help` field which can be defined to provide more information to your users:
 
-<img src="https://media.giphy.com/media/l1KVbc5CehW6r7pss/giphy.gif" width="400px" style="margin-top: 8px"/>
+<img src="https://thumbs.gfycat.com/CloudyRemorsefulFossa-size_restricted.gif" width="400px" style="margin-top: 8px"/>
 
 ```golang
 &survey.Input{
@@ -296,12 +296,12 @@ in `survey/core`:
 
 | name               | default | description                                                   |
 | ------------------ | ------- | ------------------------------------------------------------- |
-| ErrorIcon          | ✘       | Before an error                                               |
-| HelpIcon           | ⓘ       | Before help text                                              |
+| ErrorIcon          | X       | Before an error                                               |
+| HelpIcon           | i       | Before help text                                              |
 | QuestionIcon       | ?       | Before the message of a prompt                                |
-| SelectFocusIcon    | ❯       | Marks the current focus in `Select` and `MultiSelect` prompts |
-| MarkedOptionIcon   | ◉       | Marks a chosen selection in a `MultiSelect` prompt            |
-| UnmarkedOptionIcon | ◯       | Marks an unselected option in a `MultiSelect` prompt          |
+| SelectFocusIcon    | >       | Marks the current focus in `Select` and `MultiSelect` prompts |
+| UnmarkedOptionIcon | [ ]     | Marks an unselected option in a `MultiSelect` prompt          |
+| MarkedOptionIcon   | [x]     | Marks a chosen selection in a `MultiSelect` prompt            |
 
 ## Versioning
 
