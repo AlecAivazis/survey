@@ -61,6 +61,7 @@ func main() {
 1. [Examples](#examples)
 1. [Prompts](#prompts)
    1. [Input](#input)
+   1. [Multiline](#multiline)
    1. [Password](#password)
    1. [Confirm](#confirm)
    1. [Select](#select)
@@ -101,6 +102,18 @@ prompt := &survey.Input{
     Message: "ping",
 }
 survey.AskOne(prompt, &name, nil)
+```
+
+### Multiline
+
+<img src="https://thumbs.gfycat.com/ImperfectShimmeringBeagle-size_restricted.gif" width="400px"/>
+
+```golang
+text := ""
+prompt := &survey.Multiline{
+    Message: "ping",
+}
+survey.AskOne(prompt, &text, nil)
 ```
 
 ### Password
