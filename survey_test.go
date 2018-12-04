@@ -2,6 +2,7 @@ package survey
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 	"time"
 
@@ -64,6 +65,19 @@ func TestAsk(t *testing.T) {
 					},
 				},
 				{
+					Name: "commit-message-validated",
+					Prompt: &Editor{
+						Message: "Edit git commit message",
+					},
+					Validate: func(v interface{}) error {
+						s := v.(string)
+						if strings.Contains(s, "invalid") {
+							return fmt.Errorf("invalid error message")
+						}
+						return nil
+					},
+				},
+				{
 					Name: "name",
 					Prompt: &Input{
 						Message: "What is your name?",
@@ -98,11 +112,24 @@ func TestAsk(t *testing.T) {
 				// Editor
 				c.ExpectString("Edit git commit message [Enter to launch editor]")
 				c.SendLine("")
-				go func() {
-					time.Sleep(time.Millisecond)
-					c.Send("iAdd editor prompt tests\x1b")
-					c.SendLine(":wq!")
-				}()
+				time.Sleep(time.Millisecond)
+				c.Send("iAdd editor prompt tests\x1b")
+				c.SendLine(":wq!")
+
+				// Editor validated
+				c.ExpectString("Edit git commit message [Enter to launch editor]")
+				c.SendLine("")
+				time.Sleep(time.Millisecond)
+				c.Send("i invalid input first try\x1b")
+				c.SendLine(":wq!")
+				time.Sleep(time.Millisecond)
+				c.ExpectString("invalid error message")
+				c.ExpectString("Edit git commit message [Enter to launch editor]")
+				c.SendLine("")
+				time.Sleep(time.Millisecond)
+				c.ExpectString("first try")
+				c.Send("ccAdd editor prompt tests\x1b")
+				c.SendLine(":wq!")
 
 				// Input
 				c.ExpectString("What is your name?")
@@ -129,12 +156,13 @@ func TestAsk(t *testing.T) {
 				c.ExpectEOF()
 			},
 			map[string]interface{}{
-				"pizza":          true,
-				"commit-message": "Add editor prompt tests\n",
-				"name":           "Johnny Appleseed",
-				"day":            []string{"Monday", "Wednesday"},
-				"password":       "secret",
-				"color":          "yellow",
+				"pizza":                    true,
+				"commit-message":           "Add editor prompt tests\n",
+				"commit-message-validated": "Add editor prompt tests\n",
+				"name":                     "Johnny Appleseed",
+				"day":                      []string{"Monday", "Wednesday"},
+				"password":                 "secret",
+				"color":                    "yellow",
 			},
 		},
 		{
