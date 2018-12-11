@@ -18,13 +18,13 @@ var goodTable = []TestUtil.TestTableEntry{
 		"confirm", &survey.Confirm{
 			Message: "Is it raining?",
 			Help:    "Go outside, if your head becomes wet the answer is probably 'yes'",
-		}, &confirmAns,
+		}, &confirmAns, nil,
 	},
 	{
 		"input", &survey.Input{
 			Message: "What is your phone number:",
 			Help:    "Phone number should include the area code, parentheses optional",
-		}, &inputAns,
+		}, &inputAns, nil,
 	},
 	{
 		"select", &survey.MultiSelect{
@@ -32,7 +32,7 @@ var goodTable = []TestUtil.TestTableEntry{
 			Help:    "We are closed weekends and avaibility is limited on Wednesday",
 			Options: []string{"Monday", "Tuesday", "Wednesday", "Thursday", "Friday"},
 			Default: []string{"Monday", "Tuesday", "Thursday", "Friday"},
-		}, &multiselectAns,
+		}, &multiselectAns, nil,
 	},
 	{
 		"select", &survey.Select{
@@ -40,13 +40,13 @@ var goodTable = []TestUtil.TestTableEntry{
 			Help:    "Blue is the best color, but it is your choice",
 			Options: []string{"red", "blue", "green"},
 			Default: "blue",
-		}, &selectAns,
+		}, &selectAns, nil,
 	},
 	{
 		"password", &survey.Password{
 			Message: "Enter a secret:",
 			Help:    "Don't really enter a secret, this is just for testing",
-		}, &passwordAns,
+		}, &passwordAns, nil,
 	},
 }
 
