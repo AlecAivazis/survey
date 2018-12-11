@@ -11,30 +11,30 @@ var goodTable = []TestUtil.TestTableEntry{
 	{
 		"Enter 'yes'", &survey.Confirm{
 			Message: "yes:",
-		}, &answer,
+		}, &answer, nil,
 	},
 	{
 		"Enter 'no'", &survey.Confirm{
 			Message: "yes:",
-		}, &answer,
+		}, &answer, nil,
 	},
 	{
 		"default", &survey.Confirm{
 			Message: "yes:",
 			Default: true,
-		}, &answer,
+		}, &answer, nil,
 	},
 	{
 		"not recognized (enter random letter)", &survey.Confirm{
 			Message: "yes:",
 			Default: true,
-		}, &answer,
+		}, &answer, nil,
 	},
 	{
 		"no help - type '?'", &survey.Confirm{
 			Message: "yes:",
 			Default: true,
-		}, &answer,
+		}, &answer, nil,
 	},
 }
 

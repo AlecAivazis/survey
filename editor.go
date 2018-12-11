@@ -72,7 +72,20 @@ func init() {
 	}
 }
 
+func (e *Editor) PromptAgain(invalid interface{}, err error) (interface{}, error) {
+	initialValue := invalid.(string)
+	return e.prompt(initialValue)
+}
+
 func (e *Editor) Prompt() (interface{}, error) {
+	initialValue := ""
+	if e.Default != "" && e.AppendDefault {
+		initialValue = e.Default
+	}
+	return e.prompt(initialValue)
+}
+
+func (e *Editor) prompt(initialValue string) (interface{}, error) {
 	// render the template
 	err := e.Render(
 		EditorQuestionTemplate,
@@ -134,11 +147,9 @@ func (e *Editor) Prompt() (interface{}, error) {
 		return "", err
 	}
 
-	// write default value
-	if e.Default != "" && e.AppendDefault {
-		if _, err := f.WriteString(e.Default); err != nil {
-			return "", err
-		}
+	// write initial value
+	if _, err := f.WriteString(initialValue); err != nil {
+		return "", err
 	}
 
 	// close the fd to prevent the editor unable to save file
