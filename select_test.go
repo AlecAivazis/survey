@@ -234,6 +234,21 @@ func TestSelectPrompt(t *testing.T) {
 			},
 			"red",
 		},
+		{
+			"Can use space to select option",
+			&Select{
+				Message:             "Choose a color:",
+				Options:             []string{"red", "blue", "green"},
+				CanUseSpaceToSelect: true,
+			},
+			func(c *expect.Console) {
+				c.ExpectString("Choose a color:")
+				//Select red
+				c.Send(string(terminal.KeySpace))
+				c.ExpectEOF()
+			},
+			"red",
+		},
 	}
 
 	for _, test := range tests {

@@ -57,6 +57,13 @@ var goodTable = []TestUtil.TestTableEntry{
 			Options: []string{"red", "blue", "green"},
 		}, &answer, nil,
 	},
+	{
+		"can select with space", &survey.Select{
+			Message:              "Choose one:",
+			Options:              []string{"red", "blue", "green"},
+			CanUseSpaceToSelect: true,
+		}, &answer, nil,
+	},
 }
 
 var badTable = []TestUtil.TestTableEntry{

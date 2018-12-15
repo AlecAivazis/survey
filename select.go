@@ -21,17 +21,18 @@ for them to select using the arrow keys and enter. Response type is a string.
 */
 type Select struct {
 	core.Renderer
-	Message       string
-	Options       []string
-	Default       string
-	Help          string
-	PageSize      int
-	VimMode       bool
-	FilterMessage string
-	filter        string
-	selectedIndex int
-	useDefault    bool
-	showingHelp   bool
+	Message             string
+	Options             []string
+	Default             string
+	Help                string
+	PageSize            int
+	VimMode             bool
+	FilterMessage       string
+	filter              string
+	selectedIndex       int
+	useDefault          bool
+	showingHelp         bool
+	CanUseSpaceToSelect bool
 }
 
 // the data available to the templates when processing
@@ -65,7 +66,7 @@ func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPo
 	oldFilter := s.filter
 
 	// if the user pressed the enter key
-	if key == terminal.KeyEnter {
+	if key == terminal.KeyEnter || (s.CanUseSpaceToSelect && key == terminal.KeySpace) {
 		if s.selectedIndex < len(options) {
 			return []rune(options[s.selectedIndex]), 0, true
 		}
@@ -231,7 +232,7 @@ func (s *Select) Prompt() (interface{}, error) {
 		if r == terminal.KeyInterrupt {
 			return "", terminal.InterruptErr
 		}
-		if r == terminal.KeyEndTransmission {
+		if r == terminal.KeyEndTransmission || (s.CanUseSpaceToSelect && r == terminal.KeySpace) {
 			break
 		}
 		s.OnChange(nil, 0, r)

@@ -164,6 +164,11 @@ change the global `survey.PageSize`, or set the `PageSize` field on the prompt:
 prompt := &survey.Select{..., PageSize: 10}
 ```
 
+The user can use space as well as enter to select an option by setting the `CanUseSpaceToSelect` field on the prompt:
+```golang
+prompt := &survey.Select{..., CanUseSpaceToSelect: true}
+```
+
 ### MultiSelect
 
 <img src="https://thumbs.gfycat.com/SharpTameAntelope-size_restricted.gif" width="450px"/>
