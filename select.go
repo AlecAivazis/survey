@@ -28,6 +28,7 @@ type Select struct {
 	PageSize      int
 	VimMode       bool
 	FilterMessage string
+	FilterFn      func(string, []string) []string
 	filter        string
 	selectedIndex int
 	useDefault    bool
@@ -58,6 +59,15 @@ var SelectQuestionTemplate = `
     {{- color "reset"}}{{"\n"}}
   {{- end}}
 {{- end}}`
+
+var DefaultFilterFn = func(filter string, options []string) (answer []string) {
+	for _, o := range options {
+		if strings.Contains(strings.ToLower(o), filter) {
+			answer = append(answer, o)
+		}
+	}
+	return answer
+}
 
 // OnChange is called on every keypress.
 func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPos int, ok bool) {
@@ -158,13 +168,10 @@ func (s *Select) filterOptions() []string {
 	if filter == "" {
 		return s.Options
 	}
-	answer := []string{}
-	for _, o := range s.Options {
-		if strings.Contains(strings.ToLower(o), filter) {
-			answer = append(answer, o)
-		}
+	if s.FilterFn != nil {
+		return s.FilterFn(s.filter, s.Options)
 	}
-	return answer
+	return DefaultFilterFn(s.filter, s.Options)
 }
 
 func (s *Select) Prompt() (interface{}, error) {
