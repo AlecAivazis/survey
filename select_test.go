@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	expect "github.com/Netflix/go-expect"
+	"github.com/Netflix/go-expect"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/AlecAivazis/survey.v1/core"
 	"gopkg.in/AlecAivazis/survey.v1/terminal"
@@ -220,6 +220,22 @@ func TestSelectPrompt(t *testing.T) {
 			"green",
 		},
 		{
+			"Test Select prompt interaction with filter is case-insensitive",
+			&Select{
+				Message: "Choose a color:",
+				Options: []string{"red", "blue", "green"},
+			},
+			func(c *expect.Console) {
+				c.ExpectString("Choose a color:")
+				// Filter down to red and green.
+				c.Send("RE")
+				// Select green.
+				c.SendLine(string(terminal.KeyArrowDown))
+				c.ExpectEOF()
+			},
+			"green",
+		},
+		{
 			"Can select the first result in a filtered list if there is a default",
 			&Select{
 				Message: "Choose a color:",
@@ -233,6 +249,29 @@ func TestSelectPrompt(t *testing.T) {
 				c.ExpectEOF()
 			},
 			"red",
+		},
+		{
+			"Test Select prompt interaction with custom filter",
+			&Select{
+				Message: "Choose a color:",
+				Options: []string{"red", "blue", "green"},
+				FilterFn: func(filter string, options []string) (filtered []string) {
+					result := DefaultFilterFn(filter, options)
+					for _, v := range result {
+						if len(v) >= 5 {
+							filtered = append(filtered, v)
+						}
+					}
+					return
+				},
+			},
+			func(c *expect.Console) {
+				c.ExpectString("Choose a color:")
+				// Filter down to only green since custom filter only keeps options that are longer than 5 runes
+				c.SendLine("re")
+				c.ExpectEOF()
+			},
+			"green",
 		},
 	}
 

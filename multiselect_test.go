@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	expect "github.com/Netflix/go-expect"
+	"github.com/Netflix/go-expect"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/AlecAivazis/survey.v1/core"
 	"gopkg.in/AlecAivazis/survey.v1/terminal"
@@ -244,6 +244,49 @@ func TestMultiSelectPrompt(t *testing.T) {
 				c.ExpectEOF()
 			},
 			[]string{"Tuesday"},
+		},
+		{
+			"Test MultiSelect prompt interaction with filter is case-insensitive",
+			&MultiSelect{
+				Message: "What days do you prefer:",
+				Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
+			},
+			func(c *expect.Console) {
+				c.ExpectString("What days do you prefer:  [Use arrows to move, type to filter]")
+				// Filter down to Tuesday.
+				c.Send("tues")
+				// Select Tuesday.
+				c.Send(" ")
+				c.SendLine("")
+				c.ExpectEOF()
+			},
+			[]string{"Tuesday"},
+		},
+		{
+			"Test MultiSelect prompt interaction with custom filter",
+			&MultiSelect{
+				Message: "What days do you prefer:",
+				Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
+				FilterFn: func(filter string, options []string) (filtered []string) {
+					result := DefaultFilterFn(filter, options)
+					for _, v := range result {
+						if len(v) >= 7 {
+							filtered = append(filtered, v)
+						}
+					}
+					return
+				},
+			},
+			func(c *expect.Console) {
+				c.ExpectString("What days do you prefer:")
+				// Filter down to days which names are longer than 7 runes
+				c.Send("day")
+				// Select Wednesday.
+				c.Send(string(terminal.KeyArrowDown))
+				c.SendLine(" ")
+				c.ExpectEOF()
+			},
+			[]string{"Wednesday"},
 		},
 		{
 			"Test MultiSelect clears input on select",
