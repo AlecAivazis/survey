@@ -2,8 +2,6 @@ package survey
 
 import (
 	"errors"
-	"strings"
-
 	"gopkg.in/AlecAivazis/survey.v1/core"
 	"gopkg.in/AlecAivazis/survey.v1/terminal"
 )
@@ -59,15 +57,6 @@ var SelectQuestionTemplate = `
     {{- color "reset"}}{{"\n"}}
   {{- end}}
 {{- end}}`
-
-var DefaultFilterFn = func(filter string, options []string) (answer []string) {
-	for _, o := range options {
-		if strings.Contains(strings.ToLower(o), filter) {
-			answer = append(answer, o)
-		}
-	}
-	return answer
-}
 
 // OnChange is called on every keypress.
 func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPos int, ok bool) {
@@ -164,8 +153,7 @@ func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPo
 }
 
 func (s *Select) filterOptions() []string {
-	filter := strings.ToLower(s.filter)
-	if filter == "" {
+	if s.filter == "" {
 		return s.Options
 	}
 	if s.FilterFn != nil {
@@ -187,7 +175,7 @@ func (s *Select) Prompt() (interface{}, error) {
 	if s.Default != "" {
 		// find the choice
 		for i, opt := range s.Options {
-			// if the option correponds to the default
+			// if the option corresponds to the default
 			if opt == s.Default {
 				// we found our initial value
 				sel = i
