@@ -28,6 +28,7 @@ type MultiSelect struct {
 	PageSize      int
 	VimMode       bool
 	FilterMessage string
+	FilterFn      func(string, []string) []string
 	filter        string
 	selectedIndex int
 	checked       map[string]bool
@@ -146,17 +147,13 @@ func (m *MultiSelect) OnChange(line []rune, pos int, key rune) (newLine []rune, 
 }
 
 func (m *MultiSelect) filterOptions() []string {
-	filter := strings.ToLower(m.filter)
-	if filter == "" {
+	if m.filter == "" {
 		return m.Options
 	}
-	answer := []string{}
-	for _, o := range m.Options {
-		if strings.Contains(strings.ToLower(o), filter) {
-			answer = append(answer, o)
-		}
+	if m.FilterFn != nil {
+		return m.FilterFn(m.filter, m.Options)
 	}
-	return answer
+	return DefaultFilterFn(m.filter, m.Options)
 }
 
 func (m *MultiSelect) Prompt() (interface{}, error) {
@@ -166,7 +163,7 @@ func (m *MultiSelect) Prompt() (interface{}, error) {
 	if len(m.Default) > 0 {
 		for _, dflt := range m.Default {
 			for _, opt := range m.Options {
-				// if the option correponds to the default
+				// if the option corresponds to the default
 				if opt == dflt {
 					// we found our initial value
 					m.checked[opt] = true
