@@ -188,6 +188,29 @@ change the global `survey.PageSize`, or set the `PageSize` field on the prompt:
 prompt := &survey.MultiSelect{..., PageSize: 10}
 ```
 
+### Custom filtering in Select and MultiSelect
+
+A custom filter function can be provided to change the default filtering behavior by providing a value for `FilterFn` field:
+
+```golang
+&Select{
+    Message: "Choose a color:",
+    Options: []string{"red", "blue", "green"},
+    FilterFn: func(filter string, options []string) (filtered []string) {
+        result := DefaultFilterFn(filter, options)
+        for _, v := range result {
+            if len(v) >= 5 {
+                filtered = append(filtered, v)
+            }
+        }
+        return
+    },
+}
+```
+
+While the example above is contrived, this allows for use cases where "smarter" filtering might be useful, for example, when 
+options are backed by more complex types and filtering might need to occur on more metadata than just the displayed name.
+
 ### Editor
 
 Launches the user's preferred editor (defined by the $EDITOR environment variable) on a
