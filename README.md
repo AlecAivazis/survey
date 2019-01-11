@@ -153,8 +153,7 @@ prompt := &survey.Select{
 survey.AskOne(prompt, &color, nil)
 ```
 
-The user can filter for options by typing while the prompt is active. The user can also press `esc` to toggle 
-the ability cycle through the options with the j and k keys to do down and up respectively.
+The user can also press `esc` to toggle the ability cycle through the options with the j and k keys to do down and up respectively.
 
 By default, the select prompt is limited to showing 7 options at a time
 and will paginate lists of options longer than that. To increase, you can either
@@ -177,8 +176,7 @@ prompt := &survey.MultiSelect{
 survey.AskOne(prompt, &days, nil)
 ```
 
-The user can filter for options by typing while the prompt is active. The user can also press `esc` to toggle 
-the ability cycle through the options with the j and k keys to do down and up respectively.
+The user can also press `esc` to toggle the ability cycle through the options with the j and k keys to do down and up respectively.
 
 By default, the MultiSelect prompt is limited to showing 7 options at a time
 and will paginate lists of options longer than that. To increase, you can either
@@ -188,9 +186,19 @@ change the global `survey.PageSize`, or set the `PageSize` field on the prompt:
 prompt := &survey.MultiSelect{..., PageSize: 10}
 ```
 
-### Custom filtering in Select and MultiSelect
+### Editor
 
-A custom filter function can be provided to change the default filtering behavior by providing a value for `FilterFn` field:
+Launches the user's preferred editor (defined by the $EDITOR environment variable) on a
+temporary file. Once the user exits their editor, the contents of the temporary file are read in as
+the result. If neither of those are present, notepad (on Windows) or vim (Linux or Mac) is used.
+
+## Filtering options in Select and MultiSelect
+
+The user can filter for options by typing while the prompt is active. This will filter out all options that don't contain the 
+typed string anywhere in their name, ignoring case. This default filtering behavior is provided by the `DefaultFilterFn` 
+function.
+
+A custom filter function can also be provided to change this default behavior by providing a value for the `FilterFn` field:
 
 ```golang
 &Select{
@@ -210,12 +218,6 @@ A custom filter function can be provided to change the default filtering behavio
 
 While the example above is contrived, this allows for use cases where "smarter" filtering might be useful, for example, when 
 options are backed by more complex types and filtering might need to occur on more metadata than just the displayed name.
-
-### Editor
-
-Launches the user's preferred editor (defined by the $EDITOR environment variable) on a
-temporary file. Once the user exits their editor, the contents of the temporary file are read in as
-the result. If neither of those are present, notepad (on Windows) or vim (Linux or Mac) is used.
 
 ## Validation
 
