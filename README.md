@@ -209,7 +209,8 @@ q := &survey.Question{
         if str, ok := val.(string) ; !ok || len(str) > 10 {
             return errors.New("This response cannot be longer than 10 characters.")
         }
-    }
+	return nil
+    },
 }
 ```
 
