@@ -279,7 +279,7 @@ prompt := &survey.Input{
     Help:    "I couldn't come up with one.",
 }
 
-surveyCore.HelpIcon = '^'
+surveyCore.HelpInputRune = '^'
 
 survey.AskOne(prompt, &number, nil)
 ```
