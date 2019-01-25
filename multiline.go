@@ -29,7 +29,8 @@ var MultilineQuestionTemplate = `
 {{- color "green+hb"}}{{ QuestionIcon }} {{color "reset"}}
 {{- color "default+hb"}}{{ .Message }} {{color "reset"}}
 {{- if .ShowAnswer}}
-  {{- "\n"}}{{color "cyan"}}{{.Answer}}{{color "reset"}}{{"\n"}}
+  {{- "\n"}}{{color "cyan"}}{{.Answer}}{{color "reset"}}
+  {{- if .Answer }}{{ "\n" }}{{ end }}
 {{- else }}
   {{- if .Default}}{{color "white"}}({{.Default}}) {{color "reset"}}{{end}}
   {{- color "cyan"}}[Enter 2 empty lines to finish]{{color "reset"}}
