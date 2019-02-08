@@ -16,8 +16,3 @@ variables {
     files = "$(go list -v ./... | grep -iEv \"tests|examples\")"
 }
 
-
-config {
-    // we can even change the delimiter that our templates use
-    delimiters = ["{{", "}}"]
-}
