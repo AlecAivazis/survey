@@ -3,6 +3,8 @@ package terminal
 import (
 	"fmt"
 	"unicode"
+
+	"github.com/mattn/go-runewidth"
 )
 
 type RuneReader struct {
@@ -91,6 +93,8 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 			if index > 0 && len(line) > 0 {
 				// if we are at the end of the word
 				if index == len(line) {
+					// get the last character display length
+					rw := runewidth.RuneWidth(line[len(line)-1])
 					// just remove the last letter from the internal representation
 					line = line[:len(line)-1]
 					// go back one
@@ -98,13 +102,16 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 						cursor.PreviousLine(1)
 						cursor.Forward(int(terminalSize.X))
 					} else {
-						cursor.Back(1)
+						cursor.Back(rw)
 					}
 
 					// clear the rest of the line
 					EraseLine(rr.stdio.Out, ERASE_LINE_END)
 				} else {
 					// we need to remove a character from the middle of the word
+
+					// first, we need to get the display length of the deleted characters to move the cursor.
+					rw := runewidth.RuneWidth(line[index-1])
 
 					// remove the current index from the list
 					line = append(line[:index-1], line[index:]...)
@@ -115,7 +122,7 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 					cursor.Save()
 
 					// clear the rest of the line
-					cursor.Back(1)
+					cursor.Back(rw)
 
 					// print what comes after
 					for _, char := range line[index-1:] {
@@ -136,7 +143,8 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 						cursor.PreviousLine(1)
 						cursor.Forward(int(terminalSize.X))
 					} else {
-						cursor.Back(1)
+						//rw = runewidth.RuneWidth(line[index-1])
+						cursor.Back(rw)
 					}
 				}
 
@@ -160,7 +168,9 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 					cursor.PreviousLine(1)
 					cursor.Forward(int(terminalSize.X))
 				} else {
-					cursor.Back(1)
+					// get the length of the left character display
+					rw := runewidth.RuneWidth(line[index-1])
+					cursor.Back(rw)
 				}
 				//decrement the index
 				index--
@@ -183,7 +193,9 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 				if cursorCurrent.CursorIsAtLineEnd(terminalSize) {
 					cursor.NextLine(1)
 				} else {
-					cursor.Forward(1)
+					// move the cursor to the right to always move the length of the currently displayed character
+					rw := runewidth.RuneWidth(line[index])
+					cursor.Forward(rw)
 				}
 				index++
 
@@ -206,7 +218,9 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 					cursorCurrent.Y--
 
 				} else {
-					cursor.Back(1)
+					// get the display length of the terminal character
+					rw := runewidth.RuneWidth(line[index-1])
+					cursor.Back(rw)
 					cursorCurrent.X--
 				}
 				index--
@@ -221,7 +235,9 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 					cursorCurrent.Y++
 
 				} else {
-					cursor.Forward(1)
+					// move the cursor to the right to always move the length of the currently displayed character
+					rw := runewidth.RuneWidth(line[index])
+					cursor.Forward(rw)
 					cursorCurrent.X++
 				}
 				index++
@@ -306,7 +322,9 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 			if cursorCurrent.CursorIsAtLineEnd(terminalSize) {
 				cursor.NextLine(1)
 			} else {
-				cursor.Forward(1)
+				// get the entered character display length
+				rw := runewidth.RuneWidth(r)
+				cursor.Forward(rw)
 			}
 			// increment the index
 			index++
