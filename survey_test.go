@@ -136,7 +136,7 @@ func TestAsk(t *testing.T) {
 				c.SendLine("Johnny Appleseed")
 
 				// MultiSelect
-				c.ExpectString("What days do you prefer:  [Use arrows to move, type to filter]")
+				c.ExpectString("What days do you prefer:  [Use arrows to move, space to select, type to filter]")
 				// Select Monday.
 				c.Send(string(terminal.KeyArrowDown))
 				c.Send(" ")
@@ -151,7 +151,7 @@ func TestAsk(t *testing.T) {
 				c.SendLine("")
 
 				// Select
-				c.ExpectString("Choose a color:  [Use arrows to move, type to filter]")
+				c.ExpectString("Choose a color:  [Use arrows to move, space to select, type to filter]")
 				c.SendLine("yellow")
 				c.ExpectEOF()
 			},
