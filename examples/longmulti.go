@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"gopkg.in/AlecAivazis/survey.v1"
+	survey "gopkg.in/AlecAivazis/survey.v1"
 )
 
 // the questions to ask
@@ -12,7 +12,7 @@ var multiQs = []*survey.Question{
 	{
 		Name: "letter",
 		Prompt: &survey.MultiSelect{
-			Message: "Choose one or more words	:",
+			Message: "Choose one or more words :",
 			Options: []string{
 				"Afghanistan",
 				"Åland Islands",
