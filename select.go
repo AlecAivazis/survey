@@ -2,6 +2,7 @@ package survey
 
 import (
 	"errors"
+
 	"gopkg.in/AlecAivazis/survey.v1/core"
 	"gopkg.in/AlecAivazis/survey.v1/terminal"
 )
@@ -69,7 +70,7 @@ func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPo
 			return []rune(options[s.selectedIndex]), 0, true
 		}
 		// if the user pressed the up arrow or 'k' to emulate vim
-	} else if key == terminal.KeyArrowUp || (s.VimMode && key == 'k') {
+	} else if key == terminal.KeyArrowUp || (s.VimMode && key == 'k') && len(options) > 0 {
 		s.useDefault = false
 
 		// if we are at the top of the list
@@ -80,8 +81,9 @@ func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPo
 			// otherwise we are not at the top of the list so decrement the selected index
 			s.selectedIndex--
 		}
+
 		// if the user pressed down or 'j' to emulate vim
-	} else if key == terminal.KeyArrowDown || (s.VimMode && key == 'j') {
+	} else if key == terminal.KeyArrowDown || (s.VimMode && key == 'j') && len(options) > 0 {
 		s.useDefault = false
 		// if we are at the bottom of the list
 		if s.selectedIndex == len(options)-1 {
