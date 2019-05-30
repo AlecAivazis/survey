@@ -1,6 +1,6 @@
 package main
 
-import "github.com/AlecAivazis/survey"
+import "github.com/AlecAivazis/survey/v2"
 
 func main() {
 	color := ""

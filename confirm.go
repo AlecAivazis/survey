@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/AlecAivazis/survey/core"
+	"github.com/AlecAivazis/survey/v2/core"
 )
 
 // Confirm is a regular text input that accept yes/no answers. Response type is a bool.

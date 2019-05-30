@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	expect "github.com/Netflix/go-expect"
-	"github.com/AlecAivazis/survey/terminal"
+	"github.com/AlecAivazis/survey/v2/terminal"
 )
 
 func RunTest(t *testing.T, procedure func(*expect.Console), test func(terminal.Stdio) error) {

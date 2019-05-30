@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/AlecAivazis/survey"
-	"github.com/AlecAivazis/survey/tests/util"
+	"github.com/AlecAivazis/survey/v2"
+	"github.com/AlecAivazis/survey/v2/tests/util"
 )
 
 var answer = false

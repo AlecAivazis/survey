@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/AlecAivazis/survey/terminal"
+	"github.com/AlecAivazis/survey/v2/terminal"
 )
 
 type Renderer struct {
