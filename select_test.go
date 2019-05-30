@@ -285,18 +285,15 @@ func TestSelectPrompt(t *testing.T) {
 				// filter away everything
 				c.SendLine("z")
 				// send enter (should get ignored since there are no answers)
-				c.ExpectEOF()
+				c.SendLine(string(terminal.KeyEnter))
 
 				// remove the filter we just applied
 				c.SendLine(string(terminal.KeyBackspace))
 
-				// apply a different filter
-				c.SendLine("b")
 				// press enter
-				c.ExpectEOF()
-
+				c.SendLine(string(terminal.KeyEnter))
 			},
-			"blue",
+			"red",
 		},
 	}
 
