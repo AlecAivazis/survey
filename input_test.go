@@ -145,6 +145,22 @@ func TestInputPrompt(t *testing.T) {
 			},
 			"Satoshi Nakamoto",
 		},
+		{
+			// https://en.wikipedia.org/wiki/ANSI_escape_code
+			// Device Status Report - Reports the cursor position (CPR) to the
+			// application as (as though typed at the keyboard) ESC[n;mR, where n is the
+			// row and m is the column.
+			"Test Input prompt with R matching DSR",
+			&Input{
+				Message: "What is your name?",
+			},
+			func(c *expect.Console) {
+				c.ExpectString("What is your name?")
+				c.SendLine("R")
+				c.ExpectEOF()
+			},
+			"R",
+		},
 	}
 
 	for _, test := range tests {
