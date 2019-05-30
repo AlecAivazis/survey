@@ -1,5 +1,10 @@
 language: go
 
+os:
+  - linux
+  - osx
+  - windows
+
 go_import_path: gopkg.in/AlecAivazis/survey.v1
 
 before_install:
