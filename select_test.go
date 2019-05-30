@@ -8,10 +8,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Netflix/go-expect"
-	"github.com/stretchr/testify/assert"
 	"github.com/AlecAivazis/survey/core"
 	"github.com/AlecAivazis/survey/terminal"
+	"github.com/Netflix/go-expect"
+	"github.com/stretchr/testify/assert"
 )
 
 func init() {
@@ -255,8 +255,8 @@ func TestSelectPrompt(t *testing.T) {
 			&Select{
 				Message: "Choose a color:",
 				Options: []string{"red", "blue", "green"},
-				FilterFn: func(filter string, options []string) (filtered []string) {
-					result := DefaultFilterFn(filter, options)
+				Filter: func(filter string, options []string) (filtered []string) {
+					result := DefaultFilter(filter, options)
 					for _, v := range result {
 						if len(v) >= 5 {
 							filtered = append(filtered, v)
