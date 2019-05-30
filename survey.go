@@ -5,8 +5,8 @@ import (
 	"io"
 	"os"
 
-	"github.com/AlecAivazis/survey/core"
-	"github.com/AlecAivazis/survey/terminal"
+	"github.com/AlecAivazis/survey/v2/core"
+	"github.com/AlecAivazis/survey/v2/terminal"
 )
 
 // PageSize is the default maximum number of items to show in select/multiselect prompts
