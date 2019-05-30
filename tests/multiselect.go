@@ -1,8 +1,8 @@
 package main
 
 import (
-	"gopkg.in/AlecAivazis/survey.v1"
-	"gopkg.in/AlecAivazis/survey.v1/tests/util"
+	"github.com/AlecAivazis/survey"
+	"github.com/AlecAivazis/survey/tests/util"
 )
 
 var answer = []string{}

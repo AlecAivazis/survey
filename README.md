@@ -1,9 +1,9 @@
 # Survey
 
 [![Build Status](https://travis-ci.org/AlecAivazis/survey.svg?branch=feature%2Fpretty)](https://travis-ci.org/AlecAivazis/survey)
-[![GoDoc](http://img.shields.io/badge/godoc-reference-5272B4.svg)](https://godoc.org/gopkg.in/AlecAivazis/survey.v1)
+[![GoDoc](http://img.shields.io/badge/godoc-reference-5272B4.svg)](https://godoc.org/github.com/AlecAivazis/survey)
 
-A library for building interactive prompts. 
+A library for building interactive prompts.
 
 <img width="550" src="https://thumbs.gfycat.com/VillainousGraciousKouprey-size_restricted.gif"/>
 
@@ -12,7 +12,7 @@ package main
 
 import (
     "fmt"
-    "gopkg.in/AlecAivazis/survey.v1"
+    "github.com/AlecAivazis/survey"
 )
 
 // the questions to ask
@@ -82,9 +82,9 @@ Examples can be found in the `examples/` directory. Run them
 to see basic behavior:
 
 ```bash
-go get gopkg.in/AlecAivazis/survey.v1
+go get github.com/AlecAivazis/survey
 
-cd $GOPATH/src/gopkg.in/AlecAivazis/survey.v1
+cd $GOPATH/src/github.com/AlecAivazis/survey
 
 go run examples/simple.go
 go run examples/validation.go
@@ -188,14 +188,14 @@ prompt := &survey.MultiSelect{..., PageSize: 10}
 
 ### Editor
 
-Launches the user's preferred editor (defined by the $EDITOR environment variable) on a
+Launches the user's preferred editor (defined by the \$EDITOR environment variable) on a
 temporary file. Once the user exits their editor, the contents of the temporary file are read in as
 the result. If neither of those are present, notepad (on Windows) or vim (Linux or Mac) is used.
 
 ## Filtering options in Select and MultiSelect
 
-The user can filter for options by typing while the prompt is active. This will filter out all options that don't contain the 
-typed string anywhere in their name, ignoring case. This default filtering behavior is provided by the `DefaultFilterFn` 
+The user can filter for options by typing while the prompt is active. This will filter out all options that don't contain the
+typed string anywhere in their name, ignoring case. This default filtering behavior is provided by the `DefaultFilterFn`
 function.
 
 A custom filter function can also be provided to change this default behavior by providing a value for the `FilterFn` field:
@@ -216,7 +216,7 @@ A custom filter function can also be provided to change this default behavior by
 }
 ```
 
-While the example above is contrived, this allows for use cases where "smarter" filtering might be useful, for example, when 
+While the example above is contrived, this allows for use cases where "smarter" filtering might be useful, for example, when
 options are backed by more complex types and filtering might need to occur on more metadata than just the displayed name.
 
 ## Validation
@@ -270,8 +270,8 @@ looks for by setting the `HelpInputRune` variable in `survey/core`:
 
 ```golang
 import (
-    "gopkg.in/AlecAivazis/survey.v1"
-    surveyCore "gopkg.in/AlecAivazis/survey.v1/core"
+    "github.com/AlecAivazis/survey"
+    surveyCore "github.com/AlecAivazis/survey/core"
 )
 
 number := ""
@@ -337,7 +337,7 @@ to maintain those releases. Importing version 1 of survey would look like:
 ```golang
 package main
 
-import "gopkg.in/AlecAivazis/survey.v1"
+import "github.com/AlecAivazis/survey"
 ```
 
 ## Testing
@@ -348,7 +348,7 @@ if you are manipulating the cursor or using `survey`, you will need a way to int
 for things like `CursorLocation`. `vt10x.NewVT10XConsole` will create a `go-expect` console that also multiplexes
 stdio to an in-memory [virtual terminal](https://github.com/hinshun/vt10x).
 
-For example, you can test a binary utilizing `survey` by connecting the Console's tty to a subprocess's stdio. 
+For example, you can test a binary utilizing `survey` by connecting the Console's tty to a subprocess's stdio.
 
 ```go
 func TestCLI(t *testing.T) {

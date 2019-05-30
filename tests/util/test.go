@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"gopkg.in/AlecAivazis/survey.v1"
+	"github.com/AlecAivazis/survey"
 )
 
 type TestTableEntry struct {

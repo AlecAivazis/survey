@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"gopkg.in/AlecAivazis/survey.v1"
+	"github.com/AlecAivazis/survey"
 )
 
 var simpleQs = []*survey.Question{

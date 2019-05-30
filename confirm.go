@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"regexp"
 
-	"gopkg.in/AlecAivazis/survey.v1/core"
+	"github.com/AlecAivazis/survey/core"
 )
 
 // Confirm is a regular text input that accept yes/no answers. Response type is a bool.

@@ -10,8 +10,8 @@ import (
 
 	"github.com/Netflix/go-expect"
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/AlecAivazis/survey.v1/core"
-	"gopkg.in/AlecAivazis/survey.v1/terminal"
+	"github.com/AlecAivazis/survey/core"
+	"github.com/AlecAivazis/survey/terminal"
 )
 
 func init() {

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	survey "gopkg.in/AlecAivazis/survey.v1"
+	survey "github.com/AlecAivazis/survey"
 )
 
 // the questions to ask
