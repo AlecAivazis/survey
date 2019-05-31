@@ -12,13 +12,13 @@ import (
 const tagName = "survey"
 
 // add a few interfaces so users can configure how the prompt values are set
-type settable interface {
+type Settable interface {
 	WriteAnswer(field string, value interface{}) error
 }
 
 func WriteAnswer(t interface{}, name string, v interface{}) (err error) {
 	// if the field is a custom type
-	if s, ok := t.(settable); ok {
+	if s, ok := t.(Settable); ok {
 		// use the interface method
 		return s.WriteAnswer(name, v)
 	}
@@ -47,13 +47,13 @@ func WriteAnswer(t interface{}, name string, v interface{}) (err error) {
 			return err
 		}
 		field := elem.Field(fieldIndex)
-		// handle references to the settable interface aswell
-		if s, ok := field.Interface().(settable); ok {
+		// handle references to the Settable interface aswell
+		if s, ok := field.Interface().(Settable); ok {
 			// use the interface method
 			return s.WriteAnswer(name, v)
 		}
 		if field.CanAddr() {
-			if s, ok := field.Addr().Interface().(settable); ok {
+			if s, ok := field.Addr().Interface().(Settable); ok {
 				// use the interface method
 				return s.WriteAnswer(name, v)
 			}
