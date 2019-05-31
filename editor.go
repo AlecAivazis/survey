@@ -7,9 +7,9 @@ import (
 	"os/exec"
 	"runtime"
 
+	"github.com/AlecAivazis/survey/v2/core"
+	"github.com/AlecAivazis/survey/v2/terminal"
 	shellquote "github.com/kballard/go-shellquote"
-	"gopkg.in/AlecAivazis/survey.v1/core"
-	"gopkg.in/AlecAivazis/survey.v1/terminal"
 )
 
 /*

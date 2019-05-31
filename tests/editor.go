@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"gopkg.in/AlecAivazis/survey.v1"
-	"gopkg.in/AlecAivazis/survey.v1/tests/util"
+	"github.com/AlecAivazis/survey/v2"
+	"github.com/AlecAivazis/survey/v2/tests/util"
 )
 
 var answer = ""

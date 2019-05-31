@@ -4,8 +4,8 @@ import (
 	"errors"
 	"strings"
 
-	"gopkg.in/AlecAivazis/survey.v1/core"
-	"gopkg.in/AlecAivazis/survey.v1/terminal"
+	"github.com/AlecAivazis/survey/v2/core"
+	"github.com/AlecAivazis/survey/v2/terminal"
 )
 
 /*

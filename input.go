@@ -1,7 +1,7 @@
 package survey
 
 import (
-	"gopkg.in/AlecAivazis/survey.v1/core"
+	"github.com/AlecAivazis/survey/v2/core"
 )
 
 /*

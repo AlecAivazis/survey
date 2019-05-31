@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"gopkg.in/AlecAivazis/survey.v1/terminal"
+	"github.com/AlecAivazis/survey/v2/terminal"
 )
 
 type Renderer struct {
