@@ -268,8 +268,8 @@ func TestMultiSelectPrompt(t *testing.T) {
 			&MultiSelect{
 				Message: "What days do you prefer:",
 				Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
-				FilterFn: func(filter string, options []string) (filtered []string) {
-					result := DefaultFilterFn(filter, options)
+				Filter: func(filter string, options []string) (filtered []string) {
+					result := DefaultFilter(filter, options)
 					for _, v := range result {
 						if len(v) >= 7 {
 							filtered = append(filtered, v)

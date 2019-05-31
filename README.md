@@ -199,17 +199,16 @@ the result. If neither of those are present, notepad (on Windows) or vim (Linux 
 ## Filtering options in Select and MultiSelect
 
 The user can filter for options by typing while the prompt is active. This will filter out all options that don't contain the
-typed string anywhere in their name, ignoring case. This default filtering behavior is provided by the `DefaultFilterFn`
-function.
+typed string anywhere in their name, ignoring case. This default filtering behavior is provided by the `DefaultFilter` function.
 
-A custom filter function can also be provided to change this default behavior by providing a value for the `FilterFn` field:
+A custom filter function can also be provided to change this default behavior by providing a value for the `Filter` field:
 
 ```golang
 &Select{
     Message: "Choose a color:",
     Options: []string{"red", "blue", "green"},
-    FilterFn: func(filter string, options []string) (filtered []string) {
-        result := DefaultFilterFn(filter, options)
+    Filter: func(filter string, options []string) (filtered []string) {
+        result := DefaultFilter(filter, options)
         for _, v := range result {
             if len(v) >= 5 {
                 filtered = append(filtered, v)

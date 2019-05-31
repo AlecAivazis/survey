@@ -28,7 +28,7 @@ type MultiSelect struct {
 	PageSize      int
 	VimMode       bool
 	FilterMessage string
-	FilterFn      func(string, []string) []string
+	Filter        func(string, []string) []string
 	filter        string
 	selectedIndex int
 	checked       map[string]bool
@@ -150,10 +150,10 @@ func (m *MultiSelect) filterOptions() []string {
 	if m.filter == "" {
 		return m.Options
 	}
-	if m.FilterFn != nil {
-		return m.FilterFn(m.filter, m.Options)
+	if m.Filter != nil {
+		return m.Filter(m.filter, m.Options)
 	}
-	return DefaultFilterFn(m.filter, m.Options)
+	return DefaultFilter(m.filter, m.Options)
 }
 
 func (m *MultiSelect) Prompt() (interface{}, error) {

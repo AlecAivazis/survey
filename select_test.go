@@ -256,8 +256,8 @@ func TestSelectPrompt(t *testing.T) {
 			&Select{
 				Message: "Choose a color:",
 				Options: []string{"red", "blue", "green"},
-				FilterFn: func(filter string, options []string) (filtered []string) {
-					result := DefaultFilterFn(filter, options)
+				Filter: func(filter string, options []string) (filtered []string) {
+					result := DefaultFilter(filter, options)
 					for _, v := range result {
 						if len(v) >= 5 {
 							filtered = append(filtered, v)
