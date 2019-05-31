@@ -156,7 +156,7 @@ func (m *MultiSelect) filterOptions() []string {
 	return DefaultFilter(m.filter, m.Options)
 }
 
-func (m *MultiSelect) Prompt() (interface{}, error) {
+func (m *MultiSelect) Prompt(config *PromptConfig) (interface{}, error) {
 	// compute the default state
 	m.checked = make(map[string]bool)
 	// if there is a default

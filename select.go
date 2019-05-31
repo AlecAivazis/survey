@@ -168,7 +168,7 @@ func (s *Select) filterOptions() []string {
 	return DefaultFilter(s.filter, s.Options)
 }
 
-func (s *Select) Prompt() (interface{}, error) {
+func (s *Select) Prompt(config *PromptConfig) (interface{}, error) {
 	// if there are no options to render
 	if len(s.Options) == 0 {
 		// we failed

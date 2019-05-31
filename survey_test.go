@@ -36,7 +36,7 @@ func RunPromptTest(t *testing.T, test PromptTest) {
 		if p, ok := test.prompt.(wantsStdio); ok {
 			p.WithStdio(stdio)
 		}
-		answer, err = test.prompt.Prompt()
+		answer, err = test.prompt.Prompt(&PromptConfig{})
 		return err
 	})
 	require.Equal(t, test.expected, answer)

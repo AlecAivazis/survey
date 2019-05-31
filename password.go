@@ -33,7 +33,7 @@ var PasswordQuestionTemplate = `
 {{- color "default+hb"}}{{ .Message }} {{color "reset"}}
 {{- if and .Help (not .ShowHelp)}}{{color "cyan"}}[{{ HelpInputRune }} for help]{{color "reset"}} {{end}}`
 
-func (p *Password) Prompt() (line interface{}, err error) {
+func (p *Password) Prompt(config *PromptConfig) (line interface{}, err error) {
 	// render the question template
 	out, err := core.RunTemplate(
 		PasswordQuestionTemplate,
