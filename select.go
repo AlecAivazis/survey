@@ -27,7 +27,7 @@ type Select struct {
 	PageSize      int
 	VimMode       bool
 	FilterMessage string
-	FilterFn      func(string, []string) []string
+	Filter        func(string, []string) []string
 	filter        string
 	selectedIndex int
 	useDefault    bool
@@ -158,10 +158,10 @@ func (s *Select) filterOptions() []string {
 	if s.filter == "" {
 		return s.Options
 	}
-	if s.FilterFn != nil {
-		return s.FilterFn(s.filter, s.Options)
+	if s.Filter != nil {
+		return s.Filter(s.filter, s.Options)
 	}
-	return DefaultFilterFn(s.filter, s.Options)
+	return DefaultFilter(s.filter, s.Options)
 }
 
 func (s *Select) Prompt() (interface{}, error) {
