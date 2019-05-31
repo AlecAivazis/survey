@@ -33,23 +33,6 @@ var (
 	SelectFocusIcon = ">"
 )
 
-/*
-  SetFancyIcons changes the err, help, marked, and focus input icons to their
-  fancier forms. These forms may not be compatible with most terminals.
-  This function will not touch the QuestionIcon as its fancy and non fancy form
-  are the same.
-*/
-func SetFancyIcons() {
-	ErrorIcon = "✘"
-	HelpIcon = "ⓘ"
-	// QuestionIcon fancy and non-fancy form are the same
-
-	MarkedOptionIcon = "◉"
-	UnmarkedOptionIcon = "◯"
-
-	SelectFocusIcon = "❯"
-}
-
 var TemplateFuncs = map[string]interface{}{
 	// Templates with Color formatting. See Documentation: https://github.com/mgutz/ansi#style-format
 	"color": func(color string) string {
