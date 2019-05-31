@@ -77,7 +77,6 @@ for the old `v1` version, see [here](https://godoc.org/gopkg.in/AlecAivazis/surv
    1. [Changing the input rune](#changing-the-input-run)
 1. [Custom Types](#custom-types)
 1. [Customizing Output](#customizing-output)
-1. [Versioning](#versioning)
 1. [Testing](#testing)
 
 ## Examples
@@ -331,17 +330,6 @@ in `survey/core`:
 | SelectFocusIcon    | >       | Marks the current focus in `Select` and `MultiSelect` prompts |
 | UnmarkedOptionIcon | [ ]     | Marks an unselected option in a `MultiSelect` prompt          |
 | MarkedOptionIcon   | [x]     | Marks a chosen selection in a `MultiSelect` prompt            |
-
-## Versioning
-
-This project tries to maintain semantic GitHub releases as closely as possible and relies on [gopkg.in](http://labix.org/gopkg.in)
-to maintain those releases. Importing version 1 of survey would look like:
-
-```golang
-package main
-
-import "github.com/AlecAivazis/survey/v2"
-```
 
 ## Testing
 
