@@ -9,9 +9,6 @@ import (
 	"github.com/AlecAivazis/survey/v2/terminal"
 )
 
-// PageSize is the default maximum number of items to show in select/multiselect prompts
-var PageSize = 7
-
 // DefaultAskOptions is the default options on ask, using the OS stdio.
 var DefaultAskOptions = AskOptions{
 	Stdio: terminal.Stdio{
@@ -251,19 +248,7 @@ func Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
 
 // paginate returns a single page of choices given the page size, the total list of
 // possible choices, and the current selected index in the total list.
-func paginate(page int, choices []string, sel int) ([]string, int) {
-	// the number of elements to show in a single page
-	var pageSize int
-	// if the select has a specific page size
-	if page != 0 {
-		// use the specified one
-		pageSize = page
-		// otherwise the select does not have a page size
-	} else {
-		// use the package default
-		pageSize = PageSize
-	}
-
+func paginate(pageSize int, choices []string, sel int) ([]string, int) {
 	var start, end, cursor int
 
 	if len(choices) < pageSize {
