@@ -193,8 +193,16 @@ func (s *Select) Prompt(config *PromptConfig) (interface{}, error) {
 	// save the selected index
 	s.selectedIndex = sel
 
+	// figure out the page size
+	pageSize := s.PageSize
+	// if we dont have a specific one
+	if pageSize == 0 {
+		// grab the global value
+		pageSize = config.PageSize
+	}
+
 	// figure out the options and index to render
-	opts, idx := paginate(s.PageSize, s.Options, sel)
+	opts, idx := paginate(pageSize, s.Options, sel)
 
 	// ask the question
 	err := s.Render(

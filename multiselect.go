@@ -180,8 +180,15 @@ func (m *MultiSelect) Prompt(config *PromptConfig) (interface{}, error) {
 		return "", errors.New("please provide options to select from")
 	}
 
+	// figure out the page size
+	pageSize := m.PageSize
+	// if we dont have a specific one
+	if pageSize == 0 {
+		// grab the global value
+		pageSize = config.PageSize
+	}
 	// paginate the options
-	opts, idx := paginate(m.PageSize, m.Options, m.selectedIndex)
+	opts, idx := paginate(pageSize, m.Options, m.selectedIndex)
 
 	cursor := m.NewCursor()
 	cursor.Hide()       // hide the cursor
