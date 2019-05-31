@@ -274,6 +274,27 @@ func TestSelectPrompt(t *testing.T) {
 			},
 			"green",
 		},
+		{
+			"Test Select prompt with answers filtered out",
+			&Select{
+				Message: "Choose a color:",
+				Options: []string{"red", "blue", "green"},
+			},
+			func(c *expect.Console) {
+				c.ExpectString("Choose a color:")
+				// filter away everything
+				c.SendLine("z")
+				// send enter (should get ignored since there are no answers)
+				c.SendLine(string(terminal.KeyEnter))
+
+				// remove the filter we just applied
+				c.SendLine(string(terminal.KeyBackspace))
+
+				// press enter
+				c.SendLine(string(terminal.KeyEnter))
+			},
+			"red",
+		},
 	}
 
 	for _, test := range tests {

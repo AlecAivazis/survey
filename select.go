@@ -60,15 +60,22 @@ var SelectQuestionTemplate = `
 {{- end}}`
 
 // OnChange is called on every keypress.
-func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPos int, ok bool) {
+func (s *Select) OnChange(key rune) bool {
 	options := s.filterOptions()
 	oldFilter := s.filter
 
-	// if the user pressed the enter key
-	if key == terminal.KeyEnter {
-		if s.selectedIndex < len(options) {
-			return []rune(options[s.selectedIndex]), 0, true
+	// if the user pressed the enter key and the index is a valid option
+	if key == terminal.KeyEnter || key == '\n' {
+		// if the selected index is a valid option
+		if len(options) > 0 && s.selectedIndex < len(options) {
+
+			// we're done (stop prompting the user)
+			return true
 		}
+
+		// we're not done (keep prompting)
+		return false
+
 		// if the user pressed the up arrow or 'k' to emulate vim
 	} else if key == terminal.KeyArrowUp || (s.VimMode && key == 'k') && len(options) > 0 {
 		s.useDefault = false
@@ -147,11 +154,8 @@ func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPo
 		},
 	)
 
-	// if we are not pressing ent
-	if len(options) <= s.selectedIndex {
-		return []rune{}, 0, false
-	}
-	return []rune(options[s.selectedIndex]), 0, true
+	// keep prompting
+	return false
 }
 
 func (s *Select) filterOptions() []string {
@@ -222,16 +226,15 @@ func (s *Select) Prompt() (interface{}, error) {
 		if err != nil {
 			return "", err
 		}
-		if r == '\r' || r == '\n' {
-			break
-		}
 		if r == terminal.KeyInterrupt {
 			return "", terminal.InterruptErr
 		}
 		if r == terminal.KeyEndTransmission {
 			break
 		}
-		s.OnChange(nil, 0, r)
+		if s.OnChange(r) {
+			break
+		}
 	}
 	options := s.filterOptions()
 	s.filter = ""
