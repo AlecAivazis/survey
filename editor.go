@@ -23,7 +23,7 @@ Response type is a string.
 
 	message := ""
 	prompt := &survey.Editor{ Message: "What is your commit message?" }
-	survey.AskOne(prompt, &message, nil)
+	survey.AskOne(prompt, &message)
 */
 type Editor struct {
 	core.Renderer

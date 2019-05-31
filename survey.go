@@ -59,7 +59,8 @@ type AskOpt func(options *AskOptions) error
 
 // AskOptions provides additional options on ask.
 type AskOptions struct {
-	Stdio terminal.Stdio
+	Stdio      terminal.Stdio
+	Validators []Validator
 }
 
 // WithStdio specifies the standard input, output and error files survey
@@ -69,6 +70,17 @@ func WithStdio(in terminal.FileReader, out terminal.FileWriter, err io.Writer) A
 		options.Stdio.In = in
 		options.Stdio.Out = out
 		options.Stdio.Err = err
+		return nil
+	}
+}
+
+// WithValidator specifies a validator to use while prompting the user
+func WithValidator(v Validator) AskOpt {
+	return func(options *AskOptions) error {
+		// add the provided validator to the list
+		options.Validators = append(options.Validators, v)
+
+		// nothing went wrong
 		return nil
 	}
 }
@@ -87,11 +99,11 @@ in the documentation. For example:
 		Message: "name",
 	}
 
-	survey.AskOne(prompt, &name, nil)
+	survey.AskOne(prompt, &name)
 
 */
-func AskOne(p Prompt, response interface{}, v Validator, opts ...AskOpt) error {
-	err := Ask([]*Question{{Prompt: p, Validate: v}}, response, opts...)
+func AskOne(p Prompt, response interface{}, opts ...AskOpt) error {
+	err := Ask([]*Question{{Prompt: p}}, response, opts...)
 	if err != nil {
 		return err
 	}
@@ -123,7 +135,7 @@ matching name. For example:
 	err := survey.Ask(qs, &answers)
 */
 func Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
-
+	// build up the configuration options
 	options := DefaultAskOptions
 	for _, opt := range opts {
 		if err := opt(&options); err != nil {
@@ -151,10 +163,22 @@ func Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
 			return err
 		}
 
-		// if there is a validate handler for this question
+		// build up a list of validators that we have to apply to this question
+		validators := []Validator{}
+
+		// make sure to include the question specific one
 		if q.Validate != nil {
+			validators = append(validators, q.Validate)
+		}
+		// add any "global" validators
+		for _, validator := range options.Validators {
+			validators = append(validators, validator)
+		}
+
+		// apply every validator to thte response
+		for _, validator := range validators {
 			// wait for a valid response
-			for invalid := q.Validate(ans); invalid != nil; invalid = q.Validate(ans) {
+			for invalid := validator(ans); invalid != nil; invalid = validator(ans) {
 				err := q.Prompt.Error(invalid)
 				// if there was a problem
 				if err != nil {

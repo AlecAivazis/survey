@@ -19,5 +19,5 @@ func main() {
 			"j",
 		},
 	}
-	survey.AskOne(prompt, &color, nil)
+	survey.AskOne(prompt, &color)
 }
