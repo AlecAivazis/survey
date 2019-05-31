@@ -58,7 +58,7 @@ func main() {
 ```
 
 *NOTE*: This page describes the API for the upcoming `v2` release which has not been made available yet. For documentation
-for the old `v1` version, see [here](https://godoc.org/github.com/AlecAivazis/survey/v1).
+for the old `v1` version, see [here](https://godoc.org/gopkg.in/AlecAivazis/survey.v1).
 
 ## Table of Contents
 
