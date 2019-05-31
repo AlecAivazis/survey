@@ -5,6 +5,7 @@
 
 A library for building interactive prompts.
 
+
 <img width="550" src="https://thumbs.gfycat.com/VillainousGraciousKouprey-size_restricted.gif"/>
 
 ```go
@@ -55,6 +56,9 @@ func main() {
     fmt.Printf("%s chose %s.", answers.Name, answers.FavoriteColor)
 }
 ```
+
+*NOTE*: This page describes the API for the upcoming `v2` release which has not been made available yet. For documentation
+for the old `v1` version, see [here](https://godoc.org/github.com/AlecAivazis/survey/v1).
 
 ## Table of Contents
 
