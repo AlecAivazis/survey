@@ -60,7 +60,7 @@ var SelectQuestionTemplate = `
 {{- end}}`
 
 // OnChange is called on every keypress.
-func (s *Select) OnChange(line []rune, pos int, key rune) bool {
+func (s *Select) OnChange(key rune) bool {
 	options := s.filterOptions()
 	oldFilter := s.filter
 
@@ -232,7 +232,7 @@ func (s *Select) Prompt() (interface{}, error) {
 		if r == terminal.KeyEndTransmission {
 			break
 		}
-		if s.OnChange(nil, 0, r) {
+		if s.OnChange(r) {
 			break
 		}
 	}
