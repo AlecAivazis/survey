@@ -240,6 +240,16 @@ q := &survey.Question{
 }
 ```
 
+Validators can be passed to `survey.AskOne` by using `survey.WithValidator`:
+
+```golang
+color := ""
+prompt := &survey.Input{ Message: "Whats your name?" }
+
+// you can pass multiple validators here and survey will make sure each one passes
+survey.AskOne(prompt, &color, survey.WithValidator(survey.Required))
+```
+
 ### Built-in Validators
 
 `survey` comes prepackaged with a few validators to fit common situations. Currently these
