@@ -55,7 +55,7 @@ type PromptConfig struct {
 type Prompt interface {
 	Prompt(config *PromptConfig) (interface{}, error)
 	Cleanup(interface{}, *PromptConfig) error
-	Error(error) error
+	Error(error, string) error
 }
 
 // PromptAgainer Interface for Prompts that support prompting again after invalid input
@@ -222,7 +222,7 @@ func Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
 		for _, validator := range validators {
 			// wait for a valid response
 			for invalid := validator(ans); invalid != nil; invalid = validator(ans) {
-				err := q.Prompt.Error(invalid)
+				err := q.Prompt.Error(invalid, options.PromptConfig.IconSet.Error)
 				// if there was a problem
 				if err != nil {
 					return err

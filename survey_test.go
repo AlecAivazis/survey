@@ -231,7 +231,10 @@ func TestValidationError(t *testing.T) {
 
 	actual, err := core.RunTemplate(
 		core.ErrorTemplate,
-		err,
+		&core.ErrorTemplateData{
+			Error: err,
+			Icon:  "X",
+		},
 	)
 	if err != nil {
 		t.Errorf("Failed to run template to format error: %s", err)
