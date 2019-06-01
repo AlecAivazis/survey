@@ -40,7 +40,7 @@ func TestSelectRender(t *testing.T) {
 		{
 			"Test Select question output",
 			prompt,
-			SelectTemplateData{SelectedIndex: 2, PageEntries: prompt.Options,Icons: &defaultIconSet},
+			SelectTemplateData{SelectedIndex: 2, PageEntries: prompt.Options, Icons: &defaultIconSet},
 			strings.Join(
 				[]string{
 					fmt.Sprintf("%s Pick your word:  [Use arrows to move, type to filter]", defaultIconSet.Question),
@@ -55,13 +55,13 @@ func TestSelectRender(t *testing.T) {
 		{
 			"Test Select answer output",
 			prompt,
-			SelectTemplateData{Answer: "buz", ShowAnswer: true, PageEntries: prompt.Options,Icons: &defaultIconSet},
+			SelectTemplateData{Answer: "buz", ShowAnswer: true, PageEntries: prompt.Options, Icons: &defaultIconSet},
 			fmt.Sprintf("%s Pick your word: buz\n", defaultIconSet.Question),
 		},
 		{
 			"Test Select question output with help hidden",
 			helpfulPrompt,
-			SelectTemplateData{SelectedIndex: 2, PageEntries: prompt.Options},
+			SelectTemplateData{SelectedIndex: 2, PageEntries: prompt.Options, Icons: &defaultIconSet},
 			strings.Join(
 				[]string{
 					fmt.Sprintf("%s Pick your word:  [Use arrows to move, type to filter, %s for more help]", defaultIconSet.Question, string(defaultIconSet.HelpInput)),
@@ -76,7 +76,7 @@ func TestSelectRender(t *testing.T) {
 		{
 			"Test Select question output with help shown",
 			helpfulPrompt,
-			SelectTemplateData{SelectedIndex: 2, ShowHelp: true, PageEntries: prompt.Options,Icons: &defaultIconSet},
+			SelectTemplateData{SelectedIndex: 2, ShowHelp: true, PageEntries: prompt.Options, Icons: &defaultIconSet},
 			strings.Join(
 				[]string{
 					fmt.Sprintf("%s This is helpful", defaultIconSet.Help),
@@ -101,7 +101,10 @@ func TestSelectRender(t *testing.T) {
 			SelectQuestionTemplate,
 			test.data,
 		)
-		assert.Nil(t, err, test.title)
+		if !assert.Nil(t, err, test.title) {
+			fmt.Println(err.Error())
+			return
+		}
 
 		w.Close()
 		var buf bytes.Buffer
