@@ -24,20 +24,21 @@ type Password struct {
 type PasswordTemplateData struct {
 	Password
 	ShowHelp bool
+	Icons    *IconSet
 }
 
 // Templates with Color formatting. See Documentation: https://github.com/mgutz/ansi#style-format
 var PasswordQuestionTemplate = `
-{{- if .ShowHelp }}{{- color "cyan"}}{{ HelpIcon }} {{ .Help }}{{color "reset"}}{{"\n"}}{{end}}
-{{- color "green+hb"}}{{ QuestionIcon }} {{color "reset"}}
+{{- if .ShowHelp }}{{- color "cyan"}}{{ .Icons.Help }} {{ .Help }}{{color "reset"}}{{"\n"}}{{end}}
+{{- color "green+hb"}}{{ .Icons.Question }} {{color "reset"}}
 {{- color "default+hb"}}{{ .Message }} {{color "reset"}}
-{{- if and .Help (not .ShowHelp)}}{{color "cyan"}}[{{ HelpInputRune }} for help]{{color "reset"}} {{end}}`
+{{- if and .Help (not .ShowHelp)}}{{color "cyan"}}[{{ .Icons.HelpInput }} for help]{{color "reset"}} {{end}}`
 
 func (p *Password) Prompt(config *PromptConfig) (line interface{}, err error) {
 	// render the question template
 	out, err := core.RunTemplate(
 		PasswordQuestionTemplate,
-		PasswordTemplateData{Password: *p},
+		PasswordTemplateData{Password: *p, Icons: &config.IconSet},
 	)
 	fmt.Fprint(terminal.NewAnsiStdout(p.Stdio().Out), out)
 	if err != nil {
@@ -69,7 +70,7 @@ func (p *Password) Prompt(config *PromptConfig) (line interface{}, err error) {
 
 			err = p.Render(
 				PasswordQuestionTemplate,
-				PasswordTemplateData{Password: *p, ShowHelp: true},
+				PasswordTemplateData{Password: *p, ShowHelp: true, Icons: &config.IconSet},
 			)
 			if err != nil {
 				return "", err
@@ -81,6 +82,6 @@ func (p *Password) Prompt(config *PromptConfig) (line interface{}, err error) {
 }
 
 // Cleanup hides the string with a fixed number of characters.
-func (prompt *Password) Cleanup(val interface{}) error {
+func (prompt *Password) Cleanup(val interface{}, config *PromptConfig) error {
 	return nil
 }

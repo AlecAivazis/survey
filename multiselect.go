@@ -44,19 +44,20 @@ type MultiSelectTemplateData struct {
 	SelectedIndex int
 	ShowHelp      bool
 	PageEntries   []string
+	Icons         *IconSet
 }
 
 var MultiSelectQuestionTemplate = `
-{{- if .ShowHelp }}{{- color "cyan"}}{{ HelpIcon }} {{ .Help }}{{color "reset"}}{{"\n"}}{{end}}
-{{- color "green+hb"}}{{ QuestionIcon }} {{color "reset"}}
+{{- if .ShowHelp }}{{- color "cyan"}}{{ .Icons.Help }} {{ .Help }}{{color "reset"}}{{"\n"}}{{end}}
+{{- color "green+hb"}}{{ .Icons.Question }} {{color "reset"}}
 {{- color "default+hb"}}{{ .Message }}{{ .FilterMessage }}{{color "reset"}}
 {{- if .ShowAnswer}}{{color "cyan"}} {{.Answer}}{{color "reset"}}{{"\n"}}
 {{- else }}
-	{{- "  "}}{{- color "cyan"}}[Use arrows to move, space to select, type to filter{{- if and .Help (not .ShowHelp)}}, {{ HelpInputRune }} for more help{{end}}]{{color "reset"}}
+	{{- "  "}}{{- color "cyan"}}[Use arrows to move, space to select, type to filter{{- if and .Help (not .ShowHelp)}}, {{ .Icons.HelpInput }} for more help{{end}}]{{color "reset"}}
   {{- "\n"}}
   {{- range $ix, $option := .PageEntries}}
-    {{- if eq $ix $.SelectedIndex}}{{color "cyan"}}{{ SelectFocusIcon }}{{color "reset"}}{{else}} {{end}}
-    {{- if index $.Checked $option}}{{color "green"}} {{ MarkedOptionIcon }} {{else}}{{color "default+hb"}} {{ UnmarkedOptionIcon }} {{end}}
+    {{- if eq $ix $.SelectedIndex }}{{color "cyan"}}{{ $.Icons.SelectFocus }}{{color "reset"}}{{else}} {{end}}
+    {{- if index $.Checked $option }}{{color "green"}} {{ $.Icons.MarkedOption }} {{else}}{{color "default+hb"}} {{ $.Icons.UnmarkedOption }} {{end}}
     {{- color "reset"}}
     {{- " "}}{{$option}}{{"\n"}}
   {{- end}}
@@ -98,7 +99,7 @@ func (m *MultiSelect) OnChange(key rune, config *PromptConfig) {
 			m.filter = ""
 		}
 		// only show the help message if we have one to show
-	} else if key == config.IconSet.HelpInput && m.Help != "" {
+	} else if string(key) == config.IconSet.HelpInput && m.Help != "" {
 		m.showingHelp = true
 	} else if key == terminal.KeyEscape {
 		m.VimMode = !m.VimMode
@@ -146,6 +147,7 @@ func (m *MultiSelect) OnChange(key rune, config *PromptConfig) {
 			Checked:       m.checked,
 			ShowHelp:      m.showingHelp,
 			PageEntries:   opts,
+			Icons:         &config.IconSet,
 		},
 	)
 }
@@ -206,6 +208,7 @@ func (m *MultiSelect) Prompt(config *PromptConfig) (interface{}, error) {
 			SelectedIndex: idx,
 			Checked:       m.checked,
 			PageEntries:   opts,
+			Icons:         &config.IconSet,
 		},
 	)
 	if err != nil {
@@ -244,7 +247,7 @@ func (m *MultiSelect) Prompt(config *PromptConfig) (interface{}, error) {
 }
 
 // Cleanup removes the options section, and renders the ask like a normal question.
-func (m *MultiSelect) Cleanup(val interface{}) error {
+func (m *MultiSelect) Cleanup(val interface{}, config *PromptConfig) error {
 	// execute the output summary template with the answer
 	return m.Render(
 		MultiSelectQuestionTemplate,
@@ -254,6 +257,7 @@ func (m *MultiSelect) Cleanup(val interface{}) error {
 			Checked:       m.checked,
 			Answer:        strings.Join(val.([]string), ", "),
 			ShowAnswer:    true,
+			Icons:         &config.IconSet,
 		},
 	)
 }

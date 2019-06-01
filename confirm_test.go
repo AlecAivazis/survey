@@ -30,31 +30,31 @@ func TestConfirmRender(t *testing.T) {
 			"Test Confirm question output with default true",
 			Confirm{Message: "Is pizza your favorite food?", Default: true},
 			ConfirmTemplateData{},
-			fmt.Sprintf("%s Is pizza your favorite food? (Y/n) ", core.QuestionIcon),
+			fmt.Sprintf("%s Is pizza your favorite food? (Y/n) ", defaultIconSet.Question),
 		},
 		{
 			"Test Confirm question output with default false",
 			Confirm{Message: "Is pizza your favorite food?", Default: false},
 			ConfirmTemplateData{},
-			fmt.Sprintf("%s Is pizza your favorite food? (y/N) ", core.QuestionIcon),
+			fmt.Sprintf("%s Is pizza your favorite food? (y/N) ", defaultIconSet.Question),
 		},
 		{
 			"Test Confirm answer output",
 			Confirm{Message: "Is pizza your favorite food?"},
 			ConfirmTemplateData{Answer: "Yes"},
-			fmt.Sprintf("%s Is pizza your favorite food? Yes\n", core.QuestionIcon),
+			fmt.Sprintf("%s Is pizza your favorite food? Yes\n", defaultIconSet.Question),
 		},
 		{
 			"Test Confirm with help but help message is hidden",
 			Confirm{Message: "Is pizza your favorite food?", Help: "This is helpful"},
 			ConfirmTemplateData{},
-			fmt.Sprintf("%s Is pizza your favorite food? [%s for help] (y/N) ", core.QuestionIcon, string(core.HelpInputRune)),
+			fmt.Sprintf("%s Is pizza your favorite food? [%s for help] (y/N) ", defaultIconSet.Question, string(defaultIconSet.HelpInput)),
 		},
 		{
 			"Test Confirm help output with help message shown",
 			Confirm{Message: "Is pizza your favorite food?", Help: "This is helpful"},
 			ConfirmTemplateData{ShowHelp: true},
-			fmt.Sprintf("%s This is helpful\n%s Is pizza your favorite food? (y/N) ", core.HelpIcon, core.QuestionIcon),
+			fmt.Sprintf("%s This is helpful\n%s Is pizza your favorite food? (y/N) ", defaultIconSet.Help, defaultIconSet.Question),
 		},
 	}
 
@@ -128,7 +128,7 @@ func TestConfirmPrompt(t *testing.T) {
 				c.ExpectString(
 					fmt.Sprintf(
 						"Is pizza your favorite food? [%s for help] (y/N)",
-						string(core.HelpInputRune),
+						string(defaultIconSet.HelpInput),
 					),
 				)
 				c.SendLine("?")

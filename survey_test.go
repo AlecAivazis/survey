@@ -234,7 +234,7 @@ func TestValidationError(t *testing.T) {
 		t.Errorf("Failed to run template to format error: %s", err)
 	}
 
-	expected := fmt.Sprintf("%s Sorry, your reply was invalid: Football is not a valid month\n", core.ErrorIcon)
+	expected := fmt.Sprintf("%s Sorry, your reply was invalid: Football is not a valid month\n", "X")
 
 	if actual != expected {
 		t.Errorf("Formatted error was not formatted correctly. Found:\n%s\nExpected:\n%s", actual, expected)

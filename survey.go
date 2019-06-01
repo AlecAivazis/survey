@@ -10,16 +10,18 @@ import (
 )
 
 // DefaultAskOptions is the default options on ask, using the OS stdio.
-var DefaultAskOptions = AskOptions{
-	Stdio: terminal.Stdio{
-		In:  os.Stdin,
-		Out: os.Stdout,
-		Err: os.Stderr,
-	},
-	PromptConfig: PromptConfig{
-		PageSize: 7,
-		IconSet:  core.DefaultIconSet,
-	},
+func defaultAskOptions() *AskOptions {
+	return &AskOptions{
+		Stdio: terminal.Stdio{
+			In:  os.Stdin,
+			Out: os.Stdout,
+			Err: os.Stderr,
+		},
+		PromptConfig: PromptConfig{
+			PageSize: 7,
+			IconSet:  defaultIconSet,
+		},
+	}
 }
 
 // Validator is a function passed to a Question after a user has provided a response.
@@ -45,14 +47,14 @@ type Question struct {
 // PromptConfig holds the global configuration for a prompt
 type PromptConfig struct {
 	PageSize int
-	IconSet  core.IconSet
+	IconSet  IconSet
 }
 
 // Prompt is the primary interface for the objects that can take user input
 // and return a response.
 type Prompt interface {
 	Prompt(config *PromptConfig) (interface{}, error)
-	Cleanup(interface{}) error
+	Cleanup(interface{}, *PromptConfig) error
 	Error(error) error
 }
 
@@ -109,9 +111,9 @@ func WithPageSize(pageSize int) AskOpt {
 }
 
 // WithHelpInputRune changes the character that prompts look for to give the user helpful information.
-func WithHelpInputRune(r rune) AskOpt {
+func WithHelpInputRune(r string) AskOpt {
 	return func(options *AskOptions) error {
-		// set the input rune
+		// set the input character
 		options.PromptConfig.IconSet.HelpInput = r
 
 		// nothing went wrong
@@ -166,9 +168,9 @@ matching name. For example:
 */
 func Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
 	// build up the configuration options
-	options := DefaultAskOptions
+	options := defaultAskOptions()
 	for _, opt := range opts {
-		if err := opt(&options); err != nil {
+		if err := opt(options); err != nil {
 			return err
 		}
 	}
@@ -238,7 +240,7 @@ func Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
 		}
 
 		// tell the prompt to cleanup with the validated value
-		q.Prompt.Cleanup(ans)
+		q.Prompt.Cleanup(ans, &options.PromptConfig)
 
 		// if something went wrong
 		if err != nil {
@@ -294,4 +296,25 @@ func paginate(pageSize int, choices []string, sel int) ([]string, int) {
 
 	// return the subset we care about and the index
 	return choices[start:end], cursor
+}
+
+// IconSet holds the strings to use for various prompts
+type IconSet struct {
+	HelpInput      string
+	Error          string
+	Help           string
+	Question       string
+	MarkedOption   string
+	UnmarkedOption string
+	SelectFocus    string
+}
+
+// defaultIconSet is the default icons used by prompts
+var defaultIconSet = IconSet{
+	HelpInput:      "?",
+	Help:           "?",
+	Question:       "?",
+	MarkedOption:   "[x]",
+	UnmarkedOption: "[ ]",
+	SelectFocus:    ">",
 }

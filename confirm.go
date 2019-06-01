@@ -20,17 +20,18 @@ type ConfirmTemplateData struct {
 	Confirm
 	Answer   string
 	ShowHelp bool
+	Icons    *IconSet
 }
 
 // Templates with Color formatting. See Documentation: https://github.com/mgutz/ansi#style-format
 var ConfirmQuestionTemplate = `
-{{- if .ShowHelp }}{{- color "cyan"}}{{ HelpIcon }} {{ .Help }}{{color "reset"}}{{"\n"}}{{end}}
-{{- color "green+hb"}}{{ QuestionIcon }} {{color "reset"}}
+{{- if .ShowHelp }}{{- color "cyan"}}{{ .Icons.Help }} {{ .Help }}{{color "reset"}}{{"\n"}}{{end}}
+{{- color "green+hb"}}{{ .Icons.Question }} {{color "reset"}}
 {{- color "default+hb"}}{{ .Message }} {{color "reset"}}
 {{- if .Answer}}
   {{- color "cyan"}}{{.Answer}}{{color "reset"}}{{"\n"}}
 {{- else }}
-  {{- if and .Help (not .ShowHelp)}}{{color "cyan"}}[{{ HelpInputRune }} for help]{{color "reset"}} {{end}}
+  {{- if and .Help (not .ShowHelp)}}{{color "cyan"}}[{{ .Icons.HelpInput }} for help]{{color "reset"}} {{end}}
   {{- color "white"}}{{if .Default}}(Y/n) {{else}}(y/N) {{end}}{{color "reset"}}
 {{- end}}`
 
@@ -75,7 +76,7 @@ func (c *Confirm) getBool(showHelp bool, config *PromptConfig) (bool, error) {
 		case val == string(config.IconSet.HelpInput) && c.Help != "":
 			err := c.Render(
 				ConfirmQuestionTemplate,
-				ConfirmTemplateData{Confirm: *c, ShowHelp: true},
+				ConfirmTemplateData{Confirm: *c, ShowHelp: true, Icons: &config.IconSet},
 			)
 			if err != nil {
 				// use the default value and bubble up
@@ -90,7 +91,7 @@ func (c *Confirm) getBool(showHelp bool, config *PromptConfig) (bool, error) {
 			}
 			err := c.Render(
 				ConfirmQuestionTemplate,
-				ConfirmTemplateData{Confirm: *c, ShowHelp: showHelp},
+				ConfirmTemplateData{Confirm: *c, ShowHelp: showHelp, Icons: &config.IconSet},
 			)
 			if err != nil {
 				// use the default value and bubble up
@@ -116,7 +117,7 @@ func (c *Confirm) Prompt(config *PromptConfig) (interface{}, error) {
 	// render the question template
 	err := c.Render(
 		ConfirmQuestionTemplate,
-		ConfirmTemplateData{Confirm: *c},
+		ConfirmTemplateData{Confirm: *c, Icons: &config.IconSet},
 	)
 	if err != nil {
 		return "", err
@@ -127,12 +128,13 @@ func (c *Confirm) Prompt(config *PromptConfig) (interface{}, error) {
 }
 
 // Cleanup overwrite the line with the finalized formatted version
-func (c *Confirm) Cleanup(val interface{}) error {
+func (c *Confirm) Cleanup(val interface{}, config *PromptConfig) error {
 	// if the value was previously true
 	ans := yesNo(val.(bool))
+
 	// render the template
 	return c.Render(
 		ConfirmQuestionTemplate,
-		ConfirmTemplateData{Confirm: *c, Answer: ans},
+		ConfirmTemplateData{Confirm: *c, Answer: ans, Icons: &config.IconSet},
 	)
 }

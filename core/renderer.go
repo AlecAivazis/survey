@@ -13,7 +13,7 @@ type Renderer struct {
 	errorLineCount int
 }
 
-var ErrorTemplate = `{{color "red"}}{{ ErrorIcon }} Sorry, your reply was invalid: {{.Error}}{{color "reset"}}
+var ErrorTemplate = `{{color "red"}}X Sorry, your reply was invalid: {{.Error}}{{color "reset"}}
 `
 
 func (r *Renderer) WithStdio(stdio terminal.Stdio) {
@@ -39,6 +39,7 @@ func (r *Renderer) Error(invalid error) error {
 	// since errors are printed on top we need to reset the prompt
 	// as well as any previous error print
 	r.resetPrompt(r.lineCount + r.errorLineCount)
+
 	// we just cleared the prompt lines
 	r.lineCount = 0
 	out, err := RunTemplate(ErrorTemplate, invalid)
