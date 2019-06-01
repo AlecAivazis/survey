@@ -40,7 +40,7 @@ func TestSelectRender(t *testing.T) {
 		{
 			"Test Select question output",
 			prompt,
-			SelectTemplateData{SelectedIndex: 2, PageEntries: prompt.Options},
+			SelectTemplateData{SelectedIndex: 2, PageEntries: prompt.Options,Icons: &defaultIconSet},
 			strings.Join(
 				[]string{
 					fmt.Sprintf("%s Pick your word:  [Use arrows to move, type to filter]", defaultIconSet.Question),
@@ -55,7 +55,7 @@ func TestSelectRender(t *testing.T) {
 		{
 			"Test Select answer output",
 			prompt,
-			SelectTemplateData{Answer: "buz", ShowAnswer: true, PageEntries: prompt.Options},
+			SelectTemplateData{Answer: "buz", ShowAnswer: true, PageEntries: prompt.Options,Icons: &defaultIconSet},
 			fmt.Sprintf("%s Pick your word: buz\n", defaultIconSet.Question),
 		},
 		{
@@ -76,7 +76,7 @@ func TestSelectRender(t *testing.T) {
 		{
 			"Test Select question output with help shown",
 			helpfulPrompt,
-			SelectTemplateData{SelectedIndex: 2, ShowHelp: true, PageEntries: prompt.Options},
+			SelectTemplateData{SelectedIndex: 2, ShowHelp: true, PageEntries: prompt.Options,Icons: &defaultIconSet},
 			strings.Join(
 				[]string{
 					fmt.Sprintf("%s This is helpful", defaultIconSet.Help),

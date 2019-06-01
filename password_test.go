@@ -25,19 +25,19 @@ func TestPasswordRender(t *testing.T) {
 		{
 			"Test Password question output",
 			Password{Message: "Tell me your secret:"},
-			PasswordTemplateData{},
+			PasswordTemplateData{Icons: &defaultIconSet},
 			fmt.Sprintf("%s Tell me your secret: ", defaultIconSet.Question),
 		},
 		{
 			"Test Password question output with help hidden",
 			Password{Message: "Tell me your secret:", Help: "This is helpful"},
-			PasswordTemplateData{},
+			PasswordTemplateData{Icons: &defaultIconSet},
 			fmt.Sprintf("%s Tell me your secret: [%s for help] ", defaultIconSet.Question, string(defaultIconSet.HelpInput)),
 		},
 		{
 			"Test Password question output with help shown",
 			Password{Message: "Tell me your secret:", Help: "This is helpful"},
-			PasswordTemplateData{ShowHelp: true},
+			PasswordTemplateData{ShowHelp: true, Icons: &defaultIconSet},
 			fmt.Sprintf("%s This is helpful\n%s Tell me your secret: ", defaultIconSet.Help, defaultIconSet.Question),
 		},
 	}

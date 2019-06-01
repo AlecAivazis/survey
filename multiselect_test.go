@@ -44,6 +44,7 @@ func TestMultiSelectRender(t *testing.T) {
 				SelectedIndex: 2,
 				PageEntries:   prompt.Options,
 				Checked:       map[string]bool{"bar": true, "buz": true},
+				Icons: &defaultIconSet,
 			},
 			strings.Join(
 				[]string{
@@ -62,6 +63,7 @@ func TestMultiSelectRender(t *testing.T) {
 			MultiSelectTemplateData{
 				Answer:     "foo, buz",
 				ShowAnswer: true,
+				Icons: &defaultIconSet,
 			},
 			fmt.Sprintf("%s Pick your words: foo, buz\n", defaultIconSet.Question),
 		},
@@ -72,6 +74,7 @@ func TestMultiSelectRender(t *testing.T) {
 				SelectedIndex: 2,
 				PageEntries:   prompt.Options,
 				Checked:       map[string]bool{"bar": true, "buz": true},
+				Icons: &defaultIconSet,
 			},
 			strings.Join(
 				[]string{
@@ -92,6 +95,7 @@ func TestMultiSelectRender(t *testing.T) {
 				PageEntries:   prompt.Options,
 				Checked:       map[string]bool{"bar": true, "buz": true},
 				ShowHelp:      true,
+				Icons: &defaultIconSet,
 			},
 			strings.Join(
 				[]string{
