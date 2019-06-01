@@ -337,17 +337,36 @@ survey.AskOne(
 
 ## Customizing Output
 
-Customizing the icons and various parts of survey can easily be done by setting the following variables
-in `survey/core`:
+Customizing the icons and various parts of survey can easily be done by passing the `WithIcons` option
+to `Ask` or `AskOne`:
 
-| name               | default | description                                                   |
-| ------------------ | ------- | ------------------------------------------------------------- |
-| ErrorIcon          | X       | Before an error                                               |
-| HelpIcon           | i       | Before help text                                              |
-| QuestionIcon       | ?       | Before the message of a prompt                                |
-| SelectFocusIcon    | >       | Marks the current focus in `Select` and `MultiSelect` prompts |
-| UnmarkedOptionIcon | [ ]     | Marks an unselected option in a `MultiSelect` prompt          |
-| MarkedOptionIcon   | [x]     | Marks a chosen selection in a `MultiSelect` prompt            |
+```golang
+import (
+    "github.com/AlecAivazis/survey/v2"
+)
+
+number := ""
+prompt := &survey.Input{
+    Message: "If you have this need, please give me a reasonable message.",
+    Help:    "I couldn't come up with one.",
+}
+
+survey.AskOne(prompt, &number, survey.WithIconSet(function(icons *survey.IconSet) {
+    // you can set any icons
+    icons.Question = "⁇"
+}))
+```
+
+The icons available for updating are:
+
+| name           | default | description                                                   |
+| -------------- | ------- | ------------------------------------------------------------- |
+| Error          | X       | Before an error                                               |
+| Help           | i       | Before help text                                              |
+| Question       | ?       | Before the message of a prompt                                |
+| SelectFocus    | >       | Marks the current focus in `Select` and `MultiSelect` prompts |
+| UnmarkedOption | [ ]     | Marks an unselected option in a `MultiSelect` prompt          |
+| MarkedOption   | [x]     | Marks a chosen selection in a `MultiSelect` prompt            |
 
 ## Testing
 
