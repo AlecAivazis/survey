@@ -101,7 +101,7 @@ func (s *Select) OnChange(key rune, config *PromptConfig) bool {
 			s.selectedIndex++
 		}
 		// only show the help message if we have one
-	} else if key == core.HelpInputRune && s.Help != "" {
+	} else if key == config.IconSet.HelpInput && s.Help != "" {
 		s.showingHelp = true
 		// if the user wants to toggle vim mode on/off
 	} else if key == terminal.KeyEscape {

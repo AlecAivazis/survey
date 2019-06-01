@@ -8,30 +8,30 @@ import (
 	"github.com/mgutz/ansi"
 )
 
+// DisableColor can be used to make testing reliable
 var DisableColor = false
 
-var (
-	// HelpInputRune is the rune which the user should enter to trigger
-	// more detailed question help
-	HelpInputRune = '?'
+// IconSet holds the strings to use for various prompts
+type IconSet struct {
+	HelpInput      rune
+	Error          string
+	Help           string
+	Question       string
+	MarkedOption   string
+	UnmarkedOption string
+	SelectFocus    string
+}
 
-	// ErrorIcon will be be shown before an error
-	ErrorIcon = "X"
-
-	// HelpIcon will be shown before more detailed question help
-	HelpIcon = "?"
-	// QuestionIcon will be shown before a question Message
-	QuestionIcon = "?"
-
-	// MarkedOptionIcon will be prepended before a selected multiselect option
-	MarkedOptionIcon = "[x]"
-	// UnmarkedOptionIcon will be prepended before an unselected multiselect option
-	UnmarkedOptionIcon = "[ ]"
-
-	// SelectFocusIcon is prepended to an option to signify the user is
-	// currently focusing that option
-	SelectFocusIcon = ">"
-)
+// DefaultIconSet is the default icons used by prompts
+var DefaultIconSet = IconSet{
+	HelpInput:      '?',
+	Error:          "X",
+	Help:           "?",
+	Question:       "?",
+	MarkedOption:   "[x]",
+	UnmarkedOption: "[ ]",
+	SelectFocus:    ">",
+}
 
 var TemplateFuncs = map[string]interface{}{
 	// Templates with Color formatting. See Documentation: https://github.com/mgutz/ansi#style-format
@@ -42,25 +42,25 @@ var TemplateFuncs = map[string]interface{}{
 		return ansi.ColorCode(color)
 	},
 	"HelpInputRune": func() string {
-		return string(HelpInputRune)
+		return string(DefaultIconSet.HelpInput)
 	},
 	"ErrorIcon": func() string {
-		return ErrorIcon
+		return DefaultIconSet.Error
 	},
 	"HelpIcon": func() string {
-		return HelpIcon
+		return DefaultIconSet.Help
 	},
 	"QuestionIcon": func() string {
-		return QuestionIcon
+		return DefaultIconSet.Question
 	},
 	"MarkedOptionIcon": func() string {
-		return MarkedOptionIcon
+		return DefaultIconSet.MarkedOption
 	},
 	"UnmarkedOptionIcon": func() string {
-		return UnmarkedOptionIcon
+		return DefaultIconSet.UnmarkedOption
 	},
 	"SelectFocusIcon": func() string {
-		return SelectFocusIcon
+		return DefaultIconSet.SelectFocus
 	},
 }
 

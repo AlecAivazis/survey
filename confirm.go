@@ -47,7 +47,7 @@ func yesNo(t bool) string {
 	return "No"
 }
 
-func (c *Confirm) getBool(showHelp bool) (bool, error) {
+func (c *Confirm) getBool(showHelp bool, config *PromptConfig) (bool, error) {
 	cursor := c.NewCursor()
 	rr := c.NewRuneReader()
 	rr.SetTermMode()
@@ -72,7 +72,7 @@ func (c *Confirm) getBool(showHelp bool) (bool, error) {
 			answer = false
 		case val == "":
 			answer = c.Default
-		case val == string(core.HelpInputRune) && c.Help != "":
+		case val == string(config.IconSet.HelpInput) && c.Help != "":
 			err := c.Render(
 				ConfirmQuestionTemplate,
 				ConfirmTemplateData{Confirm: *c, ShowHelp: true},
@@ -123,7 +123,7 @@ func (c *Confirm) Prompt(config *PromptConfig) (interface{}, error) {
 	}
 
 	// get input and return
-	return c.getBool(false)
+	return c.getBool(false, config)
 }
 
 // Cleanup overwrite the line with the finalized formatted version

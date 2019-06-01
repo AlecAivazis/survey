@@ -72,9 +72,9 @@ func init() {
 	}
 }
 
-func (e *Editor) PromptAgain(invalid interface{}, err error) (interface{}, error) {
+func (e *Editor) PromptAgain(invalid interface{}, err error, config *PromptConfig) (interface{}, error) {
 	initialValue := invalid.(string)
-	return e.prompt(initialValue)
+	return e.prompt(initialValue, config)
 }
 
 func (e *Editor) Prompt(config *PromptConfig) (interface{}, error) {
@@ -82,10 +82,10 @@ func (e *Editor) Prompt(config *PromptConfig) (interface{}, error) {
 	if e.Default != "" && e.AppendDefault {
 		initialValue = e.Default
 	}
-	return e.prompt(initialValue)
+	return e.prompt(initialValue, config)
 }
 
-func (e *Editor) prompt(initialValue string) (interface{}, error) {
+func (e *Editor) prompt(initialValue string, config *PromptConfig) (interface{}, error) {
 	// render the template
 	err := e.Render(
 		EditorQuestionTemplate,
@@ -118,7 +118,7 @@ func (e *Editor) prompt(initialValue string) (interface{}, error) {
 		if r == terminal.KeyEndTransmission {
 			break
 		}
-		if r == core.HelpInputRune && e.Help != "" {
+		if r == config.IconSet.HelpInput && e.Help != "" {
 			err = e.Render(
 				EditorQuestionTemplate,
 				EditorTemplateData{Editor: *e, ShowHelp: true},

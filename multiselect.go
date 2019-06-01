@@ -98,7 +98,7 @@ func (m *MultiSelect) OnChange(key rune, config *PromptConfig) {
 			m.filter = ""
 		}
 		// only show the help message if we have one to show
-	} else if key == core.HelpInputRune && m.Help != "" {
+	} else if key == config.IconSet.HelpInput && m.Help != "" {
 		m.showingHelp = true
 	} else if key == terminal.KeyEscape {
 		m.VimMode = !m.VimMode

@@ -17,8 +17,8 @@ var DefaultAskOptions = AskOptions{
 		Err: os.Stderr,
 	},
 	PromptConfig: PromptConfig{
-		PageSize:      7,
-		HelpInputRune: '?',
+		PageSize: 7,
+		IconSet:  core.DefaultIconSet,
 	},
 }
 
@@ -44,8 +44,8 @@ type Question struct {
 
 // PromptConfig holds the global configuration for a prompt
 type PromptConfig struct {
-	PageSize      int
-	HelpInputRune rune
+	PageSize int
+	IconSet  core.IconSet
 }
 
 // Prompt is the primary interface for the objects that can take user input
@@ -58,7 +58,7 @@ type Prompt interface {
 
 // PromptAgainer Interface for Prompts that support prompting again after invalid input
 type PromptAgainer interface {
-	PromptAgain(invalid interface{}, err error) (interface{}, error)
+	PromptAgain(invalid interface{}, err error, config *PromptConfig) (interface{}, error)
 }
 
 // AskOpt allows setting optional ask options.
@@ -112,7 +112,7 @@ func WithPageSize(pageSize int) AskOpt {
 func WithHelpInputRune(r rune) AskOpt {
 	return func(options *AskOptions) error {
 		// set the input rune
-		options.PromptConfig.HelpInputRune = r
+		options.PromptConfig.IconSet.HelpInput = r
 
 		// nothing went wrong
 		return nil
@@ -217,7 +217,7 @@ func Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
 
 				// ask for more input
 				if promptAgainer, ok := q.Prompt.(PromptAgainer); ok {
-					ans, err = promptAgainer.PromptAgain(ans, invalid)
+					ans, err = promptAgainer.PromptAgain(ans, invalid, &options.PromptConfig)
 				} else {
 					ans, err = q.Prompt.Prompt(&options.PromptConfig)
 				}
