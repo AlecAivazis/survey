@@ -318,7 +318,7 @@ func (my *MyValue) WriteAnswer(name string, value interface{}) error {
 
 myval := MyValue{}
 survey.AskOne(
-    &survey.I
+    &survey.Input{
         Message: "Enter something:",
     },
     &myval,
