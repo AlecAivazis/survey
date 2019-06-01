@@ -63,7 +63,7 @@ var MultiSelectQuestionTemplate = `
 {{- end}}`
 
 // OnChange is called on every keypress.
-func (m *MultiSelect) OnChange(line []rune, pos int, key rune) (newLine []rune, newPos int, ok bool) {
+func (m *MultiSelect) OnChange(key rune, config *PromptConfig) {
 	options := m.filterOptions()
 	oldFilter := m.filter
 
@@ -125,10 +125,17 @@ func (m *MultiSelect) OnChange(line []rune, pos int, key rune) (newLine []rune, 
 		}
 	}
 	// paginate the options
+	// figure out the page size
+	pageSize := m.PageSize
+	// if we dont have a specific one
+	if pageSize == 0 {
+		// grab the global value
+		pageSize = config.PageSize
+	}
 
 	// TODO if we have started filtering and were looking at the end of a list
 	// and we have modified the filter then we should move the page back!
-	opts, idx := paginate(m.PageSize, options, m.selectedIndex)
+	opts, idx := paginate(pageSize, options, m.selectedIndex)
 
 	// render the options
 	m.Render(
@@ -141,9 +148,6 @@ func (m *MultiSelect) OnChange(line []rune, pos int, key rune) (newLine []rune, 
 			PageEntries:   opts,
 		},
 	)
-
-	// if we are not pressing ent
-	return line, 0, true
 }
 
 func (m *MultiSelect) filterOptions() []string {
@@ -224,7 +228,7 @@ func (m *MultiSelect) Prompt(config *PromptConfig) (interface{}, error) {
 		if r == terminal.KeyEndTransmission {
 			break
 		}
-		m.OnChange(nil, 0, r)
+		m.OnChange(r, config)
 	}
 	m.filter = ""
 	m.FilterMessage = ""
