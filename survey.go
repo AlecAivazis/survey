@@ -17,7 +17,8 @@ var DefaultAskOptions = AskOptions{
 		Err: os.Stderr,
 	},
 	PromptConfig: PromptConfig{
-		PageSize: 7,
+		PageSize:      7,
+		HelpInputRune: '?',
 	},
 }
 
@@ -43,7 +44,8 @@ type Question struct {
 
 // PromptConfig holds the global configuration for a prompt
 type PromptConfig struct {
-	PageSize int
+	PageSize      int
+	HelpInputRune rune
 }
 
 // Prompt is the primary interface for the objects that can take user input
@@ -100,6 +102,17 @@ func WithPageSize(pageSize int) AskOpt {
 	return func(options *AskOptions) error {
 		// set the page size
 		options.PromptConfig.PageSize = pageSize
+
+		// nothing went wrong
+		return nil
+	}
+}
+
+// WithHelpInputRune changes the character that prompts look for to give the user helpful information.
+func WithHelpInputRune(r rune) AskOpt {
+	return func(options *AskOptions) error {
+		// set the input rune
+		options.PromptConfig.HelpInputRune = r
 
 		// nothing went wrong
 		return nil
