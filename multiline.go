@@ -1,7 +1,6 @@
 package survey
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/AlecAivazis/survey/v2/core"
@@ -46,7 +45,6 @@ func (i *Multiline) Prompt(config *PromptConfig) (interface{}, error) {
 	if err != nil {
 		return "", err
 	}
-	fmt.Println()
 
 	// start reading runes from the standard in
 	rr := i.NewRuneReader()
