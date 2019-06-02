@@ -3,6 +3,8 @@ package terminal
 import (
 	"fmt"
 	"unicode"
+
+	"github.com/mattn/go-runewidth"
 )
 
 type RuneReader struct {
@@ -89,6 +91,10 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 		if r == KeyBackspace || r == KeyDelete {
 			// and we're not at the beginning of the line
 			if index > 0 && len(line) > 0 {
+
+				// get the length of the left character display
+				rw := runewidth.RuneWidth(line[index-1])
+
 				// if we are at the end of the word
 				if index == len(line) {
 					// just remove the last letter from the internal representation
@@ -98,7 +104,7 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 						cursor.PreviousLine(1)
 						cursor.Forward(int(terminalSize.X))
 					} else {
-						cursor.Back(1)
+						cursor.Back(rw)
 					}
 
 					// clear the rest of the line
@@ -115,7 +121,7 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 					cursor.Save()
 
 					// clear the rest of the line
-					cursor.Back(1)
+					cursor.Back(rw)
 
 					// print what comes after
 					for _, char := range line[index-1:] {
@@ -136,7 +142,7 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 						cursor.PreviousLine(1)
 						cursor.Forward(int(terminalSize.X))
 					} else {
-						cursor.Back(1)
+						cursor.Back(rw)
 					}
 				}
 
@@ -160,7 +166,9 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 					cursor.PreviousLine(1)
 					cursor.Forward(int(terminalSize.X))
 				} else {
-					cursor.Back(1)
+					// get the length of the left character display
+					rw := runewidth.RuneWidth(line[index-1])
+					cursor.Back(rw)
 				}
 				//decrement the index
 				index--
@@ -183,7 +191,9 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 				if cursorCurrent.CursorIsAtLineEnd(terminalSize) {
 					cursor.NextLine(1)
 				} else {
-					cursor.Forward(1)
+					// get the length of the left character display
+					rw := runewidth.RuneWidth(line[index])
+					cursor.Forward(rw)
 				}
 				index++
 
@@ -306,7 +316,8 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 			if cursorCurrent.CursorIsAtLineEnd(terminalSize) {
 				cursor.NextLine(1)
 			} else {
-				cursor.Forward(1)
+				rw := runewidth.RuneWidth(r)
+				cursor.Forward(rw)
 			}
 			// increment the index
 			index++
