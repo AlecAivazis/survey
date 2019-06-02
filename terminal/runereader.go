@@ -92,13 +92,15 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 			// and we're not at the beginning of the line
 			if index > 0 && len(line) > 0 {
 
-				// get the length of the left character display
-				rw := runewidth.RuneWidth(line[index-1])
-
 				// if we are at the end of the word
 				if index == len(line) {
+
+					// get the last character display length
+					rw := runewidth.RuneWidth(line[len(line)-1])
+
 					// just remove the last letter from the internal representation
 					line = line[:len(line)-1]
+
 					// go back one
 					if cursorCurrent.X == 1 {
 						cursor.PreviousLine(1)
@@ -111,6 +113,9 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 					EraseLine(rr.stdio.Out, ERASE_LINE_END)
 				} else {
 					// we need to remove a character from the middle of the word
+
+					// first, we need to get the display length of the deleted characters to move the cursor.
+					rw := runewidth.RuneWidth(line[index-1])
 
 					// remove the current index from the list
 					line = append(line[:index-1], line[index:]...)
@@ -216,7 +221,9 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 					cursorCurrent.Y--
 
 				} else {
-					cursor.Back(1)
+					// get the display length of the terminal character
+					rw := runewidth.RuneWidth(line[index-1])
+					cursor.Back(rw)
 					cursorCurrent.X--
 				}
 				index--
@@ -231,7 +238,9 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 					cursorCurrent.Y++
 
 				} else {
-					cursor.Forward(1)
+					// move the cursor to the right to always move the length of the currently displayed character
+					rw := runewidth.RuneWidth(line[index])
+					cursor.Forward(rw)
 					cursorCurrent.X++
 				}
 				index++
