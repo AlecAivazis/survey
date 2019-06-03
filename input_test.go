@@ -7,10 +7,10 @@ import (
 	"os"
 	"testing"
 
-	expect "github.com/Netflix/go-expect"
-	"github.com/stretchr/testify/assert"
 	"github.com/AlecAivazis/survey/v2/core"
 	"github.com/AlecAivazis/survey/v2/terminal"
+	expect "github.com/Netflix/go-expect"
+	"github.com/stretchr/testify/assert"
 )
 
 func init() {
@@ -59,7 +59,7 @@ func TestInputRender(t *testing.T) {
 		{
 			"Test Input question output without default but with help shown",
 			Input{Message: "What is your favorite month:", Help: "This is helpful"},
-			InputTemplateData{ShowHelp: true,Icons: &defaultIconSet},
+			InputTemplateData{ShowHelp: true, Icons: &defaultIconSet},
 			fmt.Sprintf("%s This is helpful\n%s What is your favorite month: ", defaultIconSet.Help, defaultIconSet.Question),
 		},
 		{

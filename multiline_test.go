@@ -7,10 +7,10 @@ import (
 	"os"
 	"testing"
 
-	expect "github.com/Netflix/go-expect"
-	"github.com/stretchr/testify/assert"
 	"github.com/AlecAivazis/survey/v2/core"
 	"github.com/AlecAivazis/survey/v2/terminal"
+	expect "github.com/Netflix/go-expect"
+	"github.com/stretchr/testify/assert"
 )
 
 func init() {
@@ -41,7 +41,7 @@ func TestMultilineRender(t *testing.T) {
 		{
 			"Test Multiline answer output",
 			Multiline{Message: "What is your favorite month:"},
-			MultilineTemplateData{Answer: "October", ShowAnswer: true,Icons: &defaultIconSet},
+			MultilineTemplateData{Answer: "October", ShowAnswer: true, Icons: &defaultIconSet},
 			fmt.Sprintf("%s What is your favorite month: \nOctober", defaultIconSet.Question),
 		},
 		{
@@ -59,13 +59,13 @@ func TestMultilineRender(t *testing.T) {
 		{
 			"Test Multiline question output without default but with help shown",
 			Multiline{Message: "What is your favorite month:", Help: "This is helpful"},
-			MultilineTemplateData{ShowHelp: true,Icons: &defaultIconSet},
+			MultilineTemplateData{ShowHelp: true, Icons: &defaultIconSet},
 			fmt.Sprintf("%s This is helpful\n%s What is your favorite month: [Enter 2 empty lines to finish]", defaultIconSet.Help, defaultIconSet.Question),
 		},
 		{
 			"Test Multiline question output with default and with help shown",
 			Multiline{Message: "What is your favorite month:", Default: "April", Help: "This is helpful"},
-			MultilineTemplateData{ShowHelp: true,Icons: &defaultIconSet},
+			MultilineTemplateData{ShowHelp: true, Icons: &defaultIconSet},
 			fmt.Sprintf("%s This is helpful\n%s What is your favorite month: (April) [Enter 2 empty lines to finish]", defaultIconSet.Help, defaultIconSet.Question),
 		},
 	}

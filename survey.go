@@ -32,7 +32,7 @@ var defaultIconSet = IconSet{
 	MarkedOption:   "[x]",
 	UnmarkedOption: "[ ]",
 	SelectFocus:    ">",
-	Error:			"X",
+	Error:          "X",
 }
 
 // IconSet holds the strings to use for various prompts
@@ -244,7 +244,7 @@ func Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
 		for _, validator := range validators {
 			// wait for a valid response
 			for invalid := validator(ans); invalid != nil; invalid = validator(ans) {
-				err := q.Prompt.Error(&options.PromptConfig, invalid, )
+				err := q.Prompt.Error(&options.PromptConfig, invalid)
 				// if there was a problem
 				if err != nil {
 					return err
