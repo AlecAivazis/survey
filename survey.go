@@ -162,8 +162,8 @@ func WithHelpInput(r rune) AskOpt {
 	}
 }
 
-// WithIconSet sets the icons that will be used when prompting the user
-func WithIconSet(setIcons func(*IconSet)) AskOpt {
+// WithIcons sets the icons that will be used when prompting the user
+func WithIcons(setIcons func(*IconSet)) AskOpt {
 	return func(options *AskOptions) error {
 		// update the default icons with whatever the user says
 		setIcons(&options.PromptConfig.Icons)

@@ -367,7 +367,7 @@ prompt := &survey.Input{
     Help:    "I couldn't come up with one.",
 }
 
-survey.AskOne(prompt, &number, survey.WithIconSet(function(icons *survey.IconSet) {
+survey.AskOne(prompt, &number, survey.WithIcons(function(icons *survey.IconSet) {
     // you can set any icons
     icons.Question = "⁇"
 }))
