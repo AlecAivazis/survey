@@ -208,8 +208,8 @@ the result. If neither of those are present, notepad (on Windows) or vim (Linux 
 
 ## Filtering options in Select and MultiSelect
 
-The user can filter for options by typing while the prompt is active. This will filter out all options that don't contain the
-typed string anywhere in their name, ignoring case. This default filtering behavior is provided by the `DefaultFilter` function.
+By defaualt, the user can filter for options by typing while the prompt is active. This will filter out all options that don't contain the
+typed string anywhere in their name, ignoring case.
 
 A custom filter function can also be provided to change this default behavior by providing a value for the `Filter` field:
 
@@ -217,20 +217,36 @@ A custom filter function can also be provided to change this default behavior by
 &Select{
     Message: "Choose a color:",
     Options: []string{"red", "blue", "green"},
-    Filter: func(filter string, options []string) (filtered []string) {
-        result := DefaultFilter(filter, options)
+    Filter: func(filter string, options []string) ([]string) {
+        filtered := []string{}
+
         for _, v := range result {
             if len(v) >= 5 {
                 filtered = append(filtered, v)
             }
         }
-        return
+        return filtered
     },
 }
 ```
 
-While the example above is contrived, this allows for use cases where "smarter" filtering might be useful, for example, when
-options are backed by more complex types and filtering might need to occur on more metadata than just the displayed name.
+You can also change the default filter applied with the `survey.WithFilter` `AskOpt`:
+
+```golang
+func myFilter(filter string, options []string) ([]string) {
+    filtered := []string{}
+    for _, v := range result {
+        if len(v) >= 5 {
+            filtered = append(filtered, v)
+        }
+    }
+
+    return filtered
+}
+
+
+survey.Ask(prompt, &color, survey.WithFilter(myFilter))
+```
 
 ## Validation
 
