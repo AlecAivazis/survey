@@ -98,9 +98,9 @@ go run examples/validation.go
 
 There are two primary ways to execute prompts and start collecting information from your users: `Ask` and
 `AskOne`. The primary difference is whether you are interested in collecting a single piece of information
-or if you have a list of questions to ask. For most basic usecases, `Ask` should be enough. However, for
-surveys with complicated branching logic, we recommend that you break out your questions into multiple
-calls to both of these functions to fit your needs.
+or if you have a list of questions to ask whose answers should be collected in a single struct. 
+For most basic usecases, `Ask` should be enough. However, for surveys with complicated branching logic, 
+we recommend that you break out your questions into multiple calls to both of these functions to fit your needs.
 
 ### Configuring the Prompts
 
