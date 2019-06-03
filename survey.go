@@ -21,6 +21,7 @@ func defaultAskOptions() *AskOptions {
 			PageSize:  7,
 			HelpInput: "?",
 			Icons: IconSet{
+				Error:          "X",
 				Help:           "?",
 				Question:       "?",
 				MarkedOption:   "[x]",
@@ -29,17 +30,6 @@ func defaultAskOptions() *AskOptions {
 			},
 		},
 	}
-}
-
-// defaultIconSet is the default icons used by prompts
-var defaultIconSet = IconSet{
-	HelpInput:      "?",
-	Help:           "?",
-	Question:       "?",
-	MarkedOption:   "[x]",
-	UnmarkedOption: "[ ]",
-	SelectFocus:    ">",
-	Error:          "X",
 }
 
 // IconSet holds the strings to use for various prompts

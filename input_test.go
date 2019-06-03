@@ -60,7 +60,7 @@ func TestInputRender(t *testing.T) {
 			"Test Input question output without default but with help shown",
 			Input{Message: "What is your favorite month:", Help: "This is helpful"},
 			InputTemplateData{ShowHelp: true},
-			fmt.Sprintf("%s This is helpful\n%s What is your favorite month: ", defaultIconSet.Help, defaultIconSet.Question),
+			fmt.Sprintf("%s This is helpful\n%s What is your favorite month: ", defaultAskOptions().PromptConfig.Icons.Help, defaultAskOptions().PromptConfig.Icons.Question),
 		},
 		{
 			"Test Input question output with default and with help shown",

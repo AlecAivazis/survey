@@ -162,10 +162,10 @@ func TestAsk(t *testing.T) {
 				"pizza":                    true,
 				"commit-message":           "Add editor prompt tests\n",
 				"commit-message-validated": "Add editor prompt tests\n",
-				"name":     "Johnny Appleseed",
-				"day":      []string{"Monday", "Wednesday"},
-				"password": "secret",
-				"color":    "yellow",
+				"name":                     "Johnny Appleseed",
+				"day":                      []string{"Monday", "Wednesday"},
+				"password":                 "secret",
+				"color":                    "yellow",
 			},
 		},
 		{
@@ -222,28 +222,6 @@ func TestAsk(t *testing.T) {
 			})
 			require.Equal(t, test.expected, answers)
 		})
-	}
-}
-
-func TestValidationError(t *testing.T) {
-
-	err := fmt.Errorf("Football is not a valid month")
-
-	actual, err := core.RunTemplate(
-		ErrorTemplate,
-		&ErrorTemplateData{
-			Error: err,
-			Icon:  defaultIconSet.Error,
-		},
-	)
-	if err != nil {
-		t.Errorf("Failed to run template to format error: %s", err)
-	}
-
-	expected := fmt.Sprintf("%s Sorry, your reply was invalid: Football is not a valid month\n", "X")
-
-	if actual != expected {
-		t.Errorf("Formatted error was not formatted correctly. Found:\n%s\nExpected:\n%s", actual, expected)
 	}
 }
 
