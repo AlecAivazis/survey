@@ -3,12 +3,11 @@ package survey
 import (
 	"strings"
 
-	"github.com/AlecAivazis/survey/v2/core"
 	"github.com/AlecAivazis/survey/v2/terminal"
 )
 
 type Multiline struct {
-	core.Renderer
+	Renderer
 	Message string
 	Default string
 	Help    string

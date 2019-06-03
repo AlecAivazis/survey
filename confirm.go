@@ -3,13 +3,11 @@ package survey
 import (
 	"fmt"
 	"regexp"
-
-	"github.com/AlecAivazis/survey/v2/core"
 )
 
 // Confirm is a regular text input that accept yes/no answers. Response type is a bool.
 type Confirm struct {
-	core.Renderer
+	Renderer
 	Message string
 	Default bool
 	Help    string
@@ -86,7 +84,7 @@ func (c *Confirm) getBool(showHelp bool, config *PromptConfig) (bool, error) {
 			continue
 		default:
 			// we didnt get a valid answer, so print error and prompt again
-			if err := c.Error(fmt.Errorf("%q is not a valid answer, please try again.", val), config.IconSet.Error); err != nil {
+			if err := c.Error(fmt.Errorf("%q is not a valid answer, please try again.", val), config); err != nil {
 				return c.Default, err
 			}
 			err := c.Render(

@@ -16,7 +16,7 @@ type is a string.
 	survey.AskOne(prompt, &password)
 */
 type Password struct {
-	core.Renderer
+	Renderer
 	Message string
 	Help    string
 }

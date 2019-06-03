@@ -1,9 +1,5 @@
 package survey
 
-import (
-	"github.com/AlecAivazis/survey/v2/core"
-)
-
 /*
 Input is a regular text input that prints each character the user types on the screen
 and accepts the input with the enter key. Response type is a string.
@@ -13,7 +9,7 @@ and accepts the input with the enter key. Response type is a string.
 	survey.AskOne(prompt, &name)
 */
 type Input struct {
-	core.Renderer
+	Renderer
 	Message string
 	Default string
 	Help    string

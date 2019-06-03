@@ -7,7 +7,6 @@ import (
 	"os/exec"
 	"runtime"
 
-	"github.com/AlecAivazis/survey/v2/core"
 	"github.com/AlecAivazis/survey/v2/terminal"
 	shellquote "github.com/kballard/go-shellquote"
 )
@@ -26,7 +25,7 @@ Response type is a string.
 	survey.AskOne(prompt, &message)
 */
 type Editor struct {
-	core.Renderer
+	Renderer
 	Message       string
 	Default       string
 	Help          string

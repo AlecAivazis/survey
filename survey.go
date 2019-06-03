@@ -24,6 +24,27 @@ func defaultAskOptions() *AskOptions {
 	}
 }
 
+// defaultIconSet is the default icons used by prompts
+var defaultIconSet = IconSet{
+	HelpInput:      "?",
+	Help:           "?",
+	Question:       "?",
+	MarkedOption:   "[x]",
+	UnmarkedOption: "[ ]",
+	SelectFocus:    ">",
+}
+
+// IconSet holds the strings to use for various prompts
+type IconSet struct {
+	HelpInput      string
+	Error          string
+	Help           string
+	Question       string
+	MarkedOption   string
+	UnmarkedOption string
+	SelectFocus    string
+}
+
 // Validator is a function passed to a Question after a user has provided a response.
 // If the function returns an error, then the user will be prompted again for another
 // response.
@@ -55,7 +76,7 @@ type PromptConfig struct {
 type Prompt interface {
 	Prompt(config *PromptConfig) (interface{}, error)
 	Cleanup(interface{}, *PromptConfig) error
-	Error(error, string) error
+	Error(error, *PromptConfig) error
 }
 
 // PromptAgainer Interface for Prompts that support prompting again after invalid input
@@ -222,7 +243,7 @@ func Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
 		for _, validator := range validators {
 			// wait for a valid response
 			for invalid := validator(ans); invalid != nil; invalid = validator(ans) {
-				err := q.Prompt.Error(invalid, options.PromptConfig.IconSet.Error)
+				err := q.Prompt.Error(invalid, &options.PromptConfig)
 				// if there was a problem
 				if err != nil {
 					return err
@@ -307,25 +328,4 @@ func paginate(pageSize int, choices []string, sel int) ([]string, int) {
 
 	// return the subset we care about and the index
 	return choices[start:end], cursor
-}
-
-// IconSet holds the strings to use for various prompts
-type IconSet struct {
-	HelpInput      string
-	Error          string
-	Help           string
-	Question       string
-	MarkedOption   string
-	UnmarkedOption string
-	SelectFocus    string
-}
-
-// defaultIconSet is the default icons used by prompts
-var defaultIconSet = IconSet{
-	HelpInput:      "?",
-	Help:           "?",
-	Question:       "?",
-	MarkedOption:   "[x]",
-	UnmarkedOption: "[ ]",
-	SelectFocus:    ">",
 }

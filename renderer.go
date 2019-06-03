@@ -1,9 +1,10 @@
-package core
+package survey
 
 import (
 	"fmt"
 	"strings"
 
+	"github.com/AlecAivazis/survey/v2/core"
 	"github.com/AlecAivazis/survey/v2/terminal"
 )
 
@@ -40,16 +41,16 @@ func (r *Renderer) NewCursor() *terminal.Cursor {
 	}
 }
 
-func (r *Renderer) Error(invalid error, icon string) error {
+func (r *Renderer) Error(invalid error, config *PromptConfig) error {
 	// since errors are printed on top we need to reset the prompt
 	// as well as any previous error print
 	r.resetPrompt(r.lineCount + r.errorLineCount)
 
 	// we just cleared the prompt lines
 	r.lineCount = 0
-	out, err := RunTemplate(ErrorTemplate, &ErrorTemplateData{
+	out, err := core.RunTemplate(ErrorTemplate, &ErrorTemplateData{
 		Error: invalid,
-		Icon:  icon,
+		Icon:  config.IconSet.Error,
 	})
 	if err != nil {
 		return err
@@ -77,7 +78,7 @@ func (r *Renderer) resetPrompt(lines int) {
 func (r *Renderer) Render(tmpl string, data interface{}) error {
 	r.resetPrompt(r.lineCount)
 	// render the template summarizing the current state
-	out, err := RunTemplate(tmpl, data)
+	out, err := core.RunTemplate(tmpl, data)
 	if err != nil {
 		return err
 	}

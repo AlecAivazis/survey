@@ -4,7 +4,6 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/AlecAivazis/survey/v2/core"
 	"github.com/AlecAivazis/survey/v2/terminal"
 )
 
@@ -20,7 +19,7 @@ for them to select using the arrow keys and enter. Response type is a slice of s
 	survey.AskOne(prompt, &days)
 */
 type MultiSelect struct {
-	core.Renderer
+	Renderer
 	Message       string
 	Options       []string
 	Default       []string

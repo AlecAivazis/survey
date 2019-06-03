@@ -3,7 +3,6 @@ package survey
 import (
 	"errors"
 
-	"github.com/AlecAivazis/survey/v2/core"
 	"github.com/AlecAivazis/survey/v2/terminal"
 )
 
@@ -19,7 +18,7 @@ for them to select using the arrow keys and enter. Response type is a string.
 	survey.AskOne(prompt, &color)
 */
 type Select struct {
-	core.Renderer
+	Renderer
 	Message       string
 	Options       []string
 	Default       string
