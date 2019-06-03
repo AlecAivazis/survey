@@ -4,7 +4,6 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/AlecAivazis/survey/v2/core"
 	"github.com/AlecAivazis/survey/v2/terminal"
 )
 
@@ -20,7 +19,7 @@ for them to select using the arrow keys and enter. Response type is a slice of s
 	survey.AskOne(prompt, &days)
 */
 type MultiSelect struct {
-	core.Renderer
+	Renderer
 	Message       string
 	Options       []string
 	Default       []string
@@ -44,19 +43,20 @@ type MultiSelectTemplateData struct {
 	SelectedIndex int
 	ShowHelp      bool
 	PageEntries   []string
+	Config        *PromptConfig
 }
 
 var MultiSelectQuestionTemplate = `
-{{- if .ShowHelp }}{{- color "cyan"}}{{ HelpIcon }} {{ .Help }}{{color "reset"}}{{"\n"}}{{end}}
-{{- color "green+hb"}}{{ QuestionIcon }} {{color "reset"}}
+{{- if .ShowHelp }}{{- color "cyan"}}{{ .Config.Icons.Help }} {{ .Help }}{{color "reset"}}{{"\n"}}{{end}}
+{{- color "green+hb"}}{{ .Config.Icons.Question }} {{color "reset"}}
 {{- color "default+hb"}}{{ .Message }}{{ .FilterMessage }}{{color "reset"}}
 {{- if .ShowAnswer}}{{color "cyan"}} {{.Answer}}{{color "reset"}}{{"\n"}}
 {{- else }}
-	{{- "  "}}{{- color "cyan"}}[Use arrows to move, space to select, type to filter{{- if and .Help (not .ShowHelp)}}, {{ HelpInputRune }} for more help{{end}}]{{color "reset"}}
+	{{- "  "}}{{- color "cyan"}}[Use arrows to move, space to select, type to filter{{- if and .Help (not .ShowHelp)}}, {{ .Config.HelpInput }} for more help{{end}}]{{color "reset"}}
   {{- "\n"}}
   {{- range $ix, $option := .PageEntries}}
-    {{- if eq $ix $.SelectedIndex}}{{color "cyan"}}{{ SelectFocusIcon }}{{color "reset"}}{{else}} {{end}}
-    {{- if index $.Checked $option}}{{color "green"}} {{ MarkedOptionIcon }} {{else}}{{color "default+hb"}} {{ UnmarkedOptionIcon }} {{end}}
+    {{- if eq $ix $.SelectedIndex }}{{color "cyan"}}{{ $.Config.Icons.SelectFocus }}{{color "reset"}}{{else}} {{end}}
+    {{- if index $.Checked $option }}{{color "green"}} {{ $.Config.Icons.MarkedOption }} {{else}}{{color "default+hb"}} {{ $.Config.Icons.UnmarkedOption }} {{end}}
     {{- color "reset"}}
     {{- " "}}{{$option}}{{"\n"}}
   {{- end}}
@@ -64,7 +64,7 @@ var MultiSelectQuestionTemplate = `
 
 // OnChange is called on every keypress.
 func (m *MultiSelect) OnChange(key rune, config *PromptConfig) {
-	options := m.filterOptions()
+	options := m.filterOptions(config)
 	oldFilter := m.filter
 
 	if key == terminal.KeyArrowUp || (m.VimMode && key == 'k') {
@@ -98,7 +98,7 @@ func (m *MultiSelect) OnChange(key rune, config *PromptConfig) {
 			m.filter = ""
 		}
 		// only show the help message if we have one to show
-	} else if key == core.HelpInputRune && m.Help != "" {
+	} else if string(key) == config.HelpInput && m.Help != "" {
 		m.showingHelp = true
 	} else if key == terminal.KeyEscape {
 		m.VimMode = !m.VimMode
@@ -119,7 +119,7 @@ func (m *MultiSelect) OnChange(key rune, config *PromptConfig) {
 	}
 	if oldFilter != m.filter {
 		// filter changed
-		options = m.filterOptions()
+		options = m.filterOptions(config)
 		if len(options) > 0 && len(options) <= m.selectedIndex {
 			m.selectedIndex = len(options) - 1
 		}
@@ -146,18 +146,26 @@ func (m *MultiSelect) OnChange(key rune, config *PromptConfig) {
 			Checked:       m.checked,
 			ShowHelp:      m.showingHelp,
 			PageEntries:   opts,
+			Config:        config,
 		},
 	)
 }
 
-func (m *MultiSelect) filterOptions() []string {
+func (m *MultiSelect) filterOptions(config *PromptConfig) []string {
+	// if there is no filter applied
 	if m.filter == "" {
+		// return all of the options
 		return m.Options
 	}
+
+	// if we have a specific filter to apply
 	if m.Filter != nil {
+		// apply it
 		return m.Filter(m.filter, m.Options)
 	}
-	return DefaultFilter(m.filter, m.Options)
+
+	// otherwise use the default filter
+	return config.Filter(m.filter, m.Options)
 }
 
 func (m *MultiSelect) Prompt(config *PromptConfig) (interface{}, error) {
@@ -206,6 +214,7 @@ func (m *MultiSelect) Prompt(config *PromptConfig) (interface{}, error) {
 			SelectedIndex: idx,
 			Checked:       m.checked,
 			PageEntries:   opts,
+			Config:        config,
 		},
 	)
 	if err != nil {
@@ -244,7 +253,7 @@ func (m *MultiSelect) Prompt(config *PromptConfig) (interface{}, error) {
 }
 
 // Cleanup removes the options section, and renders the ask like a normal question.
-func (m *MultiSelect) Cleanup(val interface{}) error {
+func (m *MultiSelect) Cleanup(config *PromptConfig, val interface{}) error {
 	// execute the output summary template with the answer
 	return m.Render(
 		MultiSelectQuestionTemplate,
@@ -254,6 +263,7 @@ func (m *MultiSelect) Cleanup(val interface{}) error {
 			Checked:       m.checked,
 			Answer:        strings.Join(val.([]string), ", "),
 			ShowAnswer:    true,
+			Config:        config,
 		},
 	)
 }

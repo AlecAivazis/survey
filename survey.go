@@ -4,21 +4,53 @@ import (
 	"errors"
 	"io"
 	"os"
+	"strings"
 
 	"github.com/AlecAivazis/survey/v2/core"
 	"github.com/AlecAivazis/survey/v2/terminal"
 )
 
 // DefaultAskOptions is the default options on ask, using the OS stdio.
-var DefaultAskOptions = AskOptions{
-	Stdio: terminal.Stdio{
-		In:  os.Stdin,
-		Out: os.Stdout,
-		Err: os.Stderr,
-	},
-	PromptConfig: PromptConfig{
-		PageSize: 7,
-	},
+func defaultAskOptions() *AskOptions {
+	return &AskOptions{
+		Stdio: terminal.Stdio{
+			In:  os.Stdin,
+			Out: os.Stdout,
+			Err: os.Stderr,
+		},
+		PromptConfig: PromptConfig{
+			PageSize:  7,
+			HelpInput: "?",
+			Icons: IconSet{
+				Error:          "X",
+				Help:           "?",
+				Question:       "?",
+				MarkedOption:   "[x]",
+				UnmarkedOption: "[ ]",
+				SelectFocus:    ">",
+			},
+			Filter: func(filter string, options []string) (answer []string) {
+				filter = strings.ToLower(filter)
+				for _, o := range options {
+					if strings.Contains(strings.ToLower(o), filter) {
+						answer = append(answer, o)
+					}
+				}
+				return answer
+			},
+		},
+	}
+}
+
+// IconSet holds the strings to use for various prompts
+type IconSet struct {
+	HelpInput      string
+	Error          string
+	Help           string
+	Question       string
+	MarkedOption   string
+	UnmarkedOption string
+	SelectFocus    string
 }
 
 // Validator is a function passed to a Question after a user has provided a response.
@@ -43,20 +75,23 @@ type Question struct {
 
 // PromptConfig holds the global configuration for a prompt
 type PromptConfig struct {
-	PageSize int
+	PageSize  int
+	Icons     IconSet
+	HelpInput string
+	Filter    func(filter string, options []string) (answer []string)
 }
 
 // Prompt is the primary interface for the objects that can take user input
 // and return a response.
 type Prompt interface {
 	Prompt(config *PromptConfig) (interface{}, error)
-	Cleanup(interface{}) error
-	Error(error) error
+	Cleanup(*PromptConfig, interface{}) error
+	Error(*PromptConfig, error) error
 }
 
 // PromptAgainer Interface for Prompts that support prompting again after invalid input
 type PromptAgainer interface {
-	PromptAgain(invalid interface{}, err error) (interface{}, error)
+	PromptAgain(config *PromptConfig, invalid interface{}, err error) (interface{}, error)
 }
 
 // AskOpt allows setting optional ask options.
@@ -76,6 +111,16 @@ func WithStdio(in terminal.FileReader, out terminal.FileWriter, err io.Writer) A
 		options.Stdio.In = in
 		options.Stdio.Out = out
 		options.Stdio.Err = err
+		return nil
+	}
+}
+
+// WithFilter specifies the default filter to use when asking questions.
+func WithFilter(filter func(filter string, options []string) (answer []string)) AskOpt {
+	return func(options *AskOptions) error {
+		// save the filter internally
+		options.PromptConfig.Filter = filter
+
 		return nil
 	}
 }
@@ -100,6 +145,28 @@ func WithPageSize(pageSize int) AskOpt {
 	return func(options *AskOptions) error {
 		// set the page size
 		options.PromptConfig.PageSize = pageSize
+
+		// nothing went wrong
+		return nil
+	}
+}
+
+// WithHelpInput changes the character that prompts look for to give the user helpful information.
+func WithHelpInput(r rune) AskOpt {
+	return func(options *AskOptions) error {
+		// set the input character
+		options.PromptConfig.HelpInput = string(r)
+
+		// nothing went wrong
+		return nil
+	}
+}
+
+// WithIcons sets the icons that will be used when prompting the user
+func WithIcons(setIcons func(*IconSet)) AskOpt {
+	return func(options *AskOptions) error {
+		// update the default icons with whatever the user says
+		setIcons(&options.PromptConfig.Icons)
 
 		// nothing went wrong
 		return nil
@@ -153,9 +220,9 @@ matching name. For example:
 */
 func Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
 	// build up the configuration options
-	options := DefaultAskOptions
+	options := defaultAskOptions()
 	for _, opt := range opts {
-		if err := opt(&options); err != nil {
+		if err := opt(options); err != nil {
 			return err
 		}
 	}
@@ -196,7 +263,7 @@ func Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
 		for _, validator := range validators {
 			// wait for a valid response
 			for invalid := validator(ans); invalid != nil; invalid = validator(ans) {
-				err := q.Prompt.Error(invalid)
+				err := q.Prompt.Error(&options.PromptConfig, invalid)
 				// if there was a problem
 				if err != nil {
 					return err
@@ -204,7 +271,7 @@ func Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
 
 				// ask for more input
 				if promptAgainer, ok := q.Prompt.(PromptAgainer); ok {
-					ans, err = promptAgainer.PromptAgain(ans, invalid)
+					ans, err = promptAgainer.PromptAgain(&options.PromptConfig, ans, invalid)
 				} else {
 					ans, err = q.Prompt.Prompt(&options.PromptConfig)
 				}
@@ -225,7 +292,7 @@ func Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
 		}
 
 		// tell the prompt to cleanup with the validated value
-		q.Prompt.Cleanup(ans)
+		q.Prompt.Cleanup(&options.PromptConfig, ans)
 
 		// if something went wrong
 		if err != nil {

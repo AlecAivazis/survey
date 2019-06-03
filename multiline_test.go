@@ -7,10 +7,10 @@ import (
 	"os"
 	"testing"
 
-	expect "github.com/Netflix/go-expect"
-	"github.com/stretchr/testify/assert"
 	"github.com/AlecAivazis/survey/v2/core"
 	"github.com/AlecAivazis/survey/v2/terminal"
+	expect "github.com/Netflix/go-expect"
+	"github.com/stretchr/testify/assert"
 )
 
 func init() {
@@ -30,43 +30,43 @@ func TestMultilineRender(t *testing.T) {
 			"Test Multiline question output without default",
 			Multiline{Message: "What is your favorite month:"},
 			MultilineTemplateData{},
-			fmt.Sprintf("%s What is your favorite month: [Enter 2 empty lines to finish]", core.QuestionIcon),
+			fmt.Sprintf("%s What is your favorite month: [Enter 2 empty lines to finish]", defaultAskOptions().PromptConfig.Icons.Question),
 		},
 		{
 			"Test Multiline question output with default",
 			Multiline{Message: "What is your favorite month:", Default: "April"},
 			MultilineTemplateData{},
-			fmt.Sprintf("%s What is your favorite month: (April) [Enter 2 empty lines to finish]", core.QuestionIcon),
+			fmt.Sprintf("%s What is your favorite month: (April) [Enter 2 empty lines to finish]", defaultAskOptions().PromptConfig.Icons.Question),
 		},
 		{
 			"Test Multiline answer output",
 			Multiline{Message: "What is your favorite month:"},
 			MultilineTemplateData{Answer: "October", ShowAnswer: true},
-			fmt.Sprintf("%s What is your favorite month: \nOctober", core.QuestionIcon),
+			fmt.Sprintf("%s What is your favorite month: \nOctober", defaultAskOptions().PromptConfig.Icons.Question),
 		},
 		{
 			"Test Multiline question output without default but with help hidden",
 			Multiline{Message: "What is your favorite month:", Help: "This is helpful"},
 			MultilineTemplateData{},
-			fmt.Sprintf("%s What is your favorite month: [Enter 2 empty lines to finish]", string(core.HelpInputRune)),
+			fmt.Sprintf("%s What is your favorite month: [Enter 2 empty lines to finish]", string(defaultAskOptions().PromptConfig.HelpInput)),
 		},
 		{
 			"Test Multiline question output with default and with help hidden",
 			Multiline{Message: "What is your favorite month:", Default: "April", Help: "This is helpful"},
 			MultilineTemplateData{},
-			fmt.Sprintf("%s What is your favorite month: (April) [Enter 2 empty lines to finish]", string(core.HelpInputRune)),
+			fmt.Sprintf("%s What is your favorite month: (April) [Enter 2 empty lines to finish]", string(defaultAskOptions().PromptConfig.HelpInput)),
 		},
 		{
 			"Test Multiline question output without default but with help shown",
 			Multiline{Message: "What is your favorite month:", Help: "This is helpful"},
 			MultilineTemplateData{ShowHelp: true},
-			fmt.Sprintf("%s This is helpful\n%s What is your favorite month: [Enter 2 empty lines to finish]", core.HelpIcon, core.QuestionIcon),
+			fmt.Sprintf("%s This is helpful\n%s What is your favorite month: [Enter 2 empty lines to finish]", defaultAskOptions().PromptConfig.Icons.Help, defaultAskOptions().PromptConfig.Icons.Question),
 		},
 		{
 			"Test Multiline question output with default and with help shown",
 			Multiline{Message: "What is your favorite month:", Default: "April", Help: "This is helpful"},
 			MultilineTemplateData{ShowHelp: true},
-			fmt.Sprintf("%s This is helpful\n%s What is your favorite month: (April) [Enter 2 empty lines to finish]", core.HelpIcon, core.QuestionIcon),
+			fmt.Sprintf("%s This is helpful\n%s What is your favorite month: (April) [Enter 2 empty lines to finish]", defaultAskOptions().PromptConfig.Icons.Help, defaultAskOptions().PromptConfig.Icons.Question),
 		},
 	}
 
@@ -76,6 +76,9 @@ func TestMultilineRender(t *testing.T) {
 
 		test.prompt.WithStdio(terminal.Stdio{Out: w})
 		test.data.Multiline = test.prompt
+		// set the icon set
+		test.data.Config = &defaultAskOptions().PromptConfig
+
 		err = test.prompt.Render(
 			MultilineQuestionTemplate,
 			test.data,

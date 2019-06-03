@@ -3,7 +3,6 @@ package survey
 import (
 	"errors"
 
-	"github.com/AlecAivazis/survey/v2/core"
 	"github.com/AlecAivazis/survey/v2/terminal"
 )
 
@@ -19,7 +18,7 @@ for them to select using the arrow keys and enter. Response type is a string.
 	survey.AskOne(prompt, &color)
 */
 type Select struct {
-	core.Renderer
+	Renderer
 	Message       string
 	Options       []string
 	Default       string
@@ -42,18 +41,19 @@ type SelectTemplateData struct {
 	Answer        string
 	ShowAnswer    bool
 	ShowHelp      bool
+	Config        *PromptConfig
 }
 
 var SelectQuestionTemplate = `
-{{- if .ShowHelp }}{{- color "cyan"}}{{ HelpIcon }} {{ .Help }}{{color "reset"}}{{"\n"}}{{end}}
-{{- color "green+hb"}}{{ QuestionIcon }} {{color "reset"}}
+{{- if .ShowHelp }}{{- color "cyan"}}{{ .Config.Icons.Help }} {{ .Help }}{{color "reset"}}{{"\n"}}{{end}}
+{{- color "green+hb"}}{{ .Config.Icons.Question }} {{color "reset"}}
 {{- color "default+hb"}}{{ .Message }}{{ .FilterMessage }}{{color "reset"}}
 {{- if .ShowAnswer}}{{color "cyan"}} {{.Answer}}{{color "reset"}}{{"\n"}}
 {{- else}}
-  {{- "  "}}{{- color "cyan"}}[Use arrows to move, type to filter{{- if and .Help (not .ShowHelp)}}, {{ HelpInputRune }} for more help{{end}}]{{color "reset"}}
+  {{- "  "}}{{- color "cyan"}}[Use arrows to move, space to select, type to filter{{- if and .Help (not .ShowHelp)}}, {{ .Config.HelpInput }} for more help{{end}}]{{color "reset"}}
   {{- "\n"}}
   {{- range $ix, $choice := .PageEntries}}
-    {{- if eq $ix $.SelectedIndex}}{{color "cyan+b"}}{{ SelectFocusIcon }} {{else}}{{color "default+hb"}}  {{end}}
+    {{- if eq $ix $.SelectedIndex }}{{color "cyan+b"}}{{ $.Config.Icons.SelectFocus }} {{else}}{{color "default+hb"}}  {{end}}
     {{- $choice}}
     {{- color "reset"}}{{"\n"}}
   {{- end}}
@@ -61,7 +61,7 @@ var SelectQuestionTemplate = `
 
 // OnChange is called on every keypress.
 func (s *Select) OnChange(key rune, config *PromptConfig) bool {
-	options := s.filterOptions()
+	options := s.filterOptions(config)
 	oldFilter := s.filter
 
 	// if the user pressed the enter key and the index is a valid option
@@ -101,7 +101,7 @@ func (s *Select) OnChange(key rune, config *PromptConfig) bool {
 			s.selectedIndex++
 		}
 		// only show the help message if we have one
-	} else if key == core.HelpInputRune && s.Help != "" {
+	} else if string(key) == config.HelpInput && s.Help != "" {
 		s.showingHelp = true
 		// if the user wants to toggle vim mode on/off
 	} else if key == terminal.KeyEscape {
@@ -131,7 +131,7 @@ func (s *Select) OnChange(key rune, config *PromptConfig) bool {
 	}
 	if oldFilter != s.filter {
 		// filter changed
-		options = s.filterOptions()
+		options = s.filterOptions(config)
 		if len(options) > 0 && len(options) <= s.selectedIndex {
 			s.selectedIndex = len(options) - 1
 		}
@@ -158,6 +158,7 @@ func (s *Select) OnChange(key rune, config *PromptConfig) bool {
 			SelectedIndex: idx,
 			ShowHelp:      s.showingHelp,
 			PageEntries:   opts,
+			Config:        config,
 		},
 	)
 
@@ -165,14 +166,21 @@ func (s *Select) OnChange(key rune, config *PromptConfig) bool {
 	return false
 }
 
-func (s *Select) filterOptions() []string {
+func (s *Select) filterOptions(config *PromptConfig) []string {
+	// if there is no filter applied
 	if s.filter == "" {
+		// return all of the options
 		return s.Options
 	}
+
+	// if we have a specific filter to apply
 	if s.Filter != nil {
+		// apply it
 		return s.Filter(s.filter, s.Options)
 	}
-	return DefaultFilter(s.filter, s.Options)
+
+	// otherwise use the default filter
+	return config.Filter(s.filter, s.Options)
 }
 
 func (s *Select) Prompt(config *PromptConfig) (interface{}, error) {
@@ -218,6 +226,7 @@ func (s *Select) Prompt(config *PromptConfig) (interface{}, error) {
 			Select:        *s,
 			PageEntries:   opts,
 			SelectedIndex: idx,
+			Config:        config,
 		},
 	)
 	if err != nil {
@@ -251,7 +260,7 @@ func (s *Select) Prompt(config *PromptConfig) (interface{}, error) {
 			break
 		}
 	}
-	options := s.filterOptions()
+	options := s.filterOptions(config)
 	s.filter = ""
 	s.FilterMessage = ""
 
@@ -274,13 +283,14 @@ func (s *Select) Prompt(config *PromptConfig) (interface{}, error) {
 	return val, err
 }
 
-func (s *Select) Cleanup(val interface{}) error {
+func (s *Select) Cleanup(config *PromptConfig, val interface{}) error {
 	return s.Render(
 		SelectQuestionTemplate,
 		SelectTemplateData{
 			Select:     *s,
 			Answer:     val.(string),
 			ShowAnswer: true,
+			Config:     config,
 		},
 	)
 }

@@ -16,7 +16,7 @@ type is a string.
 	survey.AskOne(prompt, &password)
 */
 type Password struct {
-	core.Renderer
+	Renderer
 	Message string
 	Help    string
 }
@@ -24,20 +24,24 @@ type Password struct {
 type PasswordTemplateData struct {
 	Password
 	ShowHelp bool
+	Config   *PromptConfig
 }
 
-// Templates with Color formatting. See Documentation: https://github.com/mgutz/ansi#style-format
+// PasswordQuestionTemplate is a template with color formatting. See Documentation: https://github.com/mgutz/ansi#style-format
 var PasswordQuestionTemplate = `
-{{- if .ShowHelp }}{{- color "cyan"}}{{ HelpIcon }} {{ .Help }}{{color "reset"}}{{"\n"}}{{end}}
-{{- color "green+hb"}}{{ QuestionIcon }} {{color "reset"}}
+{{- if .ShowHelp }}{{- color "cyan"}}{{ .Config.Icons.Help }} {{ .Help }}{{color "reset"}}{{"\n"}}{{end}}
+{{- color "green+hb"}}{{ .Config.Icons.Question }} {{color "reset"}}
 {{- color "default+hb"}}{{ .Message }} {{color "reset"}}
-{{- if and .Help (not .ShowHelp)}}{{color "cyan"}}[{{ HelpInputRune }} for help]{{color "reset"}} {{end}}`
+{{- if and .Help (not .ShowHelp)}}{{color "cyan"}}[{{ .Config.HelpInput }} for help]{{color "reset"}} {{end}}`
 
 func (p *Password) Prompt(config *PromptConfig) (line interface{}, err error) {
 	// render the question template
 	out, err := core.RunTemplate(
 		PasswordQuestionTemplate,
-		PasswordTemplateData{Password: *p},
+		PasswordTemplateData{
+			Password: *p,
+			Config:   config,
+		},
 	)
 	fmt.Fprint(terminal.NewAnsiStdout(p.Stdio().Out), out)
 	if err != nil {
@@ -63,13 +67,17 @@ func (p *Password) Prompt(config *PromptConfig) (line interface{}, err error) {
 			return string(line), err
 		}
 
-		if string(line) == string(core.HelpInputRune) {
+		if string(line) == config.HelpInput {
 			// terminal will echo the \n so we need to jump back up one row
 			cursor.PreviousLine(1)
 
 			err = p.Render(
 				PasswordQuestionTemplate,
-				PasswordTemplateData{Password: *p, ShowHelp: true},
+				PasswordTemplateData{
+					Password: *p,
+					ShowHelp: true,
+					Config:   config,
+				},
 			)
 			if err != nil {
 				return "", err
@@ -81,6 +89,6 @@ func (p *Password) Prompt(config *PromptConfig) (line interface{}, err error) {
 }
 
 // Cleanup hides the string with a fixed number of characters.
-func (prompt *Password) Cleanup(val interface{}) error {
+func (prompt *Password) Cleanup(config *PromptConfig, val interface{}) error {
 	return nil
 }

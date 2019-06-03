@@ -7,10 +7,10 @@ import (
 	"os"
 	"testing"
 
-	expect "github.com/Netflix/go-expect"
-	"github.com/stretchr/testify/assert"
 	"github.com/AlecAivazis/survey/v2/core"
 	"github.com/AlecAivazis/survey/v2/terminal"
+	expect "github.com/Netflix/go-expect"
+	"github.com/stretchr/testify/assert"
 )
 
 func init() {
@@ -30,43 +30,43 @@ func TestInputRender(t *testing.T) {
 			"Test Input question output without default",
 			Input{Message: "What is your favorite month:"},
 			InputTemplateData{},
-			fmt.Sprintf("%s What is your favorite month: ", core.QuestionIcon),
+			fmt.Sprintf("%s What is your favorite month: ", defaultAskOptions().PromptConfig.Icons.Question),
 		},
 		{
 			"Test Input question output with default",
 			Input{Message: "What is your favorite month:", Default: "April"},
 			InputTemplateData{},
-			fmt.Sprintf("%s What is your favorite month: (April) ", core.QuestionIcon),
+			fmt.Sprintf("%s What is your favorite month: (April) ", defaultAskOptions().PromptConfig.Icons.Question),
 		},
 		{
 			"Test Input answer output",
 			Input{Message: "What is your favorite month:"},
 			InputTemplateData{Answer: "October", ShowAnswer: true},
-			fmt.Sprintf("%s What is your favorite month: October\n", core.QuestionIcon),
+			fmt.Sprintf("%s What is your favorite month: October\n", defaultAskOptions().PromptConfig.Icons.Question),
 		},
 		{
 			"Test Input question output without default but with help hidden",
 			Input{Message: "What is your favorite month:", Help: "This is helpful"},
 			InputTemplateData{},
-			fmt.Sprintf("%s What is your favorite month: [%s for help] ", core.QuestionIcon, string(core.HelpInputRune)),
+			fmt.Sprintf("%s What is your favorite month: [%s for help] ", defaultAskOptions().PromptConfig.Icons.Question, string(defaultAskOptions().PromptConfig.HelpInput)),
 		},
 		{
 			"Test Input question output with default and with help hidden",
 			Input{Message: "What is your favorite month:", Default: "April", Help: "This is helpful"},
 			InputTemplateData{},
-			fmt.Sprintf("%s What is your favorite month: [%s for help] (April) ", core.QuestionIcon, string(core.HelpInputRune)),
+			fmt.Sprintf("%s What is your favorite month: [%s for help] (April) ", defaultAskOptions().PromptConfig.Icons.Question, string(defaultAskOptions().PromptConfig.HelpInput)),
 		},
 		{
 			"Test Input question output without default but with help shown",
 			Input{Message: "What is your favorite month:", Help: "This is helpful"},
 			InputTemplateData{ShowHelp: true},
-			fmt.Sprintf("%s This is helpful\n%s What is your favorite month: ", core.HelpIcon, core.QuestionIcon),
+			fmt.Sprintf("%s This is helpful\n%s What is your favorite month: ", defaultAskOptions().PromptConfig.Icons.Help, defaultAskOptions().PromptConfig.Icons.Question),
 		},
 		{
 			"Test Input question output with default and with help shown",
 			Input{Message: "What is your favorite month:", Default: "April", Help: "This is helpful"},
 			InputTemplateData{ShowHelp: true},
-			fmt.Sprintf("%s This is helpful\n%s What is your favorite month: (April) ", core.HelpIcon, core.QuestionIcon),
+			fmt.Sprintf("%s This is helpful\n%s What is your favorite month: (April) ", defaultAskOptions().PromptConfig.Icons.Help, defaultAskOptions().PromptConfig.Icons.Question),
 		},
 	}
 
@@ -76,6 +76,10 @@ func TestInputRender(t *testing.T) {
 
 		test.prompt.WithStdio(terminal.Stdio{Out: w})
 		test.data.Input = test.prompt
+
+		// set the runtime config
+		test.data.Config = &defaultAskOptions().PromptConfig
+
 		err = test.prompt.Render(
 			InputQuestionTemplate,
 			test.data,

@@ -31,49 +31,49 @@ func TestEditorRender(t *testing.T) {
 			"Test Editor question output without default",
 			Editor{Message: "What is your favorite month:"},
 			EditorTemplateData{},
-			fmt.Sprintf("%s What is your favorite month: [Enter to launch editor] ", core.QuestionIcon),
+			fmt.Sprintf("%s What is your favorite month: [Enter to launch editor] ", defaultAskOptions().PromptConfig.Icons.Question),
 		},
 		{
 			"Test Editor question output with default",
 			Editor{Message: "What is your favorite month:", Default: "April"},
 			EditorTemplateData{},
-			fmt.Sprintf("%s What is your favorite month: (April) [Enter to launch editor] ", core.QuestionIcon),
+			fmt.Sprintf("%s What is your favorite month: (April) [Enter to launch editor] ", defaultAskOptions().PromptConfig.Icons.Question),
 		},
 		{
 			"Test Editor question output with HideDefault",
 			Editor{Message: "What is your favorite month:", Default: "April", HideDefault: true},
 			EditorTemplateData{},
-			fmt.Sprintf("%s What is your favorite month: [Enter to launch editor] ", core.QuestionIcon),
+			fmt.Sprintf("%s What is your favorite month: [Enter to launch editor] ", defaultAskOptions().PromptConfig.Icons.Question),
 		},
 		{
 			"Test Editor answer output",
 			Editor{Message: "What is your favorite month:"},
 			EditorTemplateData{Answer: "October", ShowAnswer: true},
-			fmt.Sprintf("%s What is your favorite month: October\n", core.QuestionIcon),
+			fmt.Sprintf("%s What is your favorite month: October\n", defaultAskOptions().PromptConfig.Icons.Question),
 		},
 		{
 			"Test Editor question output without default but with help hidden",
 			Editor{Message: "What is your favorite month:", Help: "This is helpful"},
 			EditorTemplateData{},
-			fmt.Sprintf("%s What is your favorite month: [%s for help] [Enter to launch editor] ", core.QuestionIcon, string(core.HelpInputRune)),
+			fmt.Sprintf("%s What is your favorite month: [%s for help] [Enter to launch editor] ", defaultAskOptions().PromptConfig.Icons.Question, string(defaultAskOptions().PromptConfig.HelpInput)),
 		},
 		{
 			"Test Editor question output with default and with help hidden",
 			Editor{Message: "What is your favorite month:", Default: "April", Help: "This is helpful"},
 			EditorTemplateData{},
-			fmt.Sprintf("%s What is your favorite month: [%s for help] (April) [Enter to launch editor] ", core.QuestionIcon, string(core.HelpInputRune)),
+			fmt.Sprintf("%s What is your favorite month: [%s for help] (April) [Enter to launch editor] ", defaultAskOptions().PromptConfig.Icons.Question, string(defaultAskOptions().PromptConfig.HelpInput)),
 		},
 		{
 			"Test Editor question output without default but with help shown",
 			Editor{Message: "What is your favorite month:", Help: "This is helpful"},
 			EditorTemplateData{ShowHelp: true},
-			fmt.Sprintf("%s This is helpful\n%s What is your favorite month: [Enter to launch editor] ", core.HelpIcon, core.QuestionIcon),
+			fmt.Sprintf("%s This is helpful\n%s What is your favorite month: [Enter to launch editor] ", defaultAskOptions().PromptConfig.Icons.Help, defaultAskOptions().PromptConfig.Icons.Question),
 		},
 		{
 			"Test Editor question output with default and with help shown",
 			Editor{Message: "What is your favorite month:", Default: "April", Help: "This is helpful"},
 			EditorTemplateData{ShowHelp: true},
-			fmt.Sprintf("%s This is helpful\n%s What is your favorite month: (April) [Enter to launch editor] ", core.HelpIcon, core.QuestionIcon),
+			fmt.Sprintf("%s This is helpful\n%s What is your favorite month: (April) [Enter to launch editor] ", defaultAskOptions().PromptConfig.Icons.Help, defaultAskOptions().PromptConfig.Icons.Question),
 		},
 	}
 
@@ -83,6 +83,10 @@ func TestEditorRender(t *testing.T) {
 
 		test.prompt.WithStdio(terminal.Stdio{Out: w})
 		test.data.Editor = test.prompt
+
+		// set the icon set
+		test.data.Config = &defaultAskOptions().PromptConfig
+
 		err = test.prompt.Render(
 			EditorQuestionTemplate,
 			test.data,
@@ -180,7 +184,7 @@ func TestEditorPrompt(t *testing.T) {
 				c.ExpectString(
 					fmt.Sprintf(
 						"Edit git commit message [%s for help] [Enter to launch editor]",
-						string(core.HelpInputRune),
+						string(defaultAskOptions().PromptConfig.HelpInput),
 					),
 				)
 				c.SendLine("?")

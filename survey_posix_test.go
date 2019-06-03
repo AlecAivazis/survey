@@ -6,10 +6,10 @@ import (
 	"bytes"
 	"testing"
 
+	"github.com/AlecAivazis/survey/v2/terminal"
 	expect "github.com/Netflix/go-expect"
 	"github.com/hinshun/vt10x"
 	"github.com/stretchr/testify/require"
-	"github.com/AlecAivazis/survey/v2/terminal"
 )
 
 func RunTest(t *testing.T, procedure func(*expect.Console), test func(terminal.Stdio) error) {

@@ -47,11 +47,11 @@ func TestMultiSelectRender(t *testing.T) {
 			},
 			strings.Join(
 				[]string{
-					fmt.Sprintf("%s Pick your words:  [Use arrows to move, space to select, type to filter]", core.QuestionIcon),
-					fmt.Sprintf("  %s  foo", core.UnmarkedOptionIcon),
-					fmt.Sprintf("  %s  bar", core.MarkedOptionIcon),
-					fmt.Sprintf("%s %s  baz", core.SelectFocusIcon, core.UnmarkedOptionIcon),
-					fmt.Sprintf("  %s  buz\n", core.MarkedOptionIcon),
+					fmt.Sprintf("%s Pick your words:  [Use arrows to move, space to select, type to filter]", defaultAskOptions().PromptConfig.Icons.Question),
+					fmt.Sprintf("  %s  foo", defaultAskOptions().PromptConfig.Icons.UnmarkedOption),
+					fmt.Sprintf("  %s  bar", defaultAskOptions().PromptConfig.Icons.MarkedOption),
+					fmt.Sprintf("%s %s  baz", defaultAskOptions().PromptConfig.Icons.SelectFocus, defaultAskOptions().PromptConfig.Icons.UnmarkedOption),
+					fmt.Sprintf("  %s  buz\n", defaultAskOptions().PromptConfig.Icons.MarkedOption),
 				},
 				"\n",
 			),
@@ -63,7 +63,7 @@ func TestMultiSelectRender(t *testing.T) {
 				Answer:     "foo, buz",
 				ShowAnswer: true,
 			},
-			fmt.Sprintf("%s Pick your words: foo, buz\n", core.QuestionIcon),
+			fmt.Sprintf("%s Pick your words: foo, buz\n", defaultAskOptions().PromptConfig.Icons.Question),
 		},
 		{
 			"Test MultiSelect question output with help hidden",
@@ -75,11 +75,11 @@ func TestMultiSelectRender(t *testing.T) {
 			},
 			strings.Join(
 				[]string{
-					fmt.Sprintf("%s Pick your words:  [Use arrows to move, space to select, type to filter, %s for more help]", core.QuestionIcon, string(core.HelpInputRune)),
-					fmt.Sprintf("  %s  foo", core.UnmarkedOptionIcon),
-					fmt.Sprintf("  %s  bar", core.MarkedOptionIcon),
-					fmt.Sprintf("%s %s  baz", core.SelectFocusIcon, core.UnmarkedOptionIcon),
-					fmt.Sprintf("  %s  buz\n", core.MarkedOptionIcon),
+					fmt.Sprintf("%s Pick your words:  [Use arrows to move, space to select, type to filter, %s for more help]", defaultAskOptions().PromptConfig.Icons.Question, string(defaultAskOptions().PromptConfig.HelpInput)),
+					fmt.Sprintf("  %s  foo", defaultAskOptions().PromptConfig.Icons.UnmarkedOption),
+					fmt.Sprintf("  %s  bar", defaultAskOptions().PromptConfig.Icons.MarkedOption),
+					fmt.Sprintf("%s %s  baz", defaultAskOptions().PromptConfig.Icons.SelectFocus, defaultAskOptions().PromptConfig.Icons.UnmarkedOption),
+					fmt.Sprintf("  %s  buz\n", defaultAskOptions().PromptConfig.Icons.MarkedOption),
 				},
 				"\n",
 			),
@@ -95,12 +95,12 @@ func TestMultiSelectRender(t *testing.T) {
 			},
 			strings.Join(
 				[]string{
-					fmt.Sprintf("%s This is helpful", core.HelpIcon),
-					fmt.Sprintf("%s Pick your words:  [Use arrows to move, space to select, type to filter]", core.QuestionIcon),
-					fmt.Sprintf("  %s  foo", core.UnmarkedOptionIcon),
-					fmt.Sprintf("  %s  bar", core.MarkedOptionIcon),
-					fmt.Sprintf("%s %s  baz", core.SelectFocusIcon, core.UnmarkedOptionIcon),
-					fmt.Sprintf("  %s  buz\n", core.MarkedOptionIcon),
+					fmt.Sprintf("%s This is helpful", defaultAskOptions().PromptConfig.Icons.Help),
+					fmt.Sprintf("%s Pick your words:  [Use arrows to move, space to select, type to filter]", defaultAskOptions().PromptConfig.Icons.Question),
+					fmt.Sprintf("  %s  foo", defaultAskOptions().PromptConfig.Icons.UnmarkedOption),
+					fmt.Sprintf("  %s  bar", defaultAskOptions().PromptConfig.Icons.MarkedOption),
+					fmt.Sprintf("%s %s  baz", defaultAskOptions().PromptConfig.Icons.SelectFocus, defaultAskOptions().PromptConfig.Icons.UnmarkedOption),
+					fmt.Sprintf("  %s  buz\n", defaultAskOptions().PromptConfig.Icons.MarkedOption),
 				},
 				"\n",
 			),
@@ -113,6 +113,10 @@ func TestMultiSelectRender(t *testing.T) {
 
 		test.prompt.WithStdio(terminal.Stdio{Out: w})
 		test.data.MultiSelect = test.prompt
+
+		// set the icon set
+		test.data.Config = &defaultAskOptions().PromptConfig
+
 		err = test.prompt.Render(
 			MultiSelectQuestionTemplate,
 			test.data,
@@ -269,8 +273,7 @@ func TestMultiSelectPrompt(t *testing.T) {
 				Message: "What days do you prefer:",
 				Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
 				Filter: func(filter string, options []string) (filtered []string) {
-					result := DefaultFilter(filter, options)
-					for _, v := range result {
+					for _, v := range options {
 						if len(v) >= 7 {
 							filtered = append(filtered, v)
 						}

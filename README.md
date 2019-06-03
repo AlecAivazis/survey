@@ -208,8 +208,8 @@ the result. If neither of those are present, notepad (on Windows) or vim (Linux 
 
 ## Filtering options in Select and MultiSelect
 
-The user can filter for options by typing while the prompt is active. This will filter out all options that don't contain the
-typed string anywhere in their name, ignoring case. This default filtering behavior is provided by the `DefaultFilter` function.
+By defaualt, the user can filter for options by typing while the prompt is active. This will filter out all options that don't contain the
+typed string anywhere in their name, ignoring case.
 
 A custom filter function can also be provided to change this default behavior by providing a value for the `Filter` field:
 
@@ -217,20 +217,36 @@ A custom filter function can also be provided to change this default behavior by
 &Select{
     Message: "Choose a color:",
     Options: []string{"red", "blue", "green"},
-    Filter: func(filter string, options []string) (filtered []string) {
-        result := DefaultFilter(filter, options)
+    Filter: func(filter string, options []string) ([]string) {
+        filtered := []string{}
+
         for _, v := range result {
             if len(v) >= 5 {
                 filtered = append(filtered, v)
             }
         }
-        return
+        return filtered
     },
 }
 ```
 
-While the example above is contrived, this allows for use cases where "smarter" filtering might be useful, for example, when
-options are backed by more complex types and filtering might need to occur on more metadata than just the displayed name.
+You can also change the default filter applied with the `survey.WithFilter` `AskOpt`:
+
+```golang
+func myFilter(filter string, options []string) ([]string) {
+    filtered := []string{}
+    for _, v := range result {
+        if len(v) >= 5 {
+            filtered = append(filtered, v)
+        }
+    }
+
+    return filtered
+}
+
+
+survey.Ask(prompt, &color, survey.WithFilter(myFilter))
+```
 
 ## Validation
 
@@ -289,12 +305,11 @@ All of the prompts have a `Help` field which can be defined to provide more info
 ### Changing the input rune
 
 In some situations, `?` is a perfectly valid response. To handle this, you can change the rune that survey
-looks for by setting the `HelpInputRune` variable in `survey/core`:
+looks for by passing an `AskOpt` to `Ask` or `AskOne`:
 
 ```golang
 import (
     "github.com/AlecAivazis/survey/v2"
-    surveyCore "github.com/AlecAivazis/survey/v2/core"
 )
 
 number := ""
@@ -303,9 +318,7 @@ prompt := &survey.Input{
     Help:    "I couldn't come up with one.",
 }
 
-surveyCore.HelpInputRune = '^'
-
-survey.AskOne(prompt, &number)
+survey.AskOne(prompt, &number, survey.WithHelpInput('^'))
 ```
 
 ## Custom Types
@@ -340,17 +353,36 @@ survey.AskOne(
 
 ## Customizing Output
 
-Customizing the icons and various parts of survey can easily be done by setting the following variables
-in `survey/core`:
+Customizing the icons and various parts of survey can easily be done by passing the `WithIcons` option
+to `Ask` or `AskOne`:
 
-| name               | default | description                                                   |
-| ------------------ | ------- | ------------------------------------------------------------- |
-| ErrorIcon          | X       | Before an error                                               |
-| HelpIcon           | i       | Before help text                                              |
-| QuestionIcon       | ?       | Before the message of a prompt                                |
-| SelectFocusIcon    | >       | Marks the current focus in `Select` and `MultiSelect` prompts |
-| UnmarkedOptionIcon | [ ]     | Marks an unselected option in a `MultiSelect` prompt          |
-| MarkedOptionIcon   | [x]     | Marks a chosen selection in a `MultiSelect` prompt            |
+```golang
+import (
+    "github.com/AlecAivazis/survey/v2"
+)
+
+number := ""
+prompt := &survey.Input{
+    Message: "If you have this need, please give me a reasonable message.",
+    Help:    "I couldn't come up with one.",
+}
+
+survey.AskOne(prompt, &number, survey.WithIcons(function(icons *survey.IconSet) {
+    // you can set any icons
+    icons.Question = "⁇"
+}))
+```
+
+The icons available for updating are:
+
+| name           | default | description                                                   |
+| -------------- | ------- | ------------------------------------------------------------- |
+| Error          | X       | Before an error                                               |
+| Help           | i       | Before help text                                              |
+| Question       | ?       | Before the message of a prompt                                |
+| SelectFocus    | >       | Marks the current focus in `Select` and `MultiSelect` prompts |
+| UnmarkedOption | [ ]     | Marks an unselected option in a `MultiSelect` prompt          |
+| MarkedOption   | [x]     | Marks a chosen selection in a `MultiSelect` prompt            |
 
 ## Testing
 

@@ -43,10 +43,10 @@ func TestSelectRender(t *testing.T) {
 			SelectTemplateData{SelectedIndex: 2, PageEntries: prompt.Options},
 			strings.Join(
 				[]string{
-					fmt.Sprintf("%s Pick your word:  [Use arrows to move, type to filter]", core.QuestionIcon),
+					fmt.Sprintf("%s Pick your word:  [Use arrows to move, space to select, type to filter]", defaultAskOptions().PromptConfig.Icons.Question),
 					"  foo",
 					"  bar",
-					fmt.Sprintf("%s baz", core.SelectFocusIcon),
+					fmt.Sprintf("%s baz", defaultAskOptions().PromptConfig.Icons.SelectFocus),
 					"  buz\n",
 				},
 				"\n",
@@ -56,7 +56,7 @@ func TestSelectRender(t *testing.T) {
 			"Test Select answer output",
 			prompt,
 			SelectTemplateData{Answer: "buz", ShowAnswer: true, PageEntries: prompt.Options},
-			fmt.Sprintf("%s Pick your word: buz\n", core.QuestionIcon),
+			fmt.Sprintf("%s Pick your word: buz\n", defaultAskOptions().PromptConfig.Icons.Question),
 		},
 		{
 			"Test Select question output with help hidden",
@@ -64,10 +64,10 @@ func TestSelectRender(t *testing.T) {
 			SelectTemplateData{SelectedIndex: 2, PageEntries: prompt.Options},
 			strings.Join(
 				[]string{
-					fmt.Sprintf("%s Pick your word:  [Use arrows to move, type to filter, %s for more help]", core.QuestionIcon, string(core.HelpInputRune)),
+					fmt.Sprintf("%s Pick your word:  [Use arrows to move, space to select, type to filter, %s for more help]", defaultAskOptions().PromptConfig.Icons.Question, string(defaultAskOptions().PromptConfig.HelpInput)),
 					"  foo",
 					"  bar",
-					fmt.Sprintf("%s baz", core.SelectFocusIcon),
+					fmt.Sprintf("%s baz", defaultAskOptions().PromptConfig.Icons.SelectFocus),
 					"  buz\n",
 				},
 				"\n",
@@ -79,11 +79,11 @@ func TestSelectRender(t *testing.T) {
 			SelectTemplateData{SelectedIndex: 2, ShowHelp: true, PageEntries: prompt.Options},
 			strings.Join(
 				[]string{
-					fmt.Sprintf("%s This is helpful", core.HelpIcon),
-					fmt.Sprintf("%s Pick your word:  [Use arrows to move, type to filter]", core.QuestionIcon),
+					fmt.Sprintf("%s This is helpful", defaultAskOptions().PromptConfig.Icons.Help),
+					fmt.Sprintf("%s Pick your word:  [Use arrows to move, space to select, type to filter]", defaultAskOptions().PromptConfig.Icons.Question),
 					"  foo",
 					"  bar",
-					fmt.Sprintf("%s baz", core.SelectFocusIcon),
+					fmt.Sprintf("%s baz", defaultAskOptions().PromptConfig.Icons.SelectFocus),
 					"  buz\n",
 				},
 				"\n",
@@ -97,11 +97,18 @@ func TestSelectRender(t *testing.T) {
 
 		test.prompt.WithStdio(terminal.Stdio{Out: w})
 		test.data.Select = test.prompt
+
+		// set the icon set
+		test.data.Config = &defaultAskOptions().PromptConfig
+
 		err = test.prompt.Render(
 			SelectQuestionTemplate,
 			test.data,
 		)
-		assert.Nil(t, err, test.title)
+		if !assert.Nil(t, err, test.title) {
+			fmt.Println(err.Error())
+			return
+		}
 
 		w.Close()
 		var buf bytes.Buffer
@@ -257,8 +264,7 @@ func TestSelectPrompt(t *testing.T) {
 				Message: "Choose a color:",
 				Options: []string{"red", "blue", "green"},
 				Filter: func(filter string, options []string) (filtered []string) {
-					result := DefaultFilter(filter, options)
-					for _, v := range result {
+					for _, v := range options {
 						if len(v) >= 5 {
 							filtered = append(filtered, v)
 						}

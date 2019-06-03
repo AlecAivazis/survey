@@ -3,8 +3,8 @@ package survey
 import (
 	"testing"
 
-	expect "github.com/Netflix/go-expect"
 	"github.com/AlecAivazis/survey/v2/terminal"
+	expect "github.com/Netflix/go-expect"
 )
 
 func RunTest(t *testing.T, procedure func(*expect.Console), test func(terminal.Stdio) error) {
