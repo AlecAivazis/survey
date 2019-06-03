@@ -302,7 +302,7 @@ prompt := &survey.Input{
     Help:    "I couldn't come up with one.",
 }
 
-survey.AskOne(prompt, &number, survey.WithHelpInputRune('^'))
+survey.AskOne(prompt, &number, survey.WithHelpInput('^'))
 ```
 
 ## Custom Types

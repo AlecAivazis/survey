@@ -132,8 +132,8 @@ func WithPageSize(pageSize int) AskOpt {
 	}
 }
 
-// WithHelpInputRune changes the character that prompts look for to give the user helpful information.
-func WithHelpInputRune(r rune) AskOpt {
+// WithHelpInput changes the character that prompts look for to give the user helpful information.
+func WithHelpInput(r rune) AskOpt {
 	return func(options *AskOptions) error {
 		// set the input character
 		options.PromptConfig.IconSet.HelpInput = string(r)
