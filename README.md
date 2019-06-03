@@ -71,7 +71,7 @@ for the old `v1` version, see [here](https://godoc.org/gopkg.in/AlecAivazis/surv
    1. [Select](#select)
    1. [MultiSelect](#multiselect)
    1. [Editor](#editor)
-1. [Filtering Options](#filtering-options-in-select-and-multiselect)
+1. [Filtering Options](#filtering-options)
 1. [Validation](#validation)
    1. [Built-in Validators](#built-in-validators)
 1. [Help Text](#help-text)
@@ -239,7 +239,7 @@ the result. If neither of those are present, notepad (on Windows) or vim (Linux 
 
 ## Filtering Options
 
-By default, the user can filter for options in Select and MultiSelects by typing while the prompt 
+By default, the user can filter for options in Select and MultiSelects by typing while the prompt
 is active. This will filter out all options that don't contain the typed string anywhere in their name, ignoring case.
 
 A custom filter function can also be provided to change this behavior:
