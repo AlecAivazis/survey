@@ -96,7 +96,7 @@ go run examples/validation.go
 
 ## Running the Prompts
 
-There are two primary ways to execute a Prompt and start collecting information from your users: `Ask` and
+There are two primary ways to execute prompts and start collecting information from your users: `Ask` and
 `AskOne`. The primary difference is whether you are interested in collecting a single piece of information
 or if you have a list of questions to ask. For most basic usecases, `Ask` should be enough. However, for
 surveys with complicated branching logic, we recommend that you break out your questions into multiple
@@ -104,8 +104,8 @@ calls to both of these functions to fit your needs.
 
 ### Configuring the Prompts
 
-Most prompts take fine-grained configuration through fields on the structs you instantiate. It is
-possible to change the default behavior for prompts by passing `AskOpts` to either `Ask` or `AskOne`. Examples
+Most prompts take fine-grained configuration through fields on the structs you instantiate. It is also
+possible to change survey's default behaviors by passing `AskOpts` to either `Ask` or `AskOne`. Examples
 in this document will do both interchangeably:
 
 ```golang
@@ -242,7 +242,7 @@ the result. If neither of those are present, notepad (on Windows) or vim (Linux 
 By default, the user can filter for options by typing while the prompt is active. This will filter out all options that don't contain the
 typed string anywhere in their name, ignoring case.
 
-A custom filter function can also be provided to change this default behavior by providing a value for the `Filter` field or via the `survey.WithFilter` `AskOpt`:
+A custom filter function can also be provided to change this default behavior:
 
 ```golang
 func myFilter(filter string, options []string) ([]string) {
