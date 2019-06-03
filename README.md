@@ -70,6 +70,7 @@ for the old `v1` version, see [here](https://godoc.org/gopkg.in/AlecAivazis/surv
    1. [Select](#select)
    1. [MultiSelect](#multiselect)
    1. [Editor](#editor)
+1. [Filtering Select and MultiSelect](#filtering-options-in-select-and-multiselect)
 1. [Validation](#validation)
    1. [Built-in Validators](#built-in-validators)
 1. [Help Text](#help-text)
@@ -208,29 +209,10 @@ the result. If neither of those are present, notepad (on Windows) or vim (Linux 
 
 ## Filtering options in Select and MultiSelect
 
-By defaualt, the user can filter for options by typing while the prompt is active. This will filter out all options that don't contain the
+By default, the user can filter for options by typing while the prompt is active. This will filter out all options that don't contain the
 typed string anywhere in their name, ignoring case.
 
-A custom filter function can also be provided to change this default behavior by providing a value for the `Filter` field:
-
-```golang
-&Select{
-    Message: "Choose a color:",
-    Options: []string{"red", "blue", "green"},
-    Filter: func(filter string, options []string) ([]string) {
-        filtered := []string{}
-
-        for _, v := range result {
-            if len(v) >= 5 {
-                filtered = append(filtered, v)
-            }
-        }
-        return filtered
-    },
-}
-```
-
-You can also change the default filter applied with the `survey.WithFilter` `AskOpt`:
+A custom filter function can also be provided to change this default behavior by providing a value for the `Filter` field or via the `survey.WithFilter` `AskOpt`:
 
 ```golang
 func myFilter(filter string, options []string) ([]string) {
@@ -244,7 +226,14 @@ func myFilter(filter string, options []string) ([]string) {
     return filtered
 }
 
+// configure it for a specific prompt
+&Select{
+    Message: "Choose a color:",
+    Options: []string{"red", "blue", "green"},
+    Filter: myFilter,
+}
 
+// or define a default for all of the questions
 survey.Ask(prompt, &color, survey.WithFilter(myFilter))
 ```
 
