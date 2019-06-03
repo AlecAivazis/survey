@@ -4,6 +4,7 @@ import (
 	"errors"
 	"io"
 	"os"
+	"strings"
 
 	"github.com/AlecAivazis/survey/v2/core"
 	"github.com/AlecAivazis/survey/v2/terminal"
@@ -27,6 +28,15 @@ func defaultAskOptions() *AskOptions {
 				MarkedOption:   "[x]",
 				UnmarkedOption: "[ ]",
 				SelectFocus:    ">",
+			},
+			Filter: func(filter string, options []string) (answer []string) {
+				filter = strings.ToLower(filter)
+				for _, o := range options {
+					if strings.Contains(strings.ToLower(o), filter) {
+						answer = append(answer, o)
+					}
+				}
+				return answer
 			},
 		},
 	}
@@ -68,6 +78,7 @@ type PromptConfig struct {
 	PageSize  int
 	Icons     IconSet
 	HelpInput string
+	Filter    func(filter string, options []string) (answer []string)
 }
 
 // Prompt is the primary interface for the objects that can take user input
@@ -100,6 +111,16 @@ func WithStdio(in terminal.FileReader, out terminal.FileWriter, err io.Writer) A
 		options.Stdio.In = in
 		options.Stdio.Out = out
 		options.Stdio.Err = err
+		return nil
+	}
+}
+
+// WithFilter specifies the default filter to use when asking questions.
+func WithFilter(filter func(filter string, options []string) (answer []string)) AskOpt {
+	return func(options *AskOptions) error {
+		// save the filter internally
+		options.PromptConfig.Filter = filter
+
 		return nil
 	}
 }

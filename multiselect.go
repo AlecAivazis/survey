@@ -64,7 +64,7 @@ var MultiSelectQuestionTemplate = `
 
 // OnChange is called on every keypress.
 func (m *MultiSelect) OnChange(key rune, config *PromptConfig) {
-	options := m.filterOptions()
+	options := m.filterOptions(config)
 	oldFilter := m.filter
 
 	if key == terminal.KeyArrowUp || (m.VimMode && key == 'k') {
@@ -119,7 +119,7 @@ func (m *MultiSelect) OnChange(key rune, config *PromptConfig) {
 	}
 	if oldFilter != m.filter {
 		// filter changed
-		options = m.filterOptions()
+		options = m.filterOptions(config)
 		if len(options) > 0 && len(options) <= m.selectedIndex {
 			m.selectedIndex = len(options) - 1
 		}
@@ -151,14 +151,21 @@ func (m *MultiSelect) OnChange(key rune, config *PromptConfig) {
 	)
 }
 
-func (m *MultiSelect) filterOptions() []string {
+func (m *MultiSelect) filterOptions(config *PromptConfig) []string {
+	// if there is no filter applied
 	if m.filter == "" {
+		// return all of the options
 		return m.Options
 	}
+
+	// if we have a specific filter to apply
 	if m.Filter != nil {
+		// apply it
 		return m.Filter(m.filter, m.Options)
 	}
-	return DefaultFilter(m.filter, m.Options)
+
+	// otherwise use the default filter
+	return config.Filter(m.filter, m.Options)
 }
 
 func (m *MultiSelect) Prompt(config *PromptConfig) (interface{}, error) {

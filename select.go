@@ -61,7 +61,7 @@ var SelectQuestionTemplate = `
 
 // OnChange is called on every keypress.
 func (s *Select) OnChange(key rune, config *PromptConfig) bool {
-	options := s.filterOptions()
+	options := s.filterOptions(config)
 	oldFilter := s.filter
 
 	// if the user pressed the enter key and the index is a valid option
@@ -131,7 +131,7 @@ func (s *Select) OnChange(key rune, config *PromptConfig) bool {
 	}
 	if oldFilter != s.filter {
 		// filter changed
-		options = s.filterOptions()
+		options = s.filterOptions(config)
 		if len(options) > 0 && len(options) <= s.selectedIndex {
 			s.selectedIndex = len(options) - 1
 		}
@@ -166,14 +166,21 @@ func (s *Select) OnChange(key rune, config *PromptConfig) bool {
 	return false
 }
 
-func (s *Select) filterOptions() []string {
+func (s *Select) filterOptions(config *PromptConfig) []string {
+	// if there is no filter applied
 	if s.filter == "" {
+		// return all of the options
 		return s.Options
 	}
+
+	// if we have a specific filter to apply
 	if s.Filter != nil {
+		// apply it
 		return s.Filter(s.filter, s.Options)
 	}
-	return DefaultFilter(s.filter, s.Options)
+
+	// otherwise use the default filter
+	return config.Filter(s.filter, s.Options)
 }
 
 func (s *Select) Prompt(config *PromptConfig) (interface{}, error) {
@@ -253,7 +260,7 @@ func (s *Select) Prompt(config *PromptConfig) (interface{}, error) {
 			break
 		}
 	}
-	options := s.filterOptions()
+	options := s.filterOptions(config)
 	s.filter = ""
 	s.FilterMessage = ""
 
