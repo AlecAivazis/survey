@@ -71,7 +71,7 @@ func (c *Confirm) getBool(showHelp bool, config *PromptConfig) (bool, error) {
 			answer = false
 		case val == "":
 			answer = c.Default
-		case val == string(config.HelpInput) && c.Help != "":
+		case val == config.HelpInput && c.Help != "":
 			err := c.Render(
 				ConfirmQuestionTemplate,
 				ConfirmTemplateData{
