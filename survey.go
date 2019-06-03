@@ -32,6 +32,7 @@ var defaultIconSet = IconSet{
 	MarkedOption:   "[x]",
 	UnmarkedOption: "[ ]",
 	SelectFocus:    ">",
+	Error:			"X",
 }
 
 // IconSet holds the strings to use for various prompts

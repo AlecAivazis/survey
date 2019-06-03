@@ -233,7 +233,7 @@ func TestValidationError(t *testing.T) {
 		ErrorTemplate,
 		&ErrorTemplateData{
 			Error: err,
-			Icon:  "X",
+			Icon:  defaultIconSet.Error,
 		},
 	)
 	if err != nil {
