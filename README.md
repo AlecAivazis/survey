@@ -62,6 +62,7 @@ for the old `v1` version, see [here](https://godoc.org/gopkg.in/AlecAivazis/surv
 ## Table of Contents
 
 1. [Examples](#examples)
+1. [Running the Prompts](#running-the-prompts)
 1. [Prompts](#prompts)
    1. [Input](#input)
    1. [Multiline](#multiline)
@@ -91,6 +92,35 @@ cd $GOPATH/src/github.com/AlecAivazis/survey/v2
 
 go run examples/simple.go
 go run examples/validation.go
+```
+
+## Running the Prompts
+
+There are two primary ways to execute a Prompt and start collecting information from your users: `Ask` and
+`AskOne`. The primary difference is whether you are interested in collecting a single piece of information
+or if you have a list of questions to ask. For most basic usecases, `Ask` should be enough. However, for
+surveys with complicated branching logic, we recommend that you break out your questions into multiple
+calls to both of these functions to fit your needs.
+
+### Configuring the Prompts
+
+Most prompts take fine-grained configuration through fields on the structs you instantiate. It is
+possible to change the default behavior for prompts by passing `AskOpts` to either `Ask` or `AskOne`. Examples
+in this document will do both interchangeably:
+
+```golang
+&Select{
+    Message: "Choose a color:",
+    Options: []string{"red", "blue", "green"},
+    // can pass a validator directly
+    Validate: survey.Required,
+}
+
+// or define a default for the single call to `AskOne`
+survey.AskOne(prompt, &color, survey.WithValidator(survey.Required))
+
+// or define a default for every entry in a list of questions
+survey.Ask([]*survey.Question{prompt}, &answers, survey.WithValidator(survey.Required))
 ```
 
 ## Prompts
@@ -234,7 +264,7 @@ func myFilter(filter string, options []string) ([]string) {
 }
 
 // or define a default for all of the questions
-survey.Ask(prompt, &color, survey.WithFilter(myFilter))
+survey.AskOne(prompt, &color, survey.WithFilter(myFilter))
 ```
 
 ## Validation
