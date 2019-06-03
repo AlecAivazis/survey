@@ -21,18 +21,18 @@ type InputTemplateData struct {
 	Answer     string
 	ShowAnswer bool
 	ShowHelp   bool
-	Icons      *IconSet
+	Config     *PromptConfig
 }
 
 // Templates with Color formatting. See Documentation: https://github.com/mgutz/ansi#style-format
 var InputQuestionTemplate = `
-{{- if .ShowHelp }}{{- color "cyan"}}{{ .Icons.Help }} {{ .Help }}{{color "reset"}}{{"\n"}}{{end}}
-{{- color "green+hb"}}{{ .Icons.Question }} {{color "reset"}}
+{{- if .ShowHelp }}{{- color "cyan"}}{{ .Config.Icons.Help }} {{ .Help }}{{color "reset"}}{{"\n"}}{{end}}
+{{- color "green+hb"}}{{ .Config.Icons.Question }} {{color "reset"}}
 {{- color "default+hb"}}{{ .Message }} {{color "reset"}}
 {{- if .ShowAnswer}}
   {{- color "cyan"}}{{.Answer}}{{color "reset"}}{{"\n"}}
 {{- else }}
-  {{- if and .Help (not .ShowHelp)}}{{color "cyan"}}[{{ print .Icons.HelpInput }} for help]{{color "reset"}} {{end}}
+  {{- if and .Help (not .ShowHelp)}}{{color "cyan"}}[{{ print .Config.HelpInput }} for help]{{color "reset"}} {{end}}
   {{- if .Default}}{{color "white"}}({{.Default}}) {{color "reset"}}{{end}}
 {{- end}}`
 
@@ -40,7 +40,10 @@ func (i *Input) Prompt(config *PromptConfig) (interface{}, error) {
 	// render the template
 	err := i.Render(
 		InputQuestionTemplate,
-		InputTemplateData{Input: *i, Icons: &config.IconSet},
+		InputTemplateData{
+			Input:  *i,
+			Config: config,
+		},
 	)
 	if err != nil {
 		return "", err
@@ -63,10 +66,14 @@ func (i *Input) Prompt(config *PromptConfig) (interface{}, error) {
 		// terminal will echo the \n so we need to jump back up one row
 		cursor.PreviousLine(1)
 
-		if string(line) == string(config.IconSet.HelpInput) && i.Help != "" {
+		if string(line) == config.HelpInput && i.Help != "" {
 			err = i.Render(
 				InputQuestionTemplate,
-				InputTemplateData{Input: *i, ShowHelp: true, Icons: &config.IconSet},
+				InputTemplateData{
+					Input:    *i,
+					ShowHelp: true,
+					Config:   config,
+				},
 			)
 			if err != nil {
 				return "", err
@@ -89,6 +96,11 @@ func (i *Input) Prompt(config *PromptConfig) (interface{}, error) {
 func (i *Input) Cleanup(config *PromptConfig, val interface{}) error {
 	return i.Render(
 		InputQuestionTemplate,
-		InputTemplateData{Input: *i, Answer: val.(string), ShowAnswer: true, Icons: &config.IconSet},
+		InputTemplateData{
+			Input:      *i,
+			Answer:     val.(string),
+			ShowAnswer: true,
+			Config:     config,
+		},
 	)
 }

@@ -19,13 +19,13 @@ type MultilineTemplateData struct {
 	Answer     string
 	ShowAnswer bool
 	ShowHelp   bool
-	Icons      *IconSet
+	Config     *PromptConfig
 }
 
 // Templates with Color formatting. See Documentation: https://github.com/mgutz/ansi#style-format
 var MultilineQuestionTemplate = `
-{{- if .ShowHelp }}{{- color "cyan"}}{{ .Icons.Help }} {{ .Help }}{{color "reset"}}{{"\n"}}{{end}}
-{{- color "green+hb"}}{{ .Icons.Question }} {{color "reset"}}
+{{- if .ShowHelp }}{{- color "cyan"}}{{ .Config.Icons.Help }} {{ .Help }}{{color "reset"}}{{"\n"}}{{end}}
+{{- color "green+hb"}}{{ .Config.Icons.Question }} {{color "reset"}}
 {{- color "default+hb"}}{{ .Message }} {{color "reset"}}
 {{- if .ShowAnswer}}
   {{- "\n"}}{{color "cyan"}}{{.Answer}}{{color "reset"}}
@@ -39,7 +39,10 @@ func (i *Multiline) Prompt(config *PromptConfig) (interface{}, error) {
 	// render the template
 	err := i.Render(
 		MultilineQuestionTemplate,
-		MultilineTemplateData{Multiline: *i, Icons: &config.IconSet},
+		MultilineTemplateData{
+			Multiline: *i,
+			Config:    config,
+		},
 	)
 	if err != nil {
 		return "", err
@@ -97,6 +100,11 @@ func (i *Multiline) Prompt(config *PromptConfig) (interface{}, error) {
 func (i *Multiline) Cleanup(config *PromptConfig, val interface{}) error {
 	return i.Render(
 		MultilineQuestionTemplate,
-		MultilineTemplateData{Multiline: *i, Answer: val.(string), ShowAnswer: true, Icons: &config.IconSet},
+		MultilineTemplateData{
+			Multiline:  *i,
+			Answer:     val.(string),
+			ShowAnswer: true,
+			Config:     config,
+		},
 	)
 }

@@ -18,8 +18,15 @@ func defaultAskOptions() *AskOptions {
 			Err: os.Stderr,
 		},
 		PromptConfig: PromptConfig{
-			PageSize: 7,
-			IconSet:  defaultIconSet,
+			PageSize:  7,
+			HelpInput: "?",
+			Icons: IconSet{
+				Help:           "?",
+				Question:       "?",
+				MarkedOption:   "[x]",
+				UnmarkedOption: "[ ]",
+				SelectFocus:    ">",
+			},
 		},
 	}
 }
@@ -68,8 +75,9 @@ type Question struct {
 
 // PromptConfig holds the global configuration for a prompt
 type PromptConfig struct {
-	PageSize int
-	IconSet  IconSet
+	PageSize  int
+	Icons     IconSet
+	HelpInput string
 }
 
 // Prompt is the primary interface for the objects that can take user input
@@ -136,7 +144,7 @@ func WithPageSize(pageSize int) AskOpt {
 func WithHelpInput(r rune) AskOpt {
 	return func(options *AskOptions) error {
 		// set the input character
-		options.PromptConfig.IconSet.HelpInput = string(r)
+		options.PromptConfig.HelpInput = string(r)
 
 		// nothing went wrong
 		return nil
@@ -147,7 +155,7 @@ func WithHelpInput(r rune) AskOpt {
 func WithIconSet(setIcons func(*IconSet)) AskOpt {
 	return func(options *AskOptions) error {
 		// update the default icons with whatever the user says
-		setIcons(&options.PromptConfig.IconSet)
+		setIcons(&options.PromptConfig.Icons)
 
 		// nothing went wrong
 		return nil

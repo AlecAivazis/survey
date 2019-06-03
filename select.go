@@ -41,19 +41,19 @@ type SelectTemplateData struct {
 	Answer        string
 	ShowAnswer    bool
 	ShowHelp      bool
-	Icons         *IconSet
+	Config        *PromptConfig
 }
 
 var SelectQuestionTemplate = `
-{{- if .ShowHelp }}{{- color "cyan"}}{{ .Icons.Help }} {{ .Help }}{{color "reset"}}{{"\n"}}{{end}}
-{{- color "green+hb"}}{{ .Icons.Question }} {{color "reset"}}
+{{- if .ShowHelp }}{{- color "cyan"}}{{ .Config.Icons.Help }} {{ .Help }}{{color "reset"}}{{"\n"}}{{end}}
+{{- color "green+hb"}}{{ .Config.Icons.Question }} {{color "reset"}}
 {{- color "default+hb"}}{{ .Message }}{{ .FilterMessage }}{{color "reset"}}
 {{- if .ShowAnswer}}{{color "cyan"}} {{.Answer}}{{color "reset"}}{{"\n"}}
 {{- else}}
-  {{- "  "}}{{- color "cyan"}}[Use arrows to move, type to filter{{- if and .Help (not .ShowHelp)}}, {{ .Icons.HelpInput }} for more help{{end}}]{{color "reset"}}
+  {{- "  "}}{{- color "cyan"}}[Use arrows to move, space to select, type to filter{{- if and .Help (not .ShowHelp)}}, {{ .Config.HelpInput }} for more help{{end}}]{{color "reset"}}
   {{- "\n"}}
   {{- range $ix, $choice := .PageEntries}}
-    {{- if eq $ix $.SelectedIndex }}{{color "cyan+b"}}{{ $.Icons.SelectFocus }} {{else}}{{color "default+hb"}}  {{end}}
+    {{- if eq $ix $.SelectedIndex }}{{color "cyan+b"}}{{ $.Config.Icons.SelectFocus }} {{else}}{{color "default+hb"}}  {{end}}
     {{- $choice}}
     {{- color "reset"}}{{"\n"}}
   {{- end}}
@@ -101,7 +101,7 @@ func (s *Select) OnChange(key rune, config *PromptConfig) bool {
 			s.selectedIndex++
 		}
 		// only show the help message if we have one
-	} else if string(key) == config.IconSet.HelpInput && s.Help != "" {
+	} else if string(key) == config.HelpInput && s.Help != "" {
 		s.showingHelp = true
 		// if the user wants to toggle vim mode on/off
 	} else if key == terminal.KeyEscape {
@@ -157,7 +157,8 @@ func (s *Select) OnChange(key rune, config *PromptConfig) bool {
 			Select:        *s,
 			SelectedIndex: idx,
 			ShowHelp:      s.showingHelp,
-			PageEntries:   opts, Icons: &config.IconSet,
+			PageEntries:   opts,
+			Config:        config,
 		},
 	)
 
@@ -218,7 +219,7 @@ func (s *Select) Prompt(config *PromptConfig) (interface{}, error) {
 			Select:        *s,
 			PageEntries:   opts,
 			SelectedIndex: idx,
-			Icons:         &config.IconSet,
+			Config:        config,
 		},
 	)
 	if err != nil {
@@ -282,7 +283,7 @@ func (s *Select) Cleanup(config *PromptConfig, val interface{}) error {
 			Select:     *s,
 			Answer:     val.(string),
 			ShowAnswer: true,
-			Icons:      &config.IconSet,
+			Config:     config,
 		},
 	)
 }

@@ -43,20 +43,20 @@ type MultiSelectTemplateData struct {
 	SelectedIndex int
 	ShowHelp      bool
 	PageEntries   []string
-	Icons         *IconSet
+	Config        *PromptConfig
 }
 
 var MultiSelectQuestionTemplate = `
-{{- if .ShowHelp }}{{- color "cyan"}}{{ .Icons.Help }} {{ .Help }}{{color "reset"}}{{"\n"}}{{end}}
-{{- color "green+hb"}}{{ .Icons.Question }} {{color "reset"}}
+{{- if .ShowHelp }}{{- color "cyan"}}{{ .Config.Icons.Help }} {{ .Help }}{{color "reset"}}{{"\n"}}{{end}}
+{{- color "green+hb"}}{{ .Config.Icons.Question }} {{color "reset"}}
 {{- color "default+hb"}}{{ .Message }}{{ .FilterMessage }}{{color "reset"}}
 {{- if .ShowAnswer}}{{color "cyan"}} {{.Answer}}{{color "reset"}}{{"\n"}}
 {{- else }}
-	{{- "  "}}{{- color "cyan"}}[Use arrows to move, space to select, type to filter{{- if and .Help (not .ShowHelp)}}, {{ .Icons.HelpInput }} for more help{{end}}]{{color "reset"}}
+	{{- "  "}}{{- color "cyan"}}[Use arrows to move, space to select, type to filter{{- if and .Help (not .ShowHelp)}}, {{ .Config.HelpInput }} for more help{{end}}]{{color "reset"}}
   {{- "\n"}}
   {{- range $ix, $option := .PageEntries}}
-    {{- if eq $ix $.SelectedIndex }}{{color "cyan"}}{{ $.Icons.SelectFocus }}{{color "reset"}}{{else}} {{end}}
-    {{- if index $.Checked $option }}{{color "green"}} {{ $.Icons.MarkedOption }} {{else}}{{color "default+hb"}} {{ $.Icons.UnmarkedOption }} {{end}}
+    {{- if eq $ix $.SelectedIndex }}{{color "cyan"}}{{ $.Config.Icons.SelectFocus }}{{color "reset"}}{{else}} {{end}}
+    {{- if index $.Checked $option }}{{color "green"}} {{ $.Config.Icons.MarkedOption }} {{else}}{{color "default+hb"}} {{ $.Config.Icons.UnmarkedOption }} {{end}}
     {{- color "reset"}}
     {{- " "}}{{$option}}{{"\n"}}
   {{- end}}
@@ -98,7 +98,7 @@ func (m *MultiSelect) OnChange(key rune, config *PromptConfig) {
 			m.filter = ""
 		}
 		// only show the help message if we have one to show
-	} else if string(key) == config.IconSet.HelpInput && m.Help != "" {
+	} else if string(key) == config.HelpInput && m.Help != "" {
 		m.showingHelp = true
 	} else if key == terminal.KeyEscape {
 		m.VimMode = !m.VimMode
@@ -146,7 +146,7 @@ func (m *MultiSelect) OnChange(key rune, config *PromptConfig) {
 			Checked:       m.checked,
 			ShowHelp:      m.showingHelp,
 			PageEntries:   opts,
-			Icons:         &config.IconSet,
+			Config:        config,
 		},
 	)
 }
@@ -207,7 +207,7 @@ func (m *MultiSelect) Prompt(config *PromptConfig) (interface{}, error) {
 			SelectedIndex: idx,
 			Checked:       m.checked,
 			PageEntries:   opts,
-			Icons:         &config.IconSet,
+			Config:        config,
 		},
 	)
 	if err != nil {
@@ -256,7 +256,7 @@ func (m *MultiSelect) Cleanup(config *PromptConfig, val interface{}) error {
 			Checked:       m.checked,
 			Answer:        strings.Join(val.([]string), ", "),
 			ShowAnswer:    true,
-			Icons:         &config.IconSet,
+			Config:        config,
 		},
 	)
 }

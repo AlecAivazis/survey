@@ -25,25 +25,29 @@ func TestPasswordRender(t *testing.T) {
 		{
 			"Test Password question output",
 			Password{Message: "Tell me your secret:"},
-			PasswordTemplateData{Icons: &defaultIconSet},
-			fmt.Sprintf("%s Tell me your secret: ", defaultIconSet.Question),
+			PasswordTemplateData{},
+			fmt.Sprintf("%s Tell me your secret: ", defaultAskOptions().PromptConfig.Icons.Question),
 		},
 		{
 			"Test Password question output with help hidden",
 			Password{Message: "Tell me your secret:", Help: "This is helpful"},
-			PasswordTemplateData{Icons: &defaultIconSet},
-			fmt.Sprintf("%s Tell me your secret: [%s for help] ", defaultIconSet.Question, string(defaultIconSet.HelpInput)),
+			PasswordTemplateData{},
+			fmt.Sprintf("%s Tell me your secret: [%s for help] ", defaultAskOptions().PromptConfig.Icons.Question, string(defaultAskOptions().PromptConfig.HelpInput)),
 		},
 		{
 			"Test Password question output with help shown",
 			Password{Message: "Tell me your secret:", Help: "This is helpful"},
-			PasswordTemplateData{ShowHelp: true, Icons: &defaultIconSet},
-			fmt.Sprintf("%s This is helpful\n%s Tell me your secret: ", defaultIconSet.Help, defaultIconSet.Question),
+			PasswordTemplateData{ShowHelp: true},
+			fmt.Sprintf("%s This is helpful\n%s Tell me your secret: ", defaultAskOptions().PromptConfig.Icons.Help, defaultAskOptions().PromptConfig.Icons.Question),
 		},
 	}
 
 	for _, test := range tests {
 		test.data.Password = test.prompt
+
+		// set the icon set
+		test.data.Config = &defaultAskOptions().PromptConfig
+
 		actual, err := core.RunTemplate(
 			PasswordQuestionTemplate,
 			&test.data,

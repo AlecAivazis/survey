@@ -24,21 +24,24 @@ type Password struct {
 type PasswordTemplateData struct {
 	Password
 	ShowHelp bool
-	Icons    *IconSet
+	Config   *PromptConfig
 }
 
-// Templates with Color formatting. See Documentation: https://github.com/mgutz/ansi#style-format
+// PasswordQuestionTemplate is a template with color formatting. See Documentation: https://github.com/mgutz/ansi#style-format
 var PasswordQuestionTemplate = `
-{{- if .ShowHelp }}{{- color "cyan"}}{{ .Icons.Help }} {{ .Help }}{{color "reset"}}{{"\n"}}{{end}}
-{{- color "green+hb"}}{{ .Icons.Question }} {{color "reset"}}
+{{- if .ShowHelp }}{{- color "cyan"}}{{ .Config.Icons.Help }} {{ .Help }}{{color "reset"}}{{"\n"}}{{end}}
+{{- color "green+hb"}}{{ .Config.Icons.Question }} {{color "reset"}}
 {{- color "default+hb"}}{{ .Message }} {{color "reset"}}
-{{- if and .Help (not .ShowHelp)}}{{color "cyan"}}[{{ .Icons.HelpInput }} for help]{{color "reset"}} {{end}}`
+{{- if and .Help (not .ShowHelp)}}{{color "cyan"}}[{{ .Config.HelpInput }} for help]{{color "reset"}} {{end}}`
 
 func (p *Password) Prompt(config *PromptConfig) (line interface{}, err error) {
 	// render the question template
 	out, err := core.RunTemplate(
 		PasswordQuestionTemplate,
-		PasswordTemplateData{Password: *p, Icons: &config.IconSet},
+		PasswordTemplateData{
+			Password: *p,
+			Config:   config,
+		},
 	)
 	fmt.Fprint(terminal.NewAnsiStdout(p.Stdio().Out), out)
 	if err != nil {
@@ -64,13 +67,17 @@ func (p *Password) Prompt(config *PromptConfig) (line interface{}, err error) {
 			return string(line), err
 		}
 
-		if string(line) == string(config.IconSet.HelpInput) {
+		if string(line) == config.HelpInput {
 			// terminal will echo the \n so we need to jump back up one row
 			cursor.PreviousLine(1)
 
 			err = p.Render(
 				PasswordQuestionTemplate,
-				PasswordTemplateData{Password: *p, ShowHelp: true, Icons: &config.IconSet},
+				PasswordTemplateData{
+					Password: *p,
+					ShowHelp: true,
+					Config:   config,
+				},
 			)
 			if err != nil {
 				return "", err

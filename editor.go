@@ -40,18 +40,18 @@ type EditorTemplateData struct {
 	Answer     string
 	ShowAnswer bool
 	ShowHelp   bool
-	Icons      *IconSet
+	Config     *PromptConfig
 }
 
 // Templates with Color formatting. See Documentation: https://github.com/mgutz/ansi#style-format
 var EditorQuestionTemplate = `
-{{- if .ShowHelp }}{{- color "cyan"}}{{ .Icons.Help }} {{ .Help }}{{color "reset"}}{{"\n"}}{{end}}
-{{- color "green+hb"}}{{ .Icons.Question }} {{color "reset"}}
+{{- if .ShowHelp }}{{- color "cyan"}}{{ .Config.Icons.Help }} {{ .Help }}{{color "reset"}}{{"\n"}}{{end}}
+{{- color "green+hb"}}{{ .Config.Icons.Question }} {{color "reset"}}
 {{- color "default+hb"}}{{ .Message }} {{color "reset"}}
 {{- if .ShowAnswer}}
   {{- color "cyan"}}{{.Answer}}{{color "reset"}}{{"\n"}}
 {{- else }}
-  {{- if and .Help (not .ShowHelp)}}{{color "cyan"}}[{{ .Icons.HelpInput }} for help]{{color "reset"}} {{end}}
+  {{- if and .Help (not .ShowHelp)}}{{color "cyan"}}[{{ .Config.HelpInput }} for help]{{color "reset"}} {{end}}
   {{- if and .Default (not .HideDefault)}}{{color "white"}}({{.Default}}) {{color "reset"}}{{end}}
   {{- color "cyan"}}[Enter to launch editor] {{color "reset"}}
 {{- end}}`
@@ -89,7 +89,10 @@ func (e *Editor) prompt(initialValue string, config *PromptConfig) (interface{},
 	// render the template
 	err := e.Render(
 		EditorQuestionTemplate,
-		EditorTemplateData{Editor: *e, Icons: &config.IconSet},
+		EditorTemplateData{
+			Editor: *e,
+			Config: config,
+		},
 	)
 	if err != nil {
 		return "", err
@@ -118,10 +121,14 @@ func (e *Editor) prompt(initialValue string, config *PromptConfig) (interface{},
 		if r == terminal.KeyEndTransmission {
 			break
 		}
-		if string(r) == config.IconSet.HelpInput && e.Help != "" {
+		if string(r) == config.HelpInput && e.Help != "" {
 			err = e.Render(
 				EditorQuestionTemplate,
-				EditorTemplateData{Editor: *e, ShowHelp: true, Icons: &config.IconSet},
+				EditorTemplateData{
+					Editor:   *e,
+					ShowHelp: true,
+					Config:   config,
+				},
 			)
 			if err != nil {
 				return "", err
@@ -200,6 +207,11 @@ func (e *Editor) prompt(initialValue string, config *PromptConfig) (interface{},
 func (e *Editor) Cleanup(config *PromptConfig, val interface{}) error {
 	return e.Render(
 		EditorQuestionTemplate,
-		EditorTemplateData{Editor: *e, Answer: "<Received>", ShowAnswer: true, Icons: &config.IconSet},
+		EditorTemplateData{
+			Editor:     *e,
+			Answer:     "<Received>",
+			ShowAnswer: true,
+			Config:     config,
+		},
 	)
 }

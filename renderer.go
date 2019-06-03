@@ -50,7 +50,7 @@ func (r *Renderer) Error(config *PromptConfig, invalid error) error {
 	r.lineCount = 0
 	out, err := core.RunTemplate(ErrorTemplate, &ErrorTemplateData{
 		Error: invalid,
-		Icon:  config.IconSet.Error,
+		Icon:  config.Icons.Error,
 	})
 	if err != nil {
 		return err

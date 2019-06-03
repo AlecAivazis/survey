@@ -44,15 +44,14 @@ func TestMultiSelectRender(t *testing.T) {
 				SelectedIndex: 2,
 				PageEntries:   prompt.Options,
 				Checked:       map[string]bool{"bar": true, "buz": true},
-				Icons:         &defaultIconSet,
 			},
 			strings.Join(
 				[]string{
-					fmt.Sprintf("%s Pick your words:  [Use arrows to move, space to select, type to filter]", defaultIconSet.Question),
-					fmt.Sprintf("  %s  foo", defaultIconSet.UnmarkedOption),
-					fmt.Sprintf("  %s  bar", defaultIconSet.MarkedOption),
-					fmt.Sprintf("%s %s  baz", defaultIconSet.SelectFocus, defaultIconSet.UnmarkedOption),
-					fmt.Sprintf("  %s  buz\n", defaultIconSet.MarkedOption),
+					fmt.Sprintf("%s Pick your words:  [Use arrows to move, space to select, type to filter]", defaultAskOptions().PromptConfig.Icons.Question),
+					fmt.Sprintf("  %s  foo", defaultAskOptions().PromptConfig.Icons.UnmarkedOption),
+					fmt.Sprintf("  %s  bar", defaultAskOptions().PromptConfig.Icons.MarkedOption),
+					fmt.Sprintf("%s %s  baz", defaultAskOptions().PromptConfig.Icons.SelectFocus, defaultAskOptions().PromptConfig.Icons.UnmarkedOption),
+					fmt.Sprintf("  %s  buz\n", defaultAskOptions().PromptConfig.Icons.MarkedOption),
 				},
 				"\n",
 			),
@@ -63,9 +62,8 @@ func TestMultiSelectRender(t *testing.T) {
 			MultiSelectTemplateData{
 				Answer:     "foo, buz",
 				ShowAnswer: true,
-				Icons:      &defaultIconSet,
 			},
-			fmt.Sprintf("%s Pick your words: foo, buz\n", defaultIconSet.Question),
+			fmt.Sprintf("%s Pick your words: foo, buz\n", defaultAskOptions().PromptConfig.Icons.Question),
 		},
 		{
 			"Test MultiSelect question output with help hidden",
@@ -74,15 +72,14 @@ func TestMultiSelectRender(t *testing.T) {
 				SelectedIndex: 2,
 				PageEntries:   prompt.Options,
 				Checked:       map[string]bool{"bar": true, "buz": true},
-				Icons:         &defaultIconSet,
 			},
 			strings.Join(
 				[]string{
-					fmt.Sprintf("%s Pick your words:  [Use arrows to move, space to select, type to filter, %s for more help]", defaultIconSet.Question, string(defaultIconSet.HelpInput)),
-					fmt.Sprintf("  %s  foo", defaultIconSet.UnmarkedOption),
-					fmt.Sprintf("  %s  bar", defaultIconSet.MarkedOption),
-					fmt.Sprintf("%s %s  baz", defaultIconSet.SelectFocus, defaultIconSet.UnmarkedOption),
-					fmt.Sprintf("  %s  buz\n", defaultIconSet.MarkedOption),
+					fmt.Sprintf("%s Pick your words:  [Use arrows to move, space to select, type to filter, %s for more help]", defaultAskOptions().PromptConfig.Icons.Question, string(defaultAskOptions().PromptConfig.HelpInput)),
+					fmt.Sprintf("  %s  foo", defaultAskOptions().PromptConfig.Icons.UnmarkedOption),
+					fmt.Sprintf("  %s  bar", defaultAskOptions().PromptConfig.Icons.MarkedOption),
+					fmt.Sprintf("%s %s  baz", defaultAskOptions().PromptConfig.Icons.SelectFocus, defaultAskOptions().PromptConfig.Icons.UnmarkedOption),
+					fmt.Sprintf("  %s  buz\n", defaultAskOptions().PromptConfig.Icons.MarkedOption),
 				},
 				"\n",
 			),
@@ -95,16 +92,15 @@ func TestMultiSelectRender(t *testing.T) {
 				PageEntries:   prompt.Options,
 				Checked:       map[string]bool{"bar": true, "buz": true},
 				ShowHelp:      true,
-				Icons:         &defaultIconSet,
 			},
 			strings.Join(
 				[]string{
-					fmt.Sprintf("%s This is helpful", defaultIconSet.Help),
-					fmt.Sprintf("%s Pick your words:  [Use arrows to move, space to select, type to filter]", defaultIconSet.Question),
-					fmt.Sprintf("  %s  foo", defaultIconSet.UnmarkedOption),
-					fmt.Sprintf("  %s  bar", defaultIconSet.MarkedOption),
-					fmt.Sprintf("%s %s  baz", defaultIconSet.SelectFocus, defaultIconSet.UnmarkedOption),
-					fmt.Sprintf("  %s  buz\n", defaultIconSet.MarkedOption),
+					fmt.Sprintf("%s This is helpful", defaultAskOptions().PromptConfig.Icons.Help),
+					fmt.Sprintf("%s Pick your words:  [Use arrows to move, space to select, type to filter]", defaultAskOptions().PromptConfig.Icons.Question),
+					fmt.Sprintf("  %s  foo", defaultAskOptions().PromptConfig.Icons.UnmarkedOption),
+					fmt.Sprintf("  %s  bar", defaultAskOptions().PromptConfig.Icons.MarkedOption),
+					fmt.Sprintf("%s %s  baz", defaultAskOptions().PromptConfig.Icons.SelectFocus, defaultAskOptions().PromptConfig.Icons.UnmarkedOption),
+					fmt.Sprintf("  %s  buz\n", defaultAskOptions().PromptConfig.Icons.MarkedOption),
 				},
 				"\n",
 			),
@@ -117,6 +113,10 @@ func TestMultiSelectRender(t *testing.T) {
 
 		test.prompt.WithStdio(terminal.Stdio{Out: w})
 		test.data.MultiSelect = test.prompt
+
+		// set the icon set
+		test.data.Config = &defaultAskOptions().PromptConfig
+
 		err = test.prompt.Render(
 			MultiSelectQuestionTemplate,
 			test.data,

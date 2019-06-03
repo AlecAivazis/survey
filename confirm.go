@@ -18,18 +18,18 @@ type ConfirmTemplateData struct {
 	Confirm
 	Answer   string
 	ShowHelp bool
-	Icons    *IconSet
+	Config   *PromptConfig
 }
 
 // Templates with Color formatting. See Documentation: https://github.com/mgutz/ansi#style-format
 var ConfirmQuestionTemplate = `
-{{- if .ShowHelp }}{{- color "cyan"}}{{ .Icons.Help }} {{ .Help }}{{color "reset"}}{{"\n"}}{{end}}
-{{- color "green+hb"}}{{ .Icons.Question }} {{color "reset"}}
+{{- if .ShowHelp }}{{- color "cyan"}}{{ .Config.Icons.Help }} {{ .Help }}{{color "reset"}}{{"\n"}}{{end}}
+{{- color "green+hb"}}{{ .Config.Icons.Question }} {{color "reset"}}
 {{- color "default+hb"}}{{ .Message }} {{color "reset"}}
 {{- if .Answer}}
   {{- color "cyan"}}{{.Answer}}{{color "reset"}}{{"\n"}}
 {{- else }}
-  {{- if and .Help (not .ShowHelp)}}{{color "cyan"}}[{{ .Icons.HelpInput }} for help]{{color "reset"}} {{end}}
+  {{- if and .Help (not .ShowHelp)}}{{color "cyan"}}[{{ .Config.HelpInput }} for help]{{color "reset"}} {{end}}
   {{- color "white"}}{{if .Default}}(Y/n) {{else}}(y/N) {{end}}{{color "reset"}}
 {{- end}}`
 
@@ -71,10 +71,14 @@ func (c *Confirm) getBool(showHelp bool, config *PromptConfig) (bool, error) {
 			answer = false
 		case val == "":
 			answer = c.Default
-		case val == string(config.IconSet.HelpInput) && c.Help != "":
+		case val == string(config.HelpInput) && c.Help != "":
 			err := c.Render(
 				ConfirmQuestionTemplate,
-				ConfirmTemplateData{Confirm: *c, ShowHelp: true, Icons: &config.IconSet},
+				ConfirmTemplateData{
+					Confirm:  *c,
+					ShowHelp: true,
+					Config:   config,
+				},
 			)
 			if err != nil {
 				// use the default value and bubble up
@@ -89,7 +93,11 @@ func (c *Confirm) getBool(showHelp bool, config *PromptConfig) (bool, error) {
 			}
 			err := c.Render(
 				ConfirmQuestionTemplate,
-				ConfirmTemplateData{Confirm: *c, ShowHelp: showHelp, Icons: &config.IconSet},
+				ConfirmTemplateData{
+					Confirm:  *c,
+					ShowHelp: showHelp,
+					Config:   config,
+				},
 			)
 			if err != nil {
 				// use the default value and bubble up
@@ -115,7 +123,10 @@ func (c *Confirm) Prompt(config *PromptConfig) (interface{}, error) {
 	// render the question template
 	err := c.Render(
 		ConfirmQuestionTemplate,
-		ConfirmTemplateData{Confirm: *c, Icons: &config.IconSet},
+		ConfirmTemplateData{
+			Confirm: *c,
+			Config:  config,
+		},
 	)
 	if err != nil {
 		return "", err
@@ -133,6 +144,10 @@ func (c *Confirm) Cleanup(config *PromptConfig, val interface{}) error {
 	// render the template
 	return c.Render(
 		ConfirmQuestionTemplate,
-		ConfirmTemplateData{Confirm: *c, Answer: ans, Icons: &config.IconSet},
+		ConfirmTemplateData{
+			Confirm: *c,
+			Answer:  ans,
+			Config:  config,
+		},
 	)
 }
