@@ -10,7 +10,7 @@ and accepts the input with the enter key. Response type is a string.
 
 	name := ""
 	prompt := &survey.Input{ Message: "What is your name?" }
-	survey.AskOne(prompt, &name, nil)
+	survey.AskOne(prompt, &name)
 */
 type Input struct {
 	core.Renderer

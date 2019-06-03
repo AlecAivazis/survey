@@ -16,7 +16,7 @@ for them to select using the arrow keys and enter. Response type is a string.
 		Message: "Choose a color:",
 		Options: []string{"red", "blue", "green"},
 	}
-	survey.AskOne(prompt, &color, nil)
+	survey.AskOne(prompt, &color)
 */
 type Select struct {
 	core.Renderer

@@ -13,7 +13,7 @@ type is a string.
 
 	password := ""
 	prompt := &survey.Password{ Message: "Please type your password" }
-	survey.AskOne(prompt, &password, nil)
+	survey.AskOne(prompt, &password)
 */
 type Password struct {
 	core.Renderer

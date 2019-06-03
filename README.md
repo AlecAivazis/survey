@@ -5,7 +5,6 @@
 
 A library for building interactive prompts.
 
-
 <img width="550" src="https://thumbs.gfycat.com/VillainousGraciousKouprey-size_restricted.gif"/>
 
 ```go
@@ -57,7 +56,7 @@ func main() {
 }
 ```
 
-*NOTE*: This page describes the API for the upcoming `v2` release which has not been made available yet. For documentation
+_NOTE_: This page describes the API for the upcoming `v2` release which has not been made available yet. For documentation
 for the old `v1` version, see [here](https://godoc.org/gopkg.in/AlecAivazis/survey.v1).
 
 ## Table of Contents
@@ -104,7 +103,7 @@ name := ""
 prompt := &survey.Input{
     Message: "ping",
 }
-survey.AskOne(prompt, &name, nil)
+survey.AskOne(prompt, &name)
 ```
 
 ### Multiline
@@ -116,7 +115,7 @@ text := ""
 prompt := &survey.Multiline{
     Message: "ping",
 }
-survey.AskOne(prompt, &text, nil)
+survey.AskOne(prompt, &text)
 ```
 
 ### Password
@@ -128,7 +127,7 @@ password := ""
 prompt := &survey.Password{
     Message: "Please type your password",
 }
-survey.AskOne(prompt, &password, nil)
+survey.AskOne(prompt, &password)
 ```
 
 ### Confirm
@@ -140,7 +139,7 @@ name := false
 prompt := &survey.Confirm{
     Message: "Do you like pie?",
 }
-survey.AskOne(prompt, &name, nil)
+survey.AskOne(prompt, &name)
 ```
 
 ### Select
@@ -153,7 +152,7 @@ prompt := &survey.Select{
     Message: "Choose a color:",
     Options: []string{"red", "blue", "green"},
 }
-survey.AskOne(prompt, &color, nil)
+survey.AskOne(prompt, &color)
 ```
 
 The user can also press `esc` to toggle the ability cycle through the options with the j and k keys to do down and up respectively.
@@ -176,7 +175,7 @@ prompt := &survey.MultiSelect{
     Message: "What days do you prefer:",
     Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
 }
-survey.AskOne(prompt, &days, nil)
+survey.AskOne(prompt, &days)
 ```
 
 The user can also press `esc` to toggle the ability cycle through the options with the j and k keys to do down and up respectively.
@@ -241,6 +240,16 @@ q := &survey.Question{
 }
 ```
 
+Validators can be passed to `survey.AskOne` by using `survey.WithValidator`:
+
+```golang
+color := ""
+prompt := &survey.Input{ Message: "Whats your name?" }
+
+// you can pass multiple validators here and survey will make sure each one passes
+survey.AskOne(prompt, &color, survey.WithValidator(survey.Required))
+```
+
 ### Built-in Validators
 
 `survey` comes prepackaged with a few validators to fit common situations. Currently these
@@ -284,7 +293,7 @@ prompt := &survey.Input{
 
 surveyCore.HelpInputRune = '^'
 
-survey.AskOne(prompt, &number, nil)
+survey.AskOne(prompt, &number)
 ```
 
 ## Custom Types

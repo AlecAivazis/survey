@@ -110,7 +110,7 @@ by a carriage return.
 
 	likesPie := false
 	prompt := &survey.Confirm{ Message: "What is your name?" }
-	survey.AskOne(prompt, &likesPie, nil)
+	survey.AskOne(prompt, &likesPie)
 */
 func (c *Confirm) Prompt() (interface{}, error) {
 	// render the question template
