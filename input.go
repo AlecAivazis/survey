@@ -86,7 +86,7 @@ func (i *Input) Prompt(config *PromptConfig) (interface{}, error) {
 	return string(line), err
 }
 
-func (i *Input) Cleanup(val interface{}, config *PromptConfig) error {
+func (i *Input) Cleanup(config *PromptConfig, val interface{}) error {
 	return i.Render(
 		InputQuestionTemplate,
 		InputTemplateData{Input: *i, Answer: val.(string), ShowAnswer: true, Icons: &config.IconSet},

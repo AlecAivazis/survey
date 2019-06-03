@@ -41,7 +41,7 @@ func (r *Renderer) NewCursor() *terminal.Cursor {
 	}
 }
 
-func (r *Renderer) Error(invalid error, config *PromptConfig) error {
+func (r *Renderer) Error(config *PromptConfig, invalid error) error {
 	// since errors are printed on top we need to reset the prompt
 	// as well as any previous error print
 	r.resetPrompt(r.lineCount + r.errorLineCount)

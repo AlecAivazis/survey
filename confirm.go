@@ -84,7 +84,7 @@ func (c *Confirm) getBool(showHelp bool, config *PromptConfig) (bool, error) {
 			continue
 		default:
 			// we didnt get a valid answer, so print error and prompt again
-			if err := c.Error(fmt.Errorf("%q is not a valid answer, please try again.", val), config); err != nil {
+			if err := c.Error(config, fmt.Errorf("%q is not a valid answer, please try again.", val)); err != nil {
 				return c.Default, err
 			}
 			err := c.Render(
@@ -126,7 +126,7 @@ func (c *Confirm) Prompt(config *PromptConfig) (interface{}, error) {
 }
 
 // Cleanup overwrite the line with the finalized formatted version
-func (c *Confirm) Cleanup(val interface{}, config *PromptConfig) error {
+func (c *Confirm) Cleanup(config *PromptConfig, val interface{}) error {
 	// if the value was previously true
 	ans := yesNo(val.(bool))
 

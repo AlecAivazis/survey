@@ -94,7 +94,7 @@ func (i *Multiline) Prompt(config *PromptConfig) (interface{}, error) {
 	return val, err
 }
 
-func (i *Multiline) Cleanup(val interface{}, config *PromptConfig) error {
+func (i *Multiline) Cleanup(config *PromptConfig, val interface{}) error {
 	return i.Render(
 		MultilineQuestionTemplate,
 		MultilineTemplateData{Multiline: *i, Answer: val.(string), ShowAnswer: true, Icons: &config.IconSet},

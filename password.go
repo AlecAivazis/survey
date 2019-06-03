@@ -82,6 +82,6 @@ func (p *Password) Prompt(config *PromptConfig) (line interface{}, err error) {
 }
 
 // Cleanup hides the string with a fixed number of characters.
-func (prompt *Password) Cleanup(val interface{}, config *PromptConfig) error {
+func (prompt *Password) Cleanup(config *PromptConfig, val interface{}) error {
 	return nil
 }

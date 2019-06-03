@@ -72,7 +72,7 @@ func init() {
 	}
 }
 
-func (e *Editor) PromptAgain(invalid interface{}, err error, config *PromptConfig) (interface{}, error) {
+func (e *Editor) PromptAgain(config *PromptConfig, invalid interface{}, err error) (interface{}, error) {
 	initialValue := invalid.(string)
 	return e.prompt(initialValue, config)
 }
@@ -197,7 +197,7 @@ func (e *Editor) prompt(initialValue string, config *PromptConfig) (interface{},
 	return text, nil
 }
 
-func (e *Editor) Cleanup(val interface{}, config *PromptConfig) error {
+func (e *Editor) Cleanup(config *PromptConfig, val interface{}) error {
 	return e.Render(
 		EditorQuestionTemplate,
 		EditorTemplateData{Editor: *e, Answer: "<Received>", ShowAnswer: true, Icons: &config.IconSet},

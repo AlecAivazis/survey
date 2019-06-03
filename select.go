@@ -275,7 +275,7 @@ func (s *Select) Prompt(config *PromptConfig) (interface{}, error) {
 	return val, err
 }
 
-func (s *Select) Cleanup(val interface{}, config *PromptConfig) error {
+func (s *Select) Cleanup( config *PromptConfig, val interface{}) error {
 	return s.Render(
 		SelectQuestionTemplate,
 		SelectTemplateData{

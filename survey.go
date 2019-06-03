@@ -76,13 +76,13 @@ type PromptConfig struct {
 // and return a response.
 type Prompt interface {
 	Prompt(config *PromptConfig) (interface{}, error)
-	Cleanup(interface{}, *PromptConfig) error
-	Error(error, *PromptConfig) error
+	Cleanup(*PromptConfig, interface{}) error
+	Error(*PromptConfig, error) error
 }
 
 // PromptAgainer Interface for Prompts that support prompting again after invalid input
 type PromptAgainer interface {
-	PromptAgain(invalid interface{}, err error, config *PromptConfig) (interface{}, error)
+	PromptAgain(config *PromptConfig, invalid interface{}, err error) (interface{}, error)
 }
 
 // AskOpt allows setting optional ask options.
@@ -244,7 +244,7 @@ func Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
 		for _, validator := range validators {
 			// wait for a valid response
 			for invalid := validator(ans); invalid != nil; invalid = validator(ans) {
-				err := q.Prompt.Error(invalid, &options.PromptConfig)
+				err := q.Prompt.Error(&options.PromptConfig, invalid, )
 				// if there was a problem
 				if err != nil {
 					return err
@@ -252,7 +252,7 @@ func Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
 
 				// ask for more input
 				if promptAgainer, ok := q.Prompt.(PromptAgainer); ok {
-					ans, err = promptAgainer.PromptAgain(ans, invalid, &options.PromptConfig)
+					ans, err = promptAgainer.PromptAgain(&options.PromptConfig, ans, invalid)
 				} else {
 					ans, err = q.Prompt.Prompt(&options.PromptConfig)
 				}
@@ -273,7 +273,7 @@ func Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
 		}
 
 		// tell the prompt to cleanup with the validated value
-		q.Prompt.Cleanup(ans, &options.PromptConfig)
+		q.Prompt.Cleanup(&options.PromptConfig, ans)
 
 		// if something went wrong
 		if err != nil {

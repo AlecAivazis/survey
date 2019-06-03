@@ -246,7 +246,7 @@ func (m *MultiSelect) Prompt(config *PromptConfig) (interface{}, error) {
 }
 
 // Cleanup removes the options section, and renders the ask like a normal question.
-func (m *MultiSelect) Cleanup(val interface{}, config *PromptConfig) error {
+func (m *MultiSelect) Cleanup(config *PromptConfig, val interface{}) error {
 	// execute the output summary template with the answer
 	return m.Render(
 		MultiSelectQuestionTemplate,
