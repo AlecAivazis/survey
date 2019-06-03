@@ -60,7 +60,7 @@ var SelectQuestionTemplate = `
 {{- end}}`
 
 // OnChange is called on every keypress.
-func (s *Select) OnChange(key rune) bool {
+func (s *Select) OnChange(key rune, config *PromptConfig) bool {
 	options := s.filterOptions()
 	oldFilter := s.filter
 
@@ -138,10 +138,17 @@ func (s *Select) OnChange(key rune) bool {
 	}
 
 	// figure out the options and index to render
+	// figure out the page size
+	pageSize := s.PageSize
+	// if we dont have a specific one
+	if pageSize == 0 {
+		// grab the global value
+		pageSize = config.PageSize
+	}
 
 	// TODO if we have started filtering and were looking at the end of a list
 	// and we have modified the filter then we should move the page back!
-	opts, idx := paginate(s.PageSize, options, s.selectedIndex)
+	opts, idx := paginate(pageSize, options, s.selectedIndex)
 
 	// render the options
 	s.Render(
@@ -168,7 +175,7 @@ func (s *Select) filterOptions() []string {
 	return DefaultFilter(s.filter, s.Options)
 }
 
-func (s *Select) Prompt() (interface{}, error) {
+func (s *Select) Prompt(config *PromptConfig) (interface{}, error) {
 	// if there are no options to render
 	if len(s.Options) == 0 {
 		// we failed
@@ -193,8 +200,16 @@ func (s *Select) Prompt() (interface{}, error) {
 	// save the selected index
 	s.selectedIndex = sel
 
+	// figure out the page size
+	pageSize := s.PageSize
+	// if we dont have a specific one
+	if pageSize == 0 {
+		// grab the global value
+		pageSize = config.PageSize
+	}
+
 	// figure out the options and index to render
-	opts, idx := paginate(s.PageSize, s.Options, sel)
+	opts, idx := paginate(pageSize, s.Options, sel)
 
 	// ask the question
 	err := s.Render(
@@ -232,7 +247,7 @@ func (s *Select) Prompt() (interface{}, error) {
 		if r == terminal.KeyEndTransmission {
 			break
 		}
-		if s.OnChange(r) {
+		if s.OnChange(r, config) {
 			break
 		}
 	}

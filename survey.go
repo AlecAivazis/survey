@@ -9,15 +9,15 @@ import (
 	"github.com/AlecAivazis/survey/v2/terminal"
 )
 
-// PageSize is the default maximum number of items to show in select/multiselect prompts
-var PageSize = 7
-
 // DefaultAskOptions is the default options on ask, using the OS stdio.
 var DefaultAskOptions = AskOptions{
 	Stdio: terminal.Stdio{
 		In:  os.Stdin,
 		Out: os.Stdout,
 		Err: os.Stderr,
+	},
+	PromptConfig: PromptConfig{
+		PageSize: 7,
 	},
 }
 
@@ -41,10 +41,15 @@ type Question struct {
 	Transform Transformer
 }
 
+// PromptConfig holds the global configuration for a prompt
+type PromptConfig struct {
+	PageSize int
+}
+
 // Prompt is the primary interface for the objects that can take user input
 // and return a response.
 type Prompt interface {
-	Prompt() (interface{}, error)
+	Prompt(config *PromptConfig) (interface{}, error)
 	Cleanup(interface{}) error
 	Error(error) error
 }
@@ -59,8 +64,9 @@ type AskOpt func(options *AskOptions) error
 
 // AskOptions provides additional options on ask.
 type AskOptions struct {
-	Stdio      terminal.Stdio
-	Validators []Validator
+	Stdio        terminal.Stdio
+	Validators   []Validator
+	PromptConfig PromptConfig
 }
 
 // WithStdio specifies the standard input, output and error files survey
@@ -87,6 +93,17 @@ func WithValidator(v Validator) AskOpt {
 
 type wantsStdio interface {
 	WithStdio(terminal.Stdio)
+}
+
+// WithPageSize sets the default page size used by prompts
+func WithPageSize(pageSize int) AskOpt {
+	return func(options *AskOptions) error {
+		// set the page size
+		options.PromptConfig.PageSize = pageSize
+
+		// nothing went wrong
+		return nil
+	}
 }
 
 /*
@@ -157,7 +174,7 @@ func Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
 		}
 
 		// grab the user input and save it
-		ans, err := q.Prompt.Prompt()
+		ans, err := q.Prompt.Prompt(&options.PromptConfig)
 		// if there was a problem
 		if err != nil {
 			return err
@@ -189,7 +206,7 @@ func Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
 				if promptAgainer, ok := q.Prompt.(PromptAgainer); ok {
 					ans, err = promptAgainer.PromptAgain(ans, invalid)
 				} else {
-					ans, err = q.Prompt.Prompt()
+					ans, err = q.Prompt.Prompt(&options.PromptConfig)
 				}
 				// if there was a problem
 				if err != nil {
@@ -231,19 +248,7 @@ func Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
 
 // paginate returns a single page of choices given the page size, the total list of
 // possible choices, and the current selected index in the total list.
-func paginate(page int, choices []string, sel int) ([]string, int) {
-	// the number of elements to show in a single page
-	var pageSize int
-	// if the select has a specific page size
-	if page != 0 {
-		// use the specified one
-		pageSize = page
-		// otherwise the select does not have a page size
-	} else {
-		// use the package default
-		pageSize = PageSize
-	}
-
+func paginate(pageSize int, choices []string, sel int) ([]string, int) {
 	var start, end, cursor int
 
 	if len(choices) < pageSize {

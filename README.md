@@ -159,10 +159,16 @@ The user can also press `esc` to toggle the ability cycle through the options wi
 
 By default, the select prompt is limited to showing 7 options at a time
 and will paginate lists of options longer than that. To increase, you can either
-change the global `survey.PageSize`, or set the `PageSize` field on the prompt:
+set the `PageSize` field on the prompt:
 
 ```golang
 prompt := &survey.Select{..., PageSize: 10}
+```
+
+Or pass an an `AskOpt` to `survey.Ask` or `survey.AskOne`:
+
+```golang
+survey.AskOne(prompt, &days, survey.WithPageSize(10))
 ```
 
 ### MultiSelect
@@ -182,10 +188,16 @@ The user can also press `esc` to toggle the ability cycle through the options wi
 
 By default, the MultiSelect prompt is limited to showing 7 options at a time
 and will paginate lists of options longer than that. To increase, you can either
-change the global `survey.PageSize`, or set the `PageSize` field on the prompt:
+set the `PageSize` field on the prompt:
 
 ```golang
 prompt := &survey.MultiSelect{..., PageSize: 10}
+```
+
+Or pass an an `AskOpt` to `survey.Ask` or `survey.AskOne`:
+
+```golang
+survey.AskOne(prompt, &days, survey.WithPageSize(10))
 ```
 
 ### Editor

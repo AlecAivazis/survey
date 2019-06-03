@@ -112,7 +112,7 @@ by a carriage return.
 	prompt := &survey.Confirm{ Message: "What is your name?" }
 	survey.AskOne(prompt, &likesPie)
 */
-func (c *Confirm) Prompt() (interface{}, error) {
+func (c *Confirm) Prompt(config *PromptConfig) (interface{}, error) {
 	// render the question template
 	err := c.Render(
 		ConfirmQuestionTemplate,

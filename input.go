@@ -39,7 +39,7 @@ var InputQuestionTemplate = `
   {{- if .Default}}{{color "white"}}({{.Default}}) {{color "reset"}}{{end}}
 {{- end}}`
 
-func (i *Input) Prompt() (interface{}, error) {
+func (i *Input) Prompt(config *PromptConfig) (interface{}, error) {
 	// render the template
 	err := i.Render(
 		InputQuestionTemplate,

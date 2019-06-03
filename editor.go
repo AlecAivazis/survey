@@ -77,7 +77,7 @@ func (e *Editor) PromptAgain(invalid interface{}, err error) (interface{}, error
 	return e.prompt(initialValue)
 }
 
-func (e *Editor) Prompt() (interface{}, error) {
+func (e *Editor) Prompt(config *PromptConfig) (interface{}, error) {
 	initialValue := ""
 	if e.Default != "" && e.AppendDefault {
 		initialValue = e.Default
