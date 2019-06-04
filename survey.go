@@ -23,22 +23,28 @@ func defaultAskOptions() *AskOptions {
 			HelpInput: "?",
 			Icons: IconSet{
 				Error: Icon{
-					Text: "X",
+					Text:   "X",
+					Format: "red",
 				},
 				Help: Icon{
-					Text: "?",
+					Text:   "?",
+					Format: "cyan",
 				},
 				Question: Icon{
-					Text: "?",
+					Text:   "?",
+					Format: "green+hb",
 				},
 				MarkedOption: Icon{
-					Text: "[x]",
+					Text:   "[x]",
+					Format: "green",
 				},
 				UnmarkedOption: Icon{
-					Text: "[ ]",
+					Text:   "[ ]",
+					Format: "default+hb",
 				},
 				SelectFocus: Icon{
-					Text: ">",
+					Text:   ">",
+					Format: "cyan+b",
 				},
 			},
 			Filter: func(filter string, options []string) (answer []string) {
@@ -52,6 +58,13 @@ func defaultAskOptions() *AskOptions {
 			},
 		},
 	}
+}
+func defaultPromptConfig() *PromptConfig {
+	return &defaultAskOptions().PromptConfig
+}
+
+func defaultIcons() *IconSet {
+	return &defaultPromptConfig().Icons
 }
 
 // Icon holds the text and format to show for a particular icon

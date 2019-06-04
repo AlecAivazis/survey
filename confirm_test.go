@@ -30,31 +30,31 @@ func TestConfirmRender(t *testing.T) {
 			"Test Confirm question output with default true",
 			Confirm{Message: "Is pizza your favorite food?", Default: true},
 			ConfirmTemplateData{},
-			fmt.Sprintf("%s Is pizza your favorite food? (Y/n) ", defaultAskOptions().PromptConfig.Icons.Question),
+			fmt.Sprintf("%s Is pizza your favorite food? (Y/n) ", defaultIcons().Question.Text),
 		},
 		{
 			"Test Confirm question output with default false",
 			Confirm{Message: "Is pizza your favorite food?", Default: false},
 			ConfirmTemplateData{},
-			fmt.Sprintf("%s Is pizza your favorite food? (y/N) ", defaultAskOptions().PromptConfig.Icons.Question),
+			fmt.Sprintf("%s Is pizza your favorite food? (y/N) ", defaultIcons().Question.Text),
 		},
 		{
 			"Test Confirm answer output",
 			Confirm{Message: "Is pizza your favorite food?"},
 			ConfirmTemplateData{Answer: "Yes"},
-			fmt.Sprintf("%s Is pizza your favorite food? Yes\n", defaultAskOptions().PromptConfig.Icons.Question),
+			fmt.Sprintf("%s Is pizza your favorite food? Yes\n", defaultIcons().Question.Text),
 		},
 		{
 			"Test Confirm with help but help message is hidden",
 			Confirm{Message: "Is pizza your favorite food?", Help: "This is helpful"},
 			ConfirmTemplateData{},
-			fmt.Sprintf("%s Is pizza your favorite food? [%s for help] (y/N) ", defaultAskOptions().PromptConfig.Icons.Question, string(defaultAskOptions().PromptConfig.HelpInput)),
+			fmt.Sprintf("%s Is pizza your favorite food? [%s for help] (y/N) ", defaultIcons().Question.Text, string(defaultPromptConfig().HelpInput)),
 		},
 		{
 			"Test Confirm help output with help message shown",
 			Confirm{Message: "Is pizza your favorite food?", Help: "This is helpful"},
 			ConfirmTemplateData{ShowHelp: true},
-			fmt.Sprintf("%s This is helpful\n%s Is pizza your favorite food? (y/N) ", defaultAskOptions().PromptConfig.Icons.Help, defaultAskOptions().PromptConfig.Icons.Question),
+			fmt.Sprintf("%s This is helpful\n%s Is pizza your favorite food? (y/N) ", defaultIcons().Help.Text, defaultIcons().Question.Text),
 		},
 	}
 
@@ -66,7 +66,7 @@ func TestConfirmRender(t *testing.T) {
 		test.data.Confirm = test.prompt
 
 		// set the runtime config
-		test.data.Config = &defaultAskOptions().PromptConfig
+		test.data.Config = defaultPromptConfig()
 
 		err = test.prompt.Render(
 			ConfirmQuestionTemplate,
@@ -132,7 +132,7 @@ func TestConfirmPrompt(t *testing.T) {
 				c.ExpectString(
 					fmt.Sprintf(
 						"Is pizza your favorite food? [%s for help] (y/N)",
-						string(defaultAskOptions().PromptConfig.HelpInput),
+						string(defaultPromptConfig().HelpInput),
 					),
 				)
 				c.SendLine("?")

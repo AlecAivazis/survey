@@ -37,7 +37,7 @@ func RunPromptTest(t *testing.T, test PromptTest) {
 			p.WithStdio(stdio)
 		}
 
-		answer, err = test.prompt.Prompt(&defaultAskOptions().PromptConfig)
+		answer, err = test.prompt.Prompt(defaultPromptConfig())
 		return err
 	})
 	require.Equal(t, test.expected, answer)
