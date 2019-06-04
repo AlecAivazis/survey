@@ -77,7 +77,7 @@ for the old `v1` version, see [here](https://godoc.org/gopkg.in/AlecAivazis/surv
 1. [Help Text](#help-text)
    1. [Changing the input rune](#changing-the-input-run)
 1. [Custom Types](#custom-types)
-1. [Customizing Output](#customizing-output)
+1. [Changing the Icons ](#changing-the-icons)
 1. [Testing](#testing)
 
 ## Examples
@@ -382,9 +382,9 @@ survey.AskOne(
 )
 ```
 
-## Customizing Output
+## Changing the Icons
 
-Customizing the icons and various parts of survey can easily be done by passing the `WithIcons` option
+Change the icons and their color/format can be done by passing the `WithIcons` option.
 to `Ask` or `AskOne`:
 
 ```golang
@@ -400,7 +400,9 @@ prompt := &survey.Input{
 
 survey.AskOne(prompt, &number, survey.WithIcons(function(icons *survey.IconSet) {
     // you can set any icons
-    icons.Question = "⁇"
+    icons.Question.Text = "⁇"
+    // for more information on formatting the icons, see here: https://github.com/mgutz/ansi#style-format
+    icons.Question.Format = "yello+hb"
 }))
 ```
 
