@@ -402,7 +402,7 @@ survey.AskOne(prompt, &number, survey.WithIcons(function(icons *survey.IconSet) 
     // you can set any icons
     icons.Question.Text = "⁇"
     // for more information on formatting the icons, see here: https://github.com/mgutz/ansi#style-format
-    icons.Question.Format = "yello+hb"
+    icons.Question.Format = "yellow+hb"
 }))
 ```
 
