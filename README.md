@@ -223,11 +223,8 @@ set the `PageSize` field on the prompt:
 
 ```golang
 prompt := &survey.MultiSelect{..., PageSize: 10}
-```
 
-Or pass an an `AskOpt` to `survey.Ask` or `survey.AskOne`:
-
-```golang
+// or with an AskOpt
 survey.AskOne(prompt, &days, survey.WithPageSize(10))
 ```
 
@@ -299,7 +296,7 @@ q := &survey.Question{
 }
 ```
 
-Validators can be passed to `survey.AskOne` by using `survey.WithValidator`:
+Validators can be provided with `survey.WithValidator`:
 
 ```golang
 color := ""
@@ -336,7 +333,7 @@ All of the prompts have a `Help` field which can be defined to provide more info
 ### Changing the input rune
 
 In some situations, `?` is a perfectly valid response. To handle this, you can change the rune that survey
-looks for by passing an `AskOpt` to `Ask` or `AskOne`:
+looks for with `WithHelpInput`:
 
 ```golang
 import (
@@ -385,7 +382,6 @@ survey.AskOne(
 ## Changing the Icons
 
 Changing the icons and their color/format can be done by passing the `WithIcons` option:
-to `Ask` or `AskOne`:
 
 ```golang
 import (
