@@ -72,7 +72,7 @@ func main() {
 1. [Validation](#validation)
    1. [Built-in Validators](#built-in-validators)
 1. [Help Text](#help-text)
-   1. [Changing the input rune](#changing-the-input-run)
+   1. [Changing the input rune](#changing-the-input-rune)
 1. [Changing the Icons ](#changing-the-icons)
 1. [Custom Types](#custom-types)
 1. [Testing](#testing)
@@ -275,7 +275,7 @@ survey.AskOne(prompt, &color, survey.WithFilter(myFilter))
 Validating individual responses for a particular question can be done by defining a
 `Validate` field on the `survey.Question` to be validated. This function takes an
 `interface{}` type and returns an error to show to the user, prompting them for another
-response:
+response. Like usual, validators can be provided directly to the prompt or with `survey.WithValidator`:
 
 ```golang
 q := &survey.Question{
@@ -288,11 +288,7 @@ q := &survey.Question{
 	return nil
     },
 }
-```
 
-Validators can be provided with `survey.WithValidator`:
-
-```golang
 color := ""
 prompt := &survey.Input{ Message: "Whats your name?" }
 
