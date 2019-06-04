@@ -22,12 +22,24 @@ func defaultAskOptions() *AskOptions {
 			PageSize:  7,
 			HelpInput: "?",
 			Icons: IconSet{
-				Error:          "X",
-				Help:           "?",
-				Question:       "?",
-				MarkedOption:   "[x]",
-				UnmarkedOption: "[ ]",
-				SelectFocus:    ">",
+				Error: Icon{
+					Text: "X",
+				},
+				Help: Icon{
+					Text: "?",
+				},
+				Question: Icon{
+					Text: "?",
+				},
+				MarkedOption: Icon{
+					Text: "[x]",
+				},
+				UnmarkedOption: Icon{
+					Text: "[ ]",
+				},
+				SelectFocus: Icon{
+					Text: ">",
+				},
 			},
 			Filter: func(filter string, options []string) (answer []string) {
 				filter = strings.ToLower(filter)
@@ -42,15 +54,21 @@ func defaultAskOptions() *AskOptions {
 	}
 }
 
-// IconSet holds the strings to use for various prompts
+// Icon holds the text and format to show for a particular icon
+type Icon struct {
+	Text   string
+	Format string
+}
+
+// IconSet holds the icons to use for various prompts
 type IconSet struct {
-	HelpInput      string
-	Error          string
-	Help           string
-	Question       string
-	MarkedOption   string
-	UnmarkedOption string
-	SelectFocus    string
+	HelpInput      Icon
+	Error          Icon
+	Help           Icon
+	Question       Icon
+	MarkedOption   Icon
+	UnmarkedOption Icon
+	SelectFocus    Icon
 }
 
 // Validator is a function passed to a Question after a user has provided a response.
