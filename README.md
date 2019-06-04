@@ -237,11 +237,16 @@ Launches the user's preferred editor (defined by the \$VISUAL or \$EDITOR enviro
 temporary file. Once the user exits their editor, the contents of the temporary file are read in as
 the result. If neither of those are present, notepad (on Windows) or vim (Linux or Mac) is used.
 
-You may want to specify the file name [pattern](https://golang.org/pkg/io/ioutil/#TempFile) for the temporary file to
-activate syntax highlighting in the editor.
+You can also specify a [pattern](https://golang.org/pkg/io/ioutil/#TempFile) for the name of the temporary file. This 
+can be useful for ensuring syntax highlighting matches your usecase.
 
 ```golang
-survey.AskOne(&survey.Editor{Message: "Shell code snippet", FileNamePattern: "*.sh"}, &content)
+prompt := &survey.Editor{
+    Message: "Shell code snippet", 
+    FileNamePattern: "*.sh",
+}
+
+survey.AskOne(prompt, &content)
 ```
 
 ## Filtering Options
