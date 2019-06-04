@@ -56,9 +56,6 @@ func main() {
 }
 ```
 
-_NOTE_: This page describes the API for the upcoming `v2` release which has not been made available yet. For documentation
-for the old `v1` version, see [here](https://godoc.org/gopkg.in/AlecAivazis/survey.v1).
-
 ## Table of Contents
 
 1. [Examples](#examples)
@@ -76,8 +73,8 @@ for the old `v1` version, see [here](https://godoc.org/gopkg.in/AlecAivazis/surv
    1. [Built-in Validators](#built-in-validators)
 1. [Help Text](#help-text)
    1. [Changing the input rune](#changing-the-input-run)
-1. [Custom Types](#custom-types)
 1. [Changing the Icons ](#changing-the-icons)
+1. [Custom Types](#custom-types)
 1. [Testing](#testing)
 
 ## Examples
@@ -346,40 +343,10 @@ prompt := &survey.Input{
 survey.AskOne(prompt, &number, survey.WithHelpInput('^'))
 ```
 
-## Custom Types
-
-survey will assign prompt answers to your custom types if they implement this interface:
-
-```golang
-type Settable interface {
-    WriteAnswer(field string, value interface{}) error
-}
-```
-
-Here is an example how to use them:
-
-```golang
-type MyValue struct {
-    value string
-}
-func (my *MyValue) WriteAnswer(name string, value interface{}) error {
-     my.value = value.(string)
-}
-
-myval := MyValue{}
-survey.AskOne(
-    &survey.Input{
-        Message: "Enter something:",
-    },
-    &myval,
-    nil,
-)
-```
-
 ## Changing the Icons
 
 Changing the icons and their color/format can be done by passing the `WithIcons` option. The format
-follows the patterns outlined [here](https://github.com/mgutz/ansi#style-format).:
+follows the patterns outlined [here](https://github.com/mgutz/ansi#style-format). For example:
 
 ```golang
 import (
@@ -411,6 +378,36 @@ The icons and their default text and format are summarized below:
 | UnmarkedOption | [ ]  | default+hb | Marks an unselected option in a `MultiSelect` prompt          |
 | MarkedOption   | [x]  | cyan+b     | Marks a chosen selection in a `MultiSelect` prompt            |
 
+## Custom Types
+
+survey will assign prompt answers to your custom types if they implement this interface:
+
+```golang
+type Settable interface {
+    WriteAnswer(field string, value interface{}) error
+}
+```
+
+Here is an example how to use them:
+
+```golang
+type MyValue struct {
+    value string
+}
+func (my *MyValue) WriteAnswer(name string, value interface{}) error {
+     my.value = value.(string)
+}
+
+myval := MyValue{}
+survey.AskOne(
+    &survey.Input{
+        Message: "Enter something:",
+    },
+    &myval,
+    nil,
+)
+```
+
 ## Testing
 
 You can test your program's interactive prompts using [go-expect](https://github.com/Netflix/go-expect). The library
@@ -419,74 +416,4 @@ if you are manipulating the cursor or using `survey`, you will need a way to int
 for things like `CursorLocation`. `vt10x.NewVT10XConsole` will create a `go-expect` console that also multiplexes
 stdio to an in-memory [virtual terminal](https://github.com/hinshun/vt10x).
 
-For example, you can test a binary utilizing `survey` by connecting the Console's tty to a subprocess's stdio.
-
-```go
-func TestCLI(t *testing.T) {
- 	// Multiplex stdin/stdout to a virtual terminal to respond to ANSI escape
- 	// sequences (i.e. cursor position report).
- 	c, state, err := vt10x.NewVT10XConsole()
-	require.Nil(t, err)
-	defer c.Close()
-
-	donec := make(chan struct{})
-	go func() {
-		defer close(donec)
-    		c.ExpectString("What is your name?")
-    		c.SendLine("Johnny Appleseed")
-    		c.ExpectEOF()
-  	}()
-
-	cmd := exec.Command("your-cli")
-  	cmd.Stdin = c.Tty()
-  	cmd.Stdout = c.Tty()
-  	cmd.Stderr = c.Tty()
-
-  	err = cmd.Run()
-  	require.Nil(t, err)
-
-  	// Close the slave end of the pty, and read the remaining bytes from the master end.
-  	c.Tty().Close()
-  	<-donec
-
-  	// Dump the terminal's screen.
-  	t.Log(expect.StripTrailingEmptyLines(state.String()))
-}
-```
-
-If your application is decoupled from `os.Stdout` and `os.Stdin`, you can even test through the tty alone.
-`survey` itself is tested in this manner.
-
-```go
-func TestCLI(t *testing.T) {
-  	// Multiplex stdin/stdout to a virtual terminal to respond to ANSI escape
-  	// sequences (i.e. cursor position report).
-	c, state, err := vt10x.NewVT10XConsole()
-	require.Nil(t, err)
-  	defer c.Close()
-
-  	donec := make(chan struct{})
-	go func() {
-    		defer close(donec)
-    		c.ExpectString("What is your name?")
-    		c.SendLine("Johnny Appleseed")
-    		c.ExpectEOF()
-	}()
-
-  	prompt := &Input{
-    		Message: "What is your name?",
-  	}
-  	prompt.WithStdio(Stdio(c))
-
-  	answer, err := prompt.Prompt()
-  	require.Nil(t, err)
-  	require.Equal(t, "Johnny Appleseed", answer)
-
-  	// Close the slave end of the pty, and read the remaining bytes from the master end.
-  	c.Tty().Close()
-  	<-donec
-
-  	// Dump the terminal's screen.
-  	t.Log(expect.StripTrailingEmptyLines(state.String()))
-}
-```
+For some examples, you can see any of the tests in this repo.
