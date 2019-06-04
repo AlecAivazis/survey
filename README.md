@@ -402,8 +402,7 @@ survey.AskOne(
     &survey.Input{
         Message: "Enter something:",
     },
-    &myval,
-    nil,
+    &myval
 )
 ```
 
