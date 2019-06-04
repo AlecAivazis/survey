@@ -26,13 +26,13 @@ Response type is a string.
 */
 type Editor struct {
 	Renderer
-	Message         string
-	Default         string
-	Help            string
-	Editor          string
-	HideDefault     bool
-	AppendDefault   bool
-	FileNamePattern string
+	Message       string
+	Default       string
+	Help          string
+	Editor        string
+	HideDefault   bool
+	AppendDefault bool
+	FileName      string
 }
 
 // data available to the templates when processing
@@ -139,7 +139,7 @@ func (e *Editor) prompt(initialValue string, config *PromptConfig) (interface{},
 	}
 
 	// prepare the temp file
-	pattern := e.FileNamePattern
+	pattern := e.FileName
 	if pattern == "" {
 		pattern = "survey*.txt"
 	}

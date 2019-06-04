@@ -98,8 +98,8 @@ go run examples/validation.go
 
 There are two primary ways to execute prompts and start collecting information from your users: `Ask` and
 `AskOne`. The primary difference is whether you are interested in collecting a single piece of information
-or if you have a list of questions to ask whose answers should be collected in a single struct. 
-For most basic usecases, `Ask` should be enough. However, for surveys with complicated branching logic, 
+or if you have a list of questions to ask whose answers should be collected in a single struct.
+For most basic usecases, `Ask` should be enough. However, for surveys with complicated branching logic,
 we recommend that you break out your questions into multiple calls to both of these functions to fit your needs.
 
 ### Configuring the Prompts
@@ -237,13 +237,13 @@ Launches the user's preferred editor (defined by the \$VISUAL or \$EDITOR enviro
 temporary file. Once the user exits their editor, the contents of the temporary file are read in as
 the result. If neither of those are present, notepad (on Windows) or vim (Linux or Mac) is used.
 
-You can also specify a [pattern](https://golang.org/pkg/io/ioutil/#TempFile) for the name of the temporary file. This 
+You can also specify a [pattern](https://golang.org/pkg/io/ioutil/#TempFile) for the name of the temporary file. This
 can be useful for ensuring syntax highlighting matches your usecase.
 
 ```golang
 prompt := &survey.Editor{
-    Message: "Shell code snippet", 
-    FileNamePattern: "*.sh",
+    Message: "Shell code snippet",
+    FileName: "*.sh",
 }
 
 survey.AskOne(prompt, &content)
