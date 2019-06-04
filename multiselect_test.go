@@ -47,11 +47,11 @@ func TestMultiSelectRender(t *testing.T) {
 			},
 			strings.Join(
 				[]string{
-					fmt.Sprintf("%s Pick your words:  [Use arrows to move, space to select, type to filter]", defaultAskOptions().PromptConfig.Icons.Question),
-					fmt.Sprintf("  %s  foo", defaultAskOptions().PromptConfig.Icons.UnmarkedOption),
-					fmt.Sprintf("  %s  bar", defaultAskOptions().PromptConfig.Icons.MarkedOption),
-					fmt.Sprintf("%s %s  baz", defaultAskOptions().PromptConfig.Icons.SelectFocus, defaultAskOptions().PromptConfig.Icons.UnmarkedOption),
-					fmt.Sprintf("  %s  buz\n", defaultAskOptions().PromptConfig.Icons.MarkedOption),
+					fmt.Sprintf("%s Pick your words:  [Use arrows to move, space to select, type to filter]", defaultIcons().Question.Text),
+					fmt.Sprintf("  %s  foo", defaultIcons().UnmarkedOption.Text),
+					fmt.Sprintf("  %s  bar", defaultIcons().MarkedOption.Text),
+					fmt.Sprintf("%s %s  baz", defaultIcons().SelectFocus.Text, defaultIcons().UnmarkedOption.Text),
+					fmt.Sprintf("  %s  buz\n", defaultIcons().MarkedOption.Text),
 				},
 				"\n",
 			),
@@ -63,7 +63,7 @@ func TestMultiSelectRender(t *testing.T) {
 				Answer:     "foo, buz",
 				ShowAnswer: true,
 			},
-			fmt.Sprintf("%s Pick your words: foo, buz\n", defaultAskOptions().PromptConfig.Icons.Question),
+			fmt.Sprintf("%s Pick your words: foo, buz\n", defaultIcons().Question.Text),
 		},
 		{
 			"Test MultiSelect question output with help hidden",
@@ -75,11 +75,11 @@ func TestMultiSelectRender(t *testing.T) {
 			},
 			strings.Join(
 				[]string{
-					fmt.Sprintf("%s Pick your words:  [Use arrows to move, space to select, type to filter, %s for more help]", defaultAskOptions().PromptConfig.Icons.Question, string(defaultAskOptions().PromptConfig.HelpInput)),
-					fmt.Sprintf("  %s  foo", defaultAskOptions().PromptConfig.Icons.UnmarkedOption),
-					fmt.Sprintf("  %s  bar", defaultAskOptions().PromptConfig.Icons.MarkedOption),
-					fmt.Sprintf("%s %s  baz", defaultAskOptions().PromptConfig.Icons.SelectFocus, defaultAskOptions().PromptConfig.Icons.UnmarkedOption),
-					fmt.Sprintf("  %s  buz\n", defaultAskOptions().PromptConfig.Icons.MarkedOption),
+					fmt.Sprintf("%s Pick your words:  [Use arrows to move, space to select, type to filter, %s for more help]", defaultIcons().Question.Text, string(defaultPromptConfig().HelpInput)),
+					fmt.Sprintf("  %s  foo", defaultIcons().UnmarkedOption.Text),
+					fmt.Sprintf("  %s  bar", defaultIcons().MarkedOption.Text),
+					fmt.Sprintf("%s %s  baz", defaultIcons().SelectFocus.Text, defaultIcons().UnmarkedOption.Text),
+					fmt.Sprintf("  %s  buz\n", defaultIcons().MarkedOption.Text),
 				},
 				"\n",
 			),
@@ -95,12 +95,12 @@ func TestMultiSelectRender(t *testing.T) {
 			},
 			strings.Join(
 				[]string{
-					fmt.Sprintf("%s This is helpful", defaultAskOptions().PromptConfig.Icons.Help),
-					fmt.Sprintf("%s Pick your words:  [Use arrows to move, space to select, type to filter]", defaultAskOptions().PromptConfig.Icons.Question),
-					fmt.Sprintf("  %s  foo", defaultAskOptions().PromptConfig.Icons.UnmarkedOption),
-					fmt.Sprintf("  %s  bar", defaultAskOptions().PromptConfig.Icons.MarkedOption),
-					fmt.Sprintf("%s %s  baz", defaultAskOptions().PromptConfig.Icons.SelectFocus, defaultAskOptions().PromptConfig.Icons.UnmarkedOption),
-					fmt.Sprintf("  %s  buz\n", defaultAskOptions().PromptConfig.Icons.MarkedOption),
+					fmt.Sprintf("%s This is helpful", defaultIcons().Help.Text),
+					fmt.Sprintf("%s Pick your words:  [Use arrows to move, space to select, type to filter]", defaultIcons().Question.Text),
+					fmt.Sprintf("  %s  foo", defaultIcons().UnmarkedOption.Text),
+					fmt.Sprintf("  %s  bar", defaultIcons().MarkedOption.Text),
+					fmt.Sprintf("%s %s  baz", defaultIcons().SelectFocus.Text, defaultIcons().UnmarkedOption.Text),
+					fmt.Sprintf("  %s  buz\n", defaultIcons().MarkedOption.Text),
 				},
 				"\n",
 			),
@@ -115,7 +115,7 @@ func TestMultiSelectRender(t *testing.T) {
 		test.data.MultiSelect = test.prompt
 
 		// set the icon set
-		test.data.Config = &defaultAskOptions().PromptConfig
+		test.data.Config = defaultPromptConfig()
 
 		err = test.prompt.Render(
 			MultiSelectQuestionTemplate,

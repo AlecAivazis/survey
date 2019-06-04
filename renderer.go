@@ -16,10 +16,10 @@ type Renderer struct {
 
 type ErrorTemplateData struct {
 	Error error
-	Icon  string
+	Icon  Icon
 }
 
-var ErrorTemplate = `{{color "red"}}{{ .Icon }} Sorry, your reply was invalid: {{ .Error.Error }}{{color "reset"}}
+var ErrorTemplate = `{{color .Icon.Format }}{{ .Icon.Text }} Sorry, your reply was invalid: {{ .Error.Error }}{{color "reset"}}
 `
 
 func (r *Renderer) WithStdio(stdio terminal.Stdio) {
