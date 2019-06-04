@@ -384,7 +384,7 @@ survey.AskOne(
 
 ## Changing the Icons
 
-Changing the icons and their color/format can be done by passing the `WithIcons` option.
+Changing the icons and their color/format can be done by passing the `WithIcons` option:
 to `Ask` or `AskOne`:
 
 ```golang
