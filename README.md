@@ -189,16 +189,13 @@ survey.AskOne(prompt, &color)
 The user can also press `esc` to toggle the ability cycle through the options with the j and k keys to do down and up respectively.
 
 By default, the select prompt is limited to showing 7 options at a time
-and will paginate lists of options longer than that. To increase, you can either
-set the `PageSize` field on the prompt:
+and will paginate lists of options longer than that. This can be changed a number of ways:
 
 ```golang
-prompt := &survey.Select{..., PageSize: 10}
-```
+// as a field on a single select
+prompt := &survey.MultiSelect{..., PageSize: 10}
 
-Or pass an an `AskOpt` to `survey.Ask` or `survey.AskOne`:
-
-```golang
+// or as an option to Ask or AskOne
 survey.AskOne(prompt, &days, survey.WithPageSize(10))
 ```
 
@@ -218,13 +215,13 @@ survey.AskOne(prompt, &days)
 The user can also press `esc` to toggle the ability cycle through the options with the j and k keys to do down and up respectively.
 
 By default, the MultiSelect prompt is limited to showing 7 options at a time
-and will paginate lists of options longer than that. To increase, you can either
-set the `PageSize` field on the prompt:
+and will paginate lists of options longer than that. This can be changed a number of ways:
 
 ```golang
+// as a field on a single select
 prompt := &survey.MultiSelect{..., PageSize: 10}
 
-// or with an AskOpt
+// or as an option to Ask or AskOne
 survey.AskOne(prompt, &days, survey.WithPageSize(10))
 ```
 
@@ -381,7 +378,8 @@ survey.AskOne(
 
 ## Changing the Icons
 
-Changing the icons and their color/format can be done by passing the `WithIcons` option:
+Changing the icons and their color/format can be done by passing the `WithIcons` option. The format
+follows the patterns outlined [here](https://github.com/mgutz/ansi#style-format).:
 
 ```golang
 import (
@@ -402,16 +400,16 @@ survey.AskOne(prompt, &number, survey.WithIcons(function(icons *survey.IconSet) 
 }))
 ```
 
-The icons available for updating are:
+The icons and their default text and format are summarized below:
 
-| name           | default | description                                                   |
-| -------------- | ------- | ------------------------------------------------------------- |
-| Error          | X       | Before an error                                               |
-| Help           | i       | Before help text                                              |
-| Question       | ?       | Before the message of a prompt                                |
-| SelectFocus    | >       | Marks the current focus in `Select` and `MultiSelect` prompts |
-| UnmarkedOption | [ ]     | Marks an unselected option in a `MultiSelect` prompt          |
-| MarkedOption   | [x]     | Marks a chosen selection in a `MultiSelect` prompt            |
+| name           | text | format     | description                                                   |
+| -------------- | ---- | ---------- | ------------------------------------------------------------- |
+| Error          | X    | red        | Before an error                                               |
+| Help           | i    | cyan       | Before help text                                              |
+| Question       | ?    | green+hb   | Before the message of a prompt                                |
+| SelectFocus    | >    | green      | Marks the current focus in `Select` and `MultiSelect` prompts |
+| UnmarkedOption | [ ]  | default+hb | Marks an unselected option in a `MultiSelect` prompt          |
+| MarkedOption   | [x]  | cyan+b     | Marks a chosen selection in a `MultiSelect` prompt            |
 
 ## Testing
 
