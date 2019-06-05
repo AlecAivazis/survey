@@ -65,6 +65,7 @@ for the old `v1` version, see [here](https://godoc.org/gopkg.in/AlecAivazis/surv
 1. [Examples](#examples)
 1. [Prompts](#prompts)
    1. [Input](#input)
+   1. [MultiInput](#multiinput)
    1. [Multiline](#multiline)
    1. [Password](#password)
    1. [Confirm](#confirm)
@@ -105,6 +106,18 @@ prompt := &survey.Input{
     Message: "ping",
 }
 survey.AskOne(prompt, &name, nil)
+```
+
+### MultiInput
+
+<img src="" width="400px"/>
+
+```golang
+names := make([]string, 0)
+prompt := &survey.MultiInput{
+    Message: "Enter your friends names",
+}
+survey.AskOne(prompt, &names, nil)
 ```
 
 ### Multiline
