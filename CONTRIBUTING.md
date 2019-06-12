@@ -32,7 +32,7 @@ Bugs are tracked using the Github Issue tracker. When filing a bug, please remem
 
 ## Suggesting an API change
 
-If you have an idea, I'm more than happy to discuss it. Please open an issue labeled `Discussion` and we can work through it. In order to maintain some sense of stability, additions to the top-level API are taken just as seriously as changes that break it. Adding stuff is much easier than removing it.
+If you have an idea, I'm more than happy to discuss it. Please open an issue and we can work through it. In order to maintain some sense of stability, additions to the top-level API are taken just as seriously as changes that break it. Adding stuff is much easier than removing it.
 
 ## Submitting a contribution
 
