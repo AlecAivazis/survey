@@ -106,6 +106,113 @@ func TestWriteAnswer_canMutateStruct(t *testing.T) {
 	}
 }
 
+func TestWriteAnswer_optionAnswer(t *testing.T) {
+	t.Run("writes index for ints", func (t *testing.T) {
+		val := 0
+
+		// write a value to an existing field
+		err := WriteAnswer(&val, "", OptionAnswer{
+			Index: 10,
+			Value: "string value",
+		})
+
+		if err != nil {
+			t.Errorf("Encountered error while writing answer: %v", err.Error())
+			return
+		}
+
+		if val != 10 {
+			t.Errorf("Wrong value written. Wanted 10, got %v", val)
+			return
+		}
+	})
+
+	t.Run("writes OptionAnswer for OptionAnswer", func (t *testing.T) {
+		val := OptionAnswer{}
+
+		// write a value to an existing field
+		err := WriteAnswer(&val, "", OptionAnswer{
+			Index: 10,
+			Value: "string value",
+		})
+
+		if err != nil {
+			t.Errorf("Encountered error while writing answer: %v", err.Error())
+			return
+		}
+
+		if val.Index != 10 || val.Value != "string value" {
+			t.Errorf("Wrong internal values: %v", val)
+			return
+		}
+	})
+
+	t.Run("writes value for strings", func (t *testing.T) {
+		val := ""
+
+		// write a value to an existing field
+		err := WriteAnswer(&val, "", OptionAnswer{
+			Index: 10,
+			Value: "string value",
+		})
+
+		if err != nil {
+			t.Errorf("Encountered error while writing answer: %v", err.Error())
+			return
+		}
+
+		if val != "string value" {
+			t.Errorf("Wrong value written. Wanted \"100\", got %v", val)
+			return
+		}
+	})
+
+	t.Run("writes slice of indices for slice of ints", func (t *testing.T) {
+		val := []int{}
+
+		// write a value to an existing field
+		err := WriteAnswer(&val, "", []OptionAnswer{
+			{
+				Index: 10,
+				Value: "string value",
+			},
+		})
+
+		if err != nil {
+			t.Errorf("Encountered error while writing answer: %v", err.Error())
+			return
+		}
+
+		if len(val) != 1 || val[0] != 10 {
+			t.Errorf("Wrong value written. Wanted [10], got %v", val)
+			return
+		}
+	})
+
+	t.Run("writes slice of values for slice of strings", func (t *testing.T) {
+		val := []string{}
+
+		// write a value to an existing field
+		err := WriteAnswer(&val, "", []OptionAnswer{
+			{
+				Index: 10,
+				Value: "string value",
+			},
+		})
+
+		if err != nil {
+			t.Errorf("Encountered error while writing answer: %v", err.Error())
+			return
+		}
+
+
+		if len(val) != 1 || val[0] != "string value" {
+			t.Errorf("Wrong value written. Wanted [string value], got %v", val)
+			return
+		}
+	})
+}
+
 func TestWriteAnswer_canMutateMap(t *testing.T) {
 	// the map to hold the answer
 	ptr := make(map[string]interface{})

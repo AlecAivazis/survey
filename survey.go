@@ -47,14 +47,11 @@ func defaultAskOptions() *AskOptions {
 					Format: "cyan+b",
 				},
 			},
-			Filter: func(filter string, options []string) (answer []string) {
+			Filter: func(filter string, value string, index int) (include bool) {
 				filter = strings.ToLower(filter)
-				for _, o := range options {
-					if strings.Contains(strings.ToLower(o), filter) {
-						answer = append(answer, o)
-					}
-				}
-				return answer
+
+				// include this option if it matches
+				return strings.Contains(strings.ToLower(value), filter)
 			},
 		},
 	}
@@ -66,6 +63,9 @@ func defaultPromptConfig() *PromptConfig {
 func defaultIcons() *IconSet {
 	return &defaultPromptConfig().Icons
 }
+
+// OptionAnswer is an ergonomic alias for core.OptionAnswer
+type OptionAnswer = core.OptionAnswer
 
 // Icon holds the text and format to show for a particular icon
 type Icon struct {
@@ -109,7 +109,7 @@ type PromptConfig struct {
 	PageSize  int
 	Icons     IconSet
 	HelpInput string
-	Filter    func(filter string, options []string) (answer []string)
+	Filter    func(filter string, option string, index int) bool
 }
 
 // Prompt is the primary interface for the objects that can take user input
@@ -147,7 +147,7 @@ func WithStdio(in terminal.FileReader, out terminal.FileWriter, err io.Writer) A
 }
 
 // WithFilter specifies the default filter to use when asking questions.
-func WithFilter(filter func(filter string, options []string) (answer []string)) AskOpt {
+func WithFilter(filter func(filter string, value string, index int) (include bool)) AskOpt {
 	return func(options *AskOptions) error {
 		// save the filter internally
 		options.PromptConfig.Filter = filter
@@ -346,7 +346,7 @@ func Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
 
 // paginate returns a single page of choices given the page size, the total list of
 // possible choices, and the current selected index in the total list.
-func paginate(pageSize int, choices []string, sel int) ([]string, int) {
+func paginate(pageSize int, choices []core.OptionAnswer, sel int) ([]core.OptionAnswer, int) {
 	var start, end, cursor int
 
 	if len(choices) < pageSize {

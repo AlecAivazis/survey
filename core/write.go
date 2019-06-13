@@ -11,9 +11,24 @@ import (
 // the tag used to denote the name of the question
 const tagName = "survey"
 
-// add a few interfaces so users can configure how the prompt values are set
+// Settables allow for configuration when assigning answers
 type Settable interface {
 	WriteAnswer(field string, value interface{}) error
+}
+
+// OptionAnswer is the return type of Selects/MultiSelects that lets the appropriate information
+// get copied to the user's struct
+type OptionAnswer struct {
+	Value string
+	Index int
+}
+
+func OptionAnswerList(incoming []string) []OptionAnswer {
+	list := []OptionAnswer{}
+	for i, opt := range incoming {
+		list = append(list, OptionAnswer{Value: opt, Index: i})
+	}
+	return list
 }
 
 func WriteAnswer(t interface{}, name string, v interface{}) (err error) {
@@ -39,6 +54,13 @@ func WriteAnswer(t interface{}, name string, v interface{}) (err error) {
 	switch elem.Kind() {
 	// if we are writing to a struct
 	case reflect.Struct:
+		// if we are writing to an option answer than we want to treat
+		// it like a single thing and not a place to deposit answers
+		if elem.Type().Name() == "OptionAnswer" {
+			// copy the value over to the normal struct
+			return copy(elem, value)
+		}
+
 		// get the name of the field that matches the string we  were given
 		fieldIndex, err := findFieldIndex(elem, name)
 		// if something went wrong
@@ -210,6 +232,32 @@ func copy(t reflect.Value, v reflect.Value) (err error) {
 
 		t.Set(reflect.ValueOf(castVal))
 		return
+	}
+
+	// if we are copying from an OptionAnswer to something
+	if v.Type().Name() == "OptionAnswer" {
+		// copying an option answer to a string
+		if t.Kind() == reflect.String {
+			// copies the Value field of the struct
+			t.Set(reflect.ValueOf(v.FieldByName("Value").Interface()))
+			return
+		}
+
+		// copying an option answer to an int
+		if t.Kind() == reflect.Int {
+			// copies the Index field of the struct
+			t.Set(reflect.ValueOf(v.FieldByName("Index").Interface()))
+			return
+		}
+
+		// copying an OptionAnswer to an OptionAnswer
+		if t.Type().Name() == "OptionAnswer" {
+			t.Set(v)
+			return
+		}
+
+		// we're copying an option answer to an incorrect type
+		return fmt.Errorf("Unable to convert from OptionAnswer to type %s", t.Kind())
 	}
 
 	// if we are copying from one slice or array to another

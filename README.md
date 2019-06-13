@@ -187,6 +187,10 @@ prompt := &survey.Select{
 survey.AskOne(prompt, &color)
 ```
 
+Fields and values that come from a `Select` prompt can be one of two different things. If you pass an `int`
+the field will have the value of the selected index. If you instead pass a string, the string value selected
+will be written to the field.
+
 The user can also press `esc` to toggle the ability cycle through the options with the j and k keys to do down and up respectively.
 
 By default, the select prompt is limited to showing 7 options at a time
@@ -212,6 +216,10 @@ prompt := &survey.MultiSelect{
 }
 survey.AskOne(prompt, &days)
 ```
+
+Fields and values that come from a `MultiSelect` prompt can be one of two different things. If you pass an `int`
+the field will have a slice of the selected indices. If you instead pass a string, a slice of the string values
+selected will be written to the field.
 
 The user can also press `esc` to toggle the ability cycle through the options with the j and k keys to do down and up respectively.
 
@@ -252,15 +260,9 @@ is active. This will filter out all options that don't contain the typed string 
 A custom filter function can also be provided to change this behavior:
 
 ```golang
-func myFilter(filter string, options []string) ([]string) {
-    filtered := []string{}
-    for _, v := range result {
-        if len(v) >= 5 {
-            filtered = append(filtered, v)
-        }
-    }
-
-    return filtered
+func myFilter(filterValue string, optValue string, optIndex int) include bool {
+    // only include the option if it includes the filter and has length greater than 5
+    return strings.Contains(optValue, filterValue) && len(optValue) >= 5
 }
 
 // configure it for a specific prompt

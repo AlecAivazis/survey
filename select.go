@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/AlecAivazis/survey/v2/terminal"
+	"github.com/AlecAivazis/survey/v2/core"
 )
 
 /*
@@ -21,22 +22,23 @@ type Select struct {
 	Renderer
 	Message       string
 	Options       []string
-	Default       string
+	Default       interface{}
 	Help          string
 	PageSize      int
 	VimMode       bool
 	FilterMessage string
-	Filter        func(string, []string) []string
+	Filter        func(filter string, value string, index int) bool
 	filter        string
 	selectedIndex int
 	useDefault    bool
 	showingHelp   bool
 }
 
-// the data available to the templates when processing
+
+// SelectTemplateData is the data available to the templates when processing
 type SelectTemplateData struct {
 	Select
-	PageEntries   []string
+	PageEntries   []core.OptionAnswer
 	SelectedIndex int
 	Answer        string
 	ShowAnswer    bool
@@ -54,7 +56,7 @@ var SelectQuestionTemplate = `
   {{- "\n"}}
   {{- range $ix, $choice := .PageEntries}}
     {{- if eq $ix $.SelectedIndex }}{{color $.Config.Icons.SelectFocus.Format }}{{ $.Config.Icons.SelectFocus.Text }} {{else}}{{color "default+hb"}}  {{end}}
-    {{- $choice}}
+    {{- $choice.Value}}
     {{- color "reset"}}{{"\n"}}
   {{- end}}
 {{- end}}`
@@ -166,21 +168,35 @@ func (s *Select) OnChange(key rune, config *PromptConfig) bool {
 	return false
 }
 
-func (s *Select) filterOptions(config *PromptConfig) []string {
+func (s *Select) filterOptions(config *PromptConfig) []core.OptionAnswer {
+	// the filtered list
+	answers := []core.OptionAnswer{}
+
 	// if there is no filter applied
 	if s.filter == "" {
-		// return all of the options
-		return s.Options
+		return core.OptionAnswerList(s.Options)
 	}
 
-	// if we have a specific filter to apply
-	if s.Filter != nil {
-		// apply it
-		return s.Filter(s.filter, s.Options)
+
+	// the filter to apply
+	filter := s.Filter
+	if filter == nil {
+		filter = config.Filter
 	}
 
-	// otherwise use the default filter
-	return config.Filter(s.filter, s.Options)
+	//
+	for i, opt := range s.Options {
+		// i the filter says to include the option
+		if filter(s.filter, opt, i) {
+			answers = append(answers, core.OptionAnswer{
+				Index: i,
+				Value: opt,
+			})
+		}
+	}
+
+	// return the list of answers
+	return answers
 }
 
 func (s *Select) Prompt(config *PromptConfig) (interface{}, error) {
@@ -217,7 +233,7 @@ func (s *Select) Prompt(config *PromptConfig) (interface{}, error) {
 	}
 
 	// figure out the options and index to render
-	opts, idx := paginate(pageSize, s.Options, sel)
+	opts, idx := paginate(pageSize, core.OptionAnswerList(s.Options), sel)
 
 	// ask the question
 	err := s.Render(
@@ -264,23 +280,41 @@ func (s *Select) Prompt(config *PromptConfig) (interface{}, error) {
 	s.filter = ""
 	s.FilterMessage = ""
 
+	// the index to report
 	var val string
 	// if we are supposed to use the default value
 	if s.useDefault || s.selectedIndex >= len(options) {
 		// if there is a default value
-		if s.Default != "" {
-			// use the default value
-			val = s.Default
+		if s.Default != nil {
+			// if the default is a string
+			if defaultString, ok := s.Default.(string) ; ok {
+				// use the default value
+				val = defaultString
+			// the default value could also be an interpret which is interpretted as the index
+			} else if defaultIndex, ok := s.Default.(int) ; ok {
+				val = s.Options[defaultIndex]
+			} else {
+				return val, errors.New("default value of select must be an int or string")
+			}
 		} else if len(options) > 0 {
 			// there is no default value so use the first
-			val = options[0]
+			val = options[0].Value
 		}
 		// otherwise the selected index points to the value
 	} else if s.selectedIndex < len(options) {
 		// the
-		val = options[s.selectedIndex]
+		val = options[s.selectedIndex].Value
 	}
-	return val, err
+
+	// now that we have the value lets go hunt down the right index to return
+	idx = -1
+	for i, optionValue := range s.Options {
+		if optionValue == val {
+			idx = i
+		}
+	}
+
+	return core.OptionAnswer{Value: val, Index: idx}, err
 }
 
 func (s *Select) Cleanup(config *PromptConfig, val interface{}) error {
@@ -288,7 +322,7 @@ func (s *Select) Cleanup(config *PromptConfig, val interface{}) error {
 		SelectQuestionTemplate,
 		SelectTemplateData{
 			Select:     *s,
-			Answer:     val.(string),
+			Answer:     val.(core.OptionAnswer).Value,
 			ShowAnswer: true,
 			Config:     config,
 		},
