@@ -2,7 +2,7 @@ package survey
 
 import (
 	"errors"
-	"strings"
+	"fmt"
 
 	"github.com/AlecAivazis/survey/v2/terminal"
 	"github.com/AlecAivazis/survey/v2/core"
@@ -285,6 +285,14 @@ func (m *MultiSelect) Prompt(config *PromptConfig) (interface{}, error) {
 
 // Cleanup removes the options section, and renders the ask like a normal question.
 func (m *MultiSelect) Cleanup(config *PromptConfig, val interface{}) error {
+	// the answer to show
+	answer := ""
+	for _, ans := range val.([]core.OptionAnswer) {
+		answer = fmt.Sprintf("%s, %s", answer, ans.Value)
+	}
+	// remove the precending commas
+	answer = answer[2:]
+
 	// execute the output summary template with the answer
 	return m.Render(
 		MultiSelectQuestionTemplate,
@@ -292,7 +300,7 @@ func (m *MultiSelect) Cleanup(config *PromptConfig, val interface{}) error {
 			MultiSelect:   *m,
 			SelectedIndex: m.selectedIndex,
 			Checked:       m.checked,
-			Answer:        strings.Join(val.([]string), ", "),
+			Answer:        answer,
 			ShowAnswer:    true,
 			Config:        config,
 		},
