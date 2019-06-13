@@ -26,7 +26,7 @@ type OptionAnswer struct {
 func OptionAnswerList(incoming []string) []OptionAnswer {
 	list := []OptionAnswer{}
 	for i, opt := range incoming {
-		list = append(list, OptionAnswer{ Value: opt, Index: i })
+		list = append(list, OptionAnswer{Value: opt, Index: i})
 	}
 	return list
 }
@@ -54,6 +54,13 @@ func WriteAnswer(t interface{}, name string, v interface{}) (err error) {
 	switch elem.Kind() {
 	// if we are writing to a struct
 	case reflect.Struct:
+		// if we are writing to an option answer than we want to treat
+		// it like a single thing and not a place to deposit answers
+		if elem.Type().Name() == "OptionAnswer" {
+			// copy the value over to the normal struct
+			return copy(elem, value)
+		}
+
 		// get the name of the field that matches the string we  were given
 		fieldIndex, err := findFieldIndex(elem, name)
 		// if something went wrong
@@ -240,6 +247,12 @@ func copy(t reflect.Value, v reflect.Value) (err error) {
 		if t.Kind() == reflect.Int {
 			// copies the Index field of the struct
 			t.Set(reflect.ValueOf(v.FieldByName("Index").Interface()))
+			return
+		}
+
+		// copying an OptionAnswer to an OptionAnswer
+		if t.Type().Name() == "OptionAnswer" {
+			t.Set(v)
 			return
 		}
 

@@ -127,6 +127,26 @@ func TestWriteAnswer_optionAnswer(t *testing.T) {
 		}
 	})
 
+	t.Run("writes OptionAnswer for OptionAnswer", func (t *testing.T) {
+		val := OptionAnswer{}
+
+		// write a value to an existing field
+		err := WriteAnswer(&val, "", OptionAnswer{
+			Index: 10,
+			Value: "string value",
+		})
+
+		if err != nil {
+			t.Errorf("Encountered error while writing answer: %v", err.Error())
+			return
+		}
+
+		if val.Index != 10 || val.Value != "string value" {
+			t.Errorf("Wrong internal values: %v", val)
+			return
+		}
+	})
+
 	t.Run("writes value for strings", func (t *testing.T) {
 		val := ""
 
