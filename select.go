@@ -279,6 +279,8 @@ func (s *Select) Prompt(config *PromptConfig) (interface{}, error) {
 			// the default value could also be an interpret which is interpretted as the index
 			} else if defaultIndex, ok := s.Default.(int) ; ok {
 				val = s.Options[defaultIndex]
+			} else {
+				return val, errors.New("default value of select must be an int or string")
 			}
 		} else if len(options) > 0 {
 			// there is no default value so use the first
