@@ -242,10 +242,10 @@ func (m *MultiSelect) Prompt(config *PromptConfig) (interface{}, error) {
 	m.filter = ""
 	m.FilterMessage = ""
 
-	answers := []string{}
-	for _, option := range m.Options {
+	answers := []OptionAnswer{}
+	for i, option := range m.Options {
 		if val, ok := m.checked[option]; ok && val {
-			answers = append(answers, option)
+			answers = append(answers, OptionAnswer{Value: option, Index: i})
 		}
 	}
 

@@ -297,7 +297,6 @@ func (s *Select) Prompt(config *PromptConfig) (interface{}, error) {
 		}
 	}
 
-
 	return OptionAnswer{Value: val, Index: idx}, err
 }
 
