@@ -114,9 +114,11 @@ in this document will do both interchangeably:
 }
 
 // or define a default for the single call to `AskOne`
+// the answer will get written to the color variable
 survey.AskOne(prompt, &color, survey.WithValidator(survey.Required))
 
 // or define a default for every entry in a list of questions
+// the answer will get copied into the matching field of the struct. see above for an example
 survey.Ask([]*survey.Question{prompt}, &answers, survey.WithValidator(survey.Required))
 ```
 
