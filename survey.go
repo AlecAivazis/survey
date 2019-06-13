@@ -343,7 +343,7 @@ func Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
 
 // paginate returns a single page of choices given the page size, the total list of
 // possible choices, and the current selected index in the total list.
-func paginate(pageSize int, choices []string, sel int) ([]string, int) {
+func paginate(pageSize int, choices []core.OptionAnswer, sel int) ([]core.OptionAnswer, int) {
 	var start, end, cursor int
 
 	if len(choices) < pageSize {

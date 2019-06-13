@@ -43,7 +43,7 @@ type MultiSelectTemplateData struct {
 	Checked       map[int]bool
 	SelectedIndex int
 	ShowHelp      bool
-	PageEntries   []string
+	PageEntries   []core.OptionAnswer
 	Config        *PromptConfig
 }
 
@@ -59,7 +59,7 @@ var MultiSelectQuestionTemplate = `
     {{- if eq $ix $.SelectedIndex }}{{color $.Config.Icons.SelectFocus.Format }}{{ $.Config.Icons.SelectFocus.Text }}{{color "reset"}}{{else}} {{end}}
     {{- if index $.Checked $ix }}{{color $.Config.Icons.MarkedOption.Format }} {{ $.Config.Icons.MarkedOption.Text }} {{else}}{{color $.Config.Icons.UnmarkedOption.Format }} {{ $.Config.Icons.UnmarkedOption.Text }} {{end}}
     {{- color "reset"}}
-    {{- " "}}{{$option}}{{"\n"}}
+    {{- " "}}{{$option.Value}}{{"\n"}}
   {{- end}}
 {{- end}}`
 
@@ -88,15 +88,17 @@ func (m *MultiSelect) OnChange(key rune, config *PromptConfig) {
 		}
 		// if the user pressed down and there is room to move
 	} else if key == terminal.KeySpace {
-
+		// the option they have selected
 		if m.selectedIndex < len(options) {
+			selectedOpt := options[m.selectedIndex]
+
 			// if we haven't seen this index before
-			if old, ok := m.checked[m.selectedIndex]; !ok {
+			if old, ok := m.checked[selectedOpt.Index]; !ok {
 				// set the value to true
-				m.checked[m.selectedIndex] = true
+				m.checked[selectedOpt.Index] = true
 			} else {
 				// otherwise just invert the current value
-				m.checked[m.selectedIndex] = !old
+				m.checked[selectedOpt.Index] = !old
 			}
 			m.filter = ""
 		}
@@ -160,15 +162,8 @@ func (m *MultiSelect) filterOptions(config *PromptConfig) []core.OptionAnswer {
 
 	// if there is no filter applied
 	if m.filter == "" {
-		for i, opt := range m.Options {
-			answers = append(answers, core.OptionAnswer{
-				Value: opt,
-				Index: i,
-			})
-		}
-
 		// return all of the options
-		return answers
+		return core.OptionAnswerList(m.Options)
 	}
 
 
@@ -235,7 +230,8 @@ func (m *MultiSelect) Prompt(config *PromptConfig) (interface{}, error) {
 		pageSize = config.PageSize
 	}
 	// paginate the options
-	opts, idx := paginate(pageSize, m.Options, m.selectedIndex)
+	// build up a list of option answers
+	opts, idx := paginate(pageSize, core.OptionAnswerList(m.Options), m.selectedIndex)
 
 	cursor := m.NewCursor()
 	cursor.Hide()       // hide the cursor

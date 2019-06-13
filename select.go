@@ -38,7 +38,7 @@ type Select struct {
 // SelectTemplateData is the data available to the templates when processing
 type SelectTemplateData struct {
 	Select
-	PageEntries   []string
+	PageEntries   []core.OptionAnswer
 	SelectedIndex int
 	Answer        string
 	ShowAnswer    bool
@@ -56,7 +56,7 @@ var SelectQuestionTemplate = `
   {{- "\n"}}
   {{- range $ix, $choice := .PageEntries}}
     {{- if eq $ix $.SelectedIndex }}{{color $.Config.Icons.SelectFocus.Format }}{{ $.Config.Icons.SelectFocus.Text }} {{else}}{{color "default+hb"}}  {{end}}
-    {{- $choice}}
+    {{- $choice.Value}}
     {{- color "reset"}}{{"\n"}}
   {{- end}}
 {{- end}}`
@@ -174,15 +174,7 @@ func (s *Select) filterOptions(config *PromptConfig) []core.OptionAnswer {
 
 	// if there is no filter applied
 	if s.filter == "" {
-		for i, opt := range s.Options {
-			answers = append(answers, core.OptionAnswer{
-				Value: opt,
-				Index: i,
-			})
-		}
-
-		// return all of the options
-		return answers
+		return core.OptionAnswerList(s.Options)
 	}
 
 
@@ -241,7 +233,7 @@ func (s *Select) Prompt(config *PromptConfig) (interface{}, error) {
 	}
 
 	// figure out the options and index to render
-	opts, idx := paginate(pageSize, s.Options, sel)
+	opts, idx := paginate(pageSize, core.OptionAnswerList(s.Options), sel)
 
 	// ask the question
 	err := s.Render(
@@ -306,12 +298,12 @@ func (s *Select) Prompt(config *PromptConfig) (interface{}, error) {
 			}
 		} else if len(options) > 0 {
 			// there is no default value so use the first
-			val = options[0]
+			val = options[0].Value
 		}
 		// otherwise the selected index points to the value
 	} else if s.selectedIndex < len(options) {
 		// the
-		val = options[s.selectedIndex]
+		val = options[s.selectedIndex].Value
 	}
 
 	// now that we have the value lets go hunt down the right index to return

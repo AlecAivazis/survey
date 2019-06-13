@@ -40,7 +40,7 @@ func TestSelectRender(t *testing.T) {
 		{
 			"Test Select question output",
 			prompt,
-			SelectTemplateData{SelectedIndex: 2, PageEntries: prompt.Options},
+			SelectTemplateData{SelectedIndex: 2, PageEntries: core.OptionAnswerList(prompt.Options)},
 			strings.Join(
 				[]string{
 					fmt.Sprintf("%s Pick your word:  [Use arrows to move, space to select, type to filter]", defaultIcons().Question.Text),
@@ -55,13 +55,13 @@ func TestSelectRender(t *testing.T) {
 		{
 			"Test Select answer output",
 			prompt,
-			SelectTemplateData{Answer: "buz", ShowAnswer: true, PageEntries: prompt.Options},
+			SelectTemplateData{Answer: "buz", ShowAnswer: true, PageEntries: core.OptionAnswerList(prompt.Options)},
 			fmt.Sprintf("%s Pick your word: buz\n", defaultIcons().Question.Text),
 		},
 		{
 			"Test Select question output with help hidden",
 			helpfulPrompt,
-			SelectTemplateData{SelectedIndex: 2, PageEntries: prompt.Options},
+			SelectTemplateData{SelectedIndex: 2, PageEntries: core.OptionAnswerList(prompt.Options)},
 			strings.Join(
 				[]string{
 					fmt.Sprintf("%s Pick your word:  [Use arrows to move, space to select, type to filter, %s for more help]", defaultIcons().Question.Text, string(defaultPromptConfig().HelpInput)),
@@ -76,7 +76,7 @@ func TestSelectRender(t *testing.T) {
 		{
 			"Test Select question output with help shown",
 			helpfulPrompt,
-			SelectTemplateData{SelectedIndex: 2, ShowHelp: true, PageEntries: prompt.Options},
+			SelectTemplateData{SelectedIndex: 2, ShowHelp: true, PageEntries: core.OptionAnswerList(prompt.Options)},
 			strings.Join(
 				[]string{
 					fmt.Sprintf("%s This is helpful", defaultIcons().Help.Text),
@@ -278,13 +278,8 @@ func TestSelectPrompt(t *testing.T) {
 			&Select{
 				Message: "Choose a color:",
 				Options: []string{"red", "blue", "green"},
-				Filter: func(filter string, options []string) (filtered []string) {
-					for _, v := range options {
-						if len(v) >= 5 {
-							filtered = append(filtered, v)
-						}
-					}
-					return
+				Filter: func(filter string, optValue string, optIndex int) (filtered bool) {
+					return len(optValue) >= 5
 				},
 			},
 			func(c *expect.Console) {

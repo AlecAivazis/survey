@@ -42,7 +42,7 @@ func TestMultiSelectRender(t *testing.T) {
 			prompt,
 			MultiSelectTemplateData{
 				SelectedIndex: 2,
-				PageEntries:   prompt.Options,
+				PageEntries:   core.OptionAnswerList(prompt.Options),
 				Checked:       map[int]bool{1: true, 3: true},
 			},
 			strings.Join(
@@ -70,7 +70,7 @@ func TestMultiSelectRender(t *testing.T) {
 			helpfulPrompt,
 			MultiSelectTemplateData{
 				SelectedIndex: 2,
-				PageEntries:   prompt.Options,
+				PageEntries:   core.OptionAnswerList(prompt.Options),
 				Checked:       map[int]bool{1: true, 3: true},
 			},
 			strings.Join(
@@ -89,7 +89,7 @@ func TestMultiSelectRender(t *testing.T) {
 			helpfulPrompt,
 			MultiSelectTemplateData{
 				SelectedIndex: 2,
-				PageEntries:   prompt.Options,
+				PageEntries:   core.OptionAnswerList(prompt.Options),
 				Checked:       map[int]bool{1: true, 3: true},
 				ShowHelp:      true,
 			},
@@ -296,13 +296,8 @@ func TestMultiSelectPrompt(t *testing.T) {
 			&MultiSelect{
 				Message: "What days do you prefer:",
 				Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
-				Filter: func(filterValue string, options []string) (filtered []string) {
-					for _, opt := range options {
-						if strings.Contains(opt, filterValue) && len(opt) >= 7 {
-							filtered = append(filtered, opt)
-						}
-					}
-					return
+				Filter: func(filterValue string, optValue string, index int) bool {
+					return strings.Contains(optValue, filterValue) && len(optValue) >= 7
 				},
 			},
 			func(c *expect.Console) {

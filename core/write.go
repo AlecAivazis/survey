@@ -11,7 +11,7 @@ import (
 // the tag used to denote the name of the question
 const tagName = "survey"
 
-// add a few interfaces so users can configure how the prompt values are set
+// Settables allow for configuration when assigning answers
 type Settable interface {
 	WriteAnswer(field string, value interface{}) error
 }
@@ -21,6 +21,14 @@ type Settable interface {
 type OptionAnswer struct {
 	Value string
 	Index int
+}
+
+func OptionAnswerList(incoming []string) []OptionAnswer {
+	list := []OptionAnswer{}
+	for i, opt := range incoming {
+		list = append(list, OptionAnswer{ Value: opt, Index: i })
+	}
+	return list
 }
 
 func WriteAnswer(t interface{}, name string, v interface{}) (err error) {

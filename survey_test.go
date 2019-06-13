@@ -45,7 +45,7 @@ func RunPromptTest(t *testing.T, test PromptTest) {
 
 func TestPagination_tooFew(t *testing.T) {
 	// a small list of options
-	choices := []string{"choice1", "choice2", "choice3"}
+	choices := core.OptionAnswerList([]string{"choice1", "choice2", "choice3"})
 
 	// a page bigger than the total number
 	pageSize := 4
@@ -63,7 +63,7 @@ func TestPagination_tooFew(t *testing.T) {
 
 func TestPagination_firstHalf(t *testing.T) {
 	// the choices for the test
-	choices := []string{"choice1", "choice2", "choice3", "choice4", "choice5", "choice6"}
+	choices := core.OptionAnswerList([]string{"choice1", "choice2", "choice3", "choice4", "choice5", "choice6"})
 
 	// section the choices into groups of 4 so the choice is somewhere in the middle
 	// to verify there is no displacement of the page
@@ -82,7 +82,7 @@ func TestPagination_firstHalf(t *testing.T) {
 
 func TestPagination_middle(t *testing.T) {
 	// the choices for the test
-	choices := []string{"choice0", "choice1", "choice2", "choice3", "choice4", "choice5"}
+	choices := core.OptionAnswerList([]string{"choice0", "choice1", "choice2", "choice3", "choice4", "choice5"})
 
 	// section the choices into groups of 3
 	pageSize := 2
@@ -100,7 +100,7 @@ func TestPagination_middle(t *testing.T) {
 
 func TestPagination_lastHalf(t *testing.T) {
 	// the choices for the test
-	choices := []string{"choice0", "choice1", "choice2", "choice3", "choice4", "choice5"}
+	choices := core.OptionAnswerList([]string{"choice0", "choice1", "choice2", "choice3", "choice4", "choice5"})
 
 	// section the choices into groups of 3
 	pageSize := 3
