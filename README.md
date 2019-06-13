@@ -56,6 +56,8 @@ func main() {
 }
 ```
 
+NOTE: this page documents the upcoming `v2` release. For information on the current release, see [here](https://godoc.org/gopkg.in/AlecAivazis/survey.v1). 
+
 ## Table of Contents
 
 1. [Examples](#examples)
