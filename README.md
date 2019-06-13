@@ -106,7 +106,7 @@ possible to change survey's default behaviors by passing `AskOpts` to either `As
 in this document will do both interchangeably:
 
 ```golang
-&Select{
+prompt := &Select{
     Message: "Choose a color:",
     Options: []string{"red", "blue", "green"},
     // can pass a validator directly
@@ -118,8 +118,8 @@ in this document will do both interchangeably:
 survey.AskOne(prompt, &color, survey.WithValidator(survey.Required))
 
 // or define a default for every entry in a list of questions
-// the answer will get copied into the matching field of the struct. see above for an example
-survey.Ask([]*survey.Question{prompt}, &answers, survey.WithValidator(survey.Required))
+// the answer will get copied into the matching field of the struct as shown above
+survey.Ask(questions, &answers, survey.WithValidator(survey.Required))
 ```
 
 ## Prompts
