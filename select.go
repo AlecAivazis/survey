@@ -22,7 +22,7 @@ type Select struct {
 	Renderer
 	Message       string
 	Options       []string
-	Default       string
+	Default       interface{}
 	Help          string
 	PageSize      int
 	VimMode       bool
@@ -271,9 +271,15 @@ func (s *Select) Prompt(config *PromptConfig) (interface{}, error) {
 	// if we are supposed to use the default value
 	if s.useDefault || s.selectedIndex >= len(options) {
 		// if there is a default value
-		if s.Default != "" {
-			// use the default value
-			val = s.Default
+		if s.Default != nil {
+			// if the default is a string
+			if defaultString, ok := s.Default.(string) ; ok {
+				// use the default value
+				val = defaultString
+			// the default value could also be an interpret which is interpretted as the index
+			} else if defaultIndex, ok := s.Default.(int) ; ok {
+				val = s.Options[defaultIndex]
+			}
 		} else if len(options) > 0 {
 			// there is no default value so use the first
 			val = options[0]

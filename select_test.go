@@ -121,7 +121,7 @@ func TestSelectRender(t *testing.T) {
 func TestSelectPrompt(t *testing.T) {
 	tests := []PromptTest{
 		{
-			"Test Select prompt interaction",
+			"basic interaction",
 			&Select{
 				Message: "Choose a color:",
 				Options: []string{"red", "blue", "green"},
@@ -135,7 +135,7 @@ func TestSelectPrompt(t *testing.T) {
 			core.OptionAnswer{Index: 1, Value: "blue"},
 		},
 		{
-			"Test Select prompt interaction with default",
+			"default value",
 			&Select{
 				Message: "Choose a color:",
 				Options: []string{"red", "blue", "green"},
@@ -150,7 +150,22 @@ func TestSelectPrompt(t *testing.T) {
 			core.OptionAnswer{Index: 2, Value: "green"},
 		},
 		{
-			"Test Select prompt interaction overriding default",
+			"default index",
+			&Select{
+				Message: "Choose a color:",
+				Options: []string{"red", "blue", "green"},
+				Default: 2,
+			},
+			func(c *expect.Console) {
+				c.ExpectString("Choose a color:")
+				// Select green.
+				c.SendLine("")
+				c.ExpectEOF()
+			},
+			core.OptionAnswer{Index: 2, Value: "green"},
+		},
+		{
+			"overriding default",
 			&Select{
 				Message: "Choose a color:",
 				Options: []string{"red", "blue", "green"},
@@ -165,7 +180,7 @@ func TestSelectPrompt(t *testing.T) {
 			core.OptionAnswer{Index: 0, Value: "red"},
 		},
 		{
-			"Test Select prompt interaction and prompt for help",
+			"prompt for help",
 			&Select{
 				Message: "Choose a color:",
 				Options: []string{"red", "blue", "green"},
@@ -182,7 +197,7 @@ func TestSelectPrompt(t *testing.T) {
 			core.OptionAnswer{Index: 0, Value: "red"},
 		},
 		{
-			"Test Select prompt interaction with page size",
+			"PageSize",
 			&Select{
 				Message:  "Choose a color:",
 				Options:  []string{"red", "blue", "green"},
@@ -197,7 +212,7 @@ func TestSelectPrompt(t *testing.T) {
 			core.OptionAnswer{Index: 2, Value: "green"},
 		},
 		{
-			"Test Select prompt interaction with vim mode",
+			"vim mode",
 			&Select{
 				Message: "Choose a color:",
 				Options: []string{"red", "blue", "green"},
@@ -212,7 +227,7 @@ func TestSelectPrompt(t *testing.T) {
 			core.OptionAnswer{Index: 1, Value: "blue"},
 		},
 		{
-			"Test Select prompt interaction with filter",
+			"filter",
 			&Select{
 				Message: "Choose a color:",
 				Options: []string{"red", "blue", "green"},
@@ -228,7 +243,7 @@ func TestSelectPrompt(t *testing.T) {
 			core.OptionAnswer{Index: 2, Value: "green"},
 		},
 		{
-			"Test Select prompt interaction with filter is case-insensitive",
+			"filter is case-insensitive",
 			&Select{
 				Message: "Choose a color:",
 				Options: []string{"red", "blue", "green"},
@@ -259,7 +274,7 @@ func TestSelectPrompt(t *testing.T) {
 			core.OptionAnswer{Index: 0, Value: "red"},
 		},
 		{
-			"Test Select prompt interaction with custom filter",
+			"custom filter",
 			&Select{
 				Message: "Choose a color:",
 				Options: []string{"red", "blue", "green"},
@@ -281,7 +296,7 @@ func TestSelectPrompt(t *testing.T) {
 			core.OptionAnswer{Index: 2, Value: "green"},
 		},
 		{
-			"Test Select prompt with answers filtered out",
+			"answers filtered out",
 			&Select{
 				Message: "Choose a color:",
 				Options: []string{"red", "blue", "green"},
