@@ -64,6 +64,9 @@ func defaultIcons() *IconSet {
 	return &defaultPromptConfig().Icons
 }
 
+// OptionAnswer is an ergonomic alias for core.OptionAnswer
+type OptionAnswer = core.OptionAnswer
+
 // Icon holds the text and format to show for a particular icon
 type Icon struct {
 	Text   string
