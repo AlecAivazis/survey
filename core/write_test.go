@@ -106,6 +106,49 @@ func TestWriteAnswer_canMutateStruct(t *testing.T) {
 	}
 }
 
+func TestWriteAnswer_optionAnswer(t *testing.T) {
+
+	t.Run("writes index for ints", func (t *testing.T) {
+		val := 0
+
+		// write a value to an existing field
+		err := WriteAnswer(&val, "", OptionAnswer{
+			Index: 10,
+			Value: "string value",
+		})
+
+		if err != nil {
+			t.Errorf("Encountered error while writing answer: %v", err.Error())
+			return
+		}
+
+		if val != 10 {
+			t.Errorf("Wrong value written. Wanted 10, got %v", val)
+			return
+		}
+	})
+
+	t.Run("writes value for strings", func (t *testing.T) {
+		val := ""
+
+		// write a value to an existing field
+		err := WriteAnswer(&val, "", OptionAnswer{
+			Index: 10,
+			Value: "string value",
+		})
+
+		if err != nil {
+			t.Errorf("Encountered error while writing answer: %v", err.Error())
+			return
+		}
+
+		if val != "string value" {
+			t.Errorf("Wrong value written. Wanted \"100\", got %v", val)
+			return
+		}
+	})
+}
+
 func TestWriteAnswer_canMutateMap(t *testing.T) {
 	// the map to hold the answer
 	ptr := make(map[string]interface{})

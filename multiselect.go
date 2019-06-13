@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/AlecAivazis/survey/v2/terminal"
+	"github.com/AlecAivazis/survey/v2/core"
 )
 
 /*
@@ -242,10 +243,10 @@ func (m *MultiSelect) Prompt(config *PromptConfig) (interface{}, error) {
 	m.filter = ""
 	m.FilterMessage = ""
 
-	answers := []OptionAnswer{}
+	answers := []core.OptionAnswer{}
 	for i, option := range m.Options {
 		if val, ok := m.checked[option]; ok && val {
-			answers = append(answers, OptionAnswer{Value: option, Index: i})
+			answers = append(answers, core.OptionAnswer{Value: option, Index: i})
 		}
 	}
 

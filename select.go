@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/AlecAivazis/survey/v2/terminal"
+	"github.com/AlecAivazis/survey/v2/core"
 )
 
 /*
@@ -33,12 +34,6 @@ type Select struct {
 	showingHelp   bool
 }
 
-// OptionAnswer is the return type of Selects/MultiSelects that lets the appropriate information
-// get copied to the user's struct
-type OptionAnswer struct {
-	Value string
-	Index int
-}
 
 // SelectTemplateData is the data available to the templates when processing
 type SelectTemplateData struct {
@@ -297,7 +292,7 @@ func (s *Select) Prompt(config *PromptConfig) (interface{}, error) {
 		}
 	}
 
-	return OptionAnswer{Value: val, Index: idx}, err
+	return core.OptionAnswer{Value: val, Index: idx}, err
 }
 
 func (s *Select) Cleanup(config *PromptConfig, val interface{}) error {

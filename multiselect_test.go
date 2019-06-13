@@ -146,7 +146,7 @@ func TestMultiSelectPrompt(t *testing.T) {
 				c.SendLine(" ")
 				c.ExpectEOF()
 			},
-			[]OptionAnswer{OptionAnswer{Value: "Monday", Index: 1}},
+			[]core.OptionAnswer{core.OptionAnswer{Value: "Monday", Index: 1}},
 		},
 		{
 			"Test MultiSelect prompt interaction with default",
@@ -160,9 +160,9 @@ func TestMultiSelectPrompt(t *testing.T) {
 				c.SendLine("")
 				c.ExpectEOF()
 			},
-			[]OptionAnswer{
-				OptionAnswer{Value: "Tuesday", Index: 2},
-				OptionAnswer{Value: "Thursday", Index: 4},
+			[]core.OptionAnswer{
+				core.OptionAnswer{Value: "Tuesday", Index: 2},
+				core.OptionAnswer{Value: "Thursday", Index: 4},
 			},
 		},
 		{
@@ -180,7 +180,7 @@ func TestMultiSelectPrompt(t *testing.T) {
 				c.SendLine(" ")
 				c.ExpectEOF()
 			},
-			[]OptionAnswer{OptionAnswer{Value: "Thursday", Index: 4}},
+			[]core.OptionAnswer{core.OptionAnswer{Value: "Thursday", Index: 4}},
 		},
 		{
 			"Test MultiSelect prompt interaction and prompt for help",
@@ -198,7 +198,7 @@ func TestMultiSelectPrompt(t *testing.T) {
 				c.SendLine(" ")
 				c.ExpectEOF()
 			},
-			[]OptionAnswer{OptionAnswer{Value: "Saturday", Index: 6}},
+			[]core.OptionAnswer{core.OptionAnswer{Value: "Saturday", Index: 6}},
 		},
 		{
 			"Test MultiSelect prompt interaction with page size",
@@ -214,7 +214,7 @@ func TestMultiSelectPrompt(t *testing.T) {
 				c.SendLine(" ")
 				c.ExpectEOF()
 			},
-			[]OptionAnswer{OptionAnswer{Value: "Monday", Index: 1}},
+			[]core.OptionAnswer{core.OptionAnswer{Value: "Monday", Index: 1}},
 		},
 		{
 			"Test MultiSelect prompt interaction with vim mode",
@@ -234,10 +234,10 @@ func TestMultiSelectPrompt(t *testing.T) {
 				c.SendLine("")
 				c.ExpectEOF()
 			},
-			[]OptionAnswer{
-				OptionAnswer{Value: "Tuesday", Index: 2},
-				OptionAnswer{Value: "Thursday", Index: 4},
-				OptionAnswer{Value: "Saturday", Index: 6},
+			[]core.OptionAnswer{
+				core.OptionAnswer{Value: "Tuesday", Index: 2},
+				core.OptionAnswer{Value: "Thursday", Index: 4},
+				core.OptionAnswer{Value: "Saturday", Index: 6},
 			},
 		},
 		{
@@ -255,7 +255,7 @@ func TestMultiSelectPrompt(t *testing.T) {
 				c.SendLine("")
 				c.ExpectEOF()
 			},
-			[]OptionAnswer{OptionAnswer{Value: "Tuesday", Index: 2}},
+			[]core.OptionAnswer{core.OptionAnswer{Value: "Tuesday", Index: 2}},
 		},
 		{
 			"Test MultiSelect prompt interaction with filter is case-insensitive",
@@ -272,7 +272,7 @@ func TestMultiSelectPrompt(t *testing.T) {
 				c.SendLine("")
 				c.ExpectEOF()
 			},
-			[]OptionAnswer{OptionAnswer{Value: "Tuesday", Index: 2}},
+			[]core.OptionAnswer{core.OptionAnswer{Value: "Tuesday", Index: 2}},
 		},
 		{
 			"Test MultiSelect prompt interaction with custom filter",
@@ -297,7 +297,7 @@ func TestMultiSelectPrompt(t *testing.T) {
 				c.SendLine(" ")
 				c.ExpectEOF()
 			},
-			[]OptionAnswer{OptionAnswer{Value: "Wednesday", Index: 3}},
+			[]core.OptionAnswer{core.OptionAnswer{Value: "Wednesday", Index: 3}},
 		},
 		{
 			"Test MultiSelect clears input on select",
@@ -318,7 +318,7 @@ func TestMultiSelectPrompt(t *testing.T) {
 				c.SendLine("")
 				c.ExpectEOF()
 			},
-			[]OptionAnswer{},
+			[]core.OptionAnswer{},
 		},
 	}
 

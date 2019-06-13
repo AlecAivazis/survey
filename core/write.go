@@ -16,6 +16,13 @@ type Settable interface {
 	WriteAnswer(field string, value interface{}) error
 }
 
+// OptionAnswer is the return type of Selects/MultiSelects that lets the appropriate information
+// get copied to the user's struct
+type OptionAnswer struct {
+	Value string
+	Index int
+}
+
 func WriteAnswer(t interface{}, name string, v interface{}) (err error) {
 	// if the field is a custom type
 	if s, ok := t.(Settable); ok {
@@ -210,6 +217,26 @@ func copy(t reflect.Value, v reflect.Value) (err error) {
 
 		t.Set(reflect.ValueOf(castVal))
 		return
+	}
+
+	// if we are copying from an OptionAnswer to something
+	if v.Type().Name() == "OptionAnswer" {
+		// copying an option answer to a string
+		if t.Kind() == reflect.String {
+			// copies the Value field of the struct
+			t.Set(reflect.ValueOf(v.FieldByName("Value").Interface()))
+			return
+		}
+
+		// copying an option answer to an int
+		if t.Kind() == reflect.Int {
+			// copies the Index field of the struct
+			t.Set(reflect.ValueOf(v.FieldByName("Index").Interface()))
+			return
+		}
+
+		// we're copying an option answer to an incorrect type
+		return fmt.Errorf("Unable to convert from OptionAnswer to type %s", t.Kind())
 	}
 
 	// if we are copying from one slice or array to another
