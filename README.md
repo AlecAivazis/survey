@@ -260,7 +260,7 @@ A custom filter function can also be provided to change this behavior:
 ```golang
 func myFilter(filterValue string, optValue string, optIndex int) include bool {
     // only include the option if it includes the filter and has length greater than 5
-    return strings.Contains(optValue, filter) && len(optValue) >= 5
+    return strings.Contains(optValue, filterValue) && len(optValue) >= 5
 }
 
 // configure it for a specific prompt
