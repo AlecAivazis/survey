@@ -322,7 +322,7 @@ func (s *Select) Cleanup(config *PromptConfig, val interface{}) error {
 		SelectQuestionTemplate,
 		SelectTemplateData{
 			Select:     *s,
-			Answer:     val.(string),
+			Answer:     val.(core.OptionAnswer).Value,
 			ShowAnswer: true,
 			Config:     config,
 		},
