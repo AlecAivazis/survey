@@ -27,7 +27,7 @@ type Select struct {
 	PageSize      int
 	VimMode       bool
 	FilterMessage string
-	Filter        func(string, []string) []string
+	Filter        func(filter string, value string, index int) bool
 	filter        string
 	selectedIndex int
 	useDefault    bool
@@ -168,21 +168,43 @@ func (s *Select) OnChange(key rune, config *PromptConfig) bool {
 	return false
 }
 
-func (s *Select) filterOptions(config *PromptConfig) []string {
+func (s *Select) filterOptions(config *PromptConfig) []core.OptionAnswer {
+	// the filtered list
+	answers := []core.OptionAnswer{}
+
 	// if there is no filter applied
 	if s.filter == "" {
+		for i, opt := range s.Options {
+			answers = append(answers, core.OptionAnswer{
+				Value: opt,
+				Index: i,
+			})
+		}
+
 		// return all of the options
-		return s.Options
+		return answers
 	}
 
-	// if we have a specific filter to apply
-	if s.Filter != nil {
-		// apply it
-		return s.Filter(s.filter, s.Options)
+
+	// the filter to apply
+	filter := s.Filter
+	if filter == nil {
+		filter = config.Filter
 	}
 
-	// otherwise use the default filter
-	return config.Filter(s.filter, s.Options)
+	//
+	for i, opt := range s.Options {
+		// i the filter says to include the option
+		if filter(s.filter, opt, i) {
+			answers = append(answers, core.OptionAnswer{
+				Index: i,
+				Value: opt,
+			})
+		}
+	}
+
+	// return the list of answers
+	return answers
 }
 
 func (s *Select) Prompt(config *PromptConfig) (interface{}, error) {

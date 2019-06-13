@@ -38,12 +38,12 @@ func TestMultiSelectRender(t *testing.T) {
 		expected string
 	}{
 		{
-			"Test MultiSelect question output",
+			"question output",
 			prompt,
 			MultiSelectTemplateData{
 				SelectedIndex: 2,
 				PageEntries:   prompt.Options,
-				Checked:       map[string]bool{"bar": true, "buz": true},
+				Checked:       map[int]bool{1: true, 3: true},
 			},
 			strings.Join(
 				[]string{
@@ -57,7 +57,7 @@ func TestMultiSelectRender(t *testing.T) {
 			),
 		},
 		{
-			"Test MultiSelect answer output",
+			"answer output",
 			prompt,
 			MultiSelectTemplateData{
 				Answer:     "foo, buz",
@@ -66,12 +66,12 @@ func TestMultiSelectRender(t *testing.T) {
 			fmt.Sprintf("%s Pick your words: foo, buz\n", defaultIcons().Question.Text),
 		},
 		{
-			"Test MultiSelect question output with help hidden",
+			"help hidden",
 			helpfulPrompt,
 			MultiSelectTemplateData{
 				SelectedIndex: 2,
 				PageEntries:   prompt.Options,
-				Checked:       map[string]bool{"bar": true, "buz": true},
+				Checked:       map[int]bool{1: true, 3: true},
 			},
 			strings.Join(
 				[]string{
@@ -85,12 +85,12 @@ func TestMultiSelectRender(t *testing.T) {
 			),
 		},
 		{
-			"Test MultiSelect question output with help shown",
+			"question outputhelp shown",
 			helpfulPrompt,
 			MultiSelectTemplateData{
 				SelectedIndex: 2,
 				PageEntries:   prompt.Options,
-				Checked:       map[string]bool{"bar": true, "buz": true},
+				Checked:       map[int]bool{1: true, 3: true},
 				ShowHelp:      true,
 			},
 			strings.Join(
@@ -134,7 +134,7 @@ func TestMultiSelectRender(t *testing.T) {
 func TestMultiSelectPrompt(t *testing.T) {
 	tests := []PromptTest{
 		{
-			"Test MultiSelect prompt interaction",
+			"basic interaction",
 			&MultiSelect{
 				Message: "What days do you prefer:",
 				Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
@@ -149,7 +149,7 @@ func TestMultiSelectPrompt(t *testing.T) {
 			[]core.OptionAnswer{core.OptionAnswer{Value: "Monday", Index: 1}},
 		},
 		{
-			"Test MultiSelect prompt interaction with default",
+			"default value as []string",
 			&MultiSelect{
 				Message: "What days do you prefer:",
 				Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
@@ -166,7 +166,24 @@ func TestMultiSelectPrompt(t *testing.T) {
 			},
 		},
 		{
-			"Test MultiSelect prompt interaction overriding default",
+			"default value as []int",
+			&MultiSelect{
+				Message: "What days do you prefer:",
+				Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
+				Default: []int{2, 4},
+			},
+			func(c *expect.Console) {
+				c.ExpectString("What days do you prefer:  [Use arrows to move, space to select, type to filter]")
+				c.SendLine("")
+				c.ExpectEOF()
+			},
+			[]core.OptionAnswer{
+				core.OptionAnswer{Value: "Tuesday", Index: 2},
+				core.OptionAnswer{Value: "Thursday", Index: 4},
+			},
+		},
+		{
+			"overriding default",
 			&MultiSelect{
 				Message: "What days do you prefer:",
 				Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
@@ -183,7 +200,7 @@ func TestMultiSelectPrompt(t *testing.T) {
 			[]core.OptionAnswer{core.OptionAnswer{Value: "Thursday", Index: 4}},
 		},
 		{
-			"Test MultiSelect prompt interaction and prompt for help",
+			"prompt for help",
 			&MultiSelect{
 				Message: "What days do you prefer:",
 				Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
@@ -201,7 +218,7 @@ func TestMultiSelectPrompt(t *testing.T) {
 			[]core.OptionAnswer{core.OptionAnswer{Value: "Saturday", Index: 6}},
 		},
 		{
-			"Test MultiSelect prompt interaction with page size",
+			"page size",
 			&MultiSelect{
 				Message:  "What days do you prefer:",
 				Options:  []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
@@ -217,7 +234,7 @@ func TestMultiSelectPrompt(t *testing.T) {
 			[]core.OptionAnswer{core.OptionAnswer{Value: "Monday", Index: 1}},
 		},
 		{
-			"Test MultiSelect prompt interaction with vim mode",
+			"vim mode",
 			&MultiSelect{
 				Message: "What days do you prefer:",
 				Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
@@ -241,7 +258,7 @@ func TestMultiSelectPrompt(t *testing.T) {
 			},
 		},
 		{
-			"Test MultiSelect prompt interaction with filter",
+			"filter interaction",
 			&MultiSelect{
 				Message: "What days do you prefer:",
 				Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
@@ -258,7 +275,7 @@ func TestMultiSelectPrompt(t *testing.T) {
 			[]core.OptionAnswer{core.OptionAnswer{Value: "Tuesday", Index: 2}},
 		},
 		{
-			"Test MultiSelect prompt interaction with filter is case-insensitive",
+			"filter is case-insensitive",
 			&MultiSelect{
 				Message: "What days do you prefer:",
 				Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
@@ -275,14 +292,14 @@ func TestMultiSelectPrompt(t *testing.T) {
 			[]core.OptionAnswer{core.OptionAnswer{Value: "Tuesday", Index: 2}},
 		},
 		{
-			"Test MultiSelect prompt interaction with custom filter",
+			"custom filter",
 			&MultiSelect{
 				Message: "What days do you prefer:",
 				Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
-				Filter: func(filter string, options []string) (filtered []string) {
-					for _, v := range options {
-						if len(v) >= 7 {
-							filtered = append(filtered, v)
+				Filter: func(filterValue string, options []string) (filtered []string) {
+					for _, opt := range options {
+						if strings.Contains(opt, filterValue) && len(opt) >= 7 {
+							filtered = append(filtered, opt)
 						}
 					}
 					return
@@ -300,7 +317,7 @@ func TestMultiSelectPrompt(t *testing.T) {
 			[]core.OptionAnswer{core.OptionAnswer{Value: "Wednesday", Index: 3}},
 		},
 		{
-			"Test MultiSelect clears input on select",
+			"clears input on select",
 			&MultiSelect{
 				Message: "What days do you prefer:",
 				Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},

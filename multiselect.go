@@ -23,15 +23,15 @@ type MultiSelect struct {
 	Renderer
 	Message       string
 	Options       []string
-	Default       []string
+	Default       interface{}
 	Help          string
 	PageSize      int
 	VimMode       bool
 	FilterMessage string
-	Filter        func(string, []string) []string
+	Filter        func(filter string, value string, index int) bool
 	filter        string
 	selectedIndex int
-	checked       map[string]bool
+	checked       map[int]bool
 	showingHelp   bool
 }
 
@@ -40,7 +40,7 @@ type MultiSelectTemplateData struct {
 	MultiSelect
 	Answer        string
 	ShowAnswer    bool
-	Checked       map[string]bool
+	Checked       map[int]bool
 	SelectedIndex int
 	ShowHelp      bool
 	PageEntries   []string
@@ -57,7 +57,7 @@ var MultiSelectQuestionTemplate = `
   {{- "\n"}}
   {{- range $ix, $option := .PageEntries}}
     {{- if eq $ix $.SelectedIndex }}{{color $.Config.Icons.SelectFocus.Format }}{{ $.Config.Icons.SelectFocus.Text }}{{color "reset"}}{{else}} {{end}}
-    {{- if index $.Checked $option }}{{color $.Config.Icons.MarkedOption.Format }} {{ $.Config.Icons.MarkedOption.Text }} {{else}}{{color $.Config.Icons.UnmarkedOption.Format }} {{ $.Config.Icons.UnmarkedOption.Text }} {{end}}
+    {{- if index $.Checked $ix }}{{color $.Config.Icons.MarkedOption.Format }} {{ $.Config.Icons.MarkedOption.Text }} {{else}}{{color $.Config.Icons.UnmarkedOption.Format }} {{ $.Config.Icons.UnmarkedOption.Text }} {{end}}
     {{- color "reset"}}
     {{- " "}}{{$option}}{{"\n"}}
   {{- end}}
@@ -88,13 +88,15 @@ func (m *MultiSelect) OnChange(key rune, config *PromptConfig) {
 		}
 		// if the user pressed down and there is room to move
 	} else if key == terminal.KeySpace {
+
 		if m.selectedIndex < len(options) {
-			if old, ok := m.checked[options[m.selectedIndex]]; !ok {
-				// otherwise just invert the current value
-				m.checked[options[m.selectedIndex]] = true
+			// if we haven't seen this index before
+			if old, ok := m.checked[m.selectedIndex]; !ok {
+				// set the value to true
+				m.checked[m.selectedIndex] = true
 			} else {
 				// otherwise just invert the current value
-				m.checked[options[m.selectedIndex]] = !old
+				m.checked[m.selectedIndex] = !old
 			}
 			m.filter = ""
 		}
@@ -152,37 +154,69 @@ func (m *MultiSelect) OnChange(key rune, config *PromptConfig) {
 	)
 }
 
-func (m *MultiSelect) filterOptions(config *PromptConfig) []string {
+func (m *MultiSelect) filterOptions(config *PromptConfig) []core.OptionAnswer {
+	// the filtered list
+	answers := []core.OptionAnswer{}
+
 	// if there is no filter applied
 	if m.filter == "" {
+		for i, opt := range m.Options {
+			answers = append(answers, core.OptionAnswer{
+				Value: opt,
+				Index: i,
+			})
+		}
+
 		// return all of the options
-		return m.Options
+		return answers
 	}
 
-	// if we have a specific filter to apply
-	if m.Filter != nil {
-		// apply it
-		return m.Filter(m.filter, m.Options)
+
+	// the filter to apply
+	filter := m.Filter
+	if filter == nil {
+		filter = config.Filter
 	}
 
-	// otherwise use the default filter
-	return config.Filter(m.filter, m.Options)
+	// apply the filter to each option
+	for i, opt := range m.Options {
+		// i the filter says to include the option
+		if filter(m.filter, opt, i) {
+			answers = append(answers, core.OptionAnswer{
+				Index: i,
+				Value: opt,
+			})
+		}
+	}
+
+	// we're done here
+	return answers
 }
 
 func (m *MultiSelect) Prompt(config *PromptConfig) (interface{}, error) {
 	// compute the default state
-	m.checked = make(map[string]bool)
+	m.checked = make(map[int]bool)
 	// if there is a default
-	if len(m.Default) > 0 {
-		for _, dflt := range m.Default {
-			for _, opt := range m.Options {
-				// if the option corresponds to the default
-				if opt == dflt {
-					// we found our initial value
-					m.checked[opt] = true
-					// stop looking
-					break
+	if m.Default != nil {
+		// if the default is string values
+		if defaultValues, ok := m.Default.([]string) ; ok {
+			for _, dflt := range defaultValues {
+				for i, opt := range m.Options {
+					// if the option corresponds to the default
+					if opt == dflt {
+						// we found our initial value
+						m.checked[i] = true
+						// stop looking
+						break
+					}
 				}
+			}
+		// if the default value is index values
+		} else if defaultIndices, ok := m.Default.([]int) ; ok {
+			// go over every index we need to enable by default
+			for _, idx := range defaultIndices {
+				// and enable it
+				m.checked[idx] = true
 			}
 		}
 	}
@@ -245,7 +279,7 @@ func (m *MultiSelect) Prompt(config *PromptConfig) (interface{}, error) {
 
 	answers := []core.OptionAnswer{}
 	for i, option := range m.Options {
-		if val, ok := m.checked[option]; ok && val {
+		if val, ok := m.checked[i]; ok && val {
 			answers = append(answers, core.OptionAnswer{Value: option, Index: i})
 		}
 	}

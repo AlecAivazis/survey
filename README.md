@@ -258,15 +258,9 @@ is active. This will filter out all options that don't contain the typed string 
 A custom filter function can also be provided to change this behavior:
 
 ```golang
-func myFilter(filter string, options []string) ([]string) {
-    filtered := []string{}
-    for _, v := range result {
-        if len(v) >= 5 {
-            filtered = append(filtered, v)
-        }
-    }
-
-    return filtered
+func myFilter(filterValue string, optValue string, optIndex int) include bool {
+    // only include the option if it includes the filter and has length greater than 5
+    return strings.Contains(optValue, filter) && len(optValue) >= 5
 }
 
 // configure it for a specific prompt
