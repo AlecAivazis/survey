@@ -33,7 +33,14 @@ type Select struct {
 	showingHelp   bool
 }
 
-// the data available to the templates when processing
+// OptionAnswer is the return type of Selects/MultiSelects that lets the appropriate information
+// get copied to the user's struct
+type OptionAnswer struct {
+	Value string
+	Index int
+}
+
+// SelectTemplateData is the data available to the templates when processing
 type SelectTemplateData struct {
 	Select
 	PageEntries   []string
@@ -264,6 +271,7 @@ func (s *Select) Prompt(config *PromptConfig) (interface{}, error) {
 	s.filter = ""
 	s.FilterMessage = ""
 
+	// the index to report
 	var val string
 	// if we are supposed to use the default value
 	if s.useDefault || s.selectedIndex >= len(options) {
@@ -280,7 +288,17 @@ func (s *Select) Prompt(config *PromptConfig) (interface{}, error) {
 		// the
 		val = options[s.selectedIndex]
 	}
-	return val, err
+
+	// now that we have the value lets go hunt down the right index to return
+	idx = -1
+	for i, optionValue := range s.Options {
+		if optionValue == val {
+			idx = i
+		}
+	}
+
+
+	return OptionAnswer{Value: val, Index: idx}, err
 }
 
 func (s *Select) Cleanup(config *PromptConfig, val interface{}) error {

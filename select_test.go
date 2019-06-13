@@ -132,7 +132,7 @@ func TestSelectPrompt(t *testing.T) {
 				c.SendLine(string(terminal.KeyArrowDown))
 				c.ExpectEOF()
 			},
-			"blue",
+			OptionAnswer{Index: 1, Value: "blue"},
 		},
 		{
 			"Test Select prompt interaction with default",
@@ -147,7 +147,7 @@ func TestSelectPrompt(t *testing.T) {
 				c.SendLine("")
 				c.ExpectEOF()
 			},
-			"green",
+			OptionAnswer{Index: 2, Value: "green"},
 		},
 		{
 			"Test Select prompt interaction overriding default",
@@ -162,7 +162,7 @@ func TestSelectPrompt(t *testing.T) {
 				c.SendLine(string(terminal.KeyArrowUp))
 				c.ExpectEOF()
 			},
-			"red",
+			OptionAnswer{Index: 0, Value: "red"},
 		},
 		{
 			"Test Select prompt interaction and prompt for help",
@@ -179,7 +179,7 @@ func TestSelectPrompt(t *testing.T) {
 				c.SendLine("")
 				c.ExpectEOF()
 			},
-			"red",
+			OptionAnswer{Index: 0, Value: "red"},
 		},
 		{
 			"Test Select prompt interaction with page size",
@@ -194,7 +194,7 @@ func TestSelectPrompt(t *testing.T) {
 				c.SendLine(string(terminal.KeyArrowUp))
 				c.ExpectEOF()
 			},
-			"green",
+			OptionAnswer{Index: 2, Value: "green"},
 		},
 		{
 			"Test Select prompt interaction with vim mode",
@@ -209,7 +209,7 @@ func TestSelectPrompt(t *testing.T) {
 				c.SendLine("j")
 				c.ExpectEOF()
 			},
-			"blue",
+			OptionAnswer{Index: 1, Value: "blue"},
 		},
 		{
 			"Test Select prompt interaction with filter",
@@ -225,7 +225,7 @@ func TestSelectPrompt(t *testing.T) {
 				c.SendLine(string(terminal.KeyArrowDown))
 				c.ExpectEOF()
 			},
-			"green",
+			OptionAnswer{Index: 2, Value: "green"},
 		},
 		{
 			"Test Select prompt interaction with filter is case-insensitive",
@@ -241,7 +241,7 @@ func TestSelectPrompt(t *testing.T) {
 				c.SendLine(string(terminal.KeyArrowDown))
 				c.ExpectEOF()
 			},
-			"green",
+			OptionAnswer{Index: 2, Value: "green"},
 		},
 		{
 			"Can select the first result in a filtered list if there is a default",
@@ -256,7 +256,7 @@ func TestSelectPrompt(t *testing.T) {
 				c.SendLine("red")
 				c.ExpectEOF()
 			},
-			"red",
+			OptionAnswer{Index: 0, Value: "red"},
 		},
 		{
 			"Test Select prompt interaction with custom filter",
@@ -278,7 +278,7 @@ func TestSelectPrompt(t *testing.T) {
 				c.SendLine("re")
 				c.ExpectEOF()
 			},
-			"green",
+			OptionAnswer{Index: 2, Value: "green"},
 		},
 		{
 			"Test Select prompt with answers filtered out",
@@ -299,7 +299,7 @@ func TestSelectPrompt(t *testing.T) {
 				// press enter
 				c.SendLine(string(terminal.KeyEnter))
 			},
-			"red",
+			OptionAnswer{Index: 0, Value: "red"},
 		},
 	}
 
