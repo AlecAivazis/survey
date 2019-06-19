@@ -359,7 +359,7 @@ prompt := &survey.Input{
     Help:    "I couldn't come up with one.",
 }
 
-survey.AskOne(prompt, &number, survey.WithIcons(function(icons *survey.IconSet) {
+survey.AskOne(prompt, &number, survey.WithIcons(func(icons *survey.IconSet) {
     // you can set any icons
     icons.Question.Text = "⁇"
     // for more information on formatting the icons, see here: https://github.com/mgutz/ansi#style-format
