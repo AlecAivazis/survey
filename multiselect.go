@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/AlecAivazis/survey/v2/terminal"
 	"github.com/AlecAivazis/survey/v2/core"
+	"github.com/AlecAivazis/survey/v2/terminal"
 )
 
 /*
@@ -166,7 +166,6 @@ func (m *MultiSelect) filterOptions(config *PromptConfig) []core.OptionAnswer {
 		return core.OptionAnswerList(m.Options)
 	}
 
-
 	// the filter to apply
 	filter := m.Filter
 	if filter == nil {
@@ -194,7 +193,7 @@ func (m *MultiSelect) Prompt(config *PromptConfig) (interface{}, error) {
 	// if there is a default
 	if m.Default != nil {
 		// if the default is string values
-		if defaultValues, ok := m.Default.([]string) ; ok {
+		if defaultValues, ok := m.Default.([]string); ok {
 			for _, dflt := range defaultValues {
 				for i, opt := range m.Options {
 					// if the option corresponds to the default
@@ -206,8 +205,8 @@ func (m *MultiSelect) Prompt(config *PromptConfig) (interface{}, error) {
 					}
 				}
 			}
-		// if the default value is index values
-		} else if defaultIndices, ok := m.Default.([]int) ; ok {
+			// if the default value is index values
+		} else if defaultIndices, ok := m.Default.([]int); ok {
 			// go over every index we need to enable by default
 			for _, idx := range defaultIndices {
 				// and enable it
@@ -290,8 +289,12 @@ func (m *MultiSelect) Cleanup(config *PromptConfig, val interface{}) error {
 	for _, ans := range val.([]core.OptionAnswer) {
 		answer = fmt.Sprintf("%s, %s", answer, ans.Value)
 	}
-	// remove the precending commas
-	answer = answer[2:]
+
+	// if we answered anything
+	if len(answer) > 2 {
+		// remove the precending commas
+		answer = answer[2:]
+	}
 
 	// execute the output summary template with the answer
 	return m.Render(
