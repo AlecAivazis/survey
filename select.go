@@ -3,8 +3,8 @@ package survey
 import (
 	"errors"
 
-	"github.com/AlecAivazis/survey/v2/terminal"
 	"github.com/AlecAivazis/survey/v2/core"
+	"github.com/AlecAivazis/survey/v2/terminal"
 )
 
 /*
@@ -34,7 +34,6 @@ type Select struct {
 	showingHelp   bool
 }
 
-
 // SelectTemplateData is the data available to the templates when processing
 type SelectTemplateData struct {
 	Select
@@ -55,7 +54,7 @@ var SelectQuestionTemplate = `
   {{- "  "}}{{- color "cyan"}}[Use arrows to move, space to select, type to filter{{- if and .Help (not .ShowHelp)}}, {{ .Config.HelpInput }} for more help{{end}}]{{color "reset"}}
   {{- "\n"}}
   {{- range $ix, $choice := .PageEntries}}
-    {{- if eq $ix $.SelectedIndex }}{{color $.Config.Icons.SelectFocus.Format }}{{ $.Config.Icons.SelectFocus.Text }} {{else}}{{color "default+hb"}}  {{end}}
+    {{- if eq $ix $.SelectedIndex }}{{color $.Config.Icons.SelectFocus.Format }}{{ $.Config.Icons.SelectFocus.Text }} {{else}}{{color "default"}}  {{end}}
     {{- $choice.Value}}
     {{- color "reset"}}{{"\n"}}
   {{- end}}
@@ -177,7 +176,6 @@ func (s *Select) filterOptions(config *PromptConfig) []core.OptionAnswer {
 		return core.OptionAnswerList(s.Options)
 	}
 
-
 	// the filter to apply
 	filter := s.Filter
 	if filter == nil {
@@ -287,11 +285,11 @@ func (s *Select) Prompt(config *PromptConfig) (interface{}, error) {
 		// if there is a default value
 		if s.Default != nil {
 			// if the default is a string
-			if defaultString, ok := s.Default.(string) ; ok {
+			if defaultString, ok := s.Default.(string); ok {
 				// use the default value
 				val = defaultString
-			// the default value could also be an interpret which is interpretted as the index
-			} else if defaultIndex, ok := s.Default.(int) ; ok {
+				// the default value could also be an interpret which is interpretted as the index
+			} else if defaultIndex, ok := s.Default.(int); ok {
 				val = s.Options[defaultIndex]
 			} else {
 				return val, errors.New("default value of select must be an int or string")
