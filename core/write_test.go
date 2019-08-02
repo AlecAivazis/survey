@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -613,10 +614,11 @@ func TestWrite_canStringToFloat64(t *testing.T) {
 func TestWrite_canConvertStructFieldTypes(t *testing.T) {
 	// the struct to hold the answer
 	ptr := struct {
-		Name   string
-		Age    uint
-		Male   bool
-		Height float64
+		Name    string
+		Age     uint
+		Male    bool
+		Height  float64
+		Timeout time.Duration
 	}{}
 
 	// write the values as strings
@@ -624,6 +626,7 @@ func TestWrite_canConvertStructFieldTypes(t *testing.T) {
 	check(t, WriteAnswer(&ptr, "age", "22"))
 	check(t, WriteAnswer(&ptr, "male", "true"))
 	check(t, WriteAnswer(&ptr, "height", "6.2"))
+	check(t, WriteAnswer(&ptr, "timeout", "30s"))
 
 	// make sure we changed the fields
 	if ptr.Name != "Bob" {
@@ -640,6 +643,10 @@ func TestWrite_canConvertStructFieldTypes(t *testing.T) {
 
 	if ptr.Height != 6.2 {
 		t.Error("Did not mutate Height when writing answer.")
+	}
+
+	if ptr.Timeout != time.Duration(30*time.Second) {
+		t.Error("Did not mutate Timeout when writing answer.")
 	}
 }
 
