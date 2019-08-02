@@ -6,8 +6,6 @@ os:
   - osx
   - windows
 
-go_import_path: github.com/AlecAivazis/survey/v2
-
 before_install:
   - go get github.com/alecaivazis/run
 

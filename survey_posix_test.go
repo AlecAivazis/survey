@@ -6,7 +6,7 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/AlecAivazis/survey/v2/terminal"
+	"github.com/AlecAivazis/survey/terminal"
 	expect "github.com/Netflix/go-expect"
 	"github.com/hinshun/vt10x"
 	"github.com/stretchr/testify/require"

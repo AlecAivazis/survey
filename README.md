@@ -12,7 +12,7 @@ package main
 
 import (
     "fmt"
-    "github.com/AlecAivazis/survey/v2"
+    "github.com/AlecAivazis/survey"
 )
 
 // the questions to ask
@@ -331,7 +331,7 @@ looks for with `WithHelpInput`:
 
 ```golang
 import (
-    "github.com/AlecAivazis/survey/v2"
+    "github.com/AlecAivazis/survey"
 )
 
 number := ""
@@ -350,7 +350,7 @@ follows the patterns outlined [here](https://github.com/mgutz/ansi#style-format)
 
 ```golang
 import (
-    "github.com/AlecAivazis/survey/v2"
+    "github.com/AlecAivazis/survey"
 )
 
 number := ""
