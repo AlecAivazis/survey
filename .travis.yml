@@ -2,6 +2,7 @@ language: go
 
 os:
   - linux
+  - linux-ppc64le
   - osx
   - windows
 
