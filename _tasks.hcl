@@ -8,6 +8,9 @@ task "install-deps" {
 task "tests" {
     description = "Run the test suite"
     command = "go test {{.files}}"
+    environment {
+        GOFLAGS = "-mod=vendor"
+    }
 }
 
 variables {
