@@ -31,6 +31,12 @@ func TestMultiSelectRender(t *testing.T) {
 	helpfulPrompt := prompt
 	helpfulPrompt.Help = "This is helpful"
 
+	pagePrompt := MultiSelect{
+		Message:  "Pick your words:",
+		Options:  []string{"foo", "bar", "baz", "buz"},
+		PageSize: 2,
+	}
+
 	tests := []struct {
 		title    string
 		prompt   MultiSelect
@@ -101,6 +107,23 @@ func TestMultiSelectRender(t *testing.T) {
 					fmt.Sprintf("  %s  bar", defaultIcons().MarkedOption.Text),
 					fmt.Sprintf("%s %s  baz", defaultIcons().SelectFocus.Text, defaultIcons().UnmarkedOption.Text),
 					fmt.Sprintf("  %s  buz\n", defaultIcons().MarkedOption.Text),
+				},
+				"\n",
+			),
+		},
+		{
+			"marked on paginating",
+			pagePrompt,
+			MultiSelectTemplateData{
+				SelectedIndex: 0,
+				PageEntries:   core.OptionAnswerList(pagePrompt.Options)[1:3], /* show unmarked items(bar, baz)*/
+				Checked:       map[int]bool{0: true},                          /* foo marked */
+			},
+			strings.Join(
+				[]string{
+					fmt.Sprintf("%s Pick your words:  [Use arrows to move, space to select, type to filter]", defaultIcons().Question.Text),
+					fmt.Sprintf("%s %s  bar", defaultIcons().SelectFocus.Text, defaultIcons().UnmarkedOption.Text),
+					fmt.Sprintf("  %s  baz", defaultIcons().UnmarkedOption.Text),
 				},
 				"\n",
 			),
