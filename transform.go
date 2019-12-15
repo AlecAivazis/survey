@@ -1,6 +1,7 @@
 package survey
 
 import (
+	"github.com/AlecAivazis/survey/v2/core"
 	"reflect"
 	"strings"
 )
@@ -28,6 +29,28 @@ func TransformString(f func(s string) string) Transformer {
 		// see survey.go#L97 for more.
 		// Make sure that the the answer's value was a typeof string.
 		s, ok := ans.(string)
+		if !ok {
+			return nil
+		}
+
+		return f(s)
+	}
+}
+
+// Helper function to transform an answer option
+func TransformOption(f func(s core.OptionAnswer) core.OptionAnswer) Transformer {
+	return func(ans interface{}) interface{} {
+		// if the answer value passed in is the zero value of the appropriate type
+		if isZero(reflect.ValueOf(ans)) {
+			// skip this `Transformer` by returning a nil value.
+			// The original answer will be not affected,
+			// see survey.go#L125.
+			return nil
+		}
+
+		// "ans" is never nil here, so we don't have to check that
+		// see survey.go#L97 for more.
+		s, ok := ans.(core.OptionAnswer)
 		if !ok {
 			return nil
 		}
