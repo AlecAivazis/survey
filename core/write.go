@@ -12,7 +12,7 @@ import (
 // the tag used to denote the name of the question
 const tagName = "survey"
 
-// Settables allow for configuration when assigning answers
+// Settable allow for configuration when assigning answers
 type Settable interface {
 	WriteAnswer(field string, value interface{}) error
 }
@@ -97,6 +97,45 @@ func WriteAnswer(t interface{}, name string, v interface{}) (err error) {
 	return copy(elem, value)
 }
 
+type errFieldNotMatch struct {
+	questionName string
+}
+
+func (err errFieldNotMatch) Error() string {
+	return fmt.Sprintf("could not find field matching %v", err.questionName)
+}
+
+func (err errFieldNotMatch) Is(target error) bool { // implements the dynamic errors.Is interface.
+	if target != nil {
+		if name, ok := IsFieldNotMatch(target); ok {
+			// if have a filled questionName then perform "deeper" comparison.
+			return name == "" || err.questionName == "" || name == err.questionName
+		}
+	}
+
+	return false
+}
+
+// IsFieldNotMatch reports whether an "err" is caused by a non matching field.
+// It returns the Question.Name that couldn't be matched with a destination field.
+//
+// Usage:
+// err := survey.Ask(qs, &v);
+// if err != nil {
+// 	if name, ok := core.IsFieldNotMatch(err); ok {
+//		[...name is the not matched question name]
+// 	}
+// }
+func IsFieldNotMatch(err error) (string, bool) {
+	if err != nil {
+		if v, ok := err.(errFieldNotMatch); ok {
+			return v.questionName, true
+		}
+	}
+
+	return "", false
+}
+
 // BUG(AlecAivazis): the current implementation might cause weird conflicts if there are
 // two fields with same name that only differ by casing.
 func findFieldIndex(s reflect.Value, name string) (int, error) {
@@ -129,7 +168,7 @@ func findFieldIndex(s reflect.Value, name string) (int, error) {
 	}
 
 	// we didn't find the field
-	return -1, fmt.Errorf("could not find field matching %v", name)
+	return -1, errFieldNotMatch{name}
 }
 
 // isList returns true if the element is something we can Len()
