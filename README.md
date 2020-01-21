@@ -76,6 +76,7 @@ func main() {
 1. [Changing the Icons ](#changing-the-icons)
 1. [Custom Types](#custom-types)
 1. [Testing](#testing)
+1. [FAQ](#faq)
 
 ## Examples
 
@@ -416,3 +417,20 @@ for things like `CursorLocation`. `vt10x.NewVT10XConsole` will create a `go-expe
 stdio to an in-memory [virtual terminal](https://github.com/hinshun/vt10x).
 
 For some examples, you can see any of the tests in this repo.
+
+## FAQ
+
+### Why isn't sending a SIGINT (aka. CTRL-C) signal working?
+
+When you send an interrupt signal to the process, it only interrupts the current prompt instead of the entire process. This manifests in a `github.com/AlecAivazis/survey/v2/terminal.InterruptErr` being returned from `Ask` and `AskOne`. If you want to stop the process, handle the returned error in your code:
+
+```go
+err := survey.AskOne(prompt, &myVar)
+if err == terminal.InterruptErr {
+	fmt.Println("interrupted")
+
+	os.Exit(0)
+} else if err != nil {
+	panic(err)
+}
+```
