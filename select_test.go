@@ -42,7 +42,7 @@ func TestSelectRender(t *testing.T) {
 			SelectTemplateData{SelectedIndex: 2, PageEntries: prompt.Options},
 			strings.Join(
 				[]string{
-					fmt.Sprintf("%s Pick your word:  [Use arrows to move, space to select, type to filter]", core.QuestionIcon),
+					fmt.Sprintf("%s Pick your word:  [Use arrows to move, enter to select, type to filter]", core.QuestionIcon),
 					"  foo",
 					"  bar",
 					fmt.Sprintf("%s baz", core.SelectFocusIcon),
@@ -63,7 +63,7 @@ func TestSelectRender(t *testing.T) {
 			SelectTemplateData{SelectedIndex: 2, PageEntries: prompt.Options},
 			strings.Join(
 				[]string{
-					fmt.Sprintf("%s Pick your word:  [Use arrows to move, space to select, type to filter, %s for more help]", core.QuestionIcon, string(core.HelpInputRune)),
+					fmt.Sprintf("%s Pick your word:  [Use arrows to move, enter to select, type to filter, %s for more help]", core.QuestionIcon, string(core.HelpInputRune)),
 					"  foo",
 					"  bar",
 					fmt.Sprintf("%s baz", core.SelectFocusIcon),
@@ -79,7 +79,7 @@ func TestSelectRender(t *testing.T) {
 			strings.Join(
 				[]string{
 					fmt.Sprintf("%s This is helpful", core.HelpIcon),
-					fmt.Sprintf("%s Pick your word:  [Use arrows to move, space to select, type to filter]", core.QuestionIcon),
+					fmt.Sprintf("%s Pick your word:  [Use arrows to move, enter to select, type to filter]", core.QuestionIcon),
 					"  foo",
 					"  bar",
 					fmt.Sprintf("%s baz", core.SelectFocusIcon),
