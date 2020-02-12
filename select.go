@@ -151,6 +151,12 @@ func (s *Select) OnChange(line []rune, pos int, key rune) (newLine []rune, newPo
 	if len(options) <= s.selectedIndex {
 		return []rune{}, 0, false
 	}
+
+	// s.selectedIndex should not be a negative number
+	if s.selectedIndex < 0 {
+		return []rune{}, 0, false
+	}
+
 	return []rune(options[s.selectedIndex]), 0, true
 }
 
@@ -249,7 +255,7 @@ func (s *Select) Prompt() (interface{}, error) {
 			val = options[0]
 		}
 		// otherwise the selected index points to the value
-	} else if s.selectedIndex < len(options) {
+	} else if s.selectedIndex >= 0 && s.selectedIndex < len(options) {
 		// the
 		val = options[s.selectedIndex]
 	}
