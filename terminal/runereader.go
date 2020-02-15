@@ -3,6 +3,8 @@ package terminal
 import (
 	"fmt"
 	"unicode"
+
+	"golang.org/x/text/width"
 )
 
 type RuneReader struct {
@@ -92,19 +94,23 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 				// if we are at the end of the word
 				if index == len(line) {
 					// just remove the last letter from the internal representation
+					// also count the number of cells the rune before the cursor occupied
+					cells := runeWidth(line[len(line)-1])
 					line = line[:len(line)-1]
 					// go back one
 					if cursorCurrent.X == 1 {
 						cursor.PreviousLine(1)
 						cursor.Forward(int(terminalSize.X))
 					} else {
-						cursor.Back(1)
+						cursor.Back(cells)
 					}
 
 					// clear the rest of the line
 					EraseLine(rr.stdio.Out, ERASE_LINE_END)
 				} else {
 					// we need to remove a character from the middle of the word
+
+					cells := runeWidth(line[index-1])
 
 					// remove the current index from the list
 					line = append(line[:index-1], line[index:]...)
@@ -115,7 +121,7 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 					cursor.Save()
 
 					// clear the rest of the line
-					cursor.Back(1)
+					cursor.Back(cells)
 
 					// print what comes after
 					for _, char := range line[index-1:] {
@@ -136,7 +142,7 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 						cursor.PreviousLine(1)
 						cursor.Forward(int(terminalSize.X))
 					} else {
-						cursor.Back(1)
+						cursor.Back(cells)
 					}
 				}
 
@@ -160,7 +166,7 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 					cursor.PreviousLine(1)
 					cursor.Forward(int(terminalSize.X))
 				} else {
-					cursor.Back(1)
+					cursor.Back(runeWidth(line[index-1]))
 				}
 				//decrement the index
 				index--
@@ -183,7 +189,7 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 				if cursorCurrent.CursorIsAtLineEnd(terminalSize) {
 					cursor.NextLine(1)
 				} else {
-					cursor.Forward(1)
+					cursor.Forward(runeWidth(line[index]))
 				}
 				index++
 
@@ -206,7 +212,7 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 					cursorCurrent.Y--
 
 				} else {
-					cursor.Back(1)
+					cursor.Back(runeWidth(line[index-1]))
 					cursorCurrent.X--
 				}
 				index--
@@ -221,7 +227,7 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 					cursorCurrent.Y++
 
 				} else {
-					cursor.Forward(1)
+					cursor.Forward(runeWidth(line[index]))
 					cursorCurrent.X++
 				}
 				index++
@@ -306,11 +312,19 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 			if cursorCurrent.CursorIsAtLineEnd(terminalSize) {
 				cursor.NextLine(1)
 			} else {
-				cursor.Forward(1)
+				cursor.Forward(runeWidth(r))
 			}
 			// increment the index
 			index++
 
 		}
 	}
+}
+
+func runeWidth(r rune) int {
+	switch width.LookupRune(r).Kind() {
+	case width.EastAsianWide, width.EastAsianFullwidth:
+		return 2
+	}
+	return 1
 }
