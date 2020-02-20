@@ -100,7 +100,9 @@ func (m *MultiSelect) OnChange(key rune, config *PromptConfig) {
 				// otherwise just invert the current value
 				m.checked[selectedOpt.Index] = !old
 			}
-			m.filter = ""
+			if config.FilterKeep == false {
+				m.filter = ""
+			}
 		}
 		// only show the help message if we have one to show
 	} else if string(key) == config.HelpInput && m.Help != "" {

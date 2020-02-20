@@ -275,6 +275,24 @@ func myFilter(filterValue string, optValue string, optIndex int) bool {
 survey.AskOne(prompt, &color, survey.WithFilter(myFilter))
 ```
 
+## Keeping the filter active
+
+By default the filter will disappear if the user selects one of the filtered elements. Once the user selects one element the filter setting is gone. 
+
+However the user can prevent this from happening and keep the filter active for multiple selections in a e.g. MultiSelect:
+
+```golang
+// configure it for a specific prompt
+&Select{
+    Message:    "Choose a color:",
+    Options:    []string{"light-green", "green", "dark-green", "red"},
+    FilterKeep: true,
+}
+
+// or define a default for all of the questions
+survey.AskOne(prompt, &color, survey.WithFilterKeep(true))
+```
+
 ## Validation
 
 Validating individual responses for a particular question can be done by defining a
