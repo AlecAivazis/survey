@@ -286,11 +286,11 @@ However the user can prevent this from happening and keep the filter active for 
 &Select{
     Message:    "Choose a color:",
     Options:    []string{"light-green", "green", "dark-green", "red"},
-    FilterKeep: true,
+    KeepFilter: true,
 }
 
 // or define a default for all of the questions
-survey.AskOne(prompt, &color, survey.WithFilterKeep(true))
+survey.AskOne(prompt, &color, survey.WithKeepFilter(true))
 ```
 
 ## Validation

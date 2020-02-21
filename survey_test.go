@@ -43,7 +43,7 @@ func RunPromptTest(t *testing.T, test PromptTest) {
 	require.Equal(t, test.expected, answer)
 }
 
-func RunPromptTestFilterKeep(t *testing.T, test PromptTest) {
+func RunPromptTestKeepFilter(t *testing.T, test PromptTest) {
 	var answer interface{}
 	RunTest(t, test.procedure, func(stdio terminal.Stdio) error {
 		var err error
@@ -51,7 +51,7 @@ func RunPromptTestFilterKeep(t *testing.T, test PromptTest) {
 			p.WithStdio(stdio)
 		}
 		config := defaultPromptConfig()
-		config.FilterKeep = true
+		config.KeepFilter = true
 		answer, err = test.prompt.Prompt(config)
 		return err
 	})

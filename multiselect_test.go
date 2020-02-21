@@ -364,7 +364,7 @@ func TestMultiSelectPrompt(t *testing.T) {
 	}
 }
 
-func TestMultiSelectPromptFilterKeep(t *testing.T) {
+func TestMultiSelectPromptKeepFilter(t *testing.T) {
 	tests := []PromptTest{
 		{
 			"multi select with filter keep",
@@ -393,7 +393,7 @@ func TestMultiSelectPromptFilterKeep(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			RunPromptTestFilterKeep(t, test)
+			RunPromptTestKeepFilter(t, test)
 		})
 	}
 }

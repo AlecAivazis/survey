@@ -100,7 +100,7 @@ func (m *MultiSelect) OnChange(key rune, config *PromptConfig) {
 				// otherwise just invert the current value
 				m.checked[selectedOpt.Index] = !old
 			}
-			if config.FilterKeep == false {
+			if !config.KeepFilter {
 				m.filter = ""
 			}
 		}

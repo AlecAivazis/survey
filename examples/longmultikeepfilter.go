@@ -266,7 +266,7 @@ func main() {
 	answers := []string{}
 
 	// ask the question
-	err := survey.Ask(multiQs, &answers, survey.WithFilterKeep(true))
+	err := survey.Ask(multiQs, &answers, survey.WithKeepFilter(true))
 
 	if err != nil {
 		fmt.Println(err.Error())

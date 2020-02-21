@@ -53,7 +53,7 @@ func defaultAskOptions() *AskOptions {
 				// include this option if it matches
 				return strings.Contains(strings.ToLower(value), filter)
 			},
-			FilterKeep: false,
+			KeepFilter: false,
 		},
 	}
 }
@@ -111,7 +111,7 @@ type PromptConfig struct {
 	Icons      IconSet
 	HelpInput  string
 	Filter     func(filter string, option string, index int) bool
-	FilterKeep bool
+	KeepFilter bool
 }
 
 // Prompt is the primary interface for the objects that can take user input
@@ -158,11 +158,11 @@ func WithFilter(filter func(filter string, value string, index int) (include boo
 	}
 }
 
-// WithFilterKeep sets the if the filter is kept after selections
-func WithFilterKeep(filterKeep bool) AskOpt {
+// WithKeepFilter sets the if the filter is kept after selections
+func WithKeepFilter(KeepFilter bool) AskOpt {
 	return func(options *AskOptions) error {
 		// set the page size
-		options.PromptConfig.FilterKeep = filterKeep
+		options.PromptConfig.KeepFilter = KeepFilter
 
 		// nothing went wrong
 		return nil
