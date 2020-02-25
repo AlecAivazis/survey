@@ -43,6 +43,21 @@ func RunPromptTest(t *testing.T, test PromptTest) {
 	require.Equal(t, test.expected, answer)
 }
 
+func RunPromptTestKeepFilter(t *testing.T, test PromptTest) {
+	var answer interface{}
+	RunTest(t, test.procedure, func(stdio terminal.Stdio) error {
+		var err error
+		if p, ok := test.prompt.(wantsStdio); ok {
+			p.WithStdio(stdio)
+		}
+		config := defaultPromptConfig()
+		config.KeepFilter = true
+		answer, err = test.prompt.Prompt(config)
+		return err
+	})
+	require.Equal(t, test.expected, answer)
+}
+
 func TestPagination_tooFew(t *testing.T) {
 	// a small list of options
 	choices := core.OptionAnswerList([]string{"choice1", "choice2", "choice3"})
@@ -235,10 +250,10 @@ func TestAsk(t *testing.T) {
 				"pizza":                    true,
 				"commit-message":           "Add editor prompt tests\n",
 				"commit-message-validated": "Add editor prompt tests\n",
-				"name":                     "Johnny Appleseed",
-				"day":                      []string{"Monday", "Wednesday"},
-				"password":                 "secret",
-				"color":                    "yellow",
+				"name":     "Johnny Appleseed",
+				"day":      []string{"Monday", "Wednesday"},
+				"password": "secret",
+				"color":    "yellow",
 			},
 		},
 		{

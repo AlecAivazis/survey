@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Netflix/go-expect"
+	expect "github.com/Netflix/go-expect"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/AlecAivazis/survey/v2/core"
@@ -360,6 +360,40 @@ func TestMultiSelectPrompt(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			RunPromptTest(t, test)
+		})
+	}
+}
+
+func TestMultiSelectPromptKeepFilter(t *testing.T) {
+	tests := []PromptTest{
+		{
+			"multi select with filter keep",
+			&MultiSelect{
+				Message: "What color do you prefer:",
+				Options: []string{"green", "red", "light-green", "blue", "black", "yellow", "purple"},
+			},
+			func(c *expect.Console) {
+				c.ExpectString("What color do you prefer:  [Use arrows to move, enter to select, type to filter]")
+				// Filter down to green
+				c.Send("green")
+				// Select green.
+				c.Send(" ")
+				// Select light-green.
+				c.Send(string(terminal.KeyArrowDown))
+				c.Send(" ")
+				c.SendLine("")
+				c.ExpectEOF()
+			},
+			[]core.OptionAnswer{
+				core.OptionAnswer{Value: "green", Index: 0},
+				core.OptionAnswer{Value: "light-green", Index: 2},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			RunPromptTestKeepFilter(t, test)
 		})
 	}
 }
