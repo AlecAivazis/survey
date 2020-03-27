@@ -165,6 +165,22 @@ func TestSelectPrompt(t *testing.T) {
 			core.OptionAnswer{Index: 2, Value: "green"},
 		},
 		{
+			"default not in options",
+			&Select{
+				Message: "Choose a color:",
+				Options: []string{"red", "blue", "green"},
+				Default: "",
+			},
+			func(c *expect.Console) {
+				c.ExpectString("Choose a color:")
+				// Select default.
+				c.SendLine(string(terminal.KeyEnter))
+				c.ExpectString("red")
+				c.ExpectEOF()
+			},
+			core.OptionAnswer{Index: 0, Value: "red"},
+		},
+		{
 			"overriding default",
 			&Select{
 				Message: "Choose a color:",
