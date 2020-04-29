@@ -1,11 +1,13 @@
 package survey
 
 import (
+	"bufio"
 	"fmt"
 	"strings"
 
 	"github.com/AlecAivazis/survey/v2/core"
 	"github.com/AlecAivazis/survey/v2/terminal"
+	goterm "golang.org/x/crypto/ssh/terminal"
 )
 
 type Renderer struct {
@@ -56,7 +58,7 @@ func (r *Renderer) Error(config *PromptConfig, invalid error) error {
 		return err
 	}
 	// keep track of how many lines are printed so we can clean up later
-	r.errorLineCount = strings.Count(out, "\n")
+	r.errorLineCount = r.countLines(out)
 
 	// send the message to the user
 	fmt.Fprint(terminal.NewAnsiStdout(r.stdio.Out), out)
@@ -84,11 +86,36 @@ func (r *Renderer) Render(tmpl string, data interface{}) error {
 	}
 
 	// keep track of how many lines are printed so we can clean up later
-	r.lineCount = strings.Count(out, "\n")
+	r.lineCount = r.countLines(out)
 
 	// print the summary
 	fmt.Fprint(terminal.NewAnsiStdout(r.stdio.Out), out)
 
 	// nothing went wrong
 	return nil
+}
+
+func (r *Renderer) termWidth() (int, error) {
+	fd := int(r.stdio.Out.Fd())
+	termWidth, _, err := goterm.GetSize(fd)
+	return termWidth, err
+}
+
+// countLines will return the count of `\n` with the addition of any
+// lines that have wrapped due to narrow terminal width
+func (r *Renderer) countLines(out string) int {
+	w, err := r.termWidth()
+	if err != nil || w == 0 {
+		// if we got an error due to terminal.GetSize not being supported
+		// on current platform then just assume a very wide terminal
+		w = 10000
+	}
+
+	count := 0
+	s := bufio.NewScanner(strings.NewReader(out))
+	for s.Scan() {
+		line := s.Text()
+		count += 1 + int(len(line)/w)
+	}
+	return count
 }
