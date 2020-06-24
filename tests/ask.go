@@ -26,6 +26,11 @@ var simpleQs = []*survey.Question{
 	},
 }
 
+var singlePrompt = &survey.Input{
+	Message: "What is your name?",
+	Default: "Johnny Appleseed",
+}
+
 func main() {
 
 	fmt.Println("Asking many.")
@@ -42,7 +47,8 @@ func main() {
 
 	fmt.Println("Asking one.")
 	answer := ""
-	err = survey.AskOne(simpleQs[0].Prompt, &answer)
+
+	err = survey.AskOne(singlePrompt, &answer)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
