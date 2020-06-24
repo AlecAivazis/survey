@@ -36,14 +36,14 @@ var PasswordQuestionTemplate = `
 
 func (p *Password) Prompt(config *PromptConfig) (line interface{}, err error) {
 	// render the question template
-	out, err := core.RunTemplate(
+	userOut, _, err := core.RunTemplate(
 		PasswordQuestionTemplate,
 		PasswordTemplateData{
 			Password: *p,
 			Config:   config,
 		},
 	)
-	fmt.Fprint(terminal.NewAnsiStdout(p.Stdio().Out), out)
+	fmt.Fprint(terminal.NewAnsiStdout(p.Stdio().Out), userOut)
 	if err != nil {
 		return "", err
 	}

@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/AlecAivazis/survey/v2/core"
 	"github.com/AlecAivazis/survey/v2/terminal"
@@ -50,7 +51,7 @@ func (r *Renderer) Error(config *PromptConfig, invalid error) error {
 
 	// we just cleared the prompt lines
 	r.lineCount = 0
-	out, err := core.RunTemplate(ErrorTemplate, &ErrorTemplateData{
+	userOut, layoutOut, err := core.RunTemplate(ErrorTemplate, &ErrorTemplateData{
 		Error: invalid,
 		Icon:  config.Icons.Error,
 	})
@@ -58,10 +59,10 @@ func (r *Renderer) Error(config *PromptConfig, invalid error) error {
 		return err
 	}
 	// keep track of how many lines are printed so we can clean up later
-	r.errorLineCount = r.countLines(out)
+	r.errorLineCount = r.countLines(layoutOut)
 
 	// send the message to the user
-	fmt.Fprint(terminal.NewAnsiStdout(r.stdio.Out), out)
+	fmt.Fprint(terminal.NewAnsiStdout(r.stdio.Out), userOut)
 	return nil
 }
 
@@ -80,16 +81,16 @@ func (r *Renderer) resetPrompt(lines int) {
 func (r *Renderer) Render(tmpl string, data interface{}) error {
 	r.resetPrompt(r.lineCount)
 	// render the template summarizing the current state
-	out, err := core.RunTemplate(tmpl, data)
+	userOut, layoutOut, err := core.RunTemplate(tmpl, data)
 	if err != nil {
 		return err
 	}
 
 	// keep track of how many lines are printed so we can clean up later
-	r.lineCount = r.countLines(out)
+	r.lineCount = r.countLines(layoutOut)
 
 	// print the summary
-	fmt.Fprint(terminal.NewAnsiStdout(r.stdio.Out), out)
+	fmt.Fprint(terminal.NewAnsiStdout(r.stdio.Out), userOut)
 
 	// nothing went wrong
 	return nil
@@ -115,7 +116,13 @@ func (r *Renderer) countLines(out string) int {
 	s := bufio.NewScanner(strings.NewReader(out))
 	for s.Scan() {
 		line := s.Text()
-		count += 1 + int(len(line)/w)
+		count += 1 + int(utf8.RuneCountInString(line)/w)
 	}
+
+	// if the prompt doesn't end on a newline, subtract off one '\n'
+	if count != 0 && out[len(out)-1] != '\n' {
+		count -= 1
+	}
+
 	return count
 }
