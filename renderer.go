@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/AlecAivazis/survey/v2/core"
-	"github.com/AlecAivazis/survey/v2/terminal"
+	"github.com/tomercy/survey/core"
+	"github.com/tomercy/survey/terminal"
 )
 
 type Renderer struct {
@@ -94,7 +94,8 @@ func (r *Renderer) Render(tmpl string, data interface{}) error {
 	n := getTerminalWidth()
 
 	if data.(InputTemplateData).Answer != "" {
-		answerLines = len((data.(InputTemplateData).Answer)) / int(n)
+		total := len(data.(InputTemplateData).Answer) + len(data.(InputTemplateData).Input.Message)
+		answerLines = (total / n)
 	}
 	r.resetPrompt(r.lineCount + answerLines)
 	// render the template summarizing the current state
