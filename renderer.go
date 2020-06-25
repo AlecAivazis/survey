@@ -2,6 +2,9 @@ package survey
 
 import (
 	"fmt"
+	"os"
+	"os/exec"
+	"strconv"
 	"strings"
 
 	"github.com/AlecAivazis/survey/v2/core"
@@ -75,8 +78,25 @@ func (r *Renderer) resetPrompt(lines int) {
 	}
 }
 
+func getTerminalWidth() int {
+	cmd := exec.Command("stty", "size")
+	cmd.Stdin = os.Stdin
+	out, _ := cmd.Output()
+	outt := strings.TrimSuffix(string(out), "\n")
+	strarr := strings.Split(outt, " ")
+
+	i, _ := strconv.Atoi(strarr[1])
+	return i
+}
+
 func (r *Renderer) Render(tmpl string, data interface{}) error {
-	r.resetPrompt(r.lineCount)
+	var answerLines = 0
+	n := getTerminalWidth()
+
+	if data.(InputTemplateData).Answer != "" {
+		answerLines = len((data.(InputTemplateData).Answer)) / int(n)
+	}
+	r.resetPrompt(r.lineCount + answerLines)
 	// render the template summarizing the current state
 	out, err := core.RunTemplate(tmpl, data)
 	if err != nil {
