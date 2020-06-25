@@ -1,9 +1,8 @@
 package survey
 
 import (
-	"bufio"
+	"bytes"
 	"fmt"
-	"strings"
 	"unicode/utf8"
 
 	"github.com/AlecAivazis/survey/v2/core"
@@ -13,8 +12,8 @@ import (
 
 type Renderer struct {
 	stdio          terminal.Stdio
-	lineCount      int
-	errorLineCount int
+	renderedErrors bytes.Buffer
+	renderedText   bytes.Buffer
 }
 
 type ErrorTemplateData struct {
@@ -45,12 +44,14 @@ func (r *Renderer) NewCursor() *terminal.Cursor {
 }
 
 func (r *Renderer) Error(config *PromptConfig, invalid error) error {
-	// since errors are printed on top we need to reset the prompt
-	// as well as any previous error print
-	r.resetPrompt(r.lineCount + r.errorLineCount)
+	// cleanup the currently rendered errors
+	r.resetPrompt(r.countLines(r.renderedErrors))
+	r.renderedErrors.Reset()
 
-	// we just cleared the prompt lines
-	r.lineCount = 0
+	// cleanup the rest of the prompt
+	r.resetPrompt(r.countLines(r.renderedText))
+	r.renderedText.Reset()
+
 	userOut, layoutOut, err := core.RunTemplate(ErrorTemplate, &ErrorTemplateData{
 		Error: invalid,
 		Icon:  config.Icons.Error,
@@ -58,12 +59,50 @@ func (r *Renderer) Error(config *PromptConfig, invalid error) error {
 	if err != nil {
 		return err
 	}
-	// keep track of how many lines are printed so we can clean up later
-	r.errorLineCount = r.countLines(layoutOut)
 
 	// send the message to the user
 	fmt.Fprint(terminal.NewAnsiStdout(r.stdio.Out), userOut)
+
+	// add the printed text to the rendered error buffer so we can cleanup later
+	r.appendRenderedError(layoutOut)
+
 	return nil
+}
+
+func (r *Renderer) Render(tmpl string, data interface{}) error {
+	// cleanup the currently rendered text
+	lineCount := r.countLines(r.renderedText)
+	r.resetPrompt(lineCount)
+	r.renderedText.Reset()
+
+	// render the template summarizing the current state
+	userOut, layoutOut, err := core.RunTemplate(tmpl, data)
+	if err != nil {
+		return err
+	}
+
+	// print the summary
+	fmt.Fprint(terminal.NewAnsiStdout(r.stdio.Out), userOut)
+
+	// add the printed text to the rendered text buffer so we can cleanup later
+	r.AppendRenderedText(layoutOut)
+
+	// nothing went wrong
+	return nil
+}
+
+// appendRenderedError appends text to the renderer's error buffer
+// which is used to track what has been printed. It is not exported
+// as errors should only be displayed via Error(config, error).
+func (r *Renderer) appendRenderedError(text string) {
+	r.renderedErrors.WriteString(text)
+}
+
+// AppendRenderedText appends text to the renderer's text buffer
+// which is used to track of what has been printed. The buffer is used
+// to calculate how many lines to erase before updating the prompt.
+func (r *Renderer) AppendRenderedText(text string) {
+	r.renderedText.WriteString(text)
 }
 
 func (r *Renderer) resetPrompt(lines int) {
@@ -78,24 +117,6 @@ func (r *Renderer) resetPrompt(lines int) {
 	}
 }
 
-func (r *Renderer) Render(tmpl string, data interface{}) error {
-	r.resetPrompt(r.lineCount)
-	// render the template summarizing the current state
-	userOut, layoutOut, err := core.RunTemplate(tmpl, data)
-	if err != nil {
-		return err
-	}
-
-	// keep track of how many lines are printed so we can clean up later
-	r.lineCount = r.countLines(layoutOut)
-
-	// print the summary
-	fmt.Fprint(terminal.NewAnsiStdout(r.stdio.Out), userOut)
-
-	// nothing went wrong
-	return nil
-}
-
 func (r *Renderer) termWidth() (int, error) {
 	fd := int(r.stdio.Out.Fd())
 	termWidth, _, err := goterm.GetSize(fd)
@@ -104,7 +125,7 @@ func (r *Renderer) termWidth() (int, error) {
 
 // countLines will return the count of `\n` with the addition of any
 // lines that have wrapped due to narrow terminal width
-func (r *Renderer) countLines(out string) int {
+func (r *Renderer) countLines(buf bytes.Buffer) int {
 	w, err := r.termWidth()
 	if err != nil || w == 0 {
 		// if we got an error due to terminal.GetSize not being supported
@@ -112,16 +133,24 @@ func (r *Renderer) countLines(out string) int {
 		w = 10000
 	}
 
-	count := 0
-	s := bufio.NewScanner(strings.NewReader(out))
-	for s.Scan() {
-		line := s.Text()
-		count += 1 + int(utf8.RuneCountInString(line)/w)
-	}
+	bufBytes := buf.Bytes()
 
-	// if the prompt doesn't end on a newline, subtract off one '\n'
-	if count != 0 && out[len(out)-1] != '\n' {
-		count -= 1
+	count := 0
+	curr := 0
+	delim := -1
+	for curr < len(bufBytes) {
+		// read until the next newline or the end of the string
+		relDelim := bytes.IndexRune(bufBytes[curr:], '\n')
+		if relDelim != -1 {
+			count += 1 // new line found, add it to the count
+			delim = curr + relDelim
+		} else {
+			delim = len(bufBytes) // no new line found, read rest of text
+		}
+
+		// account for word wrapping
+		count += int(utf8.RuneCount(bufBytes[curr:delim]) / w)
+		curr = delim + 1
 	}
 
 	return count
