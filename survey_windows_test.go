@@ -3,7 +3,7 @@ package survey
 import (
 	"testing"
 
-	"github.com/tomercy/survey/terminal"
+	"github.com/AlecAivazis/survey/v2/terminal"
 	expect "github.com/Netflix/go-expect"
 )
 

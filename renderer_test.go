@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/tomercy/survey/core"
+	"github.com/AlecAivazis/survey/v2/core"
 )
 
 func TestValidationError(t *testing.T) {

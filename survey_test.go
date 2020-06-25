@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/tomercy/survey/core"
-	"github.com/tomercy/survey/terminal"
+	"github.com/AlecAivazis/survey/v2/core"
+	"github.com/AlecAivazis/survey/v2/terminal"
 	expect "github.com/Netflix/go-expect"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -250,10 +250,10 @@ func TestAsk(t *testing.T) {
 				"pizza":                    true,
 				"commit-message":           "Add editor prompt tests\n",
 				"commit-message-validated": "Add editor prompt tests\n",
-				"name":     "Johnny Appleseed",
-				"day":      []string{"Monday", "Wednesday"},
-				"password": "secret",
-				"color":    "yellow",
+				"name":                     "Johnny Appleseed",
+				"day":                      []string{"Monday", "Wednesday"},
+				"password":                 "secret",
+				"color":                    "yellow",
 			},
 		},
 		{
