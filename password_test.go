@@ -48,7 +48,7 @@ func TestPasswordRender(t *testing.T) {
 		// set the icon set
 		test.data.Config = defaultPromptConfig()
 
-		actual, err := core.RunTemplate(
+		actual, _, err := core.RunTemplate(
 			PasswordQuestionTemplate,
 			&test.data,
 		)

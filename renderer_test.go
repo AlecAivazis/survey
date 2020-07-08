@@ -11,7 +11,7 @@ func TestValidationError(t *testing.T) {
 
 	err := fmt.Errorf("Football is not a valid month")
 
-	actual, err := core.RunTemplate(
+	actual, _, err := core.RunTemplate(
 		ErrorTemplate,
 		&ErrorTemplateData{
 			Error: err,
