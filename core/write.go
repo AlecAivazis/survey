@@ -86,7 +86,17 @@ func WriteAnswer(t interface{}, name string, v interface{}) (err error) {
 		return copy(field, value)
 	case reflect.Map:
 		mapType := reflect.TypeOf(t).Elem()
-		if mapType.Key().Kind() != reflect.String || mapType.Elem().Kind() != reflect.Interface {
+		if mapType.Key().Kind() != reflect.String {
+			return errors.New("answer maps key must be of type string")
+		}
+
+		// copy only string value/index value to map if,
+		// map is not of type interface and is 'OptionAnswer'
+		if mapType.Elem().Kind() != reflect.Interface && elem.Type().Name() == "OptionAnswer" {
+			return copy(elem, value)
+		}
+
+		if mapType.Elem().Kind() != reflect.Interface {
 			return errors.New("answer maps must be of type map[string]interface")
 		}
 		mt := *t.(*map[string]interface{})
