@@ -92,8 +92,16 @@ func WriteAnswer(t interface{}, name string, v interface{}) (err error) {
 
 		// copy only string value/index value to map if,
 		// map is not of type interface and is 'OptionAnswer'
-		if mapType.Elem().Kind() != reflect.Interface && elem.Type().Name() == "OptionAnswer" {
-			return copy(elem, value)
+		if value.Type().Name() == "OptionAnswer" {
+			if kval := mapType.Elem().Kind(); kval == reflect.String {
+				mt := *t.(*map[string]string)
+				mt[name] = value.FieldByName("Value").String()
+				return nil
+			} else if kval == reflect.Int {
+				mt := *t.(*map[string]int)
+				mt[name] = int(value.FieldByName("Index").Int())
+				return nil
+			}
 		}
 
 		if mapType.Elem().Kind() != reflect.Interface {
