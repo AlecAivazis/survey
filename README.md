@@ -205,7 +205,7 @@ survey.AskOne(prompt, &days, survey.WithPageSize(10))
 
 ### MultiSelect
 
-<img src="https://thumbs.gfycat.com/SharpTameAntelope-size_restricted.gif" width="450px"/>
+![Example](img/multi-select-all-none.gif)
 
 ```golang
 days := []string{}
