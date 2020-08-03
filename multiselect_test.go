@@ -53,7 +53,7 @@ func TestMultiSelectRender(t *testing.T) {
 			},
 			strings.Join(
 				[]string{
-					fmt.Sprintf("%s Pick your words:  [Use arrows to move, space to select, type to filter]", defaultIcons().Question.Text),
+					fmt.Sprintf("%s Pick your words:  [Use arrows to move, space to select, <right> to all, <left> to none, type to filter]", defaultIcons().Question.Text),
 					fmt.Sprintf("  %s  foo", defaultIcons().UnmarkedOption.Text),
 					fmt.Sprintf("  %s  bar", defaultIcons().MarkedOption.Text),
 					fmt.Sprintf("%s %s  baz", defaultIcons().SelectFocus.Text, defaultIcons().UnmarkedOption.Text),
@@ -81,7 +81,7 @@ func TestMultiSelectRender(t *testing.T) {
 			},
 			strings.Join(
 				[]string{
-					fmt.Sprintf("%s Pick your words:  [Use arrows to move, space to select, type to filter, %s for more help]", defaultIcons().Question.Text, string(defaultPromptConfig().HelpInput)),
+					fmt.Sprintf("%s Pick your words:  [Use arrows to move, space to select, <right> to all, <left> to none, type to filter, %s for more help]", defaultIcons().Question.Text, string(defaultPromptConfig().HelpInput)),
 					fmt.Sprintf("  %s  foo", defaultIcons().UnmarkedOption.Text),
 					fmt.Sprintf("  %s  bar", defaultIcons().MarkedOption.Text),
 					fmt.Sprintf("%s %s  baz", defaultIcons().SelectFocus.Text, defaultIcons().UnmarkedOption.Text),
@@ -102,7 +102,7 @@ func TestMultiSelectRender(t *testing.T) {
 			strings.Join(
 				[]string{
 					fmt.Sprintf("%s This is helpful", defaultIcons().Help.Text),
-					fmt.Sprintf("%s Pick your words:  [Use arrows to move, space to select, type to filter]", defaultIcons().Question.Text),
+					fmt.Sprintf("%s Pick your words:  [Use arrows to move, space to select, <right> to all, <left> to none, type to filter]", defaultIcons().Question.Text),
 					fmt.Sprintf("  %s  foo", defaultIcons().UnmarkedOption.Text),
 					fmt.Sprintf("  %s  bar", defaultIcons().MarkedOption.Text),
 					fmt.Sprintf("%s %s  baz", defaultIcons().SelectFocus.Text, defaultIcons().UnmarkedOption.Text),
@@ -121,7 +121,7 @@ func TestMultiSelectRender(t *testing.T) {
 			},
 			strings.Join(
 				[]string{
-					fmt.Sprintf("%s Pick your words:  [Use arrows to move, space to select, type to filter]", defaultIcons().Question.Text),
+					fmt.Sprintf("%s Pick your words:  [Use arrows to move, space to select, <right> to all, <left> to none, type to filter]", defaultIcons().Question.Text),
 					fmt.Sprintf("%s %s  bar", defaultIcons().SelectFocus.Text, defaultIcons().UnmarkedOption.Text),
 					fmt.Sprintf("  %s  baz", defaultIcons().UnmarkedOption.Text),
 				},
@@ -163,7 +163,7 @@ func TestMultiSelectPrompt(t *testing.T) {
 				Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
 			},
 			func(c *expect.Console) {
-				c.ExpectString("What days do you prefer:  [Use arrows to move, space to select, type to filter]")
+				c.ExpectString("What days do you prefer:  [Use arrows to move, space to select, <right> to all, <left> to none, type to filter]")
 				// Select Monday.
 				c.Send(string(terminal.KeyArrowDown))
 				c.SendLine(" ")
@@ -179,7 +179,7 @@ func TestMultiSelectPrompt(t *testing.T) {
 				Default: []string{"Tuesday", "Thursday"},
 			},
 			func(c *expect.Console) {
-				c.ExpectString("What days do you prefer:  [Use arrows to move, space to select, type to filter]")
+				c.ExpectString("What days do you prefer:  [Use arrows to move, space to select, <right> to all, <left> to none, type to filter]")
 				c.SendLine("")
 				c.ExpectEOF()
 			},
@@ -196,7 +196,7 @@ func TestMultiSelectPrompt(t *testing.T) {
 				Default: []int{2, 4},
 			},
 			func(c *expect.Console) {
-				c.ExpectString("What days do you prefer:  [Use arrows to move, space to select, type to filter]")
+				c.ExpectString("What days do you prefer:  [Use arrows to move, space to select, <right> to all, <left> to none, type to filter]")
 				c.SendLine("")
 				c.ExpectEOF()
 			},
@@ -213,7 +213,7 @@ func TestMultiSelectPrompt(t *testing.T) {
 				Default: []string{"Tuesday", "Thursday"},
 			},
 			func(c *expect.Console) {
-				c.ExpectString("What days do you prefer:  [Use arrows to move, space to select, type to filter]")
+				c.ExpectString("What days do you prefer:  [Use arrows to move, space to select, <right> to all, <left> to none, type to filter]")
 				// Deselect Tuesday.
 				c.Send(string(terminal.KeyArrowDown))
 				c.Send(string(terminal.KeyArrowDown))
@@ -230,7 +230,7 @@ func TestMultiSelectPrompt(t *testing.T) {
 				Help:    "Saturday is best",
 			},
 			func(c *expect.Console) {
-				c.ExpectString("What days do you prefer:  [Use arrows to move, space to select, type to filter, ? for more help]")
+				c.ExpectString("What days do you prefer:  [Use arrows to move, space to select, <right> to all, <left> to none, type to filter, ? for more help]")
 				c.Send("?")
 				c.ExpectString("Saturday is best")
 				// Select Saturday
@@ -248,7 +248,7 @@ func TestMultiSelectPrompt(t *testing.T) {
 				PageSize: 1,
 			},
 			func(c *expect.Console) {
-				c.ExpectString("What days do you prefer:  [Use arrows to move, space to select, type to filter]")
+				c.ExpectString("What days do you prefer:  [Use arrows to move, space to select, <right> to all, <left> to none, type to filter]")
 				// Select Monday.
 				c.Send(string(terminal.KeyArrowDown))
 				c.SendLine(" ")
@@ -264,7 +264,7 @@ func TestMultiSelectPrompt(t *testing.T) {
 				VimMode: true,
 			},
 			func(c *expect.Console) {
-				c.ExpectString("What days do you prefer:  [Use arrows to move, space to select, type to filter]")
+				c.ExpectString("What days do you prefer:  [Use arrows to move, space to select, <right> to all, <left> to none, type to filter]")
 				// Select Tuesday.
 				c.Send("jj ")
 				// Select Thursday.
@@ -287,7 +287,7 @@ func TestMultiSelectPrompt(t *testing.T) {
 				Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
 			},
 			func(c *expect.Console) {
-				c.ExpectString("What days do you prefer:  [Use arrows to move, space to select, type to filter]")
+				c.ExpectString("What days do you prefer:  [Use arrows to move, space to select, <right> to all, <left> to none, type to filter]")
 				// Filter down to Tuesday.
 				c.Send("Tues")
 				// Select Tuesday.
@@ -304,7 +304,7 @@ func TestMultiSelectPrompt(t *testing.T) {
 				Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
 			},
 			func(c *expect.Console) {
-				c.ExpectString("What days do you prefer:  [Use arrows to move, space to select, type to filter]")
+				c.ExpectString("What days do you prefer:  [Use arrows to move, space to select, <right> to all, <left> to none, type to filter]")
 				// Filter down to Tuesday.
 				c.Send("tues")
 				// Select Tuesday.
@@ -341,7 +341,7 @@ func TestMultiSelectPrompt(t *testing.T) {
 				Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
 			},
 			func(c *expect.Console) {
-				c.ExpectString("What days do you prefer:  [Use arrows to move, space to select, type to filter]")
+				c.ExpectString("What days do you prefer:  [Use arrows to move, space to select, <right> to all, <left> to none, type to filter]")
 				// Filter down to Tuesday.
 				c.Send("Tues")
 				// Select Tuesday.
@@ -355,6 +355,120 @@ func TestMultiSelectPrompt(t *testing.T) {
 			},
 			[]core.OptionAnswer{},
 		},
+		{
+			"select all",
+			&MultiSelect{
+				Message: "What days do you prefer:",
+				Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
+			},
+			func(c *expect.Console) {
+				c.ExpectString("What days do you prefer:  [Use arrows to move, space to select, <right> to all, <left> to none, type to filter]")
+				// Select all
+				c.Send(string(terminal.KeyArrowRight))
+				c.SendLine("")
+				c.ExpectEOF()
+			},
+			[]core.OptionAnswer{
+				core.OptionAnswer{Value: "Sunday", Index: 0},
+				core.OptionAnswer{Value: "Monday", Index: 1},
+				core.OptionAnswer{Value: "Tuesday", Index: 2},
+				core.OptionAnswer{Value: "Wednesday", Index: 3},
+				core.OptionAnswer{Value: "Thursday", Index: 4},
+				core.OptionAnswer{Value: "Friday", Index: 5},
+				core.OptionAnswer{Value: "Saturday", Index: 6},
+			},
+		},
+		{
+			"select none",
+			&MultiSelect{
+				Message: "What days do you prefer:",
+				Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
+			},
+			func(c *expect.Console) {
+				c.ExpectString("What days do you prefer:  [Use arrows to move, space to select, <right> to all, <left> to none, type to filter]")
+				// Select first
+				c.Send(" ")
+				// Select second
+				c.Send(string(terminal.KeyArrowDown))
+				c.Send(" ")
+				// Deselect all
+				c.Send(string(terminal.KeyArrowLeft))
+				c.SendLine("")
+				c.ExpectEOF()
+			},
+			[]core.OptionAnswer{},
+		},
+		{
+			"select all with filter",
+			&MultiSelect{
+				Message: "What days do you prefer:",
+				Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
+			},
+			func(c *expect.Console) {
+				c.ExpectString("What days do you prefer:  [Use arrows to move, space to select, <right> to all, <left> to none, type to filter]")
+				// Send filter
+				c.Send("tu")
+				// Select all
+				c.Send(string(terminal.KeyArrowRight))
+				c.SendLine("")
+				c.ExpectEOF()
+			},
+			[]core.OptionAnswer{
+				core.OptionAnswer{Value: "Tuesday", Index: 2},
+				core.OptionAnswer{Value: "Saturday", Index: 6},
+			},
+		},
+		{
+			"select all with filter and select others without filter",
+			&MultiSelect{
+				Message: "What days do you prefer:",
+				Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
+			},
+			func(c *expect.Console) {
+				c.ExpectString("What days do you prefer:  [Use arrows to move, space to select, <right> to all, <left> to none, type to filter]")
+				// Select first
+				c.Send(" ")
+				// Select second
+				c.Send(string(terminal.KeyArrowDown))
+				c.Send(" ")
+				// Send filter
+				c.Send("tu")
+				// Select all
+				c.Send(string(terminal.KeyArrowRight))
+				c.SendLine("")
+				c.ExpectEOF()
+			},
+			[]core.OptionAnswer{
+				core.OptionAnswer{Value: "Sunday", Index: 0},
+				core.OptionAnswer{Value: "Monday", Index: 1},
+				core.OptionAnswer{Value: "Tuesday", Index: 2},
+				core.OptionAnswer{Value: "Saturday", Index: 6},
+			},
+		},
+		{
+			"select all with filter and deselect one without filter",
+			&MultiSelect{
+				Message: "What days do you prefer:",
+				Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
+			},
+			func(c *expect.Console) {
+				c.ExpectString("What days do you prefer:  [Use arrows to move, space to select, <right> to all, <left> to none, type to filter]")
+				// Send filter
+				c.Send("tu")
+				// Select all
+				c.Send(string(terminal.KeyArrowRight))
+				// Deselect second
+				c.Send(string(terminal.KeyArrowDown))
+				c.Send(string(terminal.KeyArrowDown))
+				c.Send(" ")
+				c.SendLine("")
+				c.ExpectEOF()
+			},
+			[]core.OptionAnswer{
+				core.OptionAnswer{Value: "Saturday", Index: 6},
+			},
+		},
+
 	}
 
 	for _, test := range tests {
@@ -373,7 +487,7 @@ func TestMultiSelectPromptKeepFilter(t *testing.T) {
 				Options: []string{"green", "red", "light-green", "blue", "black", "yellow", "purple"},
 			},
 			func(c *expect.Console) {
-				c.ExpectString("What color do you prefer:  [Use arrows to move, space to select, type to filter]")
+				c.ExpectString("What color do you prefer:  [Use arrows to move, space to select, <right> to all, <left> to none, type to filter]")
 				// Filter down to green
 				c.Send("green")
 				// Select green.
