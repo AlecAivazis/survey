@@ -59,6 +59,28 @@ func TestWrite_canWriteSlice(t *testing.T) {
 	assert.Equal(t, []string{"hello", "world"}, ptr)
 }
 
+func TestWrite_canWriteMapString(t *testing.T) {
+	// a map to hold the values
+	ptr := map[string]string{}
+
+	// copy in a value
+	WriteAnswer(&ptr, "test", OptionAnswer{Value: "hello", Index: 5})
+
+	// make sure only string value is written
+	assert.Equal(t, map[string]string{"test": "hello"}, ptr)
+}
+
+func TestWrite_canWriteMapInt(t *testing.T) {
+	// a map to hold the values
+	ptr := map[string]int{}
+
+	// copy in a value
+	WriteAnswer(&ptr, "test", OptionAnswer{Value: "hello", Index: 5})
+
+	// make sure only string value is written
+	assert.Equal(t, map[string]int{"test": 5}, ptr)
+}
+
 func TestWrite_recoversInvalidReflection(t *testing.T) {
 	// a variable to mutate
 	ptr := false
@@ -108,7 +130,7 @@ func TestWriteAnswer_canMutateStruct(t *testing.T) {
 }
 
 func TestWriteAnswer_optionAnswer(t *testing.T) {
-	t.Run("writes index for ints", func (t *testing.T) {
+	t.Run("writes index for ints", func(t *testing.T) {
 		val := 0
 
 		// write a value to an existing field
@@ -128,7 +150,7 @@ func TestWriteAnswer_optionAnswer(t *testing.T) {
 		}
 	})
 
-	t.Run("writes OptionAnswer for OptionAnswer", func (t *testing.T) {
+	t.Run("writes OptionAnswer for OptionAnswer", func(t *testing.T) {
 		val := OptionAnswer{}
 
 		// write a value to an existing field
@@ -148,7 +170,7 @@ func TestWriteAnswer_optionAnswer(t *testing.T) {
 		}
 	})
 
-	t.Run("writes value for strings", func (t *testing.T) {
+	t.Run("writes value for strings", func(t *testing.T) {
 		val := ""
 
 		// write a value to an existing field
@@ -168,7 +190,7 @@ func TestWriteAnswer_optionAnswer(t *testing.T) {
 		}
 	})
 
-	t.Run("writes slice of indices for slice of ints", func (t *testing.T) {
+	t.Run("writes slice of indices for slice of ints", func(t *testing.T) {
 		val := []int{}
 
 		// write a value to an existing field
@@ -190,7 +212,7 @@ func TestWriteAnswer_optionAnswer(t *testing.T) {
 		}
 	})
 
-	t.Run("writes slice of values for slice of strings", func (t *testing.T) {
+	t.Run("writes slice of values for slice of strings", func(t *testing.T) {
 		val := []string{}
 
 		// write a value to an existing field
@@ -205,7 +227,6 @@ func TestWriteAnswer_optionAnswer(t *testing.T) {
 			t.Errorf("Encountered error while writing answer: %v", err.Error())
 			return
 		}
-
 
 		if len(val) != 1 || val[0] != "string value" {
 			t.Errorf("Wrong value written. Wanted [string value], got %v", val)
