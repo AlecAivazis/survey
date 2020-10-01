@@ -10,6 +10,10 @@ import (
 	"github.com/AlecAivazis/survey/v2/terminal"
 )
 
+// OnSIGINTFunc is the function to run when
+// SIGINT (CTRL+C) is sent to the process.
+var OnSIGINTFunc func()
+
 // DefaultAskOptions is the default options on ask, using the OS stdio.
 func defaultAskOptions() *AskOptions {
 	return &AskOptions{
@@ -289,6 +293,10 @@ func Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
 
 		// grab the user input and save it
 		ans, err := q.Prompt.Prompt(&options.PromptConfig)
+		// if SIGINT is recieved
+		if err == terminal.InterruptErr {
+			OnSIGINTFunc()
+		}
 		// if there was a problem
 		if err != nil {
 			return err
