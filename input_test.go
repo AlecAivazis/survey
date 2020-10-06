@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/AlecAivazis/survey/v2/core"
@@ -19,6 +20,8 @@ func init() {
 }
 
 func TestInputRender(t *testing.T) {
+
+	suggestFn := func(string) (s []string) { return s }
 
 	tests := []struct {
 		title    string
@@ -68,6 +71,49 @@ func TestInputRender(t *testing.T) {
 			InputTemplateData{ShowHelp: true},
 			fmt.Sprintf("%s This is helpful\n%s What is your favorite month: (April) ", defaultIcons().Help.Text, defaultIcons().Question.Text),
 		},
+		{
+			"Test Input question output with completion",
+			Input{Message: "What is your favorite month:", Suggest: suggestFn},
+			InputTemplateData{},
+			fmt.Sprintf("%s What is your favorite month: [%s for suggestions] ", defaultIcons().Question.Text, string(defaultPromptConfig().SuggestInput)),
+		},
+		{
+			"Test Input question output with suggestions and help hidden",
+			Input{Message: "What is your favorite month:", Suggest: suggestFn, Help: "This is helpful"},
+			InputTemplateData{},
+			fmt.Sprintf("%s What is your favorite month: [%s for help] [%s for suggestions] ", defaultIcons().Question.Text, string(defaultPromptConfig().HelpInput), string(defaultPromptConfig().SuggestInput)),
+		},
+		{
+			"Test Input question output with suggestions and default and help hidden",
+			Input{Message: "What is your favorite month:", Suggest: suggestFn, Help: "This is helpful", Default: "April"},
+			InputTemplateData{},
+			fmt.Sprintf("%s What is your favorite month: [%s for help] [%s for suggestions] (April) ", defaultIcons().Question.Text, string(defaultPromptConfig().HelpInput), string(defaultPromptConfig().SuggestInput)),
+		},
+		{
+			"Test Input question output with suggestions shown",
+			Input{Message: "What is your favorite month:", Suggest: suggestFn},
+			InputTemplateData{
+				PageEntries:   core.OptionAnswerList([]string{"January", "February", "March", "etc..."}),
+				SelectedIndex: 1,
+				Answer:        "February",
+			},
+			fmt.Sprintf(
+				"%s What is your favorite month: February [Use arrows to navegate, enter to select, type to complement answer]\n"+
+					"  January\n%s February\n  March\n  etc...\n",
+				defaultIcons().Question.Text, defaultPromptConfig().Icons.SelectFocus.Text,
+			),
+		},
+		{
+			"Test Input question output with suggestion complemented",
+			Input{Message: "What is your favorite month:", Suggest: suggestFn},
+			InputTemplateData{
+				Answer: "February and",
+			},
+			fmt.Sprintf(
+				"%s What is your favorite month: [%s for suggestions] February and",
+				defaultIcons().Question.Text, defaultPromptConfig().SuggestInput,
+			),
+		},
 	}
 
 	for _, test := range tests {
@@ -95,6 +141,22 @@ func TestInputRender(t *testing.T) {
 }
 
 func TestInputPrompt(t *testing.T) {
+
+	months := []string{"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"}
+	suggestFn := func(toComplet string) []string {
+		if toComplet == "" {
+			return months
+		}
+		r := make([]string, 0)
+		for _, m := range months {
+			if !strings.Contains(m, toComplet) {
+				continue
+			}
+			r = append(r, m)
+		}
+		return r
+	}
+
 	tests := []PromptTest{
 		{
 			"Test Input prompt interaction",
@@ -164,6 +226,21 @@ func TestInputPrompt(t *testing.T) {
 				c.ExpectEOF()
 			},
 			"R",
+		},
+		{
+			"Test Input prompt interaction when ask for suggestion with empty value",
+			&Input{
+				Message: "What is your favorite month?",
+				Suggest: suggestFn,
+			},
+			func(c *expect.Console) {
+				c.ExpectString("What is your name?")
+				c.SendLine("?")
+				c.ExpectString("It might be Satoshi Nakamoto")
+				c.SendLine("Satoshi Nakamoto")
+				c.ExpectEOF()
+			},
+			"Satoshi Nakamoto",
 		},
 	}
 

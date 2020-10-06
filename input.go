@@ -1,5 +1,7 @@
 package survey
 
+import "github.com/AlecAivazis/survey/v2/core"
+
 /*
 Input is a regular text input that prints each character the user types on the screen
 and accepts the input with the enter key. Response type is a string.
@@ -13,15 +15,18 @@ type Input struct {
 	Message string
 	Default string
 	Help    string
+	Suggest func(toComplete string) []string
 }
 
 // data available to the templates when processing
 type InputTemplateData struct {
 	Input
-	Answer     string
-	ShowAnswer bool
-	ShowHelp   bool
-	Config     *PromptConfig
+	Answer        string
+	ShowAnswer    bool
+	ShowHelp      bool
+	PageEntries   []core.OptionAnswer
+	SelectedIndex int
+	Config        *PromptConfig
 }
 
 // Templates with Color formatting. See Documentation: https://github.com/mgutz/ansi#style-format
@@ -31,9 +36,19 @@ var InputQuestionTemplate = `
 {{- color "default+hb"}}{{ .Message }} {{color "reset"}}
 {{- if .ShowAnswer}}
   {{- color "cyan"}}{{.Answer}}{{color "reset"}}{{"\n"}}
+{{- else if .PageEntries -}}
+  {{- .Answer}} [Use arrows to navegate, enter to select, type to complement answer]
+  {{- "\n"}}
+  {{- range $ix, $choice := .PageEntries}}
+    {{- if eq $ix $.SelectedIndex }}{{color $.Config.Icons.SelectFocus.Format }}{{ $.Config.Icons.SelectFocus.Text }} {{else}}{{color "default"}}  {{end}}
+    {{- $choice.Value}}
+    {{- color "reset"}}{{"\n"}}
+  {{- end}}
 {{- else }}
   {{- if and .Help (not .ShowHelp)}}{{color "cyan"}}[{{ print .Config.HelpInput }} for help]{{color "reset"}} {{end}}
+  {{- if and .Suggest }}{{color "cyan"}}[{{ print .Config.SuggestInput }} for suggestions]{{color "reset"}} {{end}}
   {{- if .Default}}{{color "white"}}({{.Default}}) {{color "reset"}}{{end}}
+  {{- .Answer -}}
 {{- end}}`
 
 func (i *Input) Prompt(config *PromptConfig) (interface{}, error) {
