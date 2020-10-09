@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"strings"
 	"testing"
 
 	"github.com/AlecAivazis/survey/v2/core"
@@ -44,7 +43,7 @@ func TestInputRender(t *testing.T) {
 		{
 			"Test Input answer output",
 			Input{Message: "What is your favorite month:"},
-			InputTemplateData{Answer: "October", ShowAnswer: true},
+			InputTemplateData{ShowAnswer: true, Answer: "October"},
 			fmt.Sprintf("%s What is your favorite month: October\n", defaultIcons().Question.Text),
 		},
 		{
@@ -93,9 +92,9 @@ func TestInputRender(t *testing.T) {
 			"Test Input question output with suggestions shown",
 			Input{Message: "What is your favorite month:", Suggest: suggestFn},
 			InputTemplateData{
+				Answer:        "February",
 				PageEntries:   core.OptionAnswerList([]string{"January", "February", "March", "etc..."}),
 				SelectedIndex: 1,
-				Answer:        "February",
 			},
 			fmt.Sprintf(
 				"%s What is your favorite month: February [Use arrows to navegate, enter to select, type to complement answer]\n"+
@@ -106,9 +105,7 @@ func TestInputRender(t *testing.T) {
 		{
 			"Test Input question output with suggestion complemented",
 			Input{Message: "What is your favorite month:", Suggest: suggestFn},
-			InputTemplateData{
-				Answer: "February and",
-			},
+			InputTemplateData{Answer: "February and"},
 			fmt.Sprintf(
 				"%s What is your favorite month: [%s for suggestions] February and",
 				defaultIcons().Question.Text, defaultPromptConfig().SuggestInput,
@@ -141,21 +138,6 @@ func TestInputRender(t *testing.T) {
 }
 
 func TestInputPrompt(t *testing.T) {
-
-	months := []string{"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"}
-	suggestFn := func(toComplet string) []string {
-		if toComplet == "" {
-			return months
-		}
-		r := make([]string, 0)
-		for _, m := range months {
-			if !strings.Contains(m, toComplet) {
-				continue
-			}
-			r = append(r, m)
-		}
-		return r
-	}
 
 	tests := []PromptTest{
 		{
@@ -231,16 +213,119 @@ func TestInputPrompt(t *testing.T) {
 			"Test Input prompt interaction when ask for suggestion with empty value",
 			&Input{
 				Message: "What is your favorite month?",
-				Suggest: suggestFn,
+				Suggest: func(string) []string {
+					return []string{"January", "February"}
+				},
 			},
 			func(c *expect.Console) {
-				c.ExpectString("What is your name?")
-				c.SendLine("?")
-				c.ExpectString("It might be Satoshi Nakamoto")
-				c.SendLine("Satoshi Nakamoto")
+				c.ExpectString("What is your favorite month?")
+				c.Send(string(terminal.KeyTab))
+				c.ExpectString("January")
+				c.ExpectString("February")
+				c.SendLine("")
 				c.ExpectEOF()
 			},
-			"Satoshi Nakamoto",
+			"January",
+		},
+		{
+			"Test Input prompt interaction when ask for suggestion with some value",
+			&Input{
+				Message: "What is your favorite month?",
+				Suggest: func(string) []string {
+					return []string{"February"}
+				},
+			},
+			func(c *expect.Console) {
+				c.ExpectString("What is your favorite month?")
+				c.Send("feb")
+				c.Send(string(terminal.KeyTab))
+				c.SendLine("")
+				c.ExpectEOF()
+			},
+			"February",
+		},
+		{
+			"Test Input prompt interaction when ask for suggestion with some value, choosing the second one",
+			&Input{
+				Message: "What is your favorite month?",
+				Suggest: func(string) []string {
+					return []string{"January", "February", "March"}
+				},
+			},
+			func(c *expect.Console) {
+				c.ExpectString("What is your favorite month?")
+				c.Send(string(terminal.KeyTab))
+				c.Send(string(terminal.KeyArrowDown))
+				c.Send(string(terminal.KeyArrowDown))
+				c.SendLine("")
+				c.ExpectEOF()
+			},
+			"March",
+		},
+		{
+			"Test Input prompt interaction when ask for suggestion with some value, choosing the second one",
+			&Input{
+				Message: "What is your favorite month?",
+				Suggest: func(string) []string {
+					return []string{"January", "February", "March"}
+				},
+			},
+			func(c *expect.Console) {
+				c.ExpectString("What is your favorite month?")
+				c.Send(string(terminal.KeyTab))
+				c.Send(string(terminal.KeyArrowDown))
+				c.Send(string(terminal.KeyArrowDown))
+				c.Send(string(terminal.KeyArrowUp))
+				c.SendLine("")
+				c.ExpectEOF()
+			},
+			"February",
+		},
+		{
+			"Test Input prompt interaction when ask for suggestion, complementing it and get new suggestions",
+			&Input{
+				Message: "Where to save it?",
+				Suggest: func(complete string) []string {
+					if complete == "" {
+						return []string{"folder1/", "folder2/", "folder3/"}
+					}
+					return []string{"folder3/file1.txt", "folder3/file2.txt"}
+				},
+			},
+			func(c *expect.Console) {
+				c.ExpectString("Where to save it?")
+				c.Send(string(terminal.KeyTab))
+				c.ExpectString("folder1/")
+				c.Send(string(terminal.KeyArrowDown))
+				c.Send(string(terminal.KeyArrowDown))
+				c.Send("f")
+				c.Send(string(terminal.KeyTab))
+				c.ExpectString("folder3/file2.txt")
+				c.Send(string(terminal.KeyArrowDown))
+				c.SendLine("")
+				c.ExpectEOF()
+			},
+			"folder3/file2.txt",
+		},
+		{
+			"Test Input prompt interaction when asked suggestions, but abort suggestions",
+			&Input{
+				Message: "Wanna a suggestion?",
+				Suggest: func(string) []string {
+					return []string{"suggest1", "suggest2"}
+				},
+			},
+			func(c *expect.Console) {
+				c.ExpectString("Wanna a suggestion?")
+				c.Send("typed answer")
+				c.Send(string(terminal.KeyTab))
+				c.ExpectString("suggest1")
+				c.Send(string(terminal.KeyEscape))
+				c.ExpectString("typed answer")
+				c.SendLine("")
+				c.ExpectEOF()
+			},
+			"typed answer",
 		},
 	}
 
