@@ -62,6 +62,7 @@ func main() {
 1. [Running the Prompts](#running-the-prompts)
 1. [Prompts](#prompts)
    1. [Input](#input)
+      1. [Suggestion Options](#suggestion-options)
    1. [Multiline](#multiline)
    1. [Password](#password)
    1. [Confirm](#confirm)
@@ -135,6 +136,23 @@ prompt := &survey.Input{
     Message: "ping",
 }
 survey.AskOne(prompt, &name)
+```
+
+#### Suggestion Options
+
+<img src="https://i.imgur.com/Q7POpA1.gif" width="800px"/>
+
+```golang
+file := ""
+prompt := &survey.Input{
+    Message: "inform a file to save:",
+    Suggest: func (toComplete string) []string {
+        files, _ := filepath.Glob(toComplete + "*")
+        return files
+    },
+}
+}
+survey.AskOne(prompt, &file)
 ```
 
 ### Multiline
