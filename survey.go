@@ -59,6 +59,7 @@ func defaultAskOptions() *AskOptions {
 			},
 			KeepFilter: false,
 		},
+		OnSIGINTFunc: OnSIGINTFunc,
 	}
 }
 func defaultPromptConfig() *PromptConfig {
@@ -139,6 +140,7 @@ type AskOptions struct {
 	Stdio        terminal.Stdio
 	Validators   []Validator
 	PromptConfig PromptConfig
+	OnSIGINTFunc func()
 }
 
 // WithStdio specifies the standard input, output and error files survey
@@ -179,6 +181,16 @@ func WithValidator(v Validator) AskOpt {
 		// add the provided validator to the list
 		options.Validators = append(options.Validators, v)
 
+		// nothing went wrong
+		return nil
+	}
+}
+
+// WithSIGINTFunc specifies a function to run on recieving
+// SIGINT (aka CTRL+C) during prompt.
+func WithSIGINTFunc(fn func()) AskOpt {
+	return func(options *AskOptions) error {
+		options.OnSIGINTFunc = fn
 		// nothing went wrong
 		return nil
 	}
@@ -293,9 +305,9 @@ func Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
 
 		// grab the user input and save it
 		ans, err := q.Prompt.Prompt(&options.PromptConfig)
-		// if SIGINT is recieved
+		// if SIGINT is recieved.
 		if err == terminal.InterruptErr {
-			OnSIGINTFunc()
+			options.OnSIGINTFunc()
 		}
 		// if there was a problem
 		if err != nil {
