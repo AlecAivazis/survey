@@ -10,9 +10,9 @@ import (
 	"github.com/AlecAivazis/survey/v2/terminal"
 )
 
-// OnSIGINTFunc is the function to run when
+// OnSigint is the function to run when
 // SIGINT (CTRL+C) is sent to the process.
-var OnSIGINTFunc func()
+var OnSigint func()
 
 // DefaultAskOptions is the default options on ask, using the OS stdio.
 func defaultAskOptions() *AskOptions {
@@ -59,7 +59,7 @@ func defaultAskOptions() *AskOptions {
 			},
 			KeepFilter: false,
 		},
-		OnSIGINTFunc: OnSIGINTFunc,
+		OnSigint: OnSigint,
 	}
 }
 func defaultPromptConfig() *PromptConfig {
@@ -140,7 +140,7 @@ type AskOptions struct {
 	Stdio        terminal.Stdio
 	Validators   []Validator
 	PromptConfig PromptConfig
-	OnSIGINTFunc func()
+	OnSigint     func()
 }
 
 // WithStdio specifies the standard input, output and error files survey
@@ -190,7 +190,7 @@ func WithValidator(v Validator) AskOpt {
 // SIGINT (aka CTRL+C) during prompt.
 func WithSIGINTFunc(fn func()) AskOpt {
 	return func(options *AskOptions) error {
-		options.OnSIGINTFunc = fn
+		options.OnSigint = fn
 		// nothing went wrong
 		return nil
 	}
@@ -307,7 +307,7 @@ func Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
 		ans, err := q.Prompt.Prompt(&options.PromptConfig)
 		// if SIGINT is recieved.
 		if err == terminal.InterruptErr {
-			options.OnSIGINTFunc()
+			options.OnSigint()
 		}
 		// if there was a problem
 		if err != nil {
