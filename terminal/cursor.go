@@ -40,16 +40,6 @@ func (c *Cursor) Back(n int) {
 	fmt.Fprintf(c.Out, "\x1b[%dD", n)
 }
 
-// NextLine moves cursor to beginning of the line n lines down.
-func (c *Cursor) NextLine(n int) {
-	fmt.Fprintf(c.Out, "\x1b[%dE", n)
-}
-
-// PreviousLine moves cursor to beginning of the line n lines up.
-func (c *Cursor) PreviousLine(n int) {
-	fmt.Fprintf(c.Out, "\x1b[%dF", n)
-}
-
 // HorizontalAbsolute moves cursor horizontally to x.
 func (c *Cursor) HorizontalAbsolute(x int) {
 	fmt.Fprintf(c.Out, "\x1b[%dG", x)
@@ -86,7 +76,7 @@ func (c *Cursor) MoveNextLine(cur *Coord, terminalSize *Coord) {
 	if cur.Y == terminalSize.Y {
 		fmt.Fprintln(c.Out)
 	}
-	c.NextLine(1)
+	c.Down(1)
 }
 
 // Location returns the current location of the cursor in the terminal

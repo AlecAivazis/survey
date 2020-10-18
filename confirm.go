@@ -59,7 +59,7 @@ func (c *Confirm) getBool(showHelp bool, config *PromptConfig) (bool, error) {
 			return false, err
 		}
 		// move back up a line to compensate for the \n echoed from terminal
-		cursor.PreviousLine(1)
+		cursor.Up(1)
 		val := string(line)
 
 		// get the answer that matches the

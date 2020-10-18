@@ -69,12 +69,12 @@ func (i *Multiline) Prompt(config *PromptConfig) (interface{}, error) {
 		if string(line) == "" {
 			if emptyOnce {
 				numLines := len(multiline) + 2
-				cursor.PreviousLine(numLines)
+				cursor.Up(numLines)
 				for j := 0; j < numLines; j++ {
 					terminal.EraseLine(i.Stdio().Out, terminal.ERASE_LINE_ALL)
-					cursor.NextLine(1)
+					cursor.Down(1)
 				}
-				cursor.PreviousLine(numLines)
+				cursor.Up(numLines)
 				break
 			}
 			emptyOnce = true
