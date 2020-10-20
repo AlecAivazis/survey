@@ -186,9 +186,9 @@ func WithValidator(v Validator) AskOpt {
 	}
 }
 
-// WithSIGINTFunc specifies a function to run on recieving
+// WithInterruptFunc specifies a function to run on recieving
 // SIGINT (aka CTRL+C) during prompt.
-func WithSIGINTFunc(fn func()) AskOpt {
+func WithInterruptFunc(fn func()) AskOpt {
 	return func(options *AskOptions) error {
 		options.OnInterrupt = fn
 		// nothing went wrong
