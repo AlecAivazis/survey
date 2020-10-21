@@ -97,7 +97,7 @@ func TestInputRender(t *testing.T) {
 				SelectedIndex: 1,
 			},
 			fmt.Sprintf(
-				"%s What is your favorite month: February [Use arrows to navegate, enter to select, type to complement answer]\n"+
+				"%s What is your favorite month: February [Use arrows to move, enter to select, type to continue]\n"+
 					"  January\n%s February\n  March\n  etc...\n",
 				defaultIcons().Question.Text, defaultPromptConfig().Icons.SelectFocus.Text,
 			),

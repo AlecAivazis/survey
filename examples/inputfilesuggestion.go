@@ -19,7 +19,7 @@ var q = []*survey.Question{
 		Prompt: &survey.Input{
 			Message: "Which file should be read?",
 			Suggest: suggestFiles,
-			Help:    "Any file, may not even exit yet",
+			Help:    "Any file; do not need to exist yet",
 		},
 		Validate: survey.Required,
 	},

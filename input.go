@@ -45,7 +45,7 @@ var InputQuestionTemplate = `
 {{- if .ShowAnswer}}
   {{- color "cyan"}}{{.Answer}}{{color "reset"}}{{"\n"}}
 {{- else if .PageEntries -}}
-  {{- .Answer}} [Use arrows to navegate, enter to select, type to complement answer]
+  {{- .Answer}} [Use arrows to move, enter to select, type to continue]
   {{- "\n"}}
   {{- range $ix, $choice := .PageEntries}}
     {{- if eq $ix $.SelectedIndex }}{{color $.Config.Icons.SelectFocus.Format }}{{ $.Config.Icons.SelectFocus.Text }} {{else}}{{color "default"}}  {{end}}
