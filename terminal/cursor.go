@@ -41,11 +41,13 @@ func (c *Cursor) Back(n int) {
 }
 
 // NextLine moves cursor to beginning of the line n lines down.
+// DEPRECATED: use Down() instead
 func (c *Cursor) NextLine(n int) {
 	fmt.Fprintf(c.Out, "\x1b[%dE", n)
 }
 
 // PreviousLine moves cursor to beginning of the line n lines up.
+// DEPRECATED: use Up() instead
 func (c *Cursor) PreviousLine(n int) {
 	fmt.Fprintf(c.Out, "\x1b[%dF", n)
 }
@@ -86,7 +88,7 @@ func (c *Cursor) MoveNextLine(cur *Coord, terminalSize *Coord) {
 	if cur.Y == terminalSize.Y {
 		fmt.Fprintln(c.Out)
 	}
-	c.NextLine(1)
+	c.Down(1)
 }
 
 // Location returns the current location of the cursor in the terminal
