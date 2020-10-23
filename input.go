@@ -53,8 +53,10 @@ var InputQuestionTemplate = `
     {{- color "reset"}}{{"\n"}}
   {{- end}}
 {{- else }}
-  {{- if and .Help (not .ShowHelp)}}{{color "cyan"}}[{{ print .Config.HelpInput }} for help]{{color "reset"}} {{end}}
-  {{- if and .Suggest }}{{color "cyan"}}[{{ print .Config.SuggestInput }} for suggestions]{{color "reset"}} {{end}}
+  {{- if or (and .Help (not .ShowHelp)) .Suggest }}{{color "cyan"}}[
+    {{- if and .Help (not .ShowHelp)}}{{ print .Config.HelpInput }} for help {{- if and .Suggest}}, {{end}}{{end -}}
+    {{- if and .Suggest }}{{color "cyan"}}{{ print .Config.SuggestInput }} for suggestions{{end -}}
+  ]{{color "reset"}} {{end}}
   {{- if .Default}}{{color "white"}}({{.Default}}) {{color "reset"}}{{end}}
   {{- .Answer -}}
 {{- end}}`

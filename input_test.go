@@ -80,13 +80,13 @@ func TestInputRender(t *testing.T) {
 			"Test Input question output with suggestions and help hidden",
 			Input{Message: "What is your favorite month:", Suggest: suggestFn, Help: "This is helpful"},
 			InputTemplateData{},
-			fmt.Sprintf("%s What is your favorite month: [%s for help] [%s for suggestions] ", defaultIcons().Question.Text, string(defaultPromptConfig().HelpInput), string(defaultPromptConfig().SuggestInput)),
+			fmt.Sprintf("%s What is your favorite month: [%s for help, %s for suggestions] ", defaultIcons().Question.Text, string(defaultPromptConfig().HelpInput), string(defaultPromptConfig().SuggestInput)),
 		},
 		{
 			"Test Input question output with suggestions and default and help hidden",
 			Input{Message: "What is your favorite month:", Suggest: suggestFn, Help: "This is helpful", Default: "April"},
 			InputTemplateData{},
-			fmt.Sprintf("%s What is your favorite month: [%s for help] [%s for suggestions] (April) ", defaultIcons().Question.Text, string(defaultPromptConfig().HelpInput), string(defaultPromptConfig().SuggestInput)),
+			fmt.Sprintf("%s What is your favorite month: [%s for help, %s for suggestions] (April) ", defaultIcons().Question.Text, string(defaultPromptConfig().HelpInput), string(defaultPromptConfig().SuggestInput)),
 		},
 		{
 			"Test Input question output with suggestions shown",
