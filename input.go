@@ -72,18 +72,6 @@ func (i *Input) OnChange(key rune, config *PromptConfig) (bool, error) {
 		}
 	} else if key == terminal.KeyDeleteWord || key == terminal.KeyDeleteLine {
 		i.answer = ""
-	} else if key == terminal.KeyTab && i.Suggest != nil {
-		options := i.Suggest(i.answer)
-		i.selectedIndex = 0
-		i.typedAnswer = i.answer
-		if len(options) > 0 {
-			i.answer = options[0]
-			if len(options) == 1 {
-				i.options = nil
-			} else {
-				i.options = core.OptionAnswerList(options)
-			}
-		}
 	} else if key == terminal.KeyEscape && i.Suggest != nil {
 		if len(i.options) > 0 {
 			i.answer = i.typedAnswer
@@ -96,13 +84,25 @@ func (i *Input) OnChange(key rune, config *PromptConfig) (bool, error) {
 			i.selectedIndex--
 		}
 		i.answer = i.options[i.selectedIndex].Value
-	} else if key == terminal.KeyArrowDown && len(i.options) > 0 {
+	} else if (key == terminal.KeyArrowDown || key == terminal.KeyTab) && len(i.options) > 0 {
 		if i.selectedIndex == len(i.options)-1 {
 			i.selectedIndex = 0
 		} else {
 			i.selectedIndex++
 		}
 		i.answer = i.options[i.selectedIndex].Value
+	} else if key == terminal.KeyTab && i.Suggest != nil {
+		options := i.Suggest(i.answer)
+		i.selectedIndex = 0
+		i.typedAnswer = i.answer
+		if len(options) > 0 {
+			i.answer = options[0]
+			if len(options) == 1 {
+				i.options = nil
+			} else {
+				i.options = core.OptionAnswerList(options)
+			}
+		}
 	} else if key == terminal.KeyDelete || key == terminal.KeyBackspace {
 		if i.answer != "" {
 			i.answer = i.answer[0 : len(i.answer)-1]

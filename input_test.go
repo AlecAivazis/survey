@@ -327,6 +327,28 @@ func TestInputPrompt(t *testing.T) {
 			},
 			"typed answer",
 		},
+		{
+			"Test Input prompt interaction with suggestions, when tabbed with list being shown, should select next suggestion",
+			&Input{
+				Message: "Choose the special one:",
+				Suggest: func(string) []string {
+					return []string{"suggest1", "suggest2", "special answer"}
+				},
+			},
+			func(c *expect.Console) {
+				c.ExpectString("Choose the special one:")
+				c.Send("s")
+				c.Send(string(terminal.KeyTab))
+				c.ExpectString("suggest1")
+				c.ExpectString("suggest2")
+				c.ExpectString("special answer")
+				c.Send(string(terminal.KeyTab))
+				c.Send(string(terminal.KeyTab))
+				c.SendLine("")
+				c.ExpectEOF()
+			},
+			"special answer",
+		},
 	}
 
 	for _, test := range tests {
