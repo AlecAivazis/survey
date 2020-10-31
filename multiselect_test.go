@@ -172,6 +172,26 @@ func TestMultiSelectPrompt(t *testing.T) {
 			[]core.OptionAnswer{core.OptionAnswer{Value: "Monday", Index: 1}},
 		},
 		{
+			"cycle to next when tab send",
+			&MultiSelect{
+				Message: "What days do you prefer:",
+				Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
+			},
+			func(c *expect.Console) {
+				c.ExpectString("What days do you prefer:  [Use arrows to move, space to select, <right> to all, <left> to none, type to filter]")
+				// Select Monday.
+				c.Send(string(terminal.KeyTab))
+				c.Send(" ")
+				c.Send(string(terminal.KeyArrowDown))
+				c.SendLine(" ")
+				c.ExpectEOF()
+			},
+			[]core.OptionAnswer{
+				core.OptionAnswer{Value: "Monday", Index: 1},
+				core.OptionAnswer{Value: "Tuesday", Index: 2},
+			},
+		},
+		{
 			"default value as []string",
 			&MultiSelect{
 				Message: "What days do you prefer:",
@@ -468,7 +488,6 @@ func TestMultiSelectPrompt(t *testing.T) {
 				core.OptionAnswer{Value: "Saturday", Index: 6},
 			},
 		},
-
 	}
 
 	for _, test := range tests {
