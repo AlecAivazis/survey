@@ -102,6 +102,10 @@ func TestEditorRender(t *testing.T) {
 }
 
 func TestEditorPrompt(t *testing.T) {
+	if os.Getenv("SKIP_EDITOR_PROMPT_TESTS") != "" {
+		t.Skip("editor prompt tests skipped by dev")
+	}
+
 	if _, err := exec.LookPath("vi"); err != nil {
 		t.Skip("vi not found in PATH")
 	}

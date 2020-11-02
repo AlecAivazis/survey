@@ -135,6 +135,22 @@ func TestSelectPrompt(t *testing.T) {
 			core.OptionAnswer{Index: 1, Value: "blue"},
 		},
 		{
+			"basic interaction",
+			&Select{
+				Message: "Choose a color:",
+				Options: []string{"red", "blue", "green"},
+			},
+			func(c *expect.Console) {
+				c.ExpectString("Choose a color:")
+				// Select blue.
+				c.Send(string(terminal.KeyArrowDown))
+				// Select green.
+				c.SendLine(string(terminal.KeyTab))
+				c.ExpectEOF()
+			},
+			core.OptionAnswer{Index: 2, Value: "green"},
+		},
+		{
 			"default value",
 			&Select{
 				Message: "Choose a color:",

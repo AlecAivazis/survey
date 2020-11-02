@@ -77,7 +77,7 @@ func (m *MultiSelect) OnChange(key rune, config *PromptConfig) {
 			// decrement the selected index
 			m.selectedIndex--
 		}
-	} else if key == terminal.KeyArrowDown || (m.VimMode && key == 'j') {
+	} else if key == terminal.KeyTab || key == terminal.KeyArrowDown || (m.VimMode && key == 'j') {
 		// if we are at the bottom of the list
 		if m.selectedIndex == len(options)-1 {
 			// start at the top
