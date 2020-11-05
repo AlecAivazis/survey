@@ -61,7 +61,7 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 			for index > 0 {
 				if cursorCurrent.CursorIsAtLineBegin() {
 					EraseLine(rr.stdio.Out, ERASE_LINE_END)
-					cursor.Up(1)
+					cursor.PreviousLine(1)
 					cursor.Forward(int(terminalSize.X))
 					cursorCurrent.X = terminalSize.X
 					cursorCurrent.Y--
@@ -99,7 +99,7 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 					line = line[:len(line)-1]
 					// go back one
 					if cursorCurrent.X == 1 {
-						cursor.Up(1)
+						cursor.PreviousLine(1)
 						cursor.Forward(int(terminalSize.X))
 					} else {
 						cursor.Back(cells)
@@ -133,13 +133,13 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 					}
 					// erase what's left over from last print
 					if cursorCurrent.Y < terminalSize.Y {
-						cursor.Down(1)
+						cursor.NextLine(1)
 						EraseLine(rr.stdio.Out, ERASE_LINE_END)
 					}
 					// restore cursor
 					cursor.Restore()
 					if cursorCurrent.CursorIsAtLineBegin() {
-						cursor.Up(1)
+						cursor.PreviousLine(1)
 						cursor.Forward(int(terminalSize.X))
 					} else {
 						cursor.Back(cells)
@@ -163,7 +163,7 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 			if index > 0 {
 				//move the cursor to the prev line if necessary
 				if cursorCurrent.CursorIsAtLineBegin() {
-					cursor.Up(1)
+					cursor.PreviousLine(1)
 					cursor.Forward(int(terminalSize.X))
 				} else {
 					cursor.Back(runeWidth(line[index-1]))
@@ -187,7 +187,7 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 			if index < len(line) {
 				// move the cursor to the next line if necessary
 				if cursorCurrent.CursorIsAtLineEnd(terminalSize) {
-					cursor.Down(1)
+					cursor.NextLine(1)
 				} else {
 					cursor.Forward(runeWidth(line[index]))
 				}
@@ -206,7 +206,7 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 		if r == SpecialKeyHome {
 			for index > 0 {
 				if cursorCurrent.CursorIsAtLineBegin() {
-					cursor.Up(1)
+					cursor.PreviousLine(1)
 					cursor.Forward(int(terminalSize.X))
 					cursorCurrent.X = terminalSize.X
 					cursorCurrent.Y--
@@ -222,7 +222,7 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 		} else if r == SpecialKeyEnd {
 			for index != len(line) {
 				if cursorCurrent.CursorIsAtLineEnd(terminalSize) {
-					cursor.Down(1)
+					cursor.NextLine(1)
 					cursorCurrent.X = COORDINATE_SYSTEM_BEGIN
 					cursorCurrent.Y++
 
@@ -251,7 +251,7 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 				}
 				// erase what's left on last line
 				if cursorCurrent.Y < terminalSize.Y {
-					cursor.Down(1)
+					cursor.NextLine(1)
 					EraseLine(rr.stdio.Out, ERASE_LINE_END)
 				}
 				// restore cursor
@@ -302,7 +302,7 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 				// restore the position of the cursor horizontally
 				cursor.Restore()
 				// restore the position of the cursor vertically
-				cursor.Up(1)
+				cursor.PreviousLine(1)
 			} else {
 				// restore cursor
 				cursor.Restore()
@@ -310,7 +310,7 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 			// check if cursor needs to move to next line
 			cursorCurrent, _ = cursor.Location(rr.Buffer())
 			if cursorCurrent.CursorIsAtLineEnd(terminalSize) {
-				cursor.Down(1)
+				cursor.NextLine(1)
 			} else {
 				cursor.Forward(runeWidth(r))
 			}
