@@ -112,7 +112,7 @@ func (r *Renderer) resetPrompt(lines int) {
 	terminal.EraseLine(r.stdio.Out, terminal.ERASE_LINE_ALL)
 	// clean up what we left behind last time
 	for i := 0; i < lines; i++ {
-		cursor.Up(1)
+		cursor.PreviousLine(1)
 		terminal.EraseLine(r.stdio.Out, terminal.ERASE_LINE_ALL)
 	}
 }
