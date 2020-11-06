@@ -196,6 +196,7 @@ func (i *Input) Cleanup(config *PromptConfig, val interface{}) error {
 			Input:      *i,
 			ShowAnswer: true,
 			Config:     config,
+			Answer:     i.answer,
 		},
 	)
 }
