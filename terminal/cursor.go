@@ -42,12 +42,12 @@ func (c *Cursor) Back(n int) {
 
 // NextLine moves cursor to beginning of the line n lines down.
 func (c *Cursor) NextLine(n int) {
-	fmt.Fprintf(c.Out, "\x1b[%dE", n)
+	c.Down(1)
 }
 
 // PreviousLine moves cursor to beginning of the line n lines up.
 func (c *Cursor) PreviousLine(n int) {
-	fmt.Fprintf(c.Out, "\x1b[%dF", n)
+	c.Up(1)
 }
 
 // HorizontalAbsolute moves cursor horizontally to x.
