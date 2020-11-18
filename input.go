@@ -190,13 +190,20 @@ func (i *Input) Prompt(config *PromptConfig) (interface{}, error) {
 }
 
 func (i *Input) Cleanup(config *PromptConfig, val interface{}) error {
+	// use the default answer when cleaning up the prompt if necessary
+	ans := i.answer
+	if ans == "" && i.Default != "" {
+		ans = i.Default
+	}
+
+	// render the cleanup
 	return i.Render(
 		InputQuestionTemplate,
 		InputTemplateData{
 			Input:      *i,
 			ShowAnswer: true,
 			Config:     config,
-			Answer:     i.answer,
+			Answer:     ans,
 		},
 	)
 }
