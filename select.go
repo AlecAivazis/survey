@@ -28,6 +28,7 @@ type Select struct {
 	VimMode       bool
 	FilterMessage string
 	Filter        func(filter string, value string, index int) bool
+	HelpTextColor string
 	filter        string
 	selectedIndex int
 	useDefault    bool
@@ -51,7 +52,7 @@ var SelectQuestionTemplate = `
 {{- color "default+hb"}}{{ .Message }}{{ .FilterMessage }}{{color "reset"}}
 {{- if .ShowAnswer}}{{color "cyan"}} {{.Answer}}{{color "reset"}}{{"\n"}}
 {{- else}}
-  {{- "  "}}{{- color "cyan"}}[Use arrows to move, type to filter{{- if and .Help (not .ShowHelp)}}, {{ .Config.HelpInput }} for more help{{end}}]{{color "reset"}}
+  {{- "  "}}{{- color .HelpTextColor}}[Use arrows to move, type to filter{{- if and .Help (not .ShowHelp)}}, {{ .Config.HelpInput }} for more help{{end}}]{{color "reset"}}
   {{- "\n"}}
   {{- range $ix, $choice := .PageEntries}}
     {{- if eq $ix $.SelectedIndex }}{{color $.Config.Icons.SelectFocus.Format }}{{ $.Config.Icons.SelectFocus.Text }} {{else}}{{color "default"}}  {{end}}
@@ -59,6 +60,8 @@ var SelectQuestionTemplate = `
     {{- color "reset"}}{{"\n"}}
   {{- end}}
 {{- end}}`
+
+// {{- "  "}}{{- color "cyan"}}[Use arrows to move, type to filter{{- if and .Help (not .ShowHelp)}}, {{ .Config.HelpInput }} for more help{{end}}]{{color "reset"}}
 
 // OnChange is called on every keypress.
 func (s *Select) OnChange(key rune, config *PromptConfig) bool {
@@ -202,6 +205,11 @@ func (s *Select) Prompt(config *PromptConfig) (interface{}, error) {
 	if len(s.Options) == 0 {
 		// we failed
 		return "", errors.New("please provide options to select from")
+	}
+
+	// set help text color to cyan by default if there is not user input
+	if s.HelpTextColor == "" {
+		s.HelpTextColor = "cyan"
 	}
 
 	// start off with the first option selected
