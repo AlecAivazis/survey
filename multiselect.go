@@ -273,7 +273,10 @@ func (m *MultiSelect) Prompt(config *PromptConfig) (interface{}, error) {
 
 	// start waiting for input
 	for {
-		r, _, _ := rr.ReadRune()
+		r, _, err := rr.ReadRune()
+		if err != nil {
+			return "", err
+		}
 		if r == '\r' || r == '\n' {
 			break
 		}
