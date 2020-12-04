@@ -47,6 +47,9 @@ func defaultAskOptions() *AskOptions {
 					Text:   ">",
 					Format: "cyan+b",
 				},
+				PromptText: Icon{
+					Format: "cyan",
+				},
 			},
 			Filter: func(filter string, value string, index int) (include bool) {
 				filter = strings.ToLower(filter)
@@ -84,6 +87,7 @@ type IconSet struct {
 	MarkedOption   Icon
 	UnmarkedOption Icon
 	SelectFocus    Icon
+	PromptText     Icon
 }
 
 // Validator is a function passed to a Question after a user has provided a response.

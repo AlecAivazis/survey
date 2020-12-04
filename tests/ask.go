@@ -33,6 +33,9 @@ var singlePrompt = &survey.Input{
 
 func main() {
 
+
+
+
 	fmt.Println("Asking many.")
 	// a place to store the answers
 	ans := struct {
@@ -44,6 +47,7 @@ func main() {
 		fmt.Println(err.Error())
 		return
 	}
+
 
 	fmt.Println("Asking one.")
 	answer := ""
@@ -64,3 +68,5 @@ func main() {
 	}
 	fmt.Printf("Answered with %v.\n", vAns)
 }
+
+

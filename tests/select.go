@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/AlecAivazis/survey/v2"
-	TestUtil "github.com/AlecAivazis/survey/v2/tests/util"
+	"github.com/AlecAivazis/survey/v2/tests/util"
 )
 
 var answer = ""
@@ -10,9 +10,8 @@ var answer = ""
 var goodTable = []TestUtil.TestTableEntry{
 	{
 		"standard", &survey.Select{
-			Message:       "Choose a color:",
-			Options:       []string{"red", "blue", "green"},
-			HelpTextColor: "blue",
+			Message: "Choose a color:",
+			Options: []string{"red", "blue", "green"},
 		}, &answer, nil,
 	},
 	{

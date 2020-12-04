@@ -414,6 +414,7 @@ The icons and their default text and format are summarized below:
 | SelectFocus    | >    | green      | Marks the current focus in `Select` and `MultiSelect` prompts |
 | UnmarkedOption | [ ]  | default+hb | Marks an unselected option in a `MultiSelect` prompt          |
 | MarkedOption   | [x]  | cyan+b     | Marks a chosen selection in a `MultiSelect` prompt            |
+| PromptText     | []   | cyan       | Marks a chosen selection in a `MultiSelect` prompt            |
 
 ## Custom Types
 
