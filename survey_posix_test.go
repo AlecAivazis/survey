@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func RunTest(t *testing.T, procedure func(*expect.Console), test func(terminal.Stdio) error) {
+func RunTest(t *testing.T, procedure func(*expect.Console), test func(terminal.Stdio) error) error {
 	t.Parallel()
 
 	// Multiplex output to a buffer as well for the raw bytes.
@@ -28,7 +28,6 @@ func RunTest(t *testing.T, procedure func(*expect.Console), test func(terminal.S
 	}()
 
 	err = test(Stdio(c))
-	require.Nil(t, err)
 
 	// Close the slave end of the pty, and read the remaining bytes from the master end.
 	c.Tty().Close()
@@ -38,4 +37,6 @@ func RunTest(t *testing.T, procedure func(*expect.Console), test func(terminal.S
 
 	// Dump the terminal's screen.
 	t.Logf("\n%s", expect.StripTrailingEmptyLines(state.String()))
+
+	return err
 }

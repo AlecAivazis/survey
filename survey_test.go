@@ -31,7 +31,7 @@ type PromptTest struct {
 
 func RunPromptTest(t *testing.T, test PromptTest) {
 	var answer interface{}
-	RunTest(t, test.procedure, func(stdio terminal.Stdio) error {
+	err := RunTest(t, test.procedure, func(stdio terminal.Stdio) error {
 		var err error
 		if p, ok := test.prompt.(wantsStdio); ok {
 			p.WithStdio(stdio)
@@ -40,12 +40,13 @@ func RunPromptTest(t *testing.T, test PromptTest) {
 		answer, err = test.prompt.Prompt(defaultPromptConfig())
 		return err
 	})
+	require.Nil(t, err)
 	require.Equal(t, test.expected, answer)
 }
 
 func RunPromptTestKeepFilter(t *testing.T, test PromptTest) {
 	var answer interface{}
-	RunTest(t, test.procedure, func(stdio terminal.Stdio) error {
+	err := RunTest(t, test.procedure, func(stdio terminal.Stdio) error {
 		var err error
 		if p, ok := test.prompt.(wantsStdio); ok {
 			p.WithStdio(stdio)
@@ -55,6 +56,7 @@ func RunPromptTestKeepFilter(t *testing.T, test PromptTest) {
 		answer, err = test.prompt.Prompt(config)
 		return err
 	})
+	require.Nil(t, err)
 	require.Equal(t, test.expected, answer)
 }
 
@@ -133,7 +135,6 @@ func TestPagination_lastHalf(t *testing.T) {
 
 func TestAsk(t *testing.T) {
 	t.Skip()
-	return
 	tests := []struct {
 		name      string
 		questions []*Question
@@ -250,10 +251,10 @@ func TestAsk(t *testing.T) {
 				"pizza":                    true,
 				"commit-message":           "Add editor prompt tests\n",
 				"commit-message-validated": "Add editor prompt tests\n",
-				"name":     "Johnny Appleseed",
-				"day":      []string{"Monday", "Wednesday"},
-				"password": "secret",
-				"color":    "yellow",
+				"name":                     "Johnny Appleseed",
+				"day":                      []string{"Monday", "Wednesday"},
+				"password":                 "secret",
+				"color":                    "yellow",
 			},
 		},
 		{
@@ -305,9 +306,10 @@ func TestAsk(t *testing.T) {
 		test := test
 		t.Run(test.name, func(t *testing.T) {
 			answers := make(map[string]interface{})
-			RunTest(t, test.procedure, func(stdio terminal.Stdio) error {
+			err := RunTest(t, test.procedure, func(stdio terminal.Stdio) error {
 				return Ask(test.questions, &answers, WithStdio(stdio.In, stdio.Out, stdio.Err))
 			})
+			require.Nil(t, err)
 			require.Equal(t, test.expected, answers)
 		})
 	}
@@ -322,4 +324,58 @@ func TestAsk_returnsErrorIfTargetIsNil(t *testing.T) {
 		// the test failed
 		t.Error("Did not encounter error when asking with no where to record.")
 	}
+}
+
+func TestOnInterruptFunc(t *testing.T) {
+	// No Interrupt function set.
+	t.Run("No OnInterrupt", func(t *testing.T) {
+		answer := ""
+		err := RunTest(t, func(e *expect.Console) {
+			e.ExpectString("Are you a bot?")
+			e.SendLine(string(terminal.KeyInterrupt))
+			e.ExpectEOF()
+		}, func(t terminal.Stdio) error {
+			return AskOne(&Input{Message: "Are you a bot?"}, &answer,
+				WithStdio(t.In, t.Out, t.Err))
+		})
+
+		require.Equal(t, terminal.InterruptErr, err)
+		require.Equal(t, "", answer)
+	})
+
+	// Set global Interrupt function.
+	OnInterrupt = func() { fmt.Println("Ended abruptly!") }
+	t.Run("Global OnInterrupt", func(t *testing.T) {
+		answer := ""
+		err := RunTest(t, func(e *expect.Console) {
+			e.ExpectString("Are you a bot?")
+			e.SendLine(string(terminal.KeyInterrupt))
+			e.ExpectString("Ended abruptly!")
+			e.ExpectEOF()
+		}, func(t terminal.Stdio) error {
+			return AskOne(&Input{Message: "Are you a bot?"}, &answer,
+				WithStdio(t.In, t.Out, t.Err))
+		})
+
+		require.Equal(t, terminal.InterruptErr, err)
+		require.Equal(t, "", answer)
+	})
+
+	// Set local Interrupt function (overide global).
+	t.Run("Local Interrupt (override global", func(t *testing.T) {
+		answer := ""
+		err := RunTest(t, func(e *expect.Console) {
+			e.ExpectString("Are you a bot?")
+			e.SendLine(string(terminal.KeyInterrupt))
+			e.ExpectString("The end.")
+			e.ExpectEOF()
+		}, func(t terminal.Stdio) error {
+			return AskOne(&Input{Message: "Are you a bot?"}, &answer,
+				WithStdio(t.In, t.Out, t.Err),
+				WithInterruptFunc(func() { fmt.Println("The end.") }))
+		})
+
+		require.Equal(t, terminal.InterruptErr, err)
+		require.Equal(t, "", answer)
+	})
 }
