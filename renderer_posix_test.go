@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	expect "github.com/Netflix/go-expect"
-	"github.com/hinshun/vt10x"
+	"github.com/AlecAivazis/survey/v2/terminal"
+	pseudotty "github.com/creack/pty"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -17,14 +17,24 @@ func TestRenderer_countLines(t *testing.T) {
 	t.Parallel()
 
 	termWidth := 72
-	stdout := new(bytes.Buffer)
-	c, _, err := vt10x.NewVT10XConsole(expect.WithStdout(stdout))
-	vt10x.ResizePty(c.Tty(), termWidth, 30)
+	pty, tty, err := pseudotty.Open()
 	require.Nil(t, err)
-	defer c.Close()
-	defer c.Tty().Close()
+	defer pty.Close()
+	defer tty.Close()
 
-	r := Renderer{stdio: Stdio(c)}
+	err = pseudotty.Setsize(tty, &pseudotty.Winsize{
+		Rows: 30,
+		Cols: uint16(termWidth),
+	})
+	require.Nil(t, err)
+
+	r := Renderer{
+		stdio: terminal.Stdio{
+			In:  tty,
+			Out: tty,
+			Err: tty,
+		},
+	}
 
 	tests := []struct {
 		name  string

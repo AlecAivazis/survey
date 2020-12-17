@@ -2,6 +2,7 @@ module github.com/AlecAivazis/survey/v2
 
 require (
 	github.com/Netflix/go-expect v0.0.0-20180615182759-c93bf25de8e8
+	github.com/creack/pty v1.1.11
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/hinshun/vt10x v0.0.0-20180616224451-1954e6464174
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51
