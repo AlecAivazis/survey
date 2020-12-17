@@ -307,8 +307,8 @@ func Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
 
 		// grab the user input and save it
 		ans, err := q.Prompt.Prompt(&options.PromptConfig)
-		// if SIGINT is recieved.
-		if err == terminal.InterruptErr {
+		// if SIGINT is recieved and OnInterrupt function provided.
+		if err == terminal.InterruptErr && options.OnInterrupt != nil {
 			options.OnInterrupt()
 		}
 		// if there was a problem
