@@ -41,4 +41,10 @@ func TestComposeTransformers(t *testing.T) {
 		// the result should be lowercase.
 		t.Errorf("TestComposeTransformers transformer failed to transform the answer to title->lowercase, expected '%s' but got '%s'.", expected, got)
 	}
+
+	var emptyAns string
+	if expected, got := "", transformer(emptyAns); expected != got {
+		// TransformString transformers should be skipped and return zero value string
+		t.Errorf("TestComposeTransformers transformer failed to skip transforming on optional empty input, expected '%s' but got '%s'.", expected, got)
+	}
 }
