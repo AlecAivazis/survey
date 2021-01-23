@@ -210,6 +210,34 @@ func TestInputPrompt(t *testing.T) {
 			"R",
 		},
 		{
+			"Test Input prompt interaction when delete",
+			&Input{
+				Message: "What is your name?",
+			},
+			func(c *expect.Console) {
+				c.ExpectString("What is your name?")
+				c.Send("Johnny ")
+				c.Send(string(terminal.KeyDelete))
+				c.SendLine("")
+				c.ExpectEOF()
+			},
+			"Johnny",
+		},
+		{
+			"Test Input prompt interaction when delete rune",
+			&Input{
+				Message: "What is your name?",
+			},
+			func(c *expect.Console) {
+				c.ExpectString("What is your name?")
+				c.Send("小明")
+				c.Send(string(terminal.KeyDelete))
+				c.SendLine("")
+				c.ExpectEOF()
+			},
+			"小",
+		},
+		{
 			"Test Input prompt interaction when ask for suggestion with empty value",
 			&Input{
 				Message: "What is your favorite month?",
