@@ -327,6 +327,42 @@ func TestSelectPrompt(t *testing.T) {
 			},
 			core.OptionAnswer{Index: 0, Value: "red"},
 		},
+		{
+			"delete filter word",
+			&Select{
+				Message: "Choose a color:",
+				Options: []string{"red", "blue", "black"},
+			},
+			func(c *expect.Console) {
+				c.ExpectString("Choose a color:")
+				// Filter down to blue.
+				c.Send("blu")
+				// Filter down to blue and black.
+				c.Send(string(terminal.KeyDelete))
+				// Select black.
+				c.SendLine(string(terminal.KeyArrowDown))
+				c.ExpectEOF()
+			},
+			core.OptionAnswer{Index: 2, Value: "black"},
+		},
+		{
+			"delete filter word in rune",
+			&Select{
+				Message: "今天中午吃什么？",
+				Options: []string{"青椒牛肉丝", "小炒肉", "小煎鸡"},
+			},
+			func(c *expect.Console) {
+				c.ExpectString("今天中午吃什么？")
+				// Filter down to 小炒肉.
+				c.Send("小炒")
+				// Filter down to 小炒肉 and 小煎鸡.
+				c.Send(string(terminal.KeyDelete))
+				// Select 小煎鸡.
+				c.SendLine(string(terminal.KeyArrowDown))
+				c.ExpectEOF()
+			},
+			core.OptionAnswer{Index: 2, Value: "小煎鸡"},
+		},
 	}
 
 	for _, test := range tests {
