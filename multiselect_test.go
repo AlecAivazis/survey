@@ -488,6 +488,53 @@ func TestMultiSelectPrompt(t *testing.T) {
 				core.OptionAnswer{Value: "Saturday", Index: 6},
 			},
 		},
+		{
+			"delete filter word",
+			&MultiSelect{
+				Message: "What days do you prefer:",
+				Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
+			},
+			func(c *expect.Console) {
+				c.ExpectString("What days do you prefer:  [Use arrows to move, space to select, <right> to all, <left> to none, type to filter]")
+				// Filter down to 'Sunday'
+				c.Send("su")
+				// Delete 'u'
+				c.Send(string(terminal.KeyDelete))
+				// Filter down to 'Saturday'
+				c.Send("at")
+				// Select 'Saturday'
+				c.Send(string(terminal.KeyArrowDown))
+				c.Send(" ")
+				c.SendLine("")
+				c.ExpectEOF()
+			},
+			[]core.OptionAnswer{
+				core.OptionAnswer{Value: "Saturday", Index: 6},
+			},
+		},
+		{
+			"delete filter word in rune",
+			&MultiSelect{
+				Message: "今天中午吃什么？",
+				Options: []string{"青椒牛肉丝", "小炒肉", "小煎鸡"},
+			},
+			func(c *expect.Console) {
+				c.ExpectString("今天中午吃什么？  [Use arrows to move, space to select, <right> to all, <left> to none, type to filter]")
+				// Filter down to 小炒肉.
+				c.Send("小炒")
+				// Filter down to 小炒肉 and 小煎鸡.
+				c.Send(string(terminal.KeyDelete))
+				// Filter down to 小煎鸡.
+				c.Send("煎")
+				// Select 小煎鸡.
+				c.Send(" ")
+				c.SendLine("")
+				c.ExpectEOF()
+			},
+			[]core.OptionAnswer{
+				core.OptionAnswer{Value: "小煎鸡", Index: 2},
+			},
+		},
 	}
 
 	for _, test := range tests {
