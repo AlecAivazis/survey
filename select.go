@@ -21,6 +21,7 @@ for them to select using the arrow keys and enter. Response type is a string.
 type Select struct {
 	Renderer
 	Message       string
+	Headers       []string
 	Options       []string
 	Default       interface{}
 	Help          string
@@ -53,6 +54,9 @@ var SelectQuestionTemplate = `
 {{- else}}
   {{- "  "}}{{- color "cyan"}}[Use arrows to move, type to filter{{- if and .Help (not .ShowHelp)}}, {{ .Config.HelpInput }} for more help{{end}}]{{color "reset"}}
   {{- "\n"}}
+  {{- range $l := .Headers }}
+  {{- "  "}}{{- $l -}}{{ "\n"}}
+  {{- end }}
   {{- range $ix, $choice := .PageEntries}}
     {{- if eq $ix $.SelectedIndex }}{{color $.Config.Icons.SelectFocus.Format }}{{ $.Config.Icons.SelectFocus.Text }} {{else}}{{color "default"}}  {{end}}
     {{- $choice.Value}}
