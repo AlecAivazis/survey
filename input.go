@@ -150,8 +150,10 @@ func (i *Input) Prompt(config *PromptConfig) (interface{}, error) {
 	defer rr.RestoreTermMode()
 
 	cursor := i.NewCursor()
-	cursor.Hide()       // hide the cursor
-	defer cursor.Show() // show the cursor when we're done
+	if !config.ShowCursor {
+		cursor.Hide()       // hide the cursor
+		defer cursor.Show() // show the cursor when we're done
+	}
 
 	// start waiting for input
 	for {
