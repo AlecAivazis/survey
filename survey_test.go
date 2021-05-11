@@ -150,12 +150,14 @@ func TestAsk(t *testing.T) {
 				{
 					Name: "commit-message",
 					Prompt: &Editor{
+						Editor:  "vi",
 						Message: "Edit git commit message",
 					},
 				},
 				{
 					Name: "commit-message-validated",
 					Prompt: &Editor{
+						Editor:  "vi",
 						Message: "Edit git commit message",
 					},
 					Validate: func(v interface{}) error {
