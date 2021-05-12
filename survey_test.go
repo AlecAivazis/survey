@@ -132,8 +132,6 @@ func TestPagination_lastHalf(t *testing.T) {
 }
 
 func TestAsk(t *testing.T) {
-	t.Skip()
-	return
 	tests := []struct {
 		name      string
 		questions []*Question
@@ -152,12 +150,14 @@ func TestAsk(t *testing.T) {
 				{
 					Name: "commit-message",
 					Prompt: &Editor{
+						Editor:  "vi",
 						Message: "Edit git commit message",
 					},
 				},
 				{
 					Name: "commit-message-validated",
 					Prompt: &Editor{
+						Editor:  "vi",
 						Message: "Edit git commit message",
 					},
 					Validate: func(v interface{}) error {
@@ -174,6 +174,7 @@ func TestAsk(t *testing.T) {
 						Message: "What is your name?",
 					},
 				},
+				/* TODO gets stuck
 				{
 					Name: "day",
 					Prompt: &MultiSelect{
@@ -181,6 +182,7 @@ func TestAsk(t *testing.T) {
 						Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
 					},
 				},
+				*/
 				{
 					Name: "password",
 					Prompt: &Password{
@@ -226,6 +228,7 @@ func TestAsk(t *testing.T) {
 				c.ExpectString("What is your name?")
 				c.SendLine("Johnny Appleseed")
 
+				/* TODO gets stuck
 				// MultiSelect
 				c.ExpectString("What days do you prefer:  [Use arrows to move, space to select, type to filter]")
 				// Select Monday.
@@ -235,6 +238,7 @@ func TestAsk(t *testing.T) {
 				c.Send(string(terminal.KeyArrowDown))
 				c.Send(string(terminal.KeyArrowDown))
 				c.SendLine(" ")
+				*/
 
 				// Password
 				c.ExpectString("Please type your password")
@@ -250,10 +254,12 @@ func TestAsk(t *testing.T) {
 				"pizza":                    true,
 				"commit-message":           "Add editor prompt tests\n",
 				"commit-message-validated": "Add editor prompt tests\n",
-				"name":     "Johnny Appleseed",
-				"day":      []string{"Monday", "Wednesday"},
+				"name":                     "Johnny Appleseed",
+				/* TODO
+				"day":                      []string{"Monday", "Wednesday"},
+				*/
 				"password": "secret",
-				"color":    "yellow",
+				"color":    core.OptionAnswer{Index: 3, Value: "yellow"},
 			},
 		},
 		{
@@ -271,6 +277,7 @@ func TestAsk(t *testing.T) {
 				c.ExpectString("What is your name?")
 				c.SendLine("")
 				c.ExpectString("Sorry, your reply was invalid: Value is required")
+				time.Sleep(time.Millisecond)
 				c.SendLine("Johnny Appleseed")
 				c.ExpectEOF()
 			},
