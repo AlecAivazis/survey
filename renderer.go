@@ -69,7 +69,18 @@ func (r *Renderer) Error(config *PromptConfig, invalid error) error {
 	return nil
 }
 
+func (r *Renderer) OffsetCursor(offset int) {
+	cursor := r.NewCursor()
+	for offset > 0 {
+		cursor.PreviousLine(-1)
+		offset--
+	}
+}
+
 func (r *Renderer) Render(tmpl string, data interface{}) error {
+	cursor := r.NewCursor()
+	cursor.Restore() // clear any accessibility offsetting
+
 	// cleanup the currently rendered text
 	lineCount := r.countLines(r.renderedText)
 	r.resetPrompt(lineCount)
@@ -86,6 +97,8 @@ func (r *Renderer) Render(tmpl string, data interface{}) error {
 
 	// add the printed text to the rendered text buffer so we can cleanup later
 	r.AppendRenderedText(layoutOut)
+
+	cursor.Save()
 
 	// nothing went wrong
 	return nil
@@ -123,15 +136,20 @@ func (r *Renderer) termWidth() (int, error) {
 	return termWidth, err
 }
 
-// countLines will return the count of `\n` with the addition of any
-// lines that have wrapped due to narrow terminal width
-func (r *Renderer) countLines(buf bytes.Buffer) int {
+func (r *Renderer) termWidthSafe() int {
 	w, err := r.termWidth()
 	if err != nil || w == 0 {
 		// if we got an error due to terminal.GetSize not being supported
 		// on current platform then just assume a very wide terminal
 		w = 10000
 	}
+	return w
+}
+
+// countLines will return the count of `\n` with the addition of any
+// lines that have wrapped due to narrow terminal width
+func (r *Renderer) countLines(buf bytes.Buffer) int {
+	w := r.termWidthSafe()
 
 	bufBytes := buf.Bytes()
 
