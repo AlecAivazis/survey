@@ -61,7 +61,7 @@ var InputQuestionTemplate = `
   {{- .Answer -}}
 {{- end}}`
 
-func (i *Input) OnSpecialKeyChange(config *PromptConfig) func(rune) bool {
+func (i *Input) OnSpecialKey(config *PromptConfig) func(rune) bool {
 	return func(key rune) bool {
 		if key == terminal.KeyArrowUp && len(i.options) > 0 {
 			if i.selectedIndex == 0 {
@@ -123,12 +123,12 @@ func (i *Input) Prompt(config *PromptConfig) (interface{}, error) {
 		defer cursor.Show() // show the cursor when we're done
 	}
 
-	line, err := rr.ReadLine(0, i.OnSpecialKeyChange(config))
+	line, err := rr.ReadLine(0, i.OnSpecialKey(config))
 	if err != nil {
 		return "", err
 	}
 	i.answer = string(line)
-	// readline print an empty line, go up before we render the follow up 
+	// readline print an empty line, go up before we render the follow up
 	cursor.Up(1)
 
 	// if we ran into the help string
