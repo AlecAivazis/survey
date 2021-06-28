@@ -61,74 +61,41 @@ var InputQuestionTemplate = `
   {{- .Answer -}}
 {{- end}}`
 
-func (i *Input) OnChange(key rune, config *PromptConfig) (bool, error) {
-	if key == terminal.KeyEnter || key == '\n' {
-		if i.answer != config.HelpInput || i.Help == "" {
-			// we're done
-			return true, nil
-		} else {
-			i.answer = ""
-			i.showingHelp = true
-		}
-	} else if key == terminal.KeyDeleteWord || key == terminal.KeyDeleteLine {
-		i.answer = ""
-	} else if key == terminal.KeyEscape && i.Suggest != nil {
-		if len(i.options) > 0 {
-			i.answer = i.typedAnswer
-		}
-		i.options = nil
-	} else if key == terminal.KeyArrowUp && len(i.options) > 0 {
-		if i.selectedIndex == 0 {
-			i.selectedIndex = len(i.options) - 1
-		} else {
-			i.selectedIndex--
-		}
-		i.answer = i.options[i.selectedIndex].Value
-	} else if (key == terminal.KeyArrowDown || key == terminal.KeyTab) && len(i.options) > 0 {
-		if i.selectedIndex == len(i.options)-1 {
-			i.selectedIndex = 0
-		} else {
-			i.selectedIndex++
-		}
-		i.answer = i.options[i.selectedIndex].Value
-	} else if key == terminal.KeyTab && i.Suggest != nil {
-		options := i.Suggest(i.answer)
-		i.selectedIndex = 0
-		i.typedAnswer = i.answer
-		if len(options) > 0 {
-			i.answer = options[0]
-			if len(options) == 1 {
-				i.options = nil
+func (i *Input) OnSpecialKeyChange(config *PromptConfig) func(rune) bool {
+	return func(key rune) bool {
+		if key == terminal.KeyArrowUp && len(i.options) > 0 {
+			if i.selectedIndex == 0 {
+				i.selectedIndex = len(i.options) - 1
 			} else {
-				i.options = core.OptionAnswerList(options)
+				i.selectedIndex--
 			}
+			i.answer = i.options[i.selectedIndex].Value
+			return true
+		} else if (key == terminal.KeyArrowDown || key == terminal.KeyTab) && len(i.options) > 0 {
+			if i.selectedIndex == len(i.options)-1 {
+				i.selectedIndex = 0
+			} else {
+				i.selectedIndex++
+			}
+			i.answer = i.options[i.selectedIndex].Value
+			return true
+		} else if key == terminal.KeyTab && i.Suggest != nil {
+			options := i.Suggest(i.answer)
+			i.selectedIndex = 0
+			i.typedAnswer = i.answer
+			if len(options) > 0 {
+				i.answer = options[0]
+				if len(options) == 1 {
+					i.options = nil
+				} else {
+					i.options = core.OptionAnswerList(options)
+				}
+			}
+			return true
 		}
-	} else if key == terminal.KeyDelete || key == terminal.KeyBackspace {
-		if i.answer != "" {
-			runeAnswer := []rune(i.answer)
-			i.answer = string(runeAnswer[0 : len(runeAnswer)-1])
-		}
-	} else if key >= terminal.KeySpace {
-		i.answer += string(key)
-		i.typedAnswer = i.answer
-		i.options = nil
+
+		return false
 	}
-
-	pageSize := config.PageSize
-	opts, idx := paginate(pageSize, i.options, i.selectedIndex)
-	err := i.Render(
-		InputQuestionTemplate,
-		InputTemplateData{
-			Input:         *i,
-			Answer:        i.answer,
-			ShowHelp:      i.showingHelp,
-			SelectedIndex: idx,
-			PageEntries:   opts,
-			Config:        config,
-		},
-	)
-
-	return err != nil, err
 }
 
 func (i *Input) Prompt(config *PromptConfig) (interface{}, error) {
@@ -136,8 +103,9 @@ func (i *Input) Prompt(config *PromptConfig) (interface{}, error) {
 	err := i.Render(
 		InputQuestionTemplate,
 		InputTemplateData{
-			Input:  *i,
-			Config: config,
+			Input:    *i,
+			Config:   config,
+			ShowHelp: i.showingHelp,
 		},
 	)
 	if err != nil {
@@ -155,27 +123,35 @@ func (i *Input) Prompt(config *PromptConfig) (interface{}, error) {
 		defer cursor.Show() // show the cursor when we're done
 	}
 
-	// start waiting for input
-	for {
-		r, _, err := rr.ReadRune()
-		if err != nil {
-			return "", err
-		}
-		if r == terminal.KeyInterrupt {
-			return "", terminal.InterruptErr
-		}
-		if r == terminal.KeyEndTransmission {
-			break
-		}
+	line, err := rr.ReadLine(0, i.OnSpecialKeyChange(config))
+	if err != nil {
+		return "", err
+	}
+	i.answer = string(line)
 
-		b, err := i.OnChange(r, config)
-		if err != nil {
-			return "", err
-		}
+	// if we ran into the help string
+	if i.answer == config.HelpInput && i.Help != "" {
+		// show the help and prompt again
+		i.showingHelp = true
+		cursor.Up(1)
+		return i.Prompt(config)
+	}
 
-		if b {
-			break
-		}
+	pageSize := config.PageSize
+	opts, idx := paginate(pageSize, i.options, i.selectedIndex)
+	err = i.Render(
+		InputQuestionTemplate,
+		InputTemplateData{
+			Input:         *i,
+			Answer:        i.answer,
+			ShowHelp:      i.showingHelp,
+			SelectedIndex: idx,
+			PageEntries:   opts,
+			Config:        config,
+		},
+	)
+	if err != nil {
+		return "", err
 	}
 
 	// if the line is empty

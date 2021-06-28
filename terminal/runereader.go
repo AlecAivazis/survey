@@ -31,7 +31,7 @@ func (rr *RuneReader) printChar(char rune, mask rune) {
 	}
 }
 
-func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
+func (rr *RuneReader) ReadLine(mask rune, onRunes ...func(rune) bool) ([]rune, error) {
 	line := []rune{}
 	// we only care about horizontal displacements from the origin so start counting at 0
 	index := 0
@@ -70,6 +70,10 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 			return line, err
 		}
 
+		// if the user pressed a key the caller was interested in capturing
+		if len(onRunes) > 0 && onRunes[0](r) {
+			return line, nil
+		} 
 		// if the user pressed enter or some other newline/termination like ctrl+d
 		if r == '\r' || r == '\n' || r == KeyEndTransmission {
 			// delete what's printed out on the console screen (cleanup)
