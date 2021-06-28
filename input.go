@@ -128,12 +128,13 @@ func (i *Input) Prompt(config *PromptConfig) (interface{}, error) {
 		return "", err
 	}
 	i.answer = string(line)
+	// readline print an empty line, go up before we render the follow up 
+	cursor.Up(1)
 
 	// if we ran into the help string
 	if i.answer == config.HelpInput && i.Help != "" {
 		// show the help and prompt again
 		i.showingHelp = true
-		cursor.Up(1)
 		return i.Prompt(config)
 	}
 
