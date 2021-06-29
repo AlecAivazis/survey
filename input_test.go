@@ -102,15 +102,6 @@ func TestInputRender(t *testing.T) {
 				defaultIcons().Question.Text, defaultPromptConfig().Icons.SelectFocus.Text,
 			),
 		},
-		{
-			"Test Input question output with suggestion complemented",
-			Input{Message: "What is your favorite month:", Suggest: suggestFn},
-			InputTemplateData{Answer: "February and"},
-			fmt.Sprintf(
-				"%s What is your favorite month: [%s for suggestions] February and",
-				defaultIcons().Question.Text, defaultPromptConfig().SuggestInput,
-			),
-		},
 	}
 
 	for _, test := range tests {

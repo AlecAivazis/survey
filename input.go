@@ -1,6 +1,8 @@
 package survey
 
 import (
+	"errors"
+
 	"github.com/AlecAivazis/survey/v2/core"
 	"github.com/AlecAivazis/survey/v2/terminal"
 )
@@ -58,19 +60,19 @@ var InputQuestionTemplate = `
     {{- if and .Suggest }}{{color "cyan"}}{{ print .Config.SuggestInput }} for suggestions{{end -}}
   ]{{color "reset"}} {{end}}
   {{- if .Default}}{{color "white"}}({{.Default}}) {{color "reset"}}{{end}}
-  {{- .Answer -}}
 {{- end}}`
 
-func (i *Input) OnSpecialKey(config *PromptConfig) func(rune) bool {
-	return func(key rune) bool {
-		if key == terminal.KeyArrowUp && len(i.options) > 0 {
+func (i *Input) onRune(config *PromptConfig) terminal.OnRuneFn {
+	return terminal.OnRuneFn(func(key rune, line []rune) ([]rune, bool, error) {
+		if i.options != nil && (key == terminal.KeyEnter || key == '\n') {
+			return []rune(i.answer), true, nil
+		} else if key == terminal.KeyArrowUp && len(i.options) > 0 {
 			if i.selectedIndex == 0 {
 				i.selectedIndex = len(i.options) - 1
 			} else {
 				i.selectedIndex--
 			}
 			i.answer = i.options[i.selectedIndex].Value
-			return true
 		} else if (key == terminal.KeyArrowDown || key == terminal.KeyTab) && len(i.options) > 0 {
 			if i.selectedIndex == len(i.options)-1 {
 				i.selectedIndex = 0
@@ -78,25 +80,58 @@ func (i *Input) OnSpecialKey(config *PromptConfig) func(rune) bool {
 				i.selectedIndex++
 			}
 			i.answer = i.options[i.selectedIndex].Value
-			return true
 		} else if key == terminal.KeyTab && i.Suggest != nil {
+			i.answer = string(line)
 			options := i.Suggest(i.answer)
 			i.selectedIndex = 0
 			i.typedAnswer = i.answer
-			if len(options) > 0 {
-				i.answer = options[0]
-				if len(options) == 1 {
-					i.options = nil
-				} else {
-					i.options = core.OptionAnswerList(options)
-				}
+			if len(options) == 0 {
+				return line, false, nil
 			}
-			return true
+
+			i.answer = options[0]
+			if len(options) == 1 {
+				i.typedAnswer = i.answer
+				i.options = nil
+			} else {
+				i.options = core.OptionAnswerList(options)
+			}
+		} else {
+			if i.options == nil {
+				return line, false, nil
+			}
+
+			if key >= terminal.KeySpace {
+				i.answer += string(key)
+				i.typedAnswer = i.answer
+			}
+
+			i.options = nil
 		}
 
-		return false
-	}
+		pageSize := config.PageSize
+		opts, idx := paginate(pageSize, i.options, i.selectedIndex)
+		err := i.Render(
+			InputQuestionTemplate,
+			InputTemplateData{
+				Input:         *i,
+				Answer:        i.answer,
+				ShowHelp:      i.showingHelp,
+				SelectedIndex: idx,
+				PageEntries:   opts,
+				Config:        config,
+			},
+		)
+
+		if err == nil {
+			err = readLineAgain
+		}
+
+		return []rune(i.typedAnswer), true, err
+	})
 }
+
+var readLineAgain = errors.New("read line again")
 
 func (i *Input) Prompt(config *PromptConfig) (interface{}, error) {
 	// render the template
@@ -123,10 +158,25 @@ func (i *Input) Prompt(config *PromptConfig) (interface{}, error) {
 		defer cursor.Show() // show the cursor when we're done
 	}
 
-	line, err := rr.ReadLine(0, i.OnSpecialKey(config))
-	if err != nil {
-		return "", err
+	var line []rune
+
+	for {
+		if i.options != nil {
+			line = []rune{}
+		}
+
+		line, err = rr.ReadLineWithDefault(0, line, i.onRune(config))
+		if err == readLineAgain {
+			continue
+		}
+
+		if err != nil {
+			return "", err
+		}
+
+		break
 	}
+
 	i.answer = string(line)
 	// readline print an empty line, go up before we render the follow up
 	cursor.Up(1)
@@ -136,23 +186,6 @@ func (i *Input) Prompt(config *PromptConfig) (interface{}, error) {
 		// show the help and prompt again
 		i.showingHelp = true
 		return i.Prompt(config)
-	}
-
-	pageSize := config.PageSize
-	opts, idx := paginate(pageSize, i.options, i.selectedIndex)
-	err = i.Render(
-		InputQuestionTemplate,
-		InputTemplateData{
-			Input:         *i,
-			Answer:        i.answer,
-			ShowHelp:      i.showingHelp,
-			SelectedIndex: idx,
-			PageEntries:   opts,
-			Config:        config,
-		},
-	)
-	if err != nil {
-		return "", err
 	}
 
 	// if the line is empty
