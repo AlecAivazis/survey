@@ -22,6 +22,7 @@ type Input struct {
 	Help          string
 	Suggest       func(toComplete string) []string
 	answer        string
+	typedAnswer   string
 	options       []core.OptionAnswer
 	selectedIndex int
 	showingHelp   bool
@@ -65,6 +66,9 @@ func (i *Input) onRune(config *PromptConfig) terminal.OnRuneFn {
 	return terminal.OnRuneFn(func(key rune, line []rune) ([]rune, bool, error) {
 		if i.options != nil && (key == terminal.KeyEnter || key == '\n') {
 			return []rune(i.answer), true, nil
+		} else if i.options != nil && key == terminal.KeyEscape {
+			i.answer = i.typedAnswer
+			i.options = nil
 		} else if key == terminal.KeyArrowUp && len(i.options) > 0 {
 			if i.selectedIndex == 0 {
 				i.selectedIndex = len(i.options) - 1
@@ -81,6 +85,7 @@ func (i *Input) onRune(config *PromptConfig) terminal.OnRuneFn {
 			i.answer = i.options[i.selectedIndex].Value
 		} else if key == terminal.KeyTab && i.Suggest != nil {
 			i.answer = string(line)
+			i.typedAnswer = i.answer
 			options := i.Suggest(i.answer)
 			i.selectedIndex = 0
 			if len(options) == 0 {
@@ -89,6 +94,7 @@ func (i *Input) onRune(config *PromptConfig) terminal.OnRuneFn {
 
 			i.answer = options[0]
 			if len(options) == 1 {
+				i.typedAnswer = i.answer
 				i.options = nil
 			} else {
 				i.options = core.OptionAnswerList(options)
@@ -101,6 +107,7 @@ func (i *Input) onRune(config *PromptConfig) terminal.OnRuneFn {
 			if key >= terminal.KeySpace {
 				i.answer += string(key)
 			}
+			i.typedAnswer = i.answer
 
 			i.options = nil
 		}
@@ -123,7 +130,7 @@ func (i *Input) onRune(config *PromptConfig) terminal.OnRuneFn {
 			err = readLineAgain
 		}
 
-		return []rune(i.answer), true, err
+		return []rune(i.typedAnswer), true, err
 	})
 }
 
