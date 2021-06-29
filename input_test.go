@@ -368,6 +368,54 @@ func TestInputPrompt(t *testing.T) {
 			},
 			"special answer",
 		},
+		{
+			"Test Input prompt must allow moving cursor using right and left arrows",
+			&Input{Message: "Filename to save:"},
+			func(c *expect.Console) {
+				c.ExpectString("Filename to save:")
+				c.Send("essay.txt")
+				c.Send(string(terminal.KeyArrowLeft))
+				c.Send(string(terminal.KeyArrowLeft))
+				c.Send(string(terminal.KeyArrowLeft))
+				c.Send(string(terminal.KeyArrowLeft))
+				c.Send("_final")
+				c.Send(string(terminal.KeyArrowRight))
+				c.Send(string(terminal.KeyArrowRight))
+				c.Send(string(terminal.KeyArrowRight))
+				c.Send(string(terminal.KeyArrowRight))
+				c.Send(string(terminal.KeyBackspace))
+				c.Send(string(terminal.KeyBackspace))
+				c.Send(string(terminal.KeyBackspace))
+				c.Send("md")
+				c.Send(string(terminal.KeyArrowLeft))
+				c.Send(string(terminal.KeyArrowLeft))
+				c.Send(string(terminal.KeyArrowLeft))
+				c.SendLine("2")
+				c.ExpectEOF()
+			},
+			"essay_final2.md",
+		},
+		{
+			"Test Input prompt must allow moving cursor using right and left arrows, even after suggestions",
+			&Input{Message: "Filename to save:", Suggest: func(string) []string { return []string{".txt", ".csv", ".go"} }},
+			func(c *expect.Console) {
+				c.ExpectString("Filename to save:")
+				c.Send(string(terminal.KeyTab))
+				c.ExpectString(".txt")
+				c.ExpectString(".csv")
+				c.ExpectString(".go")
+				c.Send(string(terminal.KeyTab))
+				c.Send(string(terminal.KeyArrowLeft))
+				c.Send(string(terminal.KeyArrowLeft))
+				c.Send(string(terminal.KeyArrowLeft))
+				c.Send(string(terminal.KeyArrowLeft))
+				c.Send(string(terminal.KeyArrowLeft))
+				c.Send("newtable")
+				c.SendLine("")
+				c.ExpectEOF()
+			},
+			"newtable.csv",
+		},
 	}
 
 	for _, test := range tests {

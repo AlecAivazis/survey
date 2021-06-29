@@ -21,7 +21,6 @@ type Input struct {
 	Default       string
 	Help          string
 	Suggest       func(toComplete string) []string
-	typedAnswer   string
 	answer        string
 	options       []core.OptionAnswer
 	selectedIndex int
@@ -84,14 +83,12 @@ func (i *Input) onRune(config *PromptConfig) terminal.OnRuneFn {
 			i.answer = string(line)
 			options := i.Suggest(i.answer)
 			i.selectedIndex = 0
-			i.typedAnswer = i.answer
 			if len(options) == 0 {
 				return line, false, nil
 			}
 
 			i.answer = options[0]
 			if len(options) == 1 {
-				i.typedAnswer = i.answer
 				i.options = nil
 			} else {
 				i.options = core.OptionAnswerList(options)
@@ -103,7 +100,6 @@ func (i *Input) onRune(config *PromptConfig) terminal.OnRuneFn {
 
 			if key >= terminal.KeySpace {
 				i.answer += string(key)
-				i.typedAnswer = i.answer
 			}
 
 			i.options = nil
@@ -127,7 +123,7 @@ func (i *Input) onRune(config *PromptConfig) terminal.OnRuneFn {
 			err = readLineAgain
 		}
 
-		return []rune(i.typedAnswer), true, err
+		return []rune(i.answer), true, err
 	})
 }
 
