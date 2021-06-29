@@ -102,10 +102,6 @@ func TestEditorRender(t *testing.T) {
 }
 
 func TestEditorPrompt(t *testing.T) {
-	if os.Getenv("SKIP_EDITOR_PROMPT_TESTS") != "" {
-		t.Skip("editor prompt tests skipped by dev")
-	}
-
 	if _, err := exec.LookPath("vi"); err != nil {
 		t.Skip("vi not found in PATH")
 	}
@@ -122,7 +118,7 @@ func TestEditorPrompt(t *testing.T) {
 				c.SendLine("")
 				go c.ExpectEOF()
 				time.Sleep(time.Millisecond)
-				c.Send("iAdd editor prompt tests\x1b")
+				c.Send("ccAdd editor prompt tests\x1b")
 				c.SendLine(":wq!")
 			},
 			"Add editor prompt tests\n",
@@ -155,7 +151,7 @@ func TestEditorPrompt(t *testing.T) {
 				c.SendLine("")
 				go c.ExpectEOF()
 				time.Sleep(time.Millisecond)
-				c.Send("iAdd editor prompt tests\x1b")
+				c.Send("ccAdd editor prompt tests\x1b")
 				c.SendLine(":wq!")
 			},
 			"Add editor prompt tests\n",
@@ -196,7 +192,7 @@ func TestEditorPrompt(t *testing.T) {
 				c.SendLine("")
 				go c.ExpectEOF()
 				time.Sleep(time.Millisecond)
-				c.Send("iAdd editor prompt tests\x1b")
+				c.Send("ccAdd editor prompt tests\x1b")
 				c.SendLine(":wq!")
 			},
 			"Add editor prompt tests\n",
@@ -230,7 +226,7 @@ func TestEditorPrompt(t *testing.T) {
 				c.SendLine("")
 				go c.ExpectEOF()
 				time.Sleep(time.Millisecond)
-				c.Send("iAdd editor prompt tests\x1b")
+				c.Send("ccAdd editor prompt tests\x1b")
 				c.SendLine(":wq!")
 			},
 			"Add editor prompt tests\n",
