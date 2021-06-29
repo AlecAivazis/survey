@@ -2,6 +2,8 @@ package survey
 
 import (
 	"fmt"
+	"os"
+	"os/exec"
 	"strings"
 	"testing"
 	"time"
@@ -132,6 +134,23 @@ func TestPagination_lastHalf(t *testing.T) {
 }
 
 func TestAsk(t *testing.T) {
+
+	_, err := exec.LookPath("vi")
+	noEditor := err != nil || os.Getenv("SKIP_EDITOR_PROMPT_TESTS") != ""
+
+	filter := func(qs []*Question) []*Question { return qs }
+	if noEditor {
+		filter = func(qs []*Question) []*Question {
+			r := make([]*Question, 0)
+			for _, q := range qs {
+				if _, ok := q.Prompt.(*Editor); !ok {
+					r = append(r, q)
+				}
+			}
+			return r
+		}
+	}
+
 	tests := []struct {
 		name      string
 		questions []*Question
@@ -140,7 +159,7 @@ func TestAsk(t *testing.T) {
 	}{
 		{
 			"Test Ask for all prompts",
-			[]*Question{
+			filter([]*Question{
 				{
 					Name: "pizza",
 					Prompt: &Confirm{
@@ -196,33 +215,35 @@ func TestAsk(t *testing.T) {
 						Options: []string{"red", "blue", "green", "yellow"},
 					},
 				},
-			},
+			}),
 			func(c *expect.Console) {
 				// Confirm
 				c.ExpectString("Is pizza your favorite food? (y/N)")
 				c.SendLine("Y")
 
-				// Editor
-				c.ExpectString("Edit git commit message [Enter to launch editor]")
-				c.SendLine("")
-				time.Sleep(time.Millisecond)
-				c.Send("iAdd editor prompt tests\x1b")
-				c.SendLine(":wq!")
+				if !noEditor {
+					// Editor
+					c.ExpectString("Edit git commit message [Enter to launch editor]")
+					c.SendLine("")
+					time.Sleep(time.Millisecond)
+					c.Send("iAdd editor prompt tests\x1b")
+					c.SendLine(":wq!")
 
-				// Editor validated
-				c.ExpectString("Edit git commit message [Enter to launch editor]")
-				c.SendLine("")
-				time.Sleep(time.Millisecond)
-				c.Send("i invalid input first try\x1b")
-				c.SendLine(":wq!")
-				time.Sleep(time.Millisecond)
-				c.ExpectString("invalid error message")
-				c.ExpectString("Edit git commit message [Enter to launch editor]")
-				c.SendLine("")
-				time.Sleep(time.Millisecond)
-				c.ExpectString("first try")
-				c.Send("ccAdd editor prompt tests\x1b")
-				c.SendLine(":wq!")
+					// Editor validated
+					c.ExpectString("Edit git commit message [Enter to launch editor]")
+					c.SendLine("")
+					time.Sleep(time.Millisecond)
+					c.Send("i invalid input first try\x1b")
+					c.SendLine(":wq!")
+					time.Sleep(time.Millisecond)
+					c.ExpectString("invalid error message")
+					c.ExpectString("Edit git commit message [Enter to launch editor]")
+					c.SendLine("")
+					time.Sleep(time.Millisecond)
+					c.ExpectString("first try")
+					c.Send("iAdd editor prompt tests\x1b")
+					c.SendLine(":wq!")
+				}
 
 				// Input
 				c.ExpectString("What is your name?")
@@ -311,11 +332,16 @@ func TestAsk(t *testing.T) {
 		// Capture range variable.
 		test := test
 		t.Run(test.name, func(t *testing.T) {
+			expectedAnswers := make(map[string]interface{}, 0)
+			for _, q := range test.questions {
+				expectedAnswers[q.Name] = test.expected[q.Name]
+			}
+
 			answers := make(map[string]interface{})
 			RunTest(t, test.procedure, func(stdio terminal.Stdio) error {
 				return Ask(test.questions, &answers, WithStdio(stdio.In, stdio.Out, stdio.Err))
 			})
-			require.Equal(t, test.expected, answers)
+			require.Equal(t, expectedAnswers, answers)
 		})
 	}
 }
