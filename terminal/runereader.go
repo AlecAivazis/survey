@@ -31,7 +31,13 @@ func (rr *RuneReader) printChar(char rune, mask rune) {
 	}
 }
 
-func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
+type OnRuneFn func(rune, []rune) ([]rune, bool, error)
+
+func (rr *RuneReader) ReadLine(mask rune, onRunes ...OnRuneFn) ([]rune, error) {
+	return rr.ReadLineWithDefault(mask, []rune{}, onRunes...)
+}
+
+func (rr *RuneReader) ReadLineWithDefault(mask rune, d []rune, onRunes ...OnRuneFn) ([]rune, error) {
 	line := []rune{}
 	// we only care about horizontal displacements from the origin so start counting at 0
 	index := 0
@@ -39,6 +45,15 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 	cursor := &Cursor{
 		In:  rr.stdio.In,
 		Out: rr.stdio.Out,
+	}
+
+	onRune := func(r rune, line []rune) ([]rune, bool, error) {
+		return line, false, nil
+	}
+
+	// if the user pressed a key the caller was interested in capturing
+	if len(onRunes) > 0 {
+		onRune = onRunes[0]
 	}
 
 	// we get the terminal width and height (if resized after this point the property might become invalid)
@@ -63,11 +78,24 @@ func (rr *RuneReader) ReadLine(mask rune) ([]rune, error) {
 		}
 	}
 
+	if len(d) > 0 {
+		index = len(d)
+		fmt.Fprint(rr.stdio.Out, string(d))
+		line = d
+		for range d {
+			increment()
+		}
+	}
+
 	for {
 		// wait for some input
 		r, _, err := rr.ReadRune()
 		if err != nil {
 			return line, err
+		}
+
+		if l, stop, err := onRune(r, line); stop || err != nil {
+			return l, err
 		}
 
 		// if the user pressed enter or some other newline/termination like ctrl+d

@@ -206,7 +206,7 @@ func TestAsk(t *testing.T) {
 				c.ExpectString("Edit git commit message [Enter to launch editor]")
 				c.SendLine("")
 				time.Sleep(time.Millisecond)
-				c.Send("iAdd editor prompt tests\x1b")
+				c.Send("ccAdd editor prompt tests\x1b")
 				c.SendLine(":wq!")
 
 				// Editor validated
@@ -221,7 +221,7 @@ func TestAsk(t *testing.T) {
 				c.SendLine("")
 				time.Sleep(time.Millisecond)
 				c.ExpectString("first try")
-				c.Send("ccAdd editor prompt tests\x1b")
+				c.Send("ccAdd editor prompt tests, but validated\x1b")
 				c.SendLine(":wq!")
 
 				// Input
@@ -253,7 +253,7 @@ func TestAsk(t *testing.T) {
 			map[string]interface{}{
 				"pizza":                    true,
 				"commit-message":           "Add editor prompt tests\n",
-				"commit-message-validated": "Add editor prompt tests\n",
+				"commit-message-validated": "Add editor prompt tests, but validated\n",
 				"name":                     "Johnny Appleseed",
 				/* TODO
 				"day":                      []string{"Monday", "Wednesday"},
