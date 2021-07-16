@@ -347,6 +347,8 @@ validators include:
 | Required     | any         | Rejects zero values of the response type                    | Boolean values pass straight through since the zero value (false) is a valid response |
 | MinLength(n) | string      | Enforces that a response is at least the given length       |                                                                                       |
 | MaxLength(n) | string      | Enforces that a response is no longer than the given length |                                                                                       |
+| MaxItems(n)  | []OptionAnswer | Enforces that a response has no more selections of the indicated |                                                                               |
+| MinItems(n)  | []OptionAnswer | Enforces that a response has no less selections of the indicated |                                                                               |
 
 ## Help Text
 
