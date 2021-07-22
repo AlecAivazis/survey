@@ -184,10 +184,7 @@ func (m *MultiSelect) OnChange(key rune, config *PromptConfig) {
 	}
 
 	// render the options
-	m.Render(MultiSelectQuestionTemplate, tmplData)
-
-	offset := computeCursorOffset(MultiSelectQuestionTemplate, tmplData, opts, idx, m.termWidthSafe())
-	m.OffsetCursor(offset)
+	m.RenderWithCursorOffset(MultiSelectQuestionTemplate, tmplData, opts, idx)
 }
 
 func (m *MultiSelect) filterOptions(config *PromptConfig) []core.OptionAnswer {
@@ -281,13 +278,10 @@ func (m *MultiSelect) Prompt(config *PromptConfig) (interface{}, error) {
 	}
 
 	// ask the question
-	err := m.Render(MultiSelectQuestionTemplate, tmplData)
+	err := m.RenderWithCursorOffset(MultiSelectQuestionTemplate, tmplData, opts, idx)
 	if err != nil {
 		return "", err
 	}
-
-	offset := computeCursorOffset(MultiSelectQuestionTemplate, tmplData, opts, idx, m.termWidthSafe())
-	m.OffsetCursor(offset)
 
 	rr := m.NewRuneReader()
 	rr.SetTermMode()

@@ -104,6 +104,17 @@ func (r *Renderer) Render(tmpl string, data interface{}) error {
 	return nil
 }
 
+func (r *Renderer) RenderWithCursorOffset(tmpl string, data IterableOpts, opts []core.OptionAnswer, idx int) error {
+	if err := r.Render(tmpl, data); err != nil {
+		return err
+	}
+
+	offset := computeCursorOffset(MultiSelectQuestionTemplate, data, opts, idx, r.termWidthSafe())
+	r.OffsetCursor(offset)
+
+	return nil
+}
+
 // appendRenderedError appends text to the renderer's error buffer
 // which is used to track what has been printed. It is not exported
 // as errors should only be displayed via Error(config, error).

@@ -176,10 +176,7 @@ func (s *Select) OnChange(key rune, config *PromptConfig) bool {
 	}
 
 	// render the options
-	s.Render(SelectQuestionTemplate, tmplData)
-
-	offset := computeCursorOffset(SelectQuestionTemplate, tmplData, opts, idx, s.termWidthSafe())
-	s.OffsetCursor(offset)
+	s.RenderWithCursorOffset(SelectQuestionTemplate, tmplData, opts, idx)
 
 	// keep prompting
 	return false
@@ -275,13 +272,10 @@ func (s *Select) Prompt(config *PromptConfig) (interface{}, error) {
 	}
 
 	// ask the question
-	err := s.Render(SelectQuestionTemplate, tmplData)
+	err := s.RenderWithCursorOffset(SelectQuestionTemplate, tmplData, opts, idx)
 	if err != nil {
 		return "", err
 	}
-
-	offset := computeCursorOffset(SelectQuestionTemplate, tmplData, opts, idx, s.termWidthSafe())
-	s.OffsetCursor(offset)
 
 	// by default, use the default value
 	s.useDefault = true
