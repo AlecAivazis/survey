@@ -182,15 +182,6 @@ func (s *Select) OnChange(key rune, config *PromptConfig) bool {
 	return false
 }
 
-func (s *Select) width() int {
-	w, err := s.termWidth()
-	if err != nil || w == 0 {
-		// assume terminal of arbitrary width
-		w = 10000
-	}
-	return w - 2 // account for leading characters in template
-}
-
 func (s *Select) filterOptions(config *PromptConfig) []core.OptionAnswer {
 	// the filtered list
 	answers := []core.OptionAnswer{}
