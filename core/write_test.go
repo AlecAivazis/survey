@@ -305,12 +305,12 @@ func TestWriteAnswer_returnsErrWhenFieldNotFound(t *testing.T) {
 	}
 }
 
-func TestFindFieldIndex_canFindExportedField(t *testing.T) {
+func TestFindField_canFindExportedField(t *testing.T) {
 	// create a reflective wrapper over the struct to look through
-	val := reflect.ValueOf(struct{ Name string }{})
+	val := reflect.ValueOf(struct{ Name string }{Name: "Jack"})
 
 	// find the field matching "name"
-	fieldIndex, err := findFieldIndex(val, "name")
+	field, fieldType, err := findField(val, "name")
 	// if something went wrong
 	if err != nil {
 		// the test failed
@@ -319,20 +319,28 @@ func TestFindFieldIndex_canFindExportedField(t *testing.T) {
 	}
 
 	// make sure we got the right value
-	if val.Type().Field(fieldIndex).Name != "Name" {
+	if field.Interface() != "Jack" {
 		// the test failed
-		t.Errorf("Did not find the correct field name. Expected 'Name' found %v.", val.Type().Field(fieldIndex).Name)
+		t.Errorf("Did not find the correct field value. Expected 'Jack' found %v.", field.Interface())
+	}
+
+	// make sure we got the right field type
+	if fieldType.Name != "Name" {
+		// the test failed
+		t.Errorf("Did not find the correct field name. Expected 'Name' found %v.", fieldType.Name)
 	}
 }
 
-func TestFindFieldIndex_canFindTaggedField(t *testing.T) {
+func TestFindField_canFindTaggedField(t *testing.T) {
 	// the struct to look through
 	val := reflect.ValueOf(struct {
 		Username string `survey:"name"`
-	}{})
+	}{
+		Username: "Jack",
+	})
 
 	// find the field matching "name"
-	fieldIndex, err := findFieldIndex(val, "name")
+	field, fieldType, err := findField(val, "name")
 	// if something went wrong
 	if err != nil {
 		// the test failed
@@ -341,41 +349,55 @@ func TestFindFieldIndex_canFindTaggedField(t *testing.T) {
 	}
 
 	// make sure we got the right value
-	if val.Type().Field(fieldIndex).Name != "Username" {
+	if field.Interface() != "Jack" {
 		// the test failed
-		t.Errorf("Did not find the correct field name. Expected 'Username' found %v.", val.Type().Field(fieldIndex).Name)
+		t.Errorf("Did not find the correct field value. Expected 'Jack' found %v.", field.Interface())
+	}
+
+	// make sure we got the right fieldType
+	if fieldType.Name != "Username" {
+		// the test failed
+		t.Errorf("Did not find the correct field name. Expected 'Username' found %v.", fieldType.Name)
 	}
 }
 
-func TestFindFieldIndex_canHandleCapitalAnswerNames(t *testing.T) {
+func TestFindField_canHandleCapitalAnswerNames(t *testing.T) {
 	// create a reflective wrapper over the struct to look through
-	val := reflect.ValueOf(struct{ Name string }{})
+	val := reflect.ValueOf(struct{ Name string }{Name: "Jack"})
 
 	// find the field matching "name"
-	fieldIndex, err := findFieldIndex(val, "Name")
+	field, fieldType, err := findField(val, "Name")
 	// if something went wrong
 	if err != nil {
 		// the test failed
 		t.Error(err.Error())
 		return
 	}
-
 	// make sure we got the right value
-	if val.Type().Field(fieldIndex).Name != "Name" {
+	if field.Interface() != "Jack" {
 		// the test failed
-		t.Errorf("Did not find the correct field name. Expected 'Name' found %v.", val.Type().Field(fieldIndex).Name)
+		t.Errorf("Did not find the correct field value. Expected 'Jack' found %v.", field.Interface())
+	}
+
+	// make sure we got the right fieldType
+	if fieldType.Name != "Name" {
+		// the test failed
+		t.Errorf("Did not find the correct field name. Expected 'Name' found %v.", fieldType.Name)
 	}
 }
 
-func TestFindFieldIndex_tagOverwriteFieldName(t *testing.T) {
+func TestFindField_tagOverwriteFieldName(t *testing.T) {
 	// the struct to look through
 	val := reflect.ValueOf(struct {
 		Name     string
 		Username string `survey:"name"`
-	}{})
+	}{
+		Name:     "Ralf",
+		Username: "Jack",
+	})
 
 	// find the field matching "name"
-	fieldIndex, err := findFieldIndex(val, "name")
+	field, fieldType, err := findField(val, "name")
 	// if something went wrong
 	if err != nil {
 		// the test failed
@@ -384,9 +406,123 @@ func TestFindFieldIndex_tagOverwriteFieldName(t *testing.T) {
 	}
 
 	// make sure we got the right value
-	if val.Type().Field(fieldIndex).Name != "Username" {
+	if field.Interface() != "Jack" {
 		// the test failed
-		t.Errorf("Did not find the correct field name. Expected 'Username' found %v.", val.Type().Field(fieldIndex).Name)
+		t.Errorf("Did not find the correct field value. Expected 'Jack' found %v.", field.Interface())
+	}
+
+	// make sure we got the right fieldType
+	if fieldType.Name != "Username" {
+		// the test failed
+		t.Errorf("Did not find the correct field name. Expected 'Username' found %v.", fieldType.Name)
+	}
+}
+
+func TestFindField_supportsPromotedFields(t *testing.T) {
+	// create a reflective wrapper over the struct to look through
+	type Common struct {
+		Name string
+	}
+
+	type Strct struct {
+		Common   // Name field added by composition
+		Username string
+	}
+
+	val := reflect.ValueOf(Strct{Common: Common{Name: "Jack"}})
+
+	// find the field matching "name"
+	field, fieldType, err := findField(val, "Name")
+	// if something went wrong
+	if err != nil {
+		// the test failed
+		t.Error(err.Error())
+		return
+	}
+	// make sure we got the right value
+	if field.Interface() != "Jack" {
+		// the test failed
+		t.Errorf("Did not find the correct field value. Expected 'Jack' found %v.", field.Interface())
+	}
+
+	// make sure we got the right fieldType
+	if fieldType.Name != "Name" {
+		// the test failed
+		t.Errorf("Did not find the correct field name. Expected 'Name' found %v.", fieldType.Name)
+	}
+}
+
+func TestFindField_promotedFieldsWithTag(t *testing.T) {
+	// create a reflective wrapper over the struct to look through
+	type Common struct {
+		Username string `survey:"name"`
+	}
+
+	type Strct struct {
+		Common // Name field added by composition
+		Name   string
+	}
+
+	val := reflect.ValueOf(Strct{
+		Common: Common{Username: "Jack"},
+		Name:   "Ralf",
+	})
+
+	// find the field matching "name"
+	field, fieldType, err := findField(val, "name")
+	// if something went wrong
+	if err != nil {
+		// the test failed
+		t.Error(err.Error())
+		return
+	}
+	// make sure we got the right value
+	if field.Interface() != "Jack" {
+		// the test failed
+		t.Errorf("Did not find the correct field value. Expected 'Jack' found %v.", field.Interface())
+	}
+
+	// make sure we got the right fieldType
+	if fieldType.Name != "Username" {
+		// the test failed
+		t.Errorf("Did not find the correct field name. Expected 'Username' found %v.", fieldType.Name)
+	}
+}
+
+func TestFindField_promotedFieldsDontHavePriorityOverTags(t *testing.T) {
+	// create a reflective wrapper over the struct to look through
+	type Common struct {
+		Name string
+	}
+
+	type Strct struct {
+		Common          // Name field added by composition
+		Username string `survey:"name"`
+	}
+
+	val := reflect.ValueOf(Strct{
+		Common:   Common{Name: "Ralf"},
+		Username: "Jack",
+	})
+
+	// find the field matching "name"
+	field, fieldType, err := findField(val, "name")
+	// if something went wrong
+	if err != nil {
+		// the test failed
+		t.Error(err.Error())
+		return
+	}
+	// make sure we got the right value
+	if field.Interface() != "Jack" {
+		// the test failed
+		t.Errorf("Did not find the correct field value. Expected 'Jack' found %v.", field.Interface())
+	}
+
+	// make sure we got the right fieldType
+	if fieldType.Name != "Username" {
+		// the test failed
+		t.Errorf("Did not find the correct field name. Expected 'Username' found %v.", fieldType.Name)
 	}
 }
 
