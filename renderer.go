@@ -78,9 +78,6 @@ func (r *Renderer) OffsetCursor(offset int) {
 }
 
 func (r *Renderer) Render(tmpl string, data interface{}) error {
-	cursor := r.NewCursor()
-	cursor.Restore() // clear any accessibility offsetting
-
 	// cleanup the currently rendered text
 	lineCount := r.countLines(r.renderedText)
 	r.resetPrompt(lineCount)
@@ -98,16 +95,18 @@ func (r *Renderer) Render(tmpl string, data interface{}) error {
 	// add the printed text to the rendered text buffer so we can cleanup later
 	r.AppendRenderedText(layoutOut)
 
-	cursor.Save()
-
 	// nothing went wrong
 	return nil
 }
 
 func (r *Renderer) RenderWithCursorOffset(tmpl string, data IterableOpts, opts []core.OptionAnswer, idx int) error {
+	cursor := r.NewCursor()
+	cursor.Restore() // clear any accessibility offsetting
+
 	if err := r.Render(tmpl, data); err != nil {
 		return err
 	}
+	cursor.Save()
 
 	offset := computeCursorOffset(MultiSelectQuestionTemplate, data, opts, idx, r.termWidthSafe())
 	r.OffsetCursor(offset)
