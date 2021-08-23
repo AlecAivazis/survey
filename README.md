@@ -295,7 +295,7 @@ survey.AskOne(prompt, &color, survey.WithFilter(myFilter))
 
 ## Keeping the filter active
 
-By default the filter will disappear if the user selects one of the filtered elements. Once the user selects one element the filter setting is gone. 
+By default the filter will disappear if the user selects one of the filtered elements. Once the user selects one element the filter setting is gone.
 
 However the user can prevent this from happening and keep the filter active for multiple selections in a e.g. MultiSelect:
 
@@ -342,13 +342,13 @@ survey.AskOne(prompt, &color, survey.WithValidator(survey.Required))
 `survey` comes prepackaged with a few validators to fit common situations. Currently these
 validators include:
 
-| name         | valid types | description                                                 | notes                                                                                 |
-| ------------ | ----------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| Required     | any         | Rejects zero values of the response type                    | Boolean values pass straight through since the zero value (false) is a valid response |
-| MinLength(n) | string      | Enforces that a response is at least the given length       |                                                                                       |
-| MaxLength(n) | string      | Enforces that a response is no longer than the given length |                                                                                       |
-| MaxItems(n)  | []OptionAnswer | Enforces that a response has no more selections of the indicated |                                                                               |
-| MinItems(n)  | []OptionAnswer | Enforces that a response has no less selections of the indicated |                                                                               |
+| name         | valid types    | description                                                      | notes                                                                                 |
+| ------------ | -------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Required     | any            | Rejects zero values of the response type                         | Boolean values pass straight through since the zero value (false) is a valid response |
+| MinLength(n) | string         | Enforces that a response is at least the given length            |                                                                                       |
+| MaxLength(n) | string         | Enforces that a response is no longer than the given length      |                                                                                       |
+| MaxItems(n)  | []OptionAnswer | Enforces that a response has no more selections of the indicated |                                                                                       |
+| MinItems(n)  | []OptionAnswer | Enforces that a response has no less selections of the indicated |                                                                                       |
 
 ## Help Text
 
@@ -459,6 +459,7 @@ For some examples, you can see any of the tests in this repo.
 ## FAQ
 
 ### What kinds of IO are supported by `survey`?
+
 survey aims to support most terminal emulators; it expects support for ANSI escape sequences.
 This means that reading from piped stdin or writing to piped stdout is **not supported**,
 and likely to break your application in these situations. See [#337](https://github.com/AlecAivazis/survey/pull/337#issue-581351617)
@@ -477,4 +478,3 @@ if err == terminal.InterruptErr {
 	panic(err)
 }
 ```
-
