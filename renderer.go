@@ -72,7 +72,7 @@ func (r *Renderer) Error(config *PromptConfig, invalid error) error {
 func (r *Renderer) OffsetCursor(offset int) {
 	cursor := r.NewCursor()
 	for offset > 0 {
-		cursor.PreviousLine(-1)
+		cursor.PreviousLine(1)
 		offset--
 	}
 }
