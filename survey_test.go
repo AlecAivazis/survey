@@ -330,3 +330,191 @@ func TestAsk_returnsErrorIfTargetIsNil(t *testing.T) {
 		t.Error("Did not encounter error when asking with no where to record.")
 	}
 }
+
+func Test_computeCursorOffset_MultiSelect(t *testing.T) {
+	tests := []struct {
+		name      string
+		ix        int
+		opts      []core.OptionAnswer
+		termWidth int
+		want      int
+	}{
+		{
+			name: "no opts",
+			ix:   0,
+			opts: []core.OptionAnswer{},
+			want: 0,
+		},
+		{
+			name: "one opt",
+			ix:   0,
+			opts: core.OptionAnswerList([]string{"one"}),
+			want: 1,
+		},
+		{
+			name: "multiple opt",
+			opts: core.OptionAnswerList([]string{"one", "two"}),
+			ix:   0,
+			want: 2,
+		},
+		{
+			name: "first choice",
+			opts: core.OptionAnswerList([]string{"one", "two", "three", "four", "five"}),
+			ix:   0,
+			want: 5,
+		},
+		{
+			name: "mid choice",
+			opts: core.OptionAnswerList([]string{"one", "two", "three", "four", "five"}),
+			ix:   2,
+			want: 3,
+		},
+		{
+			name: "last choice",
+			opts: core.OptionAnswerList([]string{"one", "two", "three", "four", "five"}),
+			ix:   4,
+			want: 1,
+		},
+		{
+			name: "wide choices, uneven",
+			opts: core.OptionAnswerList([]string{
+				"wide one wide one wide one",
+				"two", "three",
+				"wide four wide four wide four",
+				"five", "six"}),
+			termWidth: 20,
+			ix:        0,
+			want:      8,
+		},
+		{
+			name: "wide choices, even",
+			opts: core.OptionAnswerList([]string{
+				"wide one wide one wide one",
+				"two", "three",
+				"012345678901",
+				"five", "six"}),
+			termWidth: 20,
+			ix:        0,
+			want:      7,
+		},
+		{
+			name: "wide choices, wide before idx",
+			opts: core.OptionAnswerList([]string{
+				"wide one wide one wide one",
+				"wide two wide two wide two",
+				"three", "four", "five", "six"}),
+			termWidth: 20,
+			ix:        2,
+			want:      4,
+		},
+	}
+	for _, tt := range tests {
+		if tt.termWidth == 0 {
+			tt.termWidth = 100
+		}
+		tmpl := MultiSelectQuestionTemplate
+		data := MultiSelectTemplateData{
+			SelectedIndex: tt.ix,
+			Config:        defaultPromptConfig(),
+		}
+		t.Run(tt.name, func(t *testing.T) {
+			if got := computeCursorOffset(tmpl, data, tt.opts, tt.ix, tt.termWidth); got != tt.want {
+				t.Errorf("computeCursorOffset() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_computeCursorOffset_Select(t *testing.T) {
+	tests := []struct {
+		name      string
+		ix        int
+		opts      []core.OptionAnswer
+		termWidth int
+		want      int
+	}{
+		{
+			name: "no opts",
+			ix:   0,
+			opts: []core.OptionAnswer{},
+			want: 0,
+		},
+		{
+			name: "one opt",
+			ix:   0,
+			opts: core.OptionAnswerList([]string{"one"}),
+			want: 1,
+		},
+		{
+			name: "multiple opt",
+			opts: core.OptionAnswerList([]string{"one", "two"}),
+			ix:   0,
+			want: 2,
+		},
+		{
+			name: "first choice",
+			opts: core.OptionAnswerList([]string{"one", "two", "three", "four", "five"}),
+			ix:   0,
+			want: 5,
+		},
+		{
+			name: "mid choice",
+			opts: core.OptionAnswerList([]string{"one", "two", "three", "four", "five"}),
+			ix:   2,
+			want: 3,
+		},
+		{
+			name: "last choice",
+			opts: core.OptionAnswerList([]string{"one", "two", "three", "four", "five"}),
+			ix:   4,
+			want: 1,
+		},
+		{
+			name: "wide choices, uneven",
+			opts: core.OptionAnswerList([]string{
+				"wide one wide one wide one",
+				"two", "three",
+				"wide four wide four wide four",
+				"five", "six"}),
+			termWidth: 20,
+			ix:        0,
+			want:      8,
+		},
+		{
+			name: "wide choices, even",
+			opts: core.OptionAnswerList([]string{
+				"wide one wide one wide one",
+				"two", "three",
+				"01234567890123456",
+				"five", "six"}),
+			termWidth: 20,
+			ix:        0,
+			want:      7,
+		},
+		{
+			name: "wide choices, wide before idx",
+			opts: core.OptionAnswerList([]string{
+				"wide one wide one wide one",
+				"wide two wide two wide two",
+				"three", "four", "five", "six"}),
+			termWidth: 20,
+			ix:        2,
+			want:      4,
+		},
+	}
+	for _, tt := range tests {
+		if tt.termWidth == 0 {
+			tt.termWidth = 100
+		}
+		tmpl := SelectQuestionTemplate
+		data := SelectTemplateData{
+			SelectedIndex: tt.ix,
+			Config:        defaultPromptConfig(),
+		}
+		t.Run(tt.name, func(t *testing.T) {
+			if got := computeCursorOffset(tmpl, data, tt.opts, tt.ix, tt.termWidth); got != tt.want {
+				t.Errorf("computeCursorOffset() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
