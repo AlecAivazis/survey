@@ -476,7 +476,7 @@ If you want to stop the process, handle the returned error in your code:
 err := survey.AskOne(prompt, &myVar)
 if err != nil {
 	if err == terminal.InterruptErr {
-		log.Fatal("interrupted"))
+		log.Fatal("interrupted")
 	}
 	...
 }
