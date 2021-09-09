@@ -464,17 +464,20 @@ survey aims to support most terminal emulators; it expects support for ANSI esca
 This means that reading from piped stdin or writing to piped stdout is **not supported**,
 and likely to break your application in these situations. See [#337](https://github.com/AlecAivazis/survey/pull/337#issue-581351617)
 
-### Why isn't sending a SIGINT (aka. CTRL-C) signal working?
+### Why isn't Ctrl-C working?
 
-When you send an interrupt signal to the process, it only interrupts the current prompt instead of the entire process. This manifests in a `github.com/AlecAivazis/survey/v2/terminal.InterruptErr` being returned from `Ask` and `AskOne`. If you want to stop the process, handle the returned error in your code:
+Ordinarily, when you type Ctrl-C, the terminal recognizes this as the QUIT button and delivers a SIGINT signal to the process, which terminates it.
+However, Survey temporarily configures the terminal to deliver control codes as ordinary input bytes.
+When Survey reads a ^C byte (ASCII \x03, "end of text"), it interrupts the current survey and returns a
+`github.com/AlecAivazis/survey/v2/terminal.InterruptErr` from `Ask` or `AskOne`.
+If you want to stop the process, handle the returned error in your code:
 
 ```go
 err := survey.AskOne(prompt, &myVar)
-if err == terminal.InterruptErr {
-	fmt.Println("interrupted")
-
-	os.Exit(0)
-} else if err != nil {
-	panic(err)
+if err != nil {
+	if err == terminal.InterruptErr {
+		log.Fatal("interrupted")
+	}
+	...
 }
 ```
