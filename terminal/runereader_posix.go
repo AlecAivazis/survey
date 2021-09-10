@@ -65,6 +65,8 @@ func (rr *RuneReader) RestoreTermMode() error {
 	return nil
 }
 
+// ReadRune Parse escape sequences such as ESC [ A for arrow keys.
+// See https://vt100.net/docs/vt102-ug/appendixc.html
 func (rr *RuneReader) ReadRune() (rune, int, error) {
 	r, size, err := rr.state.reader.ReadRune()
 	if err != nil {
@@ -74,9 +76,6 @@ func (rr *RuneReader) ReadRune() (rune, int, error) {
 	if r != KeyEscape {
 		return r, size, err
 	}
-
-	// Parse escape sequences such as ESC [ A for arrow keys.
-	// See https://vt100.net/docs/vt102-ug/appendixc.html
 
 	if rr.state.reader.Buffered() == 0 {
 		// no more characters so must be `Esc` key
