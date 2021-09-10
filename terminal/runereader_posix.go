@@ -1,3 +1,4 @@
+//go:build !windows
 // +build !windows
 
 // The terminal mode manipulation code is derived heavily from:
@@ -14,6 +15,11 @@ import (
 	"fmt"
 	"syscall"
 	"unsafe"
+)
+
+const (
+	normalKeypad      = '['
+	applicationKeypad = 'O'
 )
 
 type runeReaderState struct {
@@ -76,35 +82,126 @@ func (rr *RuneReader) ReadRune() (rune, int, error) {
 		if err != nil {
 			return r, size, err
 		}
-		if r != '[' && r != 'O' {
-			return r, size, fmt.Errorf("Unexpected Escape Sequence: %q", []rune{'\033', r})
-		}
-		r, size, err = rr.state.reader.ReadRune()
-		if err != nil {
-			return r, size, err
-		}
+
 		switch r {
-		case 'D':
-			return KeyArrowLeft, 1, nil
-		case 'C':
-			return KeyArrowRight, 1, nil
-		case 'A':
-			return KeyArrowUp, 1, nil
-		case 'B':
-			return KeyArrowDown, 1, nil
-		case 'H': // Home button
-			return SpecialKeyHome, 1, nil
-		case 'F': // End button
-			return SpecialKeyEnd, 1, nil
-		case '3': // Delete Button
-			// discard the following '~' key from buffer
-			rr.state.reader.Discard(1)
-			return SpecialKeyDelete, 1, nil
+		case normalKeypad:
+			return rr.readNormalKeypad()
+
+		case applicationKeypad:
+			return rr.readApplicationKeypad()
+
 		default:
-			// discard the following '~' key from buffer
-			rr.state.reader.Discard(1)
-			return IgnoreKey, 1, nil
+			return r, size, fmt.Errorf("unexpected escape sequence from terminal: %q", []rune{'\033', r})
 		}
 	}
+
 	return r, size, err
+}
+
+func (rr *RuneReader) readNormalKeypad() (rune, int, error) {
+	r, size, err := rr.state.reader.ReadRune()
+	if err != nil {
+		return r, size, err
+	}
+
+	switch r {
+	// ESC [ D
+	// https://vt100.net/docs/vt102-ug/appendixc.html#SC.2.2.3
+	// https://vt100.net/docs/vt102-ug/chapter5.html#S5.5.2.14
+	case 'D':
+		return KeyArrowLeft, 1, nil
+
+	// ESC [ C
+	// https://vt100.net/docs/vt102-ug/appendixc.html#SC.2.2.3
+	// https://vt100.net/docs/vt102-ug/chapter5.html#S5.5.2.14
+	case 'C':
+		return KeyArrowRight, 1, nil
+
+	// ESC [ A
+	// https://vt100.net/docs/vt102-ug/appendixc.html#SC.2.2.3
+	// https://vt100.net/docs/vt102-ug/chapter5.html#S5.5.2.14
+	case 'A':
+		return KeyArrowUp, 1, nil
+
+	// ESC [ B
+	// https://vt100.net/docs/vt102-ug/appendixc.html#SC.2.2.3
+	// https://vt100.net/docs/vt102-ug/chapter5.html#S5.5.2.14
+	case 'B':
+		return KeyArrowDown, 1, nil
+
+	// Home Key
+	// Cursor Position (Home) (CUP)
+	// ESC [ H
+	// https://vt100.net/docs/vt102-ug/appendixc.html#SC.2.2.9
+	case 'H':
+		return SpecialKeyHome, 1, nil
+
+	// End Key
+	// ESC [ F
+	case 'F':
+		return SpecialKeyEnd, 1, nil
+
+	// Delete Key
+	// Tabulation Clear (TBC)
+	// ESC [ 3
+	case '3':
+		// discard the following '~' key from buffer
+		_, _ = rr.state.reader.Discard(1)
+		return SpecialKeyDelete, 1, nil
+
+	default:
+		// discard the following '~' key from buffer
+		_, _ = rr.state.reader.Discard(1)
+		return IgnoreKey, 1, nil
+	}
+}
+
+func (rr *RuneReader) readApplicationKeypad() (rune, int, error) {
+	r, size, err := rr.state.reader.ReadRune()
+	if err != nil {
+		return r, size, err
+	}
+
+	switch r {
+	// ESC O D
+	// https://vt100.net/docs/vt102-ug/appendixc.html#SC.2.2.3
+	// https://vt100.net/docs/vt102-ug/chapter5.html#S5.5.2.14
+	case 'D':
+		return KeyArrowLeft, 1, nil
+
+	// ESC O C
+	// https://vt100.net/docs/vt102-ug/appendixc.html#SC.2.2.3
+	// https://vt100.net/docs/vt102-ug/chapter5.html#S5.5.2.14
+	case 'C':
+		return KeyArrowRight, 1, nil
+
+	// ESC O A
+	// https://vt100.net/docs/vt102-ug/appendixc.html#SC.2.2.3
+	// https://vt100.net/docs/vt102-ug/chapter5.html#S5.5.2.14
+	case 'A':
+		return KeyArrowUp, 1, nil
+
+	// ESC O B
+	// https://vt100.net/docs/vt102-ug/appendixc.html#SC.2.2.3
+	// https://vt100.net/docs/vt102-ug/chapter5.html#S5.5.2.14
+	case 'B':
+		return KeyArrowDown, 1, nil
+
+	// Home Key
+	// Cursor Position (Home) (CUP)
+	// ESC O H
+	// https://vt100.net/docs/vt102-ug/appendixc.html#SC.2.2.9
+	case 'H':
+		return SpecialKeyHome, 1, nil
+
+	// End Key
+	// ESC O F
+	case 'F':
+		return SpecialKeyEnd, 1, nil
+
+	default:
+		// discard the following '~' key from buffer
+		_, _ = rr.state.reader.Discard(1)
+		return IgnoreKey, 1, nil
+	}
 }
