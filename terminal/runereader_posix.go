@@ -71,7 +71,7 @@ func (rr *RuneReader) ReadRune() (rune, int, error) {
 		return r, size, err
 	}
 
-	if r != '\033' {
+	if r != KeyEscape {
 		return r, size, err
 	}
 
@@ -90,7 +90,7 @@ func (rr *RuneReader) ReadRune() (rune, int, error) {
 
 	// ESC O ... or ESC [ ...?
 	if r != normalKeypad && r != applicationKeypad {
-		return r, size, fmt.Errorf("unexpected escape sequence from terminal: %q", []rune{'\033', r})
+		return r, size, fmt.Errorf("unexpected escape sequence from terminal: %q", []rune{KeyEscape, r})
 	}
 
 	keypad := r
