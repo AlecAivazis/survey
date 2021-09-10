@@ -71,136 +71,57 @@ func (rr *RuneReader) ReadRune() (rune, int, error) {
 		return r, size, err
 	}
 
-	// parse ^[ sequences to look for arrow keys
-	if r == '\033' {
-		if rr.state.reader.Buffered() == 0 {
-			// no more characters so must be `Esc` key
-			return KeyEscape, 1, nil
-		}
-		r, size, err = rr.state.reader.ReadRune()
-		if err != nil {
-			return r, size, err
-		}
-
-		switch r {
-		case normalKeypad:
-			return rr.readNormalKeypad()
-
-		case applicationKeypad:
-			return rr.readApplicationKeypad()
-
-		default:
-			return r, size, fmt.Errorf("unexpected escape sequence from terminal: %q", []rune{'\033', r})
-		}
+	if r != '\033' {
+		return r, size, err
 	}
 
-	return r, size, err
-}
+	// Parse escape sequences such as ESC [ A for arrow keys.
+	// See https://vt100.net/docs/vt102-ug/appendixc.html
 
-func (rr *RuneReader) readNormalKeypad() (rune, int, error) {
-	r, size, err := rr.state.reader.ReadRune()
+	if rr.state.reader.Buffered() == 0 {
+		// no more characters so must be `Esc` key
+		return KeyEscape, 1, nil
+	}
+
+	r, size, err = rr.state.reader.ReadRune()
+	if err != nil {
+		return r, size, err
+	}
+
+	// ESC O ... or ESC [ ...?
+	if r != normalKeypad && r != applicationKeypad {
+		return r, size, fmt.Errorf("unexpected escape sequence from terminal: %q", []rune{'\033', r})
+	}
+
+	keypad := r
+
+	r, size, err = rr.state.reader.ReadRune()
 	if err != nil {
 		return r, size, err
 	}
 
 	switch r {
-	// ESC [ D
-	// https://vt100.net/docs/vt102-ug/appendixc.html#SC.2.2.3
-	// https://vt100.net/docs/vt102-ug/chapter5.html#S5.5.2.14
-	case 'D':
-		return KeyArrowLeft, 1, nil
-
-	// ESC [ C
-	// https://vt100.net/docs/vt102-ug/appendixc.html#SC.2.2.3
-	// https://vt100.net/docs/vt102-ug/chapter5.html#S5.5.2.14
-	case 'C':
-		return KeyArrowRight, 1, nil
-
-	// ESC [ A
-	// https://vt100.net/docs/vt102-ug/appendixc.html#SC.2.2.3
-	// https://vt100.net/docs/vt102-ug/chapter5.html#S5.5.2.14
-	case 'A':
+	case 'A': // ESC [ A or ESC O A
 		return KeyArrowUp, 1, nil
-
-	// ESC [ B
-	// https://vt100.net/docs/vt102-ug/appendixc.html#SC.2.2.3
-	// https://vt100.net/docs/vt102-ug/chapter5.html#S5.5.2.14
-	case 'B':
+	case 'B': // ESC [ B or ESC O B
 		return KeyArrowDown, 1, nil
-
-	// Home Key
-	// Cursor Position (Home) (CUP)
-	// ESC [ H
-	// https://vt100.net/docs/vt102-ug/appendixc.html#SC.2.2.9
-	case 'H':
-		return SpecialKeyHome, 1, nil
-
-	// End Key
-	// ESC [ F
-	case 'F':
-		return SpecialKeyEnd, 1, nil
-
-	// Delete Key
-	// Tabulation Clear (TBC)
-	// ESC [ 3
-	case '3':
-		// discard the following '~' key from buffer
-		_, _ = rr.state.reader.Discard(1)
-		return SpecialKeyDelete, 1, nil
-
-	default:
-		// discard the following '~' key from buffer
-		_, _ = rr.state.reader.Discard(1)
-		return IgnoreKey, 1, nil
-	}
-}
-
-func (rr *RuneReader) readApplicationKeypad() (rune, int, error) {
-	r, size, err := rr.state.reader.ReadRune()
-	if err != nil {
-		return r, size, err
-	}
-
-	switch r {
-	// ESC O D
-	// https://vt100.net/docs/vt102-ug/appendixc.html#SC.2.2.3
-	// https://vt100.net/docs/vt102-ug/chapter5.html#S5.5.2.14
-	case 'D':
-		return KeyArrowLeft, 1, nil
-
-	// ESC O C
-	// https://vt100.net/docs/vt102-ug/appendixc.html#SC.2.2.3
-	// https://vt100.net/docs/vt102-ug/chapter5.html#S5.5.2.14
-	case 'C':
+	case 'C': // ESC [ C or ESC O C
 		return KeyArrowRight, 1, nil
-
-	// ESC O A
-	// https://vt100.net/docs/vt102-ug/appendixc.html#SC.2.2.3
-	// https://vt100.net/docs/vt102-ug/chapter5.html#S5.5.2.14
-	case 'A':
-		return KeyArrowUp, 1, nil
-
-	// ESC O B
-	// https://vt100.net/docs/vt102-ug/appendixc.html#SC.2.2.3
-	// https://vt100.net/docs/vt102-ug/chapter5.html#S5.5.2.14
-	case 'B':
-		return KeyArrowDown, 1, nil
-
-	// Home Key
-	// Cursor Position (Home) (CUP)
-	// ESC O H
-	// https://vt100.net/docs/vt102-ug/appendixc.html#SC.2.2.9
-	case 'H':
-		return SpecialKeyHome, 1, nil
-
-	// End Key
-	// ESC O F
-	case 'F':
+	case 'D': // ESC [ D or ESC O D
+		return KeyArrowLeft, 1, nil
+	case 'F': // ESC [ F or ESC O F
 		return SpecialKeyEnd, 1, nil
-
-	default:
-		// discard the following '~' key from buffer
-		_, _ = rr.state.reader.Discard(1)
-		return IgnoreKey, 1, nil
+	case 'H': // ESC [ H or ESC O H
+		return SpecialKeyHome, 1, nil
+	case '3': // ESC [ 3
+		if keypad == normalKeypad {
+			// discard the following '~' key from buffer
+			_, _ = rr.state.reader.Discard(1)
+			return SpecialKeyDelete, 1, nil
+		}
 	}
+
+	// discard the following '~' key from buffer
+	_, _ = rr.state.reader.Discard(1)
+	return IgnoreKey, 1, nil
 }
