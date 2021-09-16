@@ -62,10 +62,6 @@ Examples can be found in the `examples/` directory. Run them
 to see basic behavior:
 
 ```bash
-go get github.com/AlecAivazis/survey/v2
-
-cd $GOPATH/src/github.com/AlecAivazis/survey
-
 go run examples/simple.go
 go run examples/validation.go
 ```
