@@ -4,15 +4,6 @@
 
 The following is a set of guidelines to follow when contributing to this package. These are not hard rules, please use common sense and feel free to propose changes to this document in a pull request.
 
-## Table of Contents
-
-1. [Code of Conduct](#code-of-conduct)
-1. [Getting Help](#getting-help)
-1. [Filing a Bug Report](#how-to-file-a-bug-report)
-1. [Suggesting an API change](#suggesting-an-api-change)
-1. [Submitting a Contribution](#submitting-a-contribution)
-1. [Writing and Running Tests](#writing-and-running-tests)
-
 ## Code of Conduct
 
 This project and its contibutors are expected to uphold the [Go Community Code of Conduct](https://golang.org/conduct). By participating, you are expected to follow these guidelines.
