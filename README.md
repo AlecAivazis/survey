@@ -1,6 +1,5 @@
 # Survey
 
-[![Build Status](https://travis-ci.org/AlecAivazis/survey.svg?branch=feature%2Fpretty)](https://travis-ci.org/AlecAivazis/survey)
 [![GoDoc](http://img.shields.io/badge/godoc-reference-5272B4.svg)](https://pkg.go.dev/github.com/AlecAivazis/survey/v2)
 
 A library for building interactive and accessible prompts on terminals supporting ANSI escape sequences.
