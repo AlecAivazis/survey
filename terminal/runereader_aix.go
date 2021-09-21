@@ -1,5 +1,3 @@
-// +build !windows,!aix
-
 // The terminal mode manipulation code is derived heavily from:
 // https://github.com/golang/crypto/blob/master/ssh/terminal/util.go:
 // Copyright 2011 The Go Authors. All rights reserved.
@@ -14,6 +12,8 @@ import (
 	"fmt"
 	"syscall"
 	"unsafe"
+
+    "golang.org/x/sys/unix"
 )
 
 const (
@@ -21,10 +21,19 @@ const (
 	applicationKeypad = 'O'
 )
 
+const (
+        ioctlReadTermios  = 0x5401
+        ioctlWriteTermios = 0x5402
+)
+
 type runeReaderState struct {
 	term   syscall.Termios
 	reader *bufio.Reader
 	buf    *bytes.Buffer
+}
+
+func ioctl_aix(fd, request, argp uintptr) error {
+        return unix.IoctlSetInt(int(fd), uint(request), int(argp))
 }
 
 func newRuneReaderState(input FileReader) runeReaderState {
@@ -44,14 +53,14 @@ func (rr *RuneReader) Buffer() *bytes.Buffer {
 
 // For reading runes we just want to disable echo.
 func (rr *RuneReader) SetTermMode() error {
-	if _, _, err := syscall.Syscall6(syscall.SYS_IOCTL, uintptr(rr.stdio.In.Fd()), ioctlReadTermios, uintptr(unsafe.Pointer(&rr.state.term)), 0, 0, 0); err != 0 {
+    if err := ioctl_aix(uintptr(rr.stdio.In.Fd()), ioctlReadTermios, uintptr(unsafe.Pointer(&rr.state.term))); err != nil {
 		return err
 	}
 
 	newState := rr.state.term
 	newState.Lflag &^= syscall.ECHO | syscall.ECHONL | syscall.ICANON | syscall.ISIG
 
-	if _, _, err := syscall.Syscall6(syscall.SYS_IOCTL, uintptr(rr.stdio.In.Fd()), ioctlWriteTermios, uintptr(unsafe.Pointer(&newState)), 0, 0, 0); err != 0 {
+    if err := ioctl_aix(uintptr(rr.stdio.In.Fd()), ioctlWriteTermios, uintptr(unsafe.Pointer(&newState))); err != nil {
 		return err
 	}
 
@@ -59,7 +68,7 @@ func (rr *RuneReader) SetTermMode() error {
 }
 
 func (rr *RuneReader) RestoreTermMode() error {
-	if _, _, err := syscall.Syscall6(syscall.SYS_IOCTL, uintptr(rr.stdio.In.Fd()), ioctlWriteTermios, uintptr(unsafe.Pointer(&rr.state.term)), 0, 0, 0); err != 0 {
+    if err := ioctl_aix(uintptr(rr.stdio.In.Fd()), ioctlWriteTermios, uintptr(unsafe.Pointer(&rr.state.term))); err != nil {
 		return err
 	}
 	return nil

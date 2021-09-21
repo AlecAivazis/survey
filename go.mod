@@ -12,6 +12,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/stretchr/testify v1.2.1
 	golang.org/x/crypto v0.0.0-20190530122614-20be4c3c3ed5 // indirect
+	golang.org/x/sys v0.0.0-20201119102817-f84b799fce68
 	golang.org/x/term v0.0.0-20210503060354-a79de5458b56
 	golang.org/x/text v0.3.3
 )
