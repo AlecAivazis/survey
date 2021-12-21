@@ -2,6 +2,7 @@ package survey
 
 import (
 	"fmt"
+	"os/exec"
 	"strings"
 	"testing"
 	"time"
@@ -132,6 +133,10 @@ func TestPagination_lastHalf(t *testing.T) {
 }
 
 func TestAsk(t *testing.T) {
+	if _, err := exec.LookPath("vi"); err != nil {
+		t.Skip("vi not found in PATH")
+	}
+
 	tests := []struct {
 		name      string
 		questions []*Question
