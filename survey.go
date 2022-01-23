@@ -329,6 +329,7 @@ func Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
 			// wait for a valid response
 			for invalid := currentValidator(ans); invalid != nil; invalid = currentValidator(ans) {
 				err := q.Prompt.Error(&options.PromptConfig, invalid)
+				// if there was a problem
 				if err != nil {
 					return err
 				}
@@ -339,6 +340,7 @@ func Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
 				} else {
 					ans, err = q.Prompt.Prompt(&options.PromptConfig)
 				}
+				// if there was a problem
 				if err != nil {
 					return err
 				}
