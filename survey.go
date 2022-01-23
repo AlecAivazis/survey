@@ -3,6 +3,7 @@ package survey
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"strings"
@@ -323,12 +324,14 @@ func Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
 			validators = append(validators, validator)
 		}
 
-		// apply every validator to thte response
-		for _, validator := range validators {
+		fmt.Printf("%d validator in total", len(validators))
+
+		// apply every validator to the response
+		for i := 0; i < len(validators); i++ {
+			currentValidator := validators[i]
 			// wait for a valid response
-			for invalid := validator(ans); invalid != nil; invalid = validator(ans) {
+			for invalid := currentValidator(ans); invalid != nil; invalid = currentValidator(ans) {
 				err := q.Prompt.Error(&options.PromptConfig, invalid)
-				// if there was a problem
 				if err != nil {
 					return err
 				}
@@ -339,10 +342,13 @@ func Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
 				} else {
 					ans, err = q.Prompt.Prompt(&options.PromptConfig)
 				}
-				// if there was a problem
 				if err != nil {
 					return err
 				}
+
+				//start over from first validator upon getting the new answer.
+				i = -1
+				break
 			}
 		}
 
