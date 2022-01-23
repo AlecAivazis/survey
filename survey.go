@@ -3,7 +3,6 @@ package survey
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"io"
 	"os"
 	"strings"
@@ -323,8 +322,6 @@ func Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
 		for _, validator := range options.Validators {
 			validators = append(validators, validator)
 		}
-
-		fmt.Printf("%d validator in total", len(validators))
 
 		// apply every validator to the response
 		for i := 0; i < len(validators); i++ {
