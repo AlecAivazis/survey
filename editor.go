@@ -101,8 +101,10 @@ func (e *Editor) prompt(initialValue string, config *PromptConfig) (interface{},
 
 	// start reading runes from the standard in
 	rr := e.NewRuneReader()
-	rr.SetTermMode()
-	defer rr.RestoreTermMode()
+	_ = rr.SetTermMode()
+	defer func() {
+		_ = rr.RestoreTermMode()
+	}()
 
 	cursor := e.NewCursor()
 	cursor.Hide()

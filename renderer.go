@@ -165,8 +165,8 @@ func (r *Renderer) countLines(buf bytes.Buffer) int {
 
 	count := 0
 	curr := 0
-	delim := -1
 	for curr < len(bufBytes) {
+		var delim int
 		// read until the next newline or the end of the string
 		relDelim := bytes.IndexRune(bufBytes[curr:], '\n')
 		if relDelim != -1 {

@@ -8,9 +8,8 @@ import (
 )
 
 type RuneReader struct {
-	stdio  Stdio
-	cursor *Cursor
-	state  runeReaderState
+	stdio Stdio
+	state runeReaderState
 }
 
 func NewRuneReader(stdio Stdio) *RuneReader {

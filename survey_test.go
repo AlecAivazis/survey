@@ -19,7 +19,7 @@ func init() {
 }
 
 func Stdio(c *expect.Console) terminal.Stdio {
-	return terminal.Stdio{c.Tty(), c.Tty(), c.Tty()}
+	return terminal.Stdio{In: c.Tty(), Out: c.Tty(), Err: c.Tty()}
 }
 
 type PromptTest struct {

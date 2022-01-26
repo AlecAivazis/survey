@@ -105,26 +105,29 @@ func TestInputRender(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		r, w, err := os.Pipe()
-		assert.Nil(t, err, test.title)
+		t.Run(test.title, func(t *testing.T) {
+			r, w, err := os.Pipe()
+			assert.NoError(t, err)
 
-		test.prompt.WithStdio(terminal.Stdio{Out: w})
-		test.data.Input = test.prompt
+			test.prompt.WithStdio(terminal.Stdio{Out: w})
+			test.data.Input = test.prompt
 
-		// set the runtime config
-		test.data.Config = defaultPromptConfig()
+			// set the runtime config
+			test.data.Config = defaultPromptConfig()
 
-		err = test.prompt.Render(
-			InputQuestionTemplate,
-			test.data,
-		)
-		assert.Nil(t, err, test.title)
+			err = test.prompt.Render(
+				InputQuestionTemplate,
+				test.data,
+			)
+			assert.NoError(t, err)
 
-		w.Close()
-		var buf bytes.Buffer
-		io.Copy(&buf, r)
+			assert.NoError(t, w.Close())
+			var buf bytes.Buffer
+			_, err = io.Copy(&buf, r)
+			assert.NoError(t, err)
 
-		assert.Contains(t, buf.String(), test.expected, test.title)
+			assert.Contains(t, buf.String(), test.expected)
+		})
 	}
 }
 

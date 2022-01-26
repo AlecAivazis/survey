@@ -1,3 +1,4 @@
+//go:build !windows
 // +build !windows
 
 package survey
@@ -18,7 +19,7 @@ func RunTest(t *testing.T, procedure func(*expect.Console), test func(terminal.S
 	// Multiplex output to a buffer as well for the raw bytes.
 	buf := new(bytes.Buffer)
 	c, state, err := vt10x.NewVT10XConsole(expect.WithStdout(buf))
-	require.Nil(t, err)
+	require.NoError(t, err)
 	defer c.Close()
 
 	donec := make(chan struct{})
@@ -28,10 +29,11 @@ func RunTest(t *testing.T, procedure func(*expect.Console), test func(terminal.S
 	}()
 
 	err = test(Stdio(c))
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	// Close the slave end of the pty, and read the remaining bytes from the master end.
-	c.Tty().Close()
+	err = c.Tty().Close()
+	require.NoError(t, err)
 	<-donec
 
 	t.Logf("Raw output: %q", buf.String())
