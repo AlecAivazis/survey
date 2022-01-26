@@ -14,6 +14,7 @@ import (
 )
 
 func RunTest(t *testing.T, procedure func(expectConsole), test func(terminal.Stdio) error) {
+	t.Helper()
 	t.Parallel()
 
 	// Multiplex output to a buffer as well for the raw bytes.

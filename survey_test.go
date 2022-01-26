@@ -62,6 +62,7 @@ type PromptTest struct {
 }
 
 func RunPromptTest(t *testing.T, test PromptTest) {
+	t.Helper()
 	var answer interface{}
 	RunTest(t, test.procedure, func(stdio terminal.Stdio) error {
 		var err error
@@ -76,6 +77,7 @@ func RunPromptTest(t *testing.T, test PromptTest) {
 }
 
 func RunPromptTestKeepFilter(t *testing.T, test PromptTest) {
+	t.Helper()
 	var answer interface{}
 	RunTest(t, test.procedure, func(stdio terminal.Stdio) error {
 		var err error
