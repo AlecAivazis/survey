@@ -9,7 +9,6 @@ import (
 
 	"github.com/AlecAivazis/survey/v2/core"
 	"github.com/AlecAivazis/survey/v2/terminal"
-	expect "github.com/Netflix/go-expect"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -103,7 +102,7 @@ func TestMultilinePrompt(t *testing.T) {
 			&Multiline{
 				Message: "What is your name?",
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("What is your name?")
 				c.SendLine("Larry Bird\nI guess...\nnot sure\n\n")
 				c.ExpectEOF()
@@ -116,7 +115,7 @@ func TestMultilinePrompt(t *testing.T) {
 				Message: "What is your name?",
 				Default: "Johnny Appleseed",
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("What is your name?")
 				c.SendLine("\n\n")
 				c.ExpectEOF()
@@ -129,7 +128,7 @@ func TestMultilinePrompt(t *testing.T) {
 				Message: "What is your name?",
 				Default: "Johnny Appleseed",
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("What is your name?")
 				c.SendLine("Larry Bird\n\n")
 				c.ExpectEOF()
@@ -142,7 +141,7 @@ func TestMultilinePrompt(t *testing.T) {
 				Message: "What is your name?",
 				Help:    "It might be Satoshi Nakamoto",
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("What is your name?")
 				c.SendLine("?")
 				c.SendLine("Satoshi Nakamoto\n\n")

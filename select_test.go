@@ -8,7 +8,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Netflix/go-expect"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/AlecAivazis/survey/v2/core"
@@ -126,7 +125,7 @@ func TestSelectPrompt(t *testing.T) {
 				Message: "Choose a color:",
 				Options: []string{"red", "blue", "green"},
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("Choose a color:")
 				// Select blue.
 				c.SendLine(string(terminal.KeyArrowDown))
@@ -140,7 +139,7 @@ func TestSelectPrompt(t *testing.T) {
 				Message: "Choose a color:",
 				Options: []string{"red", "blue", "green"},
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("Choose a color:")
 				// Select blue.
 				c.Send(string(terminal.KeyArrowDown))
@@ -157,7 +156,7 @@ func TestSelectPrompt(t *testing.T) {
 				Options: []string{"red", "blue", "green"},
 				Default: "green",
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("Choose a color:")
 				// Select green.
 				c.SendLine("")
@@ -172,7 +171,7 @@ func TestSelectPrompt(t *testing.T) {
 				Options: []string{"red", "blue", "green"},
 				Default: 2,
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("Choose a color:")
 				// Select green.
 				c.SendLine("")
@@ -187,7 +186,7 @@ func TestSelectPrompt(t *testing.T) {
 				Options: []string{"red", "blue", "green"},
 				Default: "blue",
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("Choose a color:")
 				// Select red.
 				c.SendLine(string(terminal.KeyArrowUp))
@@ -202,7 +201,7 @@ func TestSelectPrompt(t *testing.T) {
 				Options: []string{"red", "blue", "green"},
 				Help:    "My favourite color is red",
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("Choose a color:")
 				c.SendLine("?")
 				c.ExpectString("My favourite color is red")
@@ -219,7 +218,7 @@ func TestSelectPrompt(t *testing.T) {
 				Options:  []string{"red", "blue", "green"},
 				PageSize: 1,
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("Choose a color:")
 				// Select green.
 				c.SendLine(string(terminal.KeyArrowUp))
@@ -234,7 +233,7 @@ func TestSelectPrompt(t *testing.T) {
 				Options: []string{"red", "blue", "green"},
 				VimMode: true,
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("Choose a color:")
 				// Select blue.
 				c.SendLine("j")
@@ -248,7 +247,7 @@ func TestSelectPrompt(t *testing.T) {
 				Message: "Choose a color:",
 				Options: []string{"red", "blue", "green"},
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("Choose a color:")
 				// Filter down to red and green.
 				c.Send("re")
@@ -264,7 +263,7 @@ func TestSelectPrompt(t *testing.T) {
 				Message: "Choose a color:",
 				Options: []string{"red", "blue", "green"},
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("Choose a color:")
 				// Filter down to red and green.
 				c.Send("RE")
@@ -281,7 +280,7 @@ func TestSelectPrompt(t *testing.T) {
 				Options: []string{"red", "blue", "green"},
 				Default: "blue",
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("Choose a color:")
 				// Make sure only red is showing
 				c.SendLine("red")
@@ -298,7 +297,7 @@ func TestSelectPrompt(t *testing.T) {
 					return len(optValue) >= 5
 				},
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("Choose a color:")
 				// Filter down to only green since custom filter only keeps options that are longer than 5 runes
 				c.SendLine("re")
@@ -312,7 +311,7 @@ func TestSelectPrompt(t *testing.T) {
 				Message: "Choose a color:",
 				Options: []string{"red", "blue", "green"},
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("Choose a color:")
 				// filter away everything
 				c.SendLine("z")
@@ -333,7 +332,7 @@ func TestSelectPrompt(t *testing.T) {
 				Message: "Choose a color:",
 				Options: []string{"red", "blue", "black"},
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("Choose a color:")
 				// Filter down to blue.
 				c.Send("blu")
@@ -351,7 +350,7 @@ func TestSelectPrompt(t *testing.T) {
 				Message: "今天中午吃什么？",
 				Options: []string{"青椒牛肉丝", "小炒肉", "小煎鸡"},
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("今天中午吃什么？")
 				// Filter down to 小炒肉.
 				c.Send("小炒")

@@ -9,7 +9,6 @@ import (
 
 	"github.com/AlecAivazis/survey/v2/core"
 	"github.com/AlecAivazis/survey/v2/terminal"
-	expect "github.com/Netflix/go-expect"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -92,7 +91,7 @@ func TestConfirmPrompt(t *testing.T) {
 			&Confirm{
 				Message: "Is pizza your favorite food?",
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("Is pizza your favorite food? (y/N)")
 				c.SendLine("n")
 				c.ExpectEOF()
@@ -105,7 +104,7 @@ func TestConfirmPrompt(t *testing.T) {
 				Message: "Is pizza your favorite food?",
 				Default: true,
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("Is pizza your favorite food? (Y/n)")
 				c.SendLine("")
 				c.ExpectEOF()
@@ -118,7 +117,7 @@ func TestConfirmPrompt(t *testing.T) {
 				Message: "Is pizza your favorite food?",
 				Default: true,
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("Is pizza your favorite food? (Y/n)")
 				c.SendLine("n")
 				c.ExpectEOF()
@@ -131,7 +130,7 @@ func TestConfirmPrompt(t *testing.T) {
 				Message: "Is pizza your favorite food?",
 				Help:    "It probably is",
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString(
 					fmt.Sprintf(
 						"Is pizza your favorite food? [%s for help] (y/N)",

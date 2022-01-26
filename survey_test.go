@@ -18,14 +18,46 @@ func init() {
 	core.DisableColor = true
 }
 
-func Stdio(c *expect.Console) terminal.Stdio {
-	return terminal.Stdio{In: c.Tty(), Out: c.Tty(), Err: c.Tty()}
+type expectConsole interface {
+	ExpectString(string)
+	ExpectEOF()
+	SendLine(string)
+	Send(string)
+}
+
+type consoleWithErrorHandling struct {
+	console *expect.Console
+	t       *testing.T
+}
+
+func (c *consoleWithErrorHandling) ExpectString(s string) {
+	if _, err := c.console.ExpectString(s); err != nil {
+		c.t.Fatalf("ExpectString(%q) = %v", s, err)
+	}
+}
+
+func (c *consoleWithErrorHandling) SendLine(s string) {
+	if _, err := c.console.SendLine(s); err != nil {
+		c.t.Fatalf("SendLine(%q) = %v", s, err)
+	}
+}
+
+func (c *consoleWithErrorHandling) Send(s string) {
+	if _, err := c.console.Send(s); err != nil {
+		c.t.Fatalf("Send(%q) = %v", s, err)
+	}
+}
+
+func (c *consoleWithErrorHandling) ExpectEOF() {
+	if _, err := c.console.ExpectEOF(); err != nil {
+		c.t.Fatalf("ExpectEOF() = %v", err)
+	}
 }
 
 type PromptTest struct {
 	name      string
 	prompt    Prompt
-	procedure func(*expect.Console)
+	procedure func(expectConsole)
 	expected  interface{}
 }
 
@@ -135,7 +167,7 @@ func TestAsk(t *testing.T) {
 	tests := []struct {
 		name      string
 		questions []*Question
-		procedure func(*expect.Console)
+		procedure func(expectConsole)
 		expected  map[string]interface{}
 	}{
 		{
@@ -197,7 +229,7 @@ func TestAsk(t *testing.T) {
 					},
 				},
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				// Confirm
 				c.ExpectString("Is pizza your favorite food? (y/N)")
 				c.SendLine("Y")
@@ -273,7 +305,7 @@ func TestAsk(t *testing.T) {
 					Validate: Required,
 				},
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("What is your name?")
 				c.SendLine("")
 				c.ExpectString("Sorry, your reply was invalid: Value is required")
@@ -296,7 +328,7 @@ func TestAsk(t *testing.T) {
 					Transform: ToLower,
 				},
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("What is your name?")
 				c.SendLine("Johnny Appleseed")
 				c.ExpectEOF()

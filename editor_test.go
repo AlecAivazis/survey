@@ -11,7 +11,6 @@ import (
 
 	"github.com/AlecAivazis/survey/v2/core"
 	"github.com/AlecAivazis/survey/v2/terminal"
-	expect "github.com/Netflix/go-expect"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -116,7 +115,7 @@ func TestEditorPrompt(t *testing.T) {
 				Editor:  "vi",
 				Message: "Edit git commit message",
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("Edit git commit message [Enter to launch editor]")
 				c.SendLine("")
 				go c.ExpectEOF()
@@ -133,7 +132,7 @@ func TestEditorPrompt(t *testing.T) {
 				Message: "Edit git commit message",
 				Default: "No comment",
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("Edit git commit message (No comment) [Enter to launch editor]")
 				c.SendLine("")
 				go c.ExpectEOF()
@@ -149,7 +148,7 @@ func TestEditorPrompt(t *testing.T) {
 				Message: "Edit git commit message",
 				Default: "No comment",
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("Edit git commit message (No comment) [Enter to launch editor]")
 				c.SendLine("")
 				go c.ExpectEOF()
@@ -167,7 +166,7 @@ func TestEditorPrompt(t *testing.T) {
 				Default:     "No comment",
 				HideDefault: true,
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("Edit git commit message [Enter to launch editor]")
 				c.SendLine("")
 				go c.ExpectEOF()
@@ -183,7 +182,7 @@ func TestEditorPrompt(t *testing.T) {
 				Message: "Edit git commit message",
 				Help:    "Describe your git commit",
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString(
 					fmt.Sprintf(
 						"Edit git commit message [%s for help] [Enter to launch editor]",
@@ -208,7 +207,7 @@ func TestEditorPrompt(t *testing.T) {
 				Default:       "No comment",
 				AppendDefault: true,
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("Edit git commit message (No comment) [Enter to launch editor]")
 				c.SendLine("")
 				c.ExpectString("No comment")
@@ -224,7 +223,7 @@ func TestEditorPrompt(t *testing.T) {
 				Editor:  "vi --",
 				Message: "Edit git commit message",
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("Edit git commit message [Enter to launch editor]")
 				c.SendLine("")
 				go c.ExpectEOF()

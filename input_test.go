@@ -9,7 +9,6 @@ import (
 
 	"github.com/AlecAivazis/survey/v2/core"
 	"github.com/AlecAivazis/survey/v2/terminal"
-	expect "github.com/Netflix/go-expect"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -139,7 +138,7 @@ func TestInputPrompt(t *testing.T) {
 			&Input{
 				Message: "What is your name?",
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("What is your name?")
 				c.SendLine("Larry Bird")
 				c.ExpectEOF()
@@ -152,7 +151,7 @@ func TestInputPrompt(t *testing.T) {
 				Message: "What is your name?",
 				Default: "Johnny Appleseed",
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("What is your name?")
 				c.SendLine("")
 				c.ExpectEOF()
@@ -165,7 +164,7 @@ func TestInputPrompt(t *testing.T) {
 				Message: "What is your name?",
 				Default: "Johnny Appleseed",
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("What is your name?")
 				c.SendLine("Larry Bird")
 				c.ExpectEOF()
@@ -178,7 +177,7 @@ func TestInputPrompt(t *testing.T) {
 				Message: "What is your name?",
 				Help:    "It might be Satoshi Nakamoto",
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("What is your name?")
 				c.SendLine("?")
 				c.ExpectString("It might be Satoshi Nakamoto")
@@ -196,7 +195,7 @@ func TestInputPrompt(t *testing.T) {
 			&Input{
 				Message: "What is your name?",
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("What is your name?")
 				c.SendLine("R")
 				c.ExpectEOF()
@@ -208,7 +207,7 @@ func TestInputPrompt(t *testing.T) {
 			&Input{
 				Message: "What is your name?",
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("What is your name?")
 				c.Send("Johnny ")
 				c.Send(string(terminal.KeyDelete))
@@ -222,7 +221,7 @@ func TestInputPrompt(t *testing.T) {
 			&Input{
 				Message: "What is your name?",
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("What is your name?")
 				c.Send("小明")
 				c.Send(string(terminal.KeyDelete))
@@ -239,7 +238,7 @@ func TestInputPrompt(t *testing.T) {
 					return []string{"January", "February"}
 				},
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("What is your favorite month?")
 				c.Send(string(terminal.KeyTab))
 				c.ExpectString("January")
@@ -257,7 +256,7 @@ func TestInputPrompt(t *testing.T) {
 					return []string{"February"}
 				},
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("What is your favorite month?")
 				c.Send("feb")
 				c.Send(string(terminal.KeyTab))
@@ -274,7 +273,7 @@ func TestInputPrompt(t *testing.T) {
 					return []string{"January", "February", "March"}
 				},
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("What is your favorite month?")
 				c.Send(string(terminal.KeyTab))
 				c.Send(string(terminal.KeyArrowDown))
@@ -292,7 +291,7 @@ func TestInputPrompt(t *testing.T) {
 					return []string{"January", "February", "March"}
 				},
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("What is your favorite month?")
 				c.Send(string(terminal.KeyTab))
 				c.Send(string(terminal.KeyArrowDown))
@@ -314,7 +313,7 @@ func TestInputPrompt(t *testing.T) {
 					return []string{"folder3/file1.txt", "folder3/file2.txt"}
 				},
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("Where to save it?")
 				c.Send(string(terminal.KeyTab))
 				c.ExpectString("folder1/")
@@ -337,7 +336,7 @@ func TestInputPrompt(t *testing.T) {
 					return []string{"suggest1", "suggest2"}
 				},
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("Wanna a suggestion?")
 				c.Send("typed answer")
 				c.Send(string(terminal.KeyTab))
@@ -357,7 +356,7 @@ func TestInputPrompt(t *testing.T) {
 					return []string{"suggest1", "suggest2", "special answer"}
 				},
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("Choose the special one:")
 				c.Send("s")
 				c.Send(string(terminal.KeyTab))
@@ -374,7 +373,7 @@ func TestInputPrompt(t *testing.T) {
 		{
 			"Test Input prompt must allow moving cursor using right and left arrows",
 			&Input{Message: "Filename to save:"},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("Filename to save:")
 				c.Send("essay.txt")
 				c.Send(string(terminal.KeyArrowLeft))
@@ -401,7 +400,7 @@ func TestInputPrompt(t *testing.T) {
 		{
 			"Test Input prompt must allow moving cursor using right and left arrows, even after suggestions",
 			&Input{Message: "Filename to save:", Suggest: func(string) []string { return []string{".txt", ".csv", ".go"} }},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("Filename to save:")
 				c.Send(string(terminal.KeyTab))
 				c.ExpectString(".txt")
