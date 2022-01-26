@@ -21,10 +21,7 @@ jobs:
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
 
-    - name: Installer runner
-      run: go get -v github.com/alecaivazis/run
+    - name: Run tests
+      run: go list -v ./... | grep -vE '(tests|examples)$' | xargs go test -timeout 30s -v
       env:
-        GO111MODULE: off
-
-    - name: Run Tests
-      run: run tests
+        GOFLAGS: "-mod=vendor"
