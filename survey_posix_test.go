@@ -26,6 +26,7 @@ func RunTest(t *testing.T, procedure func(expectConsole), test func(terminal.Std
 	if err != nil {
 		t.Fatalf("failed to create console: %v", err)
 	}
+	defer c.Close()
 
 	donec := make(chan struct{})
 	go func() {
@@ -38,8 +39,8 @@ func RunTest(t *testing.T, procedure func(expectConsole), test func(terminal.Std
 		t.Error(err)
 	}
 
-	if err := c.Close(); err != nil {
-		t.Errorf("error closing console: %v", err)
+	if err := pty.Close(); err != nil {
+		t.Errorf("error closing pty: %v", err)
 	}
 	<-donec
 }
