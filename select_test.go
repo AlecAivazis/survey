@@ -365,9 +365,10 @@ func TestSelectPrompt(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			if strings.Contains(test.name, "SKIP") {
-				t.Skip("flakey test")
+		testName := strings.TrimPrefix(test.name, "SKIP: ")
+		t.Run(testName, func(t *testing.T) {
+			if testName != test.name {
+				t.Skipf("warning: flakey test %q", testName)
 			}
 			RunPromptTest(t, test)
 		})

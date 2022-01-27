@@ -4,11 +4,12 @@
             "owner": "go",
             "pattern": [
                 {
-                    "regexp": "^\\s*(.+\\.go):(\\d+):(?:(\\d+):)? (.*)",
+                    "regexp": "^\\s*(.+\\.go):(\\d+):(?:(\\d+):)? (?:(warning): )?(.*)",
                     "file": 1,
                     "line": 2,
                     "column": 3,
-                    "message": 4
+                    "severity": 4,
+                    "message": 5
                 }
             ]
         }

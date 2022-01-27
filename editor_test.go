@@ -105,7 +105,7 @@ func TestEditorRender(t *testing.T) {
 
 func TestEditorPrompt(t *testing.T) {
 	if _, err := exec.LookPath("vi"); err != nil {
-		t.Skip("vi not found in PATH")
+		t.Skip("warning: vi not found in PATH")
 	}
 
 	tests := []PromptTest{
