@@ -11,15 +11,19 @@ jobs:
       fail-fast: false
       matrix:
         platform: [ubuntu-latest, macos-latest, windows-latest]
+        go: ["1.17", "1.16"]
     runs-on: ${{ matrix.platform }}
     steps:
-    - name: Set up Go 1.13
+    - name: Set up Go
       uses: actions/setup-go@v2
       with:
-        go-version: ^1.13
+        go-version: "${{ matrix.go }}"
 
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
+
+    - name: Add problem matcher
+      run: echo "::add-matcher::$PWD/.github/matchers.json"
 
     - name: Run tests
       run: go test -timeout 30s -v $(go list -v ./... | grep -vE '(tests|examples)$')

@@ -105,7 +105,7 @@ func TestEditorRender(t *testing.T) {
 
 func TestEditorPrompt(t *testing.T) {
 	if _, err := exec.LookPath("vi"); err != nil {
-		t.Skip("vi not found in PATH")
+		t.Skip("warning: vi not found in PATH")
 	}
 
 	tests := []PromptTest{
@@ -118,10 +118,10 @@ func TestEditorPrompt(t *testing.T) {
 			func(c expectConsole) {
 				c.ExpectString("Edit git commit message [Enter to launch editor]")
 				c.SendLine("")
-				go c.ExpectEOF()
 				time.Sleep(time.Millisecond)
 				c.Send("ccAdd editor prompt tests\x1b")
 				c.SendLine(":wq!")
+				c.ExpectEOF()
 			},
 			"Add editor prompt tests\n",
 		},
@@ -135,9 +135,9 @@ func TestEditorPrompt(t *testing.T) {
 			func(c expectConsole) {
 				c.ExpectString("Edit git commit message (No comment) [Enter to launch editor]")
 				c.SendLine("")
-				go c.ExpectEOF()
 				time.Sleep(time.Millisecond)
 				c.SendLine(":q!")
+				c.ExpectEOF()
 			},
 			"No comment",
 		},
@@ -151,10 +151,10 @@ func TestEditorPrompt(t *testing.T) {
 			func(c expectConsole) {
 				c.ExpectString("Edit git commit message (No comment) [Enter to launch editor]")
 				c.SendLine("")
-				go c.ExpectEOF()
 				time.Sleep(time.Millisecond)
 				c.Send("ccAdd editor prompt tests\x1b")
 				c.SendLine(":wq!")
+				c.ExpectEOF()
 			},
 			"Add editor prompt tests\n",
 		},
@@ -169,9 +169,9 @@ func TestEditorPrompt(t *testing.T) {
 			func(c expectConsole) {
 				c.ExpectString("Edit git commit message [Enter to launch editor]")
 				c.SendLine("")
-				go c.ExpectEOF()
 				time.Sleep(time.Millisecond)
 				c.SendLine(":q!")
+				c.ExpectEOF()
 			},
 			"No comment",
 		},
@@ -192,10 +192,10 @@ func TestEditorPrompt(t *testing.T) {
 				c.SendLine("?")
 				c.ExpectString("Describe your git commit")
 				c.SendLine("")
-				go c.ExpectEOF()
 				time.Sleep(time.Millisecond)
 				c.Send("ccAdd editor prompt tests\x1b")
 				c.SendLine(":wq!")
+				c.ExpectEOF()
 			},
 			"Add editor prompt tests\n",
 		},
@@ -226,10 +226,10 @@ func TestEditorPrompt(t *testing.T) {
 			func(c expectConsole) {
 				c.ExpectString("Edit git commit message [Enter to launch editor]")
 				c.SendLine("")
-				go c.ExpectEOF()
 				time.Sleep(time.Millisecond)
 				c.Send("ccAdd editor prompt tests\x1b")
 				c.SendLine(":wq!")
+				c.ExpectEOF()
 			},
 			"Add editor prompt tests\n",
 		},

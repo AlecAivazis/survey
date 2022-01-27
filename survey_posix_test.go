@@ -4,23 +4,28 @@
 package survey
 
 import (
-	"bytes"
 	"testing"
 
 	"github.com/AlecAivazis/survey/v2/terminal"
 	expect "github.com/Netflix/go-expect"
+	pseudotty "github.com/creack/pty"
 	"github.com/hinshun/vt10x"
-	"github.com/stretchr/testify/require"
 )
 
 func RunTest(t *testing.T, procedure func(expectConsole), test func(terminal.Stdio) error) {
 	t.Helper()
 	t.Parallel()
 
-	// Multiplex output to a buffer as well for the raw bytes.
-	buf := new(bytes.Buffer)
-	c, state, err := vt10x.NewVT10XConsole(expect.WithStdout(buf))
-	require.NoError(t, err)
+	pty, tty, err := pseudotty.Open()
+	if err != nil {
+		t.Fatalf("failed to open pseudotty: %v", err)
+	}
+
+	term := vt10x.New(vt10x.WithWriter(tty))
+	c, err := expect.NewConsole(expect.WithStdin(pty), expect.WithStdout(term), expect.WithCloser(pty, tty))
+	if err != nil {
+		t.Fatalf("failed to create console: %v", err)
+	}
 	defer c.Close()
 
 	donec := make(chan struct{})
@@ -29,16 +34,13 @@ func RunTest(t *testing.T, procedure func(expectConsole), test func(terminal.Std
 		procedure(&consoleWithErrorHandling{console: c, t: t})
 	}()
 
-	err = test(terminal.Stdio{In: c.Tty(), Out: c.Tty(), Err: c.Tty()})
-	require.NoError(t, err)
+	stdio := terminal.Stdio{In: c.Tty(), Out: c.Tty(), Err: c.Tty()}
+	if err := test(stdio); err != nil {
+		t.Error(err)
+	}
 
-	// Close the slave end of the pty, and read the remaining bytes from the master end.
-	err = c.Tty().Close()
-	require.NoError(t, err)
+	if err := c.Tty().Close(); err != nil {
+		t.Errorf("error closing Tty: %v", err)
+	}
 	<-donec
-
-	t.Logf("Raw output: %q", buf.String())
-
-	// Dump the terminal's screen.
-	t.Logf("\n%s", expect.StripTrailingEmptyLines(state.String()))
 }

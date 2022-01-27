@@ -10,41 +10,31 @@ import (
 	"unicode/utf8"
 )
 
-// VT represents the virtual terminal emulator.
-type VT struct {
-	dest *State
-	rwc  io.ReadWriteCloser
-	br   *bufio.Reader
+type terminal struct {
+	*State
 }
 
-// Create initializes a virtual terminal emulator with the target state
-// and io.ReadWriteCloser input.
-func Create(state *State, rwc io.ReadWriteCloser) (*VT, error) {
-	t := &VT{
-		dest: state,
-		rwc:  rwc,
-	}
-	t.init()
-	return t, nil
+func newTerminal(info TerminalInfo) *terminal {
+	t := &terminal{&State{w: info.w}}
+	t.init(info.cols, info.rows)
+	return t
 }
 
-func (t *VT) init() {
-	t.br = bufio.NewReader(t.rwc)
-	t.dest.w = t.rwc
-	t.dest.numlock = true
-	t.dest.state = t.dest.parse
-	t.dest.cur.attr.fg = DefaultFG
-	t.dest.cur.attr.bg = DefaultBG
-	t.Resize(80, 24)
-	t.dest.reset()
+func (t *terminal) init(cols, rows int) {
+	t.numlock = true
+	t.state = t.parse
+	t.cur.Attr.FG = DefaultFG
+	t.cur.Attr.BG  = DefaultBG
+	t.Resize(cols, rows)
+	t.reset()
 }
 
 // Write parses input and writes terminal changes to state.
-func (t *VT) Write(p []byte) (int, error) {
+func (t *terminal) Write(p []byte) (int, error) {
 	var written int
 	r := bytes.NewReader(p)
-	t.dest.lock()
-	defer t.dest.unlock()
+	t.lock()
+	defer t.unlock()
 	for {
 		c, sz, err := r.ReadRune()
 		if err != nil {
@@ -59,51 +49,43 @@ func (t *VT) Write(p []byte) (int, error) {
 				// not enough bytes for a full rune
 				return written - 1, nil
 			}
-			t.dest.logln("invalid utf8 sequence")
+			t.logln("invalid utf8 sequence")
 			continue
 		}
-		t.dest.put(c)
+		t.put(c)
 	}
 	return written, nil
 }
 
-// Close closes the io.ReadWriteCloser.
-func (t *VT) Close() error {
-	return t.rwc.Close()
-}
-
-// Parse blocks on read on pty or io.ReadCloser, then parses sequences until
-// buffer empties. State is locked as soon as first rune is read, and unlocked
-// when buffer is empty.
 // TODO: add tests for expected blocking behavior
-func (t *VT) Parse() error {
+func (t *terminal) Parse(br *bufio.Reader) error {
 	var locked bool
 	defer func() {
 		if locked {
-			t.dest.unlock()
+			t.unlock()
 		}
 	}()
 	for {
-		c, sz, err := t.br.ReadRune()
+		c, sz, err := br.ReadRune()
 		if err != nil {
 			return err
 		}
 		if c == unicode.ReplacementChar && sz == 1 {
-			t.dest.logln("invalid utf8 sequence")
+			t.logln("invalid utf8 sequence")
 			break
 		}
 		if !locked {
-			t.dest.lock()
+			t.lock()
 			locked = true
 		}
 
 		// put rune for parsing and update state
-		t.dest.put(c)
+		t.put(c)
 
 		// break if our buffer is empty, or if buffer contains an
 		// incomplete rune.
-		n := t.br.Buffered()
-		if n == 0 || (n < 4 && !fullRuneBuffered(t.br)) {
+		n := br.Buffered()
+		if n == 0 || (n < 4 && !fullRuneBuffered(br)) {
 			break
 		}
 	}
@@ -119,9 +101,8 @@ func fullRuneBuffered(br *bufio.Reader) bool {
 	return utf8.FullRune(buf)
 }
 
-// Resize reports new size to pty and updates state.
-func (t *VT) Resize(cols, rows int) {
-	t.dest.lock()
-	defer t.dest.unlock()
-	_ = t.dest.resize(cols, rows)
+func (t *terminal) Resize(cols, rows int) {
+	t.lock()
+	defer t.unlock()
+	_ = t.resize(cols, rows)
 }
