@@ -39,8 +39,8 @@ func RunTest(t *testing.T, procedure func(expectConsole), test func(terminal.Std
 		t.Error(err)
 	}
 
-	if err := pty.Close(); err != nil {
-		t.Errorf("error closing pty: %v", err)
+	if err := c.Tty().Close(); err != nil {
+		t.Errorf("error closing Tty: %v", err)
 	}
 	<-donec
 }
