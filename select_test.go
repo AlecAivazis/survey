@@ -195,7 +195,7 @@ func TestSelectPrompt(t *testing.T) {
 			core.OptionAnswer{Index: 0, Value: "red"},
 		},
 		{
-			"SKIP: prompt for help",
+			"prompt for help",
 			&Select{
 				Message: "Choose a color:",
 				Options: []string{"red", "blue", "green"},
@@ -345,7 +345,7 @@ func TestSelectPrompt(t *testing.T) {
 			core.OptionAnswer{Index: 2, Value: "black"},
 		},
 		{
-			"SKIP: delete filter word in rune",
+			"delete filter word in rune",
 			&Select{
 				Message: "今天中午吃什么？",
 				Options: []string{"青椒牛肉丝", "小炒肉", "小煎鸡"},
@@ -355,7 +355,7 @@ func TestSelectPrompt(t *testing.T) {
 				// Filter down to 小炒肉.
 				c.Send("小炒")
 				// Filter down to 小炒肉 and 小煎鸡.
-				c.Send(string(terminal.KeyDelete))
+				c.Send(string(terminal.KeyBackspace))
 				// Select 小煎鸡.
 				c.SendLine(string(terminal.KeyArrowDown))
 				c.ExpectEOF()

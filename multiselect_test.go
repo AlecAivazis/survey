@@ -525,7 +525,7 @@ func TestMultiSelectPrompt(t *testing.T) {
 				// Filter down to 小炒肉.
 				c.Send("小炒")
 				// Filter down to 小炒肉 and 小煎鸡.
-				c.Send(string(terminal.KeyDelete))
+				c.Send(string(terminal.KeyBackspace))
 				// Filter down to 小煎鸡.
 				c.Send("煎")
 				// Select 小煎鸡.
