@@ -2,6 +2,7 @@ package survey
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -149,7 +150,9 @@ func (e *Editor) prompt(initialValue string, config *PromptConfig) (interface{},
 	if err != nil {
 		return "", err
 	}
-	defer os.Remove(f.Name())
+	defer func() {
+		_ = os.Remove(f.Name())
+	}()
 
 	// write utf8 BOM header
 	// The reason why we do this is because notepad.exe on Windows determines the

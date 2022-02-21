@@ -44,8 +44,11 @@ func (p *Password) Prompt(config *PromptConfig) (interface{}, error) {
 			Config:   config,
 		},
 	)
-	fmt.Fprint(terminal.NewAnsiStdout(p.Stdio().Out), userOut)
 	if err != nil {
+		return "", err
+	}
+
+	if _, err := fmt.Fprint(terminal.NewAnsiStdout(p.Stdio().Out), userOut); err != nil {
 		return "", err
 	}
 
