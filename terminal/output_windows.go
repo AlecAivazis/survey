@@ -67,7 +67,9 @@ func (w *Writer) Write(data []byte) (n int, err error) {
 	r := bytes.NewReader(data)
 
 	for {
-		ch, size, err := r.ReadRune()
+		var ch rune
+		var size int
+		ch, size, err = r.ReadRune()
 		if err != nil {
 			return
 		}
