@@ -91,12 +91,12 @@ func randString(n int) string {
 func TestMaxItems(t *testing.T) {
 	// the list to test
 	testList := []core.OptionAnswer{
-		core.OptionAnswer{Value: "a", Index: 0},
-		core.OptionAnswer{Value: "b", Index: 1},
-		core.OptionAnswer{Value: "c", Index: 2},
-		core.OptionAnswer{Value: "d", Index: 3},
-		core.OptionAnswer{Value: "e", Index: 4},
-		core.OptionAnswer{Value: "f", Index: 5},
+		{Value: "a", Index: 0},
+		{Value: "b", Index: 1},
+		{Value: "c", Index: 2},
+		{Value: "d", Index: 3},
+		{Value: "e", Index: 4},
+		{Value: "f", Index: 5},
 	}
 
 	// validate the list
@@ -108,12 +108,12 @@ func TestMaxItems(t *testing.T) {
 func TestMinItems(t *testing.T) {
 	// the list to test
 	testList := []core.OptionAnswer{
-		core.OptionAnswer{Value: "a", Index: 0},
-		core.OptionAnswer{Value: "b", Index: 1},
-		core.OptionAnswer{Value: "c", Index: 2},
-		core.OptionAnswer{Value: "d", Index: 3},
-		core.OptionAnswer{Value: "e", Index: 4},
-		core.OptionAnswer{Value: "f", Index: 5},
+		{Value: "a", Index: 0},
+		{Value: "b", Index: 1},
+		{Value: "c", Index: 2},
+		{Value: "d", Index: 3},
+		{Value: "e", Index: 4},
+		{Value: "f", Index: 5},
 	}
 
 	// validate the list

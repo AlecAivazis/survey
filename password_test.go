@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/AlecAivazis/survey/v2/core"
-	expect "github.com/Netflix/go-expect"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -64,7 +63,7 @@ func TestPasswordPrompt(t *testing.T) {
 			&Password{
 				Message: "Please type your password",
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("Please type your password")
 				c.Send("secret")
 				c.SendLine("")
@@ -78,7 +77,7 @@ func TestPasswordPrompt(t *testing.T) {
 				Message: "Please type your password",
 				Help:    "It's a secret",
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("Please type your password")
 				c.SendLine("?")
 				c.ExpectString("It's a secret")

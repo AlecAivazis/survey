@@ -17,9 +17,17 @@ package expect
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"io"
+	"time"
 	"unicode/utf8"
 )
+
+// Expectf reads from the Console's tty until the provided formatted string
+// is read or an error occurs, and returns the buffer read by Console.
+func (c *Console) Expectf(format string, args ...interface{}) (string, error) {
+	return c.Expect(String(fmt.Sprintf(format, args...)))
+}
 
 // ExpectString reads from Console's tty until the provided string is read or
 // an error occurs, and returns the buffer read by Console.
@@ -28,9 +36,9 @@ func (c *Console) ExpectString(s string) (string, error) {
 }
 
 // ExpectEOF reads from Console's tty until EOF or an error occurs, and returns
-// the buffer read by Console.
+// the buffer read by Console.  We also treat the PTSClosed error as an EOF.
 func (c *Console) ExpectEOF() (string, error) {
-	return c.Expect(EOF)
+	return c.Expect(EOF, PTSClosed)
 }
 
 // Expect reads from Console's tty until a condition specified from opts is
@@ -51,10 +59,38 @@ func (c *Console) Expect(opts ...ExpectOpt) (string, error) {
 	writer := io.MultiWriter(append(c.opts.Stdouts, buf)...)
 	runeWriter := bufio.NewWriterSize(writer, utf8.UTFMax)
 
+	readTimeout := c.opts.ReadTimeout
+	if options.ReadTimeout != nil {
+		readTimeout = options.ReadTimeout
+	}
+
+	var matcher Matcher
+	var err error
+
+	defer func() {
+		for _, observer := range c.opts.ExpectObservers {
+			if matcher != nil {
+				observer([]Matcher{matcher}, buf.String(), err)
+				return
+			}
+			observer(options.Matchers, buf.String(), err)
+		}
+	}()
+
 	for {
-		r, _, err := c.runeReader.ReadRune()
+		if readTimeout != nil {
+			err = c.passthroughPipe.SetReadDeadline(time.Now().Add(*readTimeout))
+			if err != nil {
+				return buf.String(), err
+			}
+		}
+
+		var r rune
+		r, _, err = c.runeReader.ReadRune()
 		if err != nil {
-			if options.EOF && err == io.EOF {
+			matcher = options.Match(err)
+			if matcher != nil {
+				err = nil
 				break
 			}
 			return buf.String(), err
@@ -72,18 +108,21 @@ func (c *Console) Expect(opts ...ExpectOpt) (string, error) {
 			return buf.String(), err
 		}
 
-		matchFound := false
-		for _, matcher := range options.Matchers {
-			if matcher.Match(buf) {
-				matchFound = true
-				break
-			}
-		}
-
-		if matchFound {
+		matcher = options.Match(buf)
+		if matcher != nil {
 			break
 		}
 	}
 
-	return buf.String(), nil
+	if matcher != nil {
+		cb, ok := matcher.(CallbackMatcher)
+		if ok {
+			err = cb.Callback(buf)
+			if err != nil {
+				return buf.String(), err
+			}
+		}
+	}
+
+	return buf.String(), err
 }

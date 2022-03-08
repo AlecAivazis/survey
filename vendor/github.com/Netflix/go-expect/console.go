@@ -21,9 +21,10 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"time"
 	"unicode/utf8"
 
-	"github.com/kr/pty"
+	"github.com/creack/pty"
 )
 
 // Console is an interface to automate input and output for interactive
@@ -31,11 +32,12 @@ import (
 // input back on it's tty. Console can also multiplex other sources of input
 // and multiplex its output to other writers.
 type Console struct {
-	opts       ConsoleOpts
-	ptm        *os.File
-	pts        *os.File
-	runeReader *bufio.Reader
-	closers    []io.Closer
+	opts            ConsoleOpts
+	ptm             *os.File
+	pts             *os.File
+	passthroughPipe *PassthroughPipe
+	runeReader      *bufio.Reader
+	closers         []io.Closer
 }
 
 // ConsoleOpt allows setting Console options.
@@ -43,11 +45,29 @@ type ConsoleOpt func(*ConsoleOpts) error
 
 // ConsoleOpts provides additional options on creating a Console.
 type ConsoleOpts struct {
-	Logger  *log.Logger
-	Stdins  []io.Reader
-	Stdouts []io.Writer
-	Closers []io.Closer
+	Logger          *log.Logger
+	Stdins          []io.Reader
+	Stdouts         []io.Writer
+	Closers         []io.Closer
+	ExpectObservers []ExpectObserver
+	SendObservers   []SendObserver
+	ReadTimeout     *time.Duration
 }
+
+// ExpectObserver provides an interface for a function callback that will
+// be called after each Expect operation.
+// matchers will be the list of active matchers when an error occurred,
+//   or a list of matchers that matched `buf` when err is nil.
+// buf is the captured output that was matched against.
+// err is error that might have occurred. May be nil.
+type ExpectObserver func(matchers []Matcher, buf string, err error)
+
+// SendObserver provides an interface for a function callback that will
+// be called after each Send operation.
+// msg is the string that was sent.
+// num is the number of bytes actually sent.
+// err is the error that might have occured.  May be nil.
+type SendObserver func(msg string, num int, err error)
 
 // WithStdout adds writers that Console duplicates writes to, similar to the
 // Unix tee(1) command.
@@ -89,6 +109,30 @@ func WithLogger(logger *log.Logger) ConsoleOpt {
 	}
 }
 
+// WithExpectObserver adds an ExpectObserver to allow monitoring Expect operations.
+func WithExpectObserver(observers ...ExpectObserver) ConsoleOpt {
+	return func(opts *ConsoleOpts) error {
+		opts.ExpectObservers = append(opts.ExpectObservers, observers...)
+		return nil
+	}
+}
+
+// WithSendObserver adds a SendObserver to allow monitoring Send operations.
+func WithSendObserver(observers ...SendObserver) ConsoleOpt {
+	return func(opts *ConsoleOpts) error {
+		opts.SendObservers = append(opts.SendObservers, observers...)
+		return nil
+	}
+}
+
+// WithDefaultTimeout sets a default read timeout during Expect statements.
+func WithDefaultTimeout(timeout time.Duration) ConsoleOpt {
+	return func(opts *ConsoleOpts) error {
+		opts.ReadTimeout = &timeout
+		return nil
+	}
+}
+
 // NewConsole returns a new Console with the given options.
 func NewConsole(opts ...ConsoleOpt) (*Console, error) {
 	options := ConsoleOpts{
@@ -107,21 +151,28 @@ func NewConsole(opts ...ConsoleOpt) (*Console, error) {
 	}
 	closers := append(options.Closers, pts, ptm)
 
+	passthroughPipe, err := NewPassthroughPipe(ptm)
+	if err != nil {
+		return nil, err
+	}
+	closers = append(closers, passthroughPipe)
+
 	c := &Console{
-		opts:       options,
-		ptm:        ptm,
-		pts:        pts,
-		runeReader: bufio.NewReaderSize(ptm, utf8.UTFMax),
-		closers:    closers,
+		opts:            options,
+		ptm:             ptm,
+		pts:             pts,
+		passthroughPipe: passthroughPipe,
+		runeReader:      bufio.NewReaderSize(passthroughPipe, utf8.UTFMax),
+		closers:         closers,
 	}
 
-	for _, r := range options.Stdins {
-		go func(r io.Reader) {
-			_, err := io.Copy(c, r)
+	for _, stdin := range options.Stdins {
+		go func(stdin io.Reader) {
+			_, err := io.Copy(c, stdin)
 			if err != nil {
 				c.Logf("failed to copy stdin: %s", err)
 			}
-		}(r)
+		}(stdin)
 	}
 
 	return c, nil
@@ -145,6 +196,12 @@ func (c *Console) Write(b []byte) (int, error) {
 	return c.ptm.Write(b)
 }
 
+// Fd returns Console's file descripting referencing the master part of its
+// pty.
+func (c *Console) Fd() uintptr {
+	return c.ptm.Fd()
+}
+
 // Close closes Console's tty. Calling Close will unblock Expect and ExpectEOF.
 func (c *Console) Close() error {
 	for _, fd := range c.closers {
@@ -159,7 +216,11 @@ func (c *Console) Close() error {
 // Send writes string s to Console's tty.
 func (c *Console) Send(s string) (int, error) {
 	c.Logf("console send: %q", s)
-	return c.ptm.WriteString(s)
+	n, err := c.ptm.WriteString(s)
+	for _, observer := range c.opts.SendObservers {
+		observer(s, n, err)
+	}
+	return n, err
 }
 
 // SendLine writes string s to Console's tty with a trailing newline.
