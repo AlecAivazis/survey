@@ -23,7 +23,10 @@ func TestWrite_canWriteToBool(t *testing.T) {
 	ptr := true
 
 	// try to copy a false value to the pointer
-	WriteAnswer(&ptr, "", false)
+	err := WriteAnswer(&ptr, "", false)
+	if err != nil {
+		t.Fatalf("WriteAnswer() = %v", err)
+	}
 
 	// if the value is true
 	if ptr {
@@ -39,7 +42,7 @@ func TestWrite_canWriteString(t *testing.T) {
 	// try to copy a false value to the pointer
 	err := WriteAnswer(&ptr, "", "hello")
 	if err != nil {
-		t.Error(err)
+		t.Fatalf("WriteAnswer() = %v", err)
 	}
 
 	// if the value is not what we wrote
@@ -53,7 +56,10 @@ func TestWrite_canWriteSlice(t *testing.T) {
 	ptr := []string{}
 
 	// copy in a value
-	WriteAnswer(&ptr, "", []string{"hello", "world"})
+	err := WriteAnswer(&ptr, "", []string{"hello", "world"})
+	if err != nil {
+		t.Fatalf("WriteAnswer() = %v", err)
+	}
 
 	// make sure there are two entries
 	assert.Equal(t, []string{"hello", "world"}, ptr)
@@ -64,7 +70,10 @@ func TestWrite_canWriteMapString(t *testing.T) {
 	ptr := map[string]string{}
 
 	// copy in a value
-	WriteAnswer(&ptr, "test", OptionAnswer{Value: "hello", Index: 5})
+	err := WriteAnswer(&ptr, "test", OptionAnswer{Value: "hello", Index: 5})
+	if err != nil {
+		t.Fatalf("WriteAnswer() = %v", err)
+	}
 
 	// make sure only string value is written
 	assert.Equal(t, map[string]string{"test": "hello"}, ptr)
@@ -75,7 +84,10 @@ func TestWrite_canWriteMapInt(t *testing.T) {
 	ptr := map[string]int{}
 
 	// copy in a value
-	WriteAnswer(&ptr, "test", OptionAnswer{Value: "hello", Index: 5})
+	err := WriteAnswer(&ptr, "test", OptionAnswer{Value: "hello", Index: 5})
+	if err != nil {
+		t.Fatalf("WriteAnswer() = %v", err)
+	}
 
 	// make sure only string value is written
 	assert.Equal(t, map[string]int{"test": 5}, ptr)
@@ -100,7 +112,10 @@ func TestWriteAnswer_handlesNonStructValues(t *testing.T) {
 	ptr := ""
 
 	// write a value to the pointer
-	WriteAnswer(&ptr, "", "world")
+	err := WriteAnswer(&ptr, "", "world")
+	if err != nil {
+		t.Fatalf("WriteAnswer() = %v", err)
+	}
 
 	// if we didn't change the value appropriate
 	if ptr != "world" {
@@ -591,7 +606,10 @@ func TestWrite_canStringToBool(t *testing.T) {
 	ptr := true
 
 	// try to copy a false value to the pointer
-	WriteAnswer(&ptr, "", "false")
+	err := WriteAnswer(&ptr, "", "false")
+	if err != nil {
+		t.Fatalf("WriteAnswer() = %v", err)
+	}
 
 	// if the value is true
 	if ptr {
@@ -605,7 +623,10 @@ func TestWrite_canStringToInt(t *testing.T) {
 	var ptr int = 1
 
 	// try to copy a value to the pointer
-	WriteAnswer(&ptr, "", "2")
+	err := WriteAnswer(&ptr, "", "2")
+	if err != nil {
+		t.Fatalf("WriteAnswer() = %v", err)
+	}
 
 	// if the value is true
 	if ptr != 2 {
@@ -619,7 +640,10 @@ func TestWrite_canStringToInt8(t *testing.T) {
 	var ptr int8 = 1
 
 	// try to copy a value to the pointer
-	WriteAnswer(&ptr, "", "2")
+	err := WriteAnswer(&ptr, "", "2")
+	if err != nil {
+		t.Fatalf("WriteAnswer() = %v", err)
+	}
 
 	// if the value is true
 	if ptr != 2 {
@@ -633,7 +657,10 @@ func TestWrite_canStringToInt16(t *testing.T) {
 	var ptr int16 = 1
 
 	// try to copy a value to the pointer
-	WriteAnswer(&ptr, "", "2")
+	err := WriteAnswer(&ptr, "", "2")
+	if err != nil {
+		t.Fatalf("WriteAnswer() = %v", err)
+	}
 
 	// if the value is true
 	if ptr != 2 {
@@ -647,7 +674,10 @@ func TestWrite_canStringToInt32(t *testing.T) {
 	var ptr int32 = 1
 
 	// try to copy a value to the pointer
-	WriteAnswer(&ptr, "", "2")
+	err := WriteAnswer(&ptr, "", "2")
+	if err != nil {
+		t.Fatalf("WriteAnswer() = %v", err)
+	}
 
 	// if the value is true
 	if ptr != 2 {
@@ -661,7 +691,10 @@ func TestWrite_canStringToInt64(t *testing.T) {
 	var ptr int64 = 1
 
 	// try to copy a value to the pointer
-	WriteAnswer(&ptr, "", "2")
+	err := WriteAnswer(&ptr, "", "2")
+	if err != nil {
+		t.Fatalf("WriteAnswer() = %v", err)
+	}
 
 	// if the value is true
 	if ptr != 2 {
@@ -675,7 +708,10 @@ func TestWrite_canStringToUint(t *testing.T) {
 	var ptr uint = 1
 
 	// try to copy a value to the pointer
-	WriteAnswer(&ptr, "", "2")
+	err := WriteAnswer(&ptr, "", "2")
+	if err != nil {
+		t.Fatalf("WriteAnswer() = %v", err)
+	}
 
 	// if the value is true
 	if ptr != 2 {
@@ -689,7 +725,10 @@ func TestWrite_canStringToUint8(t *testing.T) {
 	var ptr uint8 = 1
 
 	// try to copy a value to the pointer
-	WriteAnswer(&ptr, "", "2")
+	err := WriteAnswer(&ptr, "", "2")
+	if err != nil {
+		t.Fatalf("WriteAnswer() = %v", err)
+	}
 
 	// if the value is true
 	if ptr != 2 {
@@ -703,7 +742,10 @@ func TestWrite_canStringToUint16(t *testing.T) {
 	var ptr uint16 = 1
 
 	// try to copy a value to the pointer
-	WriteAnswer(&ptr, "", "2")
+	err := WriteAnswer(&ptr, "", "2")
+	if err != nil {
+		t.Fatalf("WriteAnswer() = %v", err)
+	}
 
 	// if the value is true
 	if ptr != 2 {
@@ -717,7 +759,10 @@ func TestWrite_canStringToUint32(t *testing.T) {
 	var ptr uint32 = 1
 
 	// try to copy a value to the pointer
-	WriteAnswer(&ptr, "", "2")
+	err := WriteAnswer(&ptr, "", "2")
+	if err != nil {
+		t.Fatalf("WriteAnswer() = %v", err)
+	}
 
 	// if the value is true
 	if ptr != 2 {
@@ -731,7 +776,10 @@ func TestWrite_canStringToUint64(t *testing.T) {
 	var ptr uint64 = 1
 
 	// try to copy a value to the pointer
-	WriteAnswer(&ptr, "", "2")
+	err := WriteAnswer(&ptr, "", "2")
+	if err != nil {
+		t.Fatalf("WriteAnswer() = %v", err)
+	}
 
 	// if the value is true
 	if ptr != 2 {
@@ -745,7 +793,10 @@ func TestWrite_canStringToFloat32(t *testing.T) {
 	var ptr float32 = 1.0
 
 	// try to copy a value to the pointer
-	WriteAnswer(&ptr, "", "2.5")
+	err := WriteAnswer(&ptr, "", "2.5")
+	if err != nil {
+		t.Fatalf("WriteAnswer() = %v", err)
+	}
 
 	// if the value is true
 	if ptr != 2.5 {
@@ -759,7 +810,10 @@ func TestWrite_canStringToFloat64(t *testing.T) {
 	var ptr float64 = 1.0
 
 	// try to copy a value to the pointer
-	WriteAnswer(&ptr, "", "2.5")
+	err := WriteAnswer(&ptr, "", "2.5")
+	if err != nil {
+		t.Fatalf("WriteAnswer() = %v", err)
+	}
 
 	// if the value is true
 	if ptr != 2.5 {

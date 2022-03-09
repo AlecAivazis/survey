@@ -11,7 +11,6 @@ import (
 
 	"github.com/AlecAivazis/survey/v2/core"
 	"github.com/AlecAivazis/survey/v2/terminal"
-	expect "github.com/Netflix/go-expect"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -78,32 +77,35 @@ func TestEditorRender(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		r, w, err := os.Pipe()
-		assert.Nil(t, err, test.title)
+		t.Run(test.title, func(t *testing.T) {
+			r, w, err := os.Pipe()
+			assert.NoError(t, err)
 
-		test.prompt.WithStdio(terminal.Stdio{Out: w})
-		test.data.Editor = test.prompt
+			test.prompt.WithStdio(terminal.Stdio{Out: w})
+			test.data.Editor = test.prompt
 
-		// set the icon set
-		test.data.Config = defaultPromptConfig()
+			// set the icon set
+			test.data.Config = defaultPromptConfig()
 
-		err = test.prompt.Render(
-			EditorQuestionTemplate,
-			test.data,
-		)
-		assert.Nil(t, err, test.title)
+			err = test.prompt.Render(
+				EditorQuestionTemplate,
+				test.data,
+			)
+			assert.NoError(t, err)
 
-		w.Close()
-		var buf bytes.Buffer
-		io.Copy(&buf, r)
+			assert.NoError(t, w.Close())
+			var buf bytes.Buffer
+			_, err = io.Copy(&buf, r)
+			assert.NoError(t, err)
 
-		assert.Contains(t, buf.String(), test.expected, test.title)
+			assert.Contains(t, buf.String(), test.expected)
+		})
 	}
 }
 
 func TestEditorPrompt(t *testing.T) {
 	if _, err := exec.LookPath("vi"); err != nil {
-		t.Skip("vi not found in PATH")
+		t.Skip("warning: vi not found in PATH")
 	}
 
 	tests := []PromptTest{
@@ -113,13 +115,13 @@ func TestEditorPrompt(t *testing.T) {
 				Editor:  "vi",
 				Message: "Edit git commit message",
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("Edit git commit message [Enter to launch editor]")
 				c.SendLine("")
-				go c.ExpectEOF()
 				time.Sleep(time.Millisecond)
 				c.Send("ccAdd editor prompt tests\x1b")
 				c.SendLine(":wq!")
+				c.ExpectEOF()
 			},
 			"Add editor prompt tests\n",
 		},
@@ -130,12 +132,12 @@ func TestEditorPrompt(t *testing.T) {
 				Message: "Edit git commit message",
 				Default: "No comment",
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("Edit git commit message (No comment) [Enter to launch editor]")
 				c.SendLine("")
-				go c.ExpectEOF()
 				time.Sleep(time.Millisecond)
 				c.SendLine(":q!")
+				c.ExpectEOF()
 			},
 			"No comment",
 		},
@@ -146,13 +148,13 @@ func TestEditorPrompt(t *testing.T) {
 				Message: "Edit git commit message",
 				Default: "No comment",
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("Edit git commit message (No comment) [Enter to launch editor]")
 				c.SendLine("")
-				go c.ExpectEOF()
 				time.Sleep(time.Millisecond)
 				c.Send("ccAdd editor prompt tests\x1b")
 				c.SendLine(":wq!")
+				c.ExpectEOF()
 			},
 			"Add editor prompt tests\n",
 		},
@@ -164,12 +166,12 @@ func TestEditorPrompt(t *testing.T) {
 				Default:     "No comment",
 				HideDefault: true,
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("Edit git commit message [Enter to launch editor]")
 				c.SendLine("")
-				go c.ExpectEOF()
 				time.Sleep(time.Millisecond)
 				c.SendLine(":q!")
+				c.ExpectEOF()
 			},
 			"No comment",
 		},
@@ -180,7 +182,7 @@ func TestEditorPrompt(t *testing.T) {
 				Message: "Edit git commit message",
 				Help:    "Describe your git commit",
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString(
 					fmt.Sprintf(
 						"Edit git commit message [%s for help] [Enter to launch editor]",
@@ -190,10 +192,10 @@ func TestEditorPrompt(t *testing.T) {
 				c.SendLine("?")
 				c.ExpectString("Describe your git commit")
 				c.SendLine("")
-				go c.ExpectEOF()
 				time.Sleep(time.Millisecond)
 				c.Send("ccAdd editor prompt tests\x1b")
 				c.SendLine(":wq!")
+				c.ExpectEOF()
 			},
 			"Add editor prompt tests\n",
 		},
@@ -205,7 +207,7 @@ func TestEditorPrompt(t *testing.T) {
 				Default:       "No comment",
 				AppendDefault: true,
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("Edit git commit message (No comment) [Enter to launch editor]")
 				c.SendLine("")
 				c.ExpectString("No comment")
@@ -221,13 +223,13 @@ func TestEditorPrompt(t *testing.T) {
 				Editor:  "vi --",
 				Message: "Edit git commit message",
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("Edit git commit message [Enter to launch editor]")
 				c.SendLine("")
-				go c.ExpectEOF()
 				time.Sleep(time.Millisecond)
 				c.Send("ccAdd editor prompt tests\x1b")
 				c.SendLine(":wq!")
+				c.ExpectEOF()
 			},
 			"Add editor prompt tests\n",
 		},

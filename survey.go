@@ -356,7 +356,7 @@ func Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
 			return err
 		}
 
-		// add the answer to the response data structure
+		// add it to the map
 		if err := core.WriteAnswer(response, q.Name, ans); err != nil {
 			return err
 		}
@@ -409,7 +409,6 @@ type IterableOpts interface {
 
 func computeCursorOffset(tmpl string, data IterableOpts, opts []core.OptionAnswer, idx, tWidth int) int {
 	tmpls, err := core.GetTemplatePair(tmpl)
-
 	if err != nil {
 		return 0
 	}
@@ -417,8 +416,8 @@ func computeCursorOffset(tmpl string, data IterableOpts, opts []core.OptionAnswe
 	t := tmpls[0]
 
 	renderOpt := func(ix int, opt core.OptionAnswer) string {
-		buf := bytes.NewBufferString("")
-		t.ExecuteTemplate(buf, "option", data.IterateOption(ix, opt))
+		var buf bytes.Buffer
+		_ = t.ExecuteTemplate(&buf, "option", data.IterateOption(ix, opt))
 		return buf.String()
 	}
 
