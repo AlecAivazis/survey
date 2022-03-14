@@ -12,8 +12,8 @@ var simpleQs = []*survey.Question{
 		Name: "name",
 		Prompt: &survey.Input{
 			Message: "What is your name?",
+			Default: "Jordan",
 		},
-		Validate: survey.Required,
 	},
 }
 
@@ -28,5 +28,5 @@ func main() {
 		return
 	}
 	// print the answers
-	fmt.Printf("Your name is %s.\n", ansmap["name"])
+	fmt.Printf("Your name is %q.\n", ansmap["name"])
 }

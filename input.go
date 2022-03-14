@@ -59,7 +59,6 @@ var InputQuestionTemplate = `
     {{- if and .Help (not .ShowHelp)}}{{ print .Config.HelpInput }} for help {{- if and .Suggest}}, {{end}}{{end -}}
     {{- if and .Suggest }}{{color "cyan"}}{{ print .Config.SuggestInput }} for suggestions{{end -}}
   ]{{color "reset"}} {{end}}
-  {{- if .Default}}{{color "white"}}({{.Default}}) {{color "reset"}}{{end}}
 {{- end}}`
 
 func (i *Input) onRune(config *PromptConfig) terminal.OnRuneFn {
@@ -162,7 +161,7 @@ func (i *Input) Prompt(config *PromptConfig) (interface{}, error) {
 		defer cursor.Show() // show the cursor when we're done
 	}
 
-	var line []rune
+	line := []rune(i.Default)
 
 	for {
 		if i.options != nil {
@@ -192,12 +191,6 @@ func (i *Input) Prompt(config *PromptConfig) (interface{}, error) {
 		return i.Prompt(config)
 	}
 
-	// if the line is empty
-	if len(i.answer) == 0 {
-		// use the default value
-		return i.Default, err
-	}
-
 	lineStr := i.answer
 
 	i.AppendRenderedText(lineStr)
@@ -207,12 +200,6 @@ func (i *Input) Prompt(config *PromptConfig) (interface{}, error) {
 }
 
 func (i *Input) Cleanup(config *PromptConfig, val interface{}) error {
-	// use the default answer when cleaning up the prompt if necessary
-	ans := i.answer
-	if ans == "" && i.Default != "" {
-		ans = i.Default
-	}
-
 	// render the cleanup
 	return i.Render(
 		InputQuestionTemplate,
@@ -220,7 +207,7 @@ func (i *Input) Cleanup(config *PromptConfig, val interface{}) error {
 			Input:      *i,
 			ShowAnswer: true,
 			Config:     config,
-			Answer:     ans,
+			Answer:     i.answer,
 		},
 	)
 }
