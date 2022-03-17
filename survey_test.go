@@ -1,6 +1,7 @@
 package survey
 
 import (
+	"errors"
 	"fmt"
 	"os/exec"
 	"strings"
@@ -566,4 +567,72 @@ func Test_computeCursorOffset_Select(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestAsk_Validation(t *testing.T) {
+	p := &mockPrompt{
+		answers: []string{"", "company", "COM", "com"},
+	}
+
+	var res struct {
+		TLDN string
+	}
+	err := Ask([]*Question{
+		{
+			Name:   "TLDN",
+			Prompt: p,
+			Validate: func(v interface{}) error {
+				s := v.(string)
+				if strings.ToLower(s) != s {
+					return errors.New("value contains uppercase characters")
+				}
+				return nil
+			},
+		},
+	}, &res, WithValidator(MinLength(1)), WithValidator(MaxLength(5)))
+	if err != nil {
+		t.Fatalf("Ask() = %v", err)
+	}
+
+	if res.TLDN != "com" {
+		t.Errorf("answer: %q, want %q", res.TLDN, "com")
+	}
+	if p.cleanups != 1 {
+		t.Errorf("cleanups: %d, want %d", p.cleanups, 1)
+	}
+	if err1 := p.printedErrors[0].Error(); err1 != "value is too short. Min length is 1" {
+		t.Errorf("printed error 1: %q, want %q", err1, "value is too short. Min length is 1")
+	}
+	if err2 := p.printedErrors[1].Error(); err2 != "value is too long. Max length is 5" {
+		t.Errorf("printed error 2: %q, want %q", err2, "value is too long. Max length is 5")
+	}
+	if err3 := p.printedErrors[2].Error(); err3 != "value contains uppercase characters" {
+		t.Errorf("printed error 2: %q, want %q", err3, "value contains uppercase characters")
+	}
+}
+
+type mockPrompt struct {
+	index         int
+	answers       []string
+	cleanups      int
+	printedErrors []error
+}
+
+func (p *mockPrompt) Prompt(*PromptConfig) (interface{}, error) {
+	if p.index >= len(p.answers) {
+		return nil, errors.New("no more answers")
+	}
+	val := p.answers[p.index]
+	p.index++
+	return val, nil
+}
+
+func (p *mockPrompt) Cleanup(*PromptConfig, interface{}) error {
+	p.cleanups++
+	return nil
+}
+
+func (p *mockPrompt) Error(_ *PromptConfig, err error) error {
+	p.printedErrors = append(p.printedErrors, err)
+	return nil
 }
