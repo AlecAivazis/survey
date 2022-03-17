@@ -9,7 +9,6 @@ import (
 
 	"github.com/AlecAivazis/survey/v2/core"
 	"github.com/AlecAivazis/survey/v2/terminal"
-	expect "github.com/Netflix/go-expect"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -59,26 +58,29 @@ func TestConfirmRender(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		r, w, err := os.Pipe()
-		assert.Nil(t, err, test.title)
+		t.Run(test.title, func(t *testing.T) {
+			r, w, err := os.Pipe()
+			assert.NoError(t, err)
 
-		test.prompt.WithStdio(terminal.Stdio{Out: w})
-		test.data.Confirm = test.prompt
+			test.prompt.WithStdio(terminal.Stdio{Out: w})
+			test.data.Confirm = test.prompt
 
-		// set the runtime config
-		test.data.Config = defaultPromptConfig()
+			// set the runtime config
+			test.data.Config = defaultPromptConfig()
 
-		err = test.prompt.Render(
-			ConfirmQuestionTemplate,
-			test.data,
-		)
-		assert.Nil(t, err, test.title)
+			err = test.prompt.Render(
+				ConfirmQuestionTemplate,
+				test.data,
+			)
+			assert.NoError(t, err)
 
-		w.Close()
-		var buf bytes.Buffer
-		io.Copy(&buf, r)
+			assert.NoError(t, w.Close())
+			var buf bytes.Buffer
+			_, err = io.Copy(&buf, r)
+			assert.NoError(t, err)
 
-		assert.Contains(t, buf.String(), test.expected, test.title)
+			assert.Contains(t, buf.String(), test.expected)
+		})
 	}
 }
 
@@ -89,7 +91,7 @@ func TestConfirmPrompt(t *testing.T) {
 			&Confirm{
 				Message: "Is pizza your favorite food?",
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("Is pizza your favorite food? (y/N)")
 				c.SendLine("n")
 				c.ExpectEOF()
@@ -102,7 +104,7 @@ func TestConfirmPrompt(t *testing.T) {
 				Message: "Is pizza your favorite food?",
 				Default: true,
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("Is pizza your favorite food? (Y/n)")
 				c.SendLine("")
 				c.ExpectEOF()
@@ -115,7 +117,7 @@ func TestConfirmPrompt(t *testing.T) {
 				Message: "Is pizza your favorite food?",
 				Default: true,
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("Is pizza your favorite food? (Y/n)")
 				c.SendLine("n")
 				c.ExpectEOF()
@@ -128,7 +130,7 @@ func TestConfirmPrompt(t *testing.T) {
 				Message: "Is pizza your favorite food?",
 				Help:    "It probably is",
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString(
 					fmt.Sprintf(
 						"Is pizza your favorite food? [%s for help] (y/N)",

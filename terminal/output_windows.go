@@ -67,9 +67,11 @@ func (w *Writer) Write(data []byte) (n int, err error) {
 	r := bytes.NewReader(data)
 
 	for {
-		ch, size, err := r.ReadRune()
+		var ch rune
+		var size int
+		ch, size, err = r.ReadRune()
 		if err != nil {
-			break
+			return
 		}
 		n += size
 
@@ -78,13 +80,15 @@ func (w *Writer) Write(data []byte) (n int, err error) {
 			size, err = w.handleEscape(r)
 			n += size
 			if err != nil {
-				break
+				return
 			}
 		default:
-			fmt.Fprint(w.out, string(ch))
+			_, err = fmt.Fprint(w.out, string(ch))
+			if err != nil {
+				return
+			}
 		}
 	}
-	return
 }
 
 func (w *Writer) handleEscape(r *bytes.Reader) (n int, err error) {

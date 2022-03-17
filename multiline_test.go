@@ -9,7 +9,6 @@ import (
 
 	"github.com/AlecAivazis/survey/v2/core"
 	"github.com/AlecAivazis/survey/v2/terminal"
-	expect "github.com/Netflix/go-expect"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -71,25 +70,28 @@ func TestMultilineRender(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		r, w, err := os.Pipe()
-		assert.Nil(t, err, test.title)
+		t.Run(test.title, func(t *testing.T) {
+			r, w, err := os.Pipe()
+			assert.NoError(t, err)
 
-		test.prompt.WithStdio(terminal.Stdio{Out: w})
-		test.data.Multiline = test.prompt
-		// set the icon set
-		test.data.Config = defaultPromptConfig()
+			test.prompt.WithStdio(terminal.Stdio{Out: w})
+			test.data.Multiline = test.prompt
+			// set the icon set
+			test.data.Config = defaultPromptConfig()
 
-		err = test.prompt.Render(
-			MultilineQuestionTemplate,
-			test.data,
-		)
-		assert.Nil(t, err, test.title)
+			err = test.prompt.Render(
+				MultilineQuestionTemplate,
+				test.data,
+			)
+			assert.NoError(t, err)
 
-		w.Close()
-		var buf bytes.Buffer
-		io.Copy(&buf, r)
+			assert.NoError(t, w.Close())
+			var buf bytes.Buffer
+			_, err = io.Copy(&buf, r)
+			assert.NoError(t, err)
 
-		assert.Contains(t, buf.String(), test.expected, test.title)
+			assert.Contains(t, buf.String(), test.expected, test.title)
+		})
 	}
 }
 
@@ -100,7 +102,7 @@ func TestMultilinePrompt(t *testing.T) {
 			&Multiline{
 				Message: "What is your name?",
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("What is your name?")
 				c.SendLine("Larry Bird\nI guess...\nnot sure\n\n")
 				c.ExpectEOF()
@@ -113,7 +115,7 @@ func TestMultilinePrompt(t *testing.T) {
 				Message: "What is your name?",
 				Default: "Johnny Appleseed",
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("What is your name?")
 				c.SendLine("\n\n")
 				c.ExpectEOF()
@@ -126,7 +128,7 @@ func TestMultilinePrompt(t *testing.T) {
 				Message: "What is your name?",
 				Default: "Johnny Appleseed",
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("What is your name?")
 				c.SendLine("Larry Bird\n\n")
 				c.ExpectEOF()
@@ -139,7 +141,7 @@ func TestMultilinePrompt(t *testing.T) {
 				Message: "What is your name?",
 				Help:    "It might be Satoshi Nakamoto",
 			},
-			func(c *expect.Console) {
+			func(c expectConsole) {
 				c.ExpectString("What is your name?")
 				c.SendLine("?")
 				c.SendLine("Satoshi Nakamoto\n\n")

@@ -319,9 +319,7 @@ func Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
 			validators = append(validators, q.Validate)
 		}
 		// add any "global" validators
-		for _, validator := range options.Validators {
-			validators = append(validators, validator)
-		}
+		validators = append(validators, options.Validators...)
 
 		// apply every validator to thte response
 		for _, validator := range validators {
@@ -356,21 +354,14 @@ func Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
 		}
 
 		// tell the prompt to cleanup with the validated value
-		q.Prompt.Cleanup(&options.PromptConfig, ans)
-
-		// if something went wrong
-		if err != nil {
-			// stop listening
+		if err := q.Prompt.Cleanup(&options.PromptConfig, ans); err != nil {
 			return err
 		}
 
 		// add it to the map
-		err = core.WriteAnswer(response, q.Name, ans)
-		// if something went wrong
-		if err != nil {
+		if err := core.WriteAnswer(response, q.Name, ans); err != nil {
 			return err
 		}
-
 	}
 
 	// return the response
@@ -420,7 +411,6 @@ type IterableOpts interface {
 
 func computeCursorOffset(tmpl string, data IterableOpts, opts []core.OptionAnswer, idx, tWidth int) int {
 	tmpls, err := core.GetTemplatePair(tmpl)
-
 	if err != nil {
 		return 0
 	}
@@ -428,8 +418,8 @@ func computeCursorOffset(tmpl string, data IterableOpts, opts []core.OptionAnswe
 	t := tmpls[0]
 
 	renderOpt := func(ix int, opt core.OptionAnswer) string {
-		buf := bytes.NewBufferString("")
-		t.ExecuteTemplate(buf, "option", data.IterateOption(ix, opt))
+		var buf bytes.Buffer
+		_ = t.ExecuteTemplate(&buf, "option", data.IterateOption(ix, opt))
 		return buf.String()
 	}
 
