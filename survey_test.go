@@ -2,7 +2,6 @@ package survey
 
 import (
 	"errors"
-	"fmt"
 	"os/exec"
 	"strings"
 	"testing"
