@@ -71,6 +71,9 @@ func (w *Writer) Write(data []byte) (n int, err error) {
 		var size int
 		ch, size, err = r.ReadRune()
 		if err != nil {
+			if err == io.EOF {
+				err = nil
+			}
 			return
 		}
 		n += size
