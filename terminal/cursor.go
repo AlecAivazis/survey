@@ -1,3 +1,4 @@
+//go:build !windows
 // +build !windows
 
 package terminal
@@ -78,8 +79,8 @@ func (c *Cursor) Hide() error {
 	return err
 }
 
-// Move moves the cursor to a specific x,y location.
-func (c *Cursor) Move(x int, y int) error {
+// move moves the cursor to a specific x,y location.
+func (c *Cursor) move(x int, y int) error {
 	_, err := fmt.Fprintf(c.Out, "\x1b[%d;%df", x, y)
 	return err
 }
@@ -194,7 +195,7 @@ func (c *Cursor) Size(buf *bytes.Buffer) (*Coord, error) {
 	defer c.Restore()
 
 	// move the cursor to the very bottom of the terminal
-	c.Move(999, 999)
+	c.move(999, 999)
 
 	// ask for the current location
 	bottom, err := c.Location(buf)
