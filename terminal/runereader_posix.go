@@ -44,7 +44,7 @@ func (rr *RuneReader) Buffer() *bytes.Buffer {
 
 // For reading runes we just want to disable echo.
 func (rr *RuneReader) SetTermMode() error {
-	if _, _, err := syscall.Syscall6(syscall.SYS_IOCTL, uintptr(rr.stdio.In.Fd()), ioctlReadTermios, uintptr(unsafe.Pointer(&rr.state.term)), 0, 0, 0); err != 0 {
+	if _, _, err := syscall.Syscall(syscall.SYS_IOCTL, uintptr(rr.stdio.In.Fd()), ioctlReadTermios, uintptr(unsafe.Pointer(&rr.state.term))); err != 0 {
 		return err
 	}
 
@@ -56,7 +56,7 @@ func (rr *RuneReader) SetTermMode() error {
 	newState.Cc[syscall.VMIN] = 1
 	newState.Cc[syscall.VTIME] = 0
 
-	if _, _, err := syscall.Syscall6(syscall.SYS_IOCTL, uintptr(rr.stdio.In.Fd()), ioctlWriteTermios, uintptr(unsafe.Pointer(&newState)), 0, 0, 0); err != 0 {
+	if _, _, err := syscall.Syscall(syscall.SYS_IOCTL, uintptr(rr.stdio.In.Fd()), ioctlWriteTermios, uintptr(unsafe.Pointer(&newState))); err != 0 {
 		return err
 	}
 
@@ -64,7 +64,7 @@ func (rr *RuneReader) SetTermMode() error {
 }
 
 func (rr *RuneReader) RestoreTermMode() error {
-	if _, _, err := syscall.Syscall6(syscall.SYS_IOCTL, uintptr(rr.stdio.In.Fd()), ioctlWriteTermios, uintptr(unsafe.Pointer(&rr.state.term)), 0, 0, 0); err != 0 {
+	if _, _, err := syscall.Syscall(syscall.SYS_IOCTL, uintptr(rr.stdio.In.Fd()), ioctlWriteTermios, uintptr(unsafe.Pointer(&rr.state.term))); err != 0 {
 		return err
 	}
 	return nil
