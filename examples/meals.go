@@ -45,19 +45,6 @@ func main() {
 	// ask the question
 	err := survey.Ask(qs, &answers)
 
-	prompt := &survey.Select{
-		Message: "Choose a color:",
-		Options: []string{"red", "blue", "green"},
-		Description: func(value string, index int) string {
-			if value == "red" {
-				return "My favorite color"
-			}
-			return ""
-		},
-	}
-	var color string
-	survey.AskOne(prompt, &color)
-
 	if err != nil {
 		fmt.Println(err.Error())
 		return
