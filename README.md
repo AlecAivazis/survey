@@ -203,26 +203,6 @@ prompt := &survey.Select{
 }
 survey.AskOne(prompt, &color)
 ```
-### Select
-
-<img src="https://thumbs.gfycat.com/GrimFilthyAmazonparrot-size_restricted.gif" width="450px"/>
-
-```golang
-color := ""
-prompt := &survey.Select{
-    Message: "Choose a color:",
-    Options: []string{"red", "blue", "green"},
-}
-survey.AskOne(prompt, &color)
-```
-
-```golang
-// as a field on a single select
-prompt := &survey.MultiSelect{..., PageSize: 10}
-
-// or as an option to Ask or AskOne
-survey.AskOne(prompt, &days, survey.WithPageSize(10))
-```
 
 ### MultiSelect
 
