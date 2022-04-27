@@ -34,7 +34,7 @@ func main() {
 			Prompt: &survey.Select{
 				Message: "Choose a meal:",
 				Options: titles,
-				Comment: func(value string, index int) string {
+				Description: func(value string, index int) string {
 					return meals[index].Comment
 				},
 			},
