@@ -185,6 +185,37 @@ The user can also press `esc` to toggle the ability cycle through the options wi
 By default, the select prompt is limited to showing 7 options at a time
 and will paginate lists of options longer than that. This can be changed a number of ways:
 
+#### Select option's description
+
+![Example](img/description.gif)
+
+```golang
+color := ""
+prompt := &survey.Select{
+    Message: "Choose a color:",
+    Options: []string{"red", "blue", "green"},
+    Description: func(value string, index int) string {
+        if value == "red" {
+            return "My favorite color"
+        }
+        return ""
+    },
+}
+survey.AskOne(prompt, &color)
+```
+### Select
+
+<img src="https://thumbs.gfycat.com/GrimFilthyAmazonparrot-size_restricted.gif" width="450px"/>
+
+```golang
+color := ""
+prompt := &survey.Select{
+    Message: "Choose a color:",
+    Options: []string{"red", "blue", "green"},
+}
+survey.AskOne(prompt, &color)
+```
+
 ```golang
 // as a field on a single select
 prompt := &survey.MultiSelect{..., PageSize: 10}
