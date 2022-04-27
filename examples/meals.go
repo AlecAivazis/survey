@@ -6,7 +6,6 @@ import (
 	"github.com/AlecAivazis/survey/v2"
 )
 
-// the questions to ask
 type Meal struct {
 	Title   string
 	Comment string
