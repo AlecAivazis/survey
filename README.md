@@ -187,7 +187,7 @@ and will paginate lists of options longer than that. This can be changed a numbe
 
 #### Select option's description
 
-![Example](img/description.gif)
+![Example](img/description-demo.gif)
 
 ```golang
 color := ""
