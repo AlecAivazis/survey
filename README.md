@@ -185,9 +185,14 @@ The user can also press `esc` to toggle the ability cycle through the options wi
 By default, the select prompt is limited to showing 7 options at a time
 and will paginate lists of options longer than that. This can be changed a number of ways:
 
-#### Select option's description
+```golang
+// as a field on a single select
+prompt := &survey.MultiSelect{..., PageSize: 10}
 
-![Example](img/description-demo.gif)
+// or as an option to Ask or AskOne
+survey.AskOne(prompt, &days, survey.WithPageSize(10))
+
+#### Select option's description
 
 ```golang
 color := ""
