@@ -191,6 +191,22 @@ prompt := &survey.MultiSelect{..., PageSize: 10}
 
 // or as an option to Ask or AskOne
 survey.AskOne(prompt, &days, survey.WithPageSize(10))
+
+#### Select option's description
+
+```golang
+color := ""
+prompt := &survey.Select{
+    Message: "Choose a color:",
+    Options: []string{"red", "blue", "green"},
+    Description: func(value string, index int) string {
+        if value == "red" {
+            return "My favorite color"
+        }
+        return ""
+    },
+}
+survey.AskOne(prompt, &color)
 ```
 
 ### MultiSelect
