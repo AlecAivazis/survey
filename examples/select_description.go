@@ -13,10 +13,10 @@ type Meal struct {
 
 func main() {
 	var meals = []Meal{
-		{Title: "Bread", Comment: "Good, not so healthy"},
-		{Title: "Eggs", Comment: "Healthy"},
+		{Title: "Bread", Comment: "Contains gluten"},
+		{Title: "Eggs", Comment: "Free-range"},
 		{Title: "Apple", Comment: ""},
-		{Title: "Burger", Comment: "Really?"},
+		{Title: "Burger", Comment: "Veggie patties available"},
 	}
 
 	titles := make([]string, len(meals))
