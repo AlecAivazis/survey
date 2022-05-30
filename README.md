@@ -191,8 +191,11 @@ prompt := &survey.MultiSelect{..., PageSize: 10}
 
 // or as an option to Ask or AskOne
 survey.AskOne(prompt, &days, survey.WithPageSize(10))
+```
 
-#### Select option's description
+#### Select options description
+
+The optional description text can be used to add extra information to each option listed in the select prompt:
 
 ```golang
 color := ""
@@ -207,6 +210,9 @@ prompt := &survey.Select{
     },
 }
 survey.AskOne(prompt, &color)
+
+// Assuming that the user chose "red - My favorite color":
+fmt.Println(color) //=> "red"
 ```
 
 ### MultiSelect
