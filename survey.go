@@ -12,6 +12,55 @@ import (
 	"github.com/AlecAivazis/survey/v2/terminal"
 )
 
+//SurveyInterface includes all the functions a normal user uses when using survey
+type SurveyInterface interface {
+	WithStdio(in terminal.FileReader, out terminal.FileWriter, err io.Writer) AskOpt
+	WithFilter(filter func(filter string, value string, index int) (include bool)) AskOpt
+	WithKeepFilter(KeepFilter bool) AskOpt
+	WithValidator(v Validator) AskOpt
+	WithPageSize(pageSize int) AskOpt
+	WithHelpInput(r rune) AskOpt
+	WithIcons(setIcons func(*IconSet)) AskOpt
+	WithShowCursor(ShowCursor bool) AskOpt
+	AskOne(p Prompt, response interface{}, opts ...AskOpt) error
+	Ask(qs []*Question, response interface{}, opts ...AskOpt) error
+}
+
+type Survey struct{}
+
+//the following ten functions are just passthroughs to the actual functions, but they make sure that the survey struct is backwards compatible to calling the functions directly
+
+func (survey Survey) WithStdio(in terminal.FileReader, out terminal.FileWriter, err io.Writer) AskOpt {
+	return WithStdio(in, out, err)
+}
+func (survey Survey) WithFilter(filter func(filter string, value string, index int) (include bool)) AskOpt {
+	return WithFilter(filter)
+}
+func (survey Survey) WithKeepFilter(KeepFilter bool) AskOpt {
+	return WithKeepFilter(KeepFilter)
+}
+func (survey Survey) WithValidator(v Validator) AskOpt {
+	return WithValidator(v)
+}
+func (survey Survey) WithPageSize(pageSize int) AskOpt {
+	return WithPageSize(pageSize)
+}
+func (survey Survey) WithHelpInput(r rune) AskOpt {
+	return WithHelpInput(r)
+}
+func (survey Survey) WithIcons(setIcons func(*IconSet)) AskOpt {
+	return WithIcons(setIcons)
+}
+func (survey Survey) WithShowCursor(ShowCursor bool) AskOpt {
+	return WithShowCursor(ShowCursor)
+}
+func (survey Survey) AskOne(p Prompt, response interface{}, opts ...AskOpt) error {
+	return AskOne(p, response, opts...)
+}
+func (survey Survey) Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
+	return Ask(qs, response, opts...)
+}
+
 // DefaultAskOptions is the default options on ask, using the OS stdio.
 func defaultAskOptions() *AskOptions {
 	return &AskOptions{
