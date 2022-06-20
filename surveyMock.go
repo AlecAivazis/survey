@@ -10,7 +10,6 @@ import (
 type SurveyMock struct {
 	singleResponse    interface{}
 	multipleResponses map[string]interface{}
-	LastPrompt        Prompt
 }
 
 // Not implemented, because it does not affect the mock
