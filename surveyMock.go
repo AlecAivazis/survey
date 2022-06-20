@@ -6,7 +6,6 @@ import (
 	"github.com/AlecAivazis/survey/v2/terminal"
 )
 
-
 type SurveyMock struct{}
 
 //TODO implement the mock functionality
@@ -36,6 +35,7 @@ func (survey *SurveyMock) WithShowCursor(ShowCursor bool) AskOpt {
 }
 func (survey *SurveyMock) AskOne(p Prompt, response interface{}, opts ...AskOpt) error {
 	return nil
+}
 func (survey *SurveyMock) Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
 	return nil
 }
