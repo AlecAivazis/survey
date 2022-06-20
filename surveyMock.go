@@ -3,39 +3,83 @@ package survey
 import (
 	"io"
 
+	"github.com/AlecAivazis/survey/v2/core"
 	"github.com/AlecAivazis/survey/v2/terminal"
 )
 
-type SurveyMock struct{}
+type SurveyMock struct {
+	singleResponse    interface{}
+	multipleResponses map[string]interface{}
+	LastPrompt        Prompt
+}
 
-//TODO implement the mock functionality
-func (survey *SurveyMock) WithStdio(in terminal.FileReader, out terminal.FileWriter, err io.Writer) AskOpt {
+// Not implemented, because it does not affect the mock
+func (mock *SurveyMock) WithStdio(in terminal.FileReader, out terminal.FileWriter, err io.Writer) AskOpt {
 	return nil
 }
-func (survey *SurveyMock) WithFilter(filter func(filter string, value string, index int) (include bool)) AskOpt {
+
+// Not implemented, because it does not affect the mock
+func (mock *SurveyMock) WithFilter(filter func(filter string, value string, index int) (include bool)) AskOpt {
 	return nil
 }
-func (survey *SurveyMock) WithKeepFilter(KeepFilter bool) AskOpt {
+
+// Not implemented, because it does not affect the mock
+func (mock *SurveyMock) WithKeepFilter(KeepFilter bool) AskOpt {
 	return nil
 }
-func (survey *SurveyMock) WithValidator(v Validator) AskOpt {
+
+// Not implemented, because it does not affect the mock
+func (mock *SurveyMock) WithValidator(v Validator) AskOpt {
 	return nil
 }
-func (survey *SurveyMock) WithPageSize(pageSize int) AskOpt {
+
+// Not implemented, because it does not affect the mock
+func (mock *SurveyMock) WithPageSize(pageSize int) AskOpt {
 	return nil
 }
-func (survey *SurveyMock) WithHelpInput(r rune) AskOpt {
+
+// Not implemented, because it does not affect the mock
+func (mock *SurveyMock) WithHelpInput(r rune) AskOpt {
 	return nil
 }
-func (survey *SurveyMock) WithIcons(setIcons func(*IconSet)) AskOpt {
+
+// Not implemented, because it does not affect the mock
+func (mock *SurveyMock) WithIcons(setIcons func(*IconSet)) AskOpt {
 	return nil
 }
-func (survey *SurveyMock) WithShowCursor(ShowCursor bool) AskOpt {
+
+// Not implemented, because it does not affect the mock
+func (mock *SurveyMock) WithShowCursor(ShowCursor bool) AskOpt {
 	return nil
 }
-func (survey *SurveyMock) AskOne(p Prompt, response interface{}, opts ...AskOpt) error {
+
+func (mock *SurveyMock) AskOne(p Prompt, response interface{}, opts ...AskOpt) error {
+	err := core.WriteAnswer(response, "", mock.singleResponse)
+	if err != nil {
+		// panicing is fine inside a mock
+		panic(err)
+	}
 	return nil
 }
-func (survey *SurveyMock) Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
+
+func (mock *SurveyMock) Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
+	for _, q := range qs {
+
+		err := core.WriteAnswer(response, q.Name, mock.multipleResponses[q.Name])
+		if err != nil {
+			// panicing is fine inside a mock
+			panic(err)
+		}
+
+	}
+
 	return nil
+}
+
+func (mock *SurveyMock) SetResponse(response interface{}) {
+	if val, ok := response.(map[string]interface{}); ok {
+		mock.multipleResponses = val
+	} else {
+		mock.singleResponse = response
+	}
 }
