@@ -14,46 +14,13 @@ import (
 
 //SurveyorInterface includes all the functions a normal user uses when using survey
 type SurveyorInterface interface {
-	WithStdio(in terminal.FileReader, out terminal.FileWriter, err io.Writer) AskOpt
-	WithFilter(filter func(filter string, value string, index int) (include bool)) AskOpt
-	WithKeepFilter(KeepFilter bool) AskOpt
-	WithValidator(v Validator) AskOpt
-	WithPageSize(pageSize int) AskOpt
-	WithHelpInput(r rune) AskOpt
-	WithIcons(setIcons func(*IconSet)) AskOpt
-	WithShowCursor(ShowCursor bool) AskOpt
 	AskOne(p Prompt, response interface{}, opts ...AskOpt) error
 	Ask(qs []*Question, response interface{}, opts ...AskOpt) error
 }
 
 type Surveyor struct{}
 
-//the following ten functions are just passthroughs to the actual functions, but they make sure that the surveyor struct is backwards compatible to calling the functions directly
-
-func (surveyor Surveyor) WithStdio(in terminal.FileReader, out terminal.FileWriter, err io.Writer) AskOpt {
-	return WithStdio(in, out, err)
-}
-func (surveyor Surveyor) WithFilter(filter func(filter string, value string, index int) (include bool)) AskOpt {
-	return WithFilter(filter)
-}
-func (surveyor Surveyor) WithKeepFilter(KeepFilter bool) AskOpt {
-	return WithKeepFilter(KeepFilter)
-}
-func (surveyor Surveyor) WithValidator(v Validator) AskOpt {
-	return WithValidator(v)
-}
-func (surveyor Surveyor) WithPageSize(pageSize int) AskOpt {
-	return WithPageSize(pageSize)
-}
-func (surveyor Surveyor) WithHelpInput(r rune) AskOpt {
-	return WithHelpInput(r)
-}
-func (surveyor Surveyor) WithIcons(setIcons func(*IconSet)) AskOpt {
-	return WithIcons(setIcons)
-}
-func (surveyor Surveyor) WithShowCursor(ShowCursor bool) AskOpt {
-	return WithShowCursor(ShowCursor)
-}
+//the following two functions are just passthroughs to the actual functions, but they make sure that the surveyor struct is backwards compatible to calling the functions directly
 func (surveyor Surveyor) AskOne(p Prompt, response interface{}, opts ...AskOpt) error {
 	return AskOne(p, response, opts...)
 }
