@@ -44,8 +44,10 @@ func main() {
         Age           int                     // if the types don't match, survey will convert it
     }{}
 
+    surveyor := survey.Surveyor{}
+
     // perform the questions
-    err := survey.Ask(qs, &answers)
+    err := surveyor.Ask(qs, &answers)
     if err != nil {
         fmt.Println(err.Error())
         return
@@ -87,13 +89,15 @@ prompt := &Select{
     Validate: survey.Required,
 }
 
+surveyor := survey.Surveyor{}
+
 // or define a default for the single call to `AskOne`
 // the answer will get written to the color variable
-survey.AskOne(prompt, &color, survey.WithValidator(survey.Required))
+surveyor.AskOne(prompt, &color, survey.WithValidator(survey.Required))
 
 // or define a default for every entry in a list of questions
 // the answer will get copied into the matching field of the struct as shown above
-survey.Ask(questions, &answers, survey.WithValidator(survey.Required))
+surveyor.Ask(questions, &answers, survey.WithValidator(survey.Required))
 ```
 
 ## Prompts
@@ -107,7 +111,9 @@ name := ""
 prompt := &survey.Input{
     Message: "ping",
 }
-survey.AskOne(prompt, &name)
+
+surveyor := survey.Surveyor{}
+surveyor.AskOne(prompt, &name)
 ```
 
 #### Suggestion Options
@@ -123,8 +129,9 @@ prompt := &survey.Input{
         return files
     },
 }
-}
-survey.AskOne(prompt, &file)
+
+surveyor := survey.Surveyor{}
+surveyor.AskOne(prompt, &file)
 ```
 
 ### Multiline
@@ -136,7 +143,9 @@ text := ""
 prompt := &survey.Multiline{
     Message: "ping",
 }
-survey.AskOne(prompt, &text)
+
+surveyor := survey.Surveyor{}
+surveyor.AskOne(prompt, &text)
 ```
 
 ### Password
@@ -148,7 +157,9 @@ password := ""
 prompt := &survey.Password{
     Message: "Please type your password",
 }
-survey.AskOne(prompt, &password)
+
+surveyor := survey.Surveyor{}
+surveyor.AskOne(prompt, &password)
 ```
 
 ### Confirm
@@ -160,7 +171,9 @@ name := false
 prompt := &survey.Confirm{
     Message: "Do you like pie?",
 }
-survey.AskOne(prompt, &name)
+
+surveyor := survey.Surveyor{}
+surveyor.AskOne(prompt, &name)
 ```
 
 ### Select
@@ -173,7 +186,8 @@ prompt := &survey.Select{
     Message: "Choose a color:",
     Options: []string{"red", "blue", "green"},
 }
-survey.AskOne(prompt, &color)
+surveyor := survey.Surveyor{}
+surveyor.AskOne(prompt, &color)
 ```
 
 Fields and values that come from a `Select` prompt can be one of two different things. If you pass an `int`
@@ -190,7 +204,7 @@ and will paginate lists of options longer than that. This can be changed a numbe
 prompt := &survey.MultiSelect{..., PageSize: 10}
 
 // or as an option to Ask or AskOne
-survey.AskOne(prompt, &days, survey.WithPageSize(10))
+surveyor.AskOne(prompt, &days, survey.WithPageSize(10))
 ```
 
 #### Select options description
@@ -209,7 +223,9 @@ prompt := &survey.Select{
         return ""
     },
 }
-survey.AskOne(prompt, &color)
+
+surveyor := survey.Surveyor{}
+surveyor.AskOne(prompt, &color)
 
 // Assuming that the user chose "red - My favorite color":
 fmt.Println(color) //=> "red"
@@ -225,7 +241,9 @@ prompt := &survey.MultiSelect{
     Message: "What days do you prefer:",
     Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
 }
-survey.AskOne(prompt, &days)
+
+surveyor := survey.Surveyor{}
+surveyor.AskOne(prompt, &days)
 ```
 
 Fields and values that come from a `MultiSelect` prompt can be one of two different things. If you pass an `int`
@@ -242,7 +260,7 @@ and will paginate lists of options longer than that. This can be changed a numbe
 prompt := &survey.MultiSelect{..., PageSize: 10}
 
 // or as an option to Ask or AskOne
-survey.AskOne(prompt, &days, survey.WithPageSize(10))
+surveyor.AskOne(prompt, &days, survey.WithPageSize(10))
 ```
 
 ### Editor
@@ -259,8 +277,8 @@ prompt := &survey.Editor{
     Message: "Shell code snippet",
     FileName: "*.sh",
 }
-
-survey.AskOne(prompt, &content)
+surveyor := survey.Surveyor{}
+surveyor.AskOne(prompt, &content)
 ```
 
 ## Filtering Options
@@ -284,7 +302,7 @@ func myFilter(filterValue string, optValue string, optIndex int) bool {
 }
 
 // or define a default for all of the questions
-survey.AskOne(prompt, &color, survey.WithFilter(myFilter))
+surveyor.AskOne(prompt, &color, survey.WithFilter(myFilter))
 ```
 
 ## Keeping the filter active
@@ -302,7 +320,7 @@ However the user can prevent this from happening and keep the filter active for 
 }
 
 // or define a default for all of the questions
-survey.AskOne(prompt, &color, survey.WithKeepFilter(true))
+surveyor.AskOne(prompt, &color, survey.WithKeepFilter(true))
 ```
 
 ## Validation
@@ -373,7 +391,8 @@ prompt := &survey.Input{
     Help:    "I couldn't come up with one.",
 }
 
-survey.AskOne(prompt, &number, survey.WithHelpInput('^'))
+surveyor := survey.Surveyor{}
+surveyor.AskOne(prompt, &number, survey.WithHelpInput('^'))
 ```
 
 ## Changing the Icons
@@ -392,7 +411,8 @@ prompt := &survey.Input{
     Help:    "I couldn't come up with one.",
 }
 
-survey.AskOne(prompt, &number, survey.WithIcons(func(icons *survey.IconSet) {
+surveyor := survey.Surveyor{}
+surveyor.AskOne(prompt, &number, survey.WithIcons(func(icons *survey.IconSet) {
     // you can set any icons
     icons.Question.Text = "⁇"
     // for more information on formatting the icons, see here: https://github.com/mgutz/ansi#style-format
@@ -432,7 +452,9 @@ func (my *MyValue) WriteAnswer(name string, value interface{}) error {
 }
 
 myval := MyValue{}
-survey.AskOne(
+
+surveyor := survey.Surveyor{}
+surveyor.AskOne(
     &survey.Input{
         Message: "Enter something:",
     },
@@ -459,14 +481,13 @@ For some examples, you can see any of the tests in this repo.
 Instead of calling the survey functions directly, you can create a survey struct and call the functions from there.
 
 ```golang
-
-survey := survey.Survey{}
-
 response := false
 prompt := &survey.Confirm{
     Message: "Do you like pie?",
 }
-survey.AskOne(prompt, &response)
+
+surveyor := survey.Surveyor{}
+surveyor.AskOne(prompt, &response)
 
 ```
 
@@ -530,7 +551,7 @@ When Survey reads a ^C byte (ASCII \x03, "end of text"), it interrupts the curre
 If you want to stop the process, handle the returned error in your code:
 
 ```go
-err := survey.AskOne(prompt, &myVar)
+err := surveyor.AskOne(prompt, &myVar)
 if err != nil {
 	if err == terminal.InterruptErr {
 		log.Fatal("interrupted")
