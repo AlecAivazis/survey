@@ -506,7 +506,7 @@ func TestAskForPie(t *testing.T) {
     result := AskForPie(mock)
     
     //check output of the function
-    if result != true {
+    if !result {
         t.Fatal("AskForPie returned false, but it should have returned true")
     }
 }
