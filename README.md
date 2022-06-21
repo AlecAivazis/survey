@@ -476,17 +476,17 @@ If you create only one survey struct at the top level of your program and pass i
 
 ```golang
 func main() {
-    survey := survey.Survey{}
+    surveyor := survey.Surveyor{}
 
-    AskForPie(survey)
+    AskForPie(surveyor)
 }
 
-func AskForPie(survey survey.SurveyInterface) bool {
+func AskForPie(surveyor survey.SurveyInterface) bool {
     response := false
     prompt := &survey.Confirm{
         Message: "Do you like pie?",
     }
-    survey.AskOne(prompt, &response)
+    surveyor.AskOne(prompt, &response)
 
     return response
 }
@@ -499,7 +499,7 @@ func AskForPie(survey survey.SurveyInterface) bool {
 func TestAskForPie(t *testing.T) {
     
     //create mock
-    mock := survey.SurveyMock{} 
+    mock := survey.SurveyorMock{} 
     //set the response the "user" should select 
     mock.setResponse(true)
 

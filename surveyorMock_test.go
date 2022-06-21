@@ -6,7 +6,7 @@ import (
 
 func TestMockAskOne(t *testing.T) {
 	t.Run("Setting Response", func(t *testing.T) {
-		mock := SurveyMock{}
+		mock := SurveyorMock{}
 		mock.SetResponse(true)
 
 		prompt := &Confirm{
@@ -25,7 +25,7 @@ func TestMockAskOne(t *testing.T) {
 
 func TestMockAsk(t *testing.T) {
 	t.Run("Setting Response", func(t *testing.T) {
-		mock := SurveyMock{}
+		mock := SurveyorMock{}
 
 		test := make(map[string]interface{})
 		test["test"] = true
