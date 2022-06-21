@@ -507,7 +507,7 @@ func TestAskForPie(t *testing.T) {
     
     //check output of the function
     if result != true {
-        t.Fatalf("AskForPie returned false, but it should have returned true!")
+        t.Fatal("AskForPie returned false, but it should have returned true")
     }
 }
 
