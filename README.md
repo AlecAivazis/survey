@@ -456,11 +456,9 @@ For some examples, you can see any of the tests in this repo.
 
 ### Using a mock (unstable API)
 
-#### Warning: 
-
+>**Warning:** 
 > The Mock API is currently still unstable and subject to change. 
 > Once it's done, it will be the recommended way to test survey. 
-
 > If you are unsure what to use right now, use a simulated terminal.
 
 Instead of calling the survey functions directly, you can create a survey struct and call the functions from there.
