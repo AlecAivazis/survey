@@ -442,7 +442,7 @@ survey.AskOne(
 
 ## Testing
 
-There are two ways to test a program using survey. Using a mock is recommended because it leads to faster, less brittle tests. 
+There are two ways to test a program using survey:
 
 ### Using a simulated terminal
 
@@ -454,7 +454,14 @@ stdio to an in-memory [virtual terminal](https://github.com/hinshun/vt10x).
 
 For some examples, you can see any of the tests in this repo.
 
-### Using a mock
+### Using a mock (unstable API)
+
+#### Warning: 
+
+> The Mock API is currently still unstable and subject to change. 
+> Once it's done, it will be the recommended way to test survey. 
+
+> If you are unsure what to use right now, use a simulated terminal.
 
 Instead of calling the survey functions directly, you can create a survey struct and call the functions from there.
 
