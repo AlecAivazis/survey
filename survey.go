@@ -369,7 +369,16 @@ func Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
 // paginate returns a single page of choices given the page size, the total list of
 // possible choices, and the current selected index in the total list.
 func paginate(pageSize int, choices []core.OptionAnswer, sel int) ([]core.OptionAnswer, int) {
+	return paginateWithFooter(pageSize, choices, sel, "")
+}
+
+// returns a single page of choices given the page size, the total list of
+// possible choices, and the current selected index in the total list.
+// Use nonLastPageFooter to display a message after all choices when page is not the last one,
+// for example, use it to provide a hint to users about there are more items below.
+func paginateWithFooter(pageSize int, choices []core.OptionAnswer, sel int, nonLastPageFooter string) ([]core.OptionAnswer, int) {
 	var start, end, cursor int
+	showExtraRow := false
 
 	if len(choices) < pageSize {
 		// if we dont have enough options to fill a page
@@ -382,6 +391,7 @@ func paginate(pageSize int, choices []core.OptionAnswer, sel int) ([]core.Option
 		start = 0
 		end = pageSize
 		cursor = sel
+		showExtraRow = true
 
 	} else if len(choices)-sel-1 < pageSize/2 {
 		// if we are in the last half page
@@ -397,10 +407,15 @@ func paginate(pageSize int, choices []core.OptionAnswer, sel int) ([]core.Option
 		cursor = pageSize / 2
 		start = sel - above
 		end = sel + below
+		showExtraRow = true
 	}
 
 	// return the subset we care about and the index
-	return choices[start:end], cursor
+	result := choices[start:end]
+	if showExtraRow {
+		result = append(result, core.OptionAnswer{Value: nonLastPageFooter})
+	}
+	return result, cursor
 }
 
 type IterableOpts interface {

@@ -29,6 +29,7 @@ type Select struct {
 	FilterMessage string
 	Filter        func(filter string, value string, index int) bool
 	Description   func(value string, index int) string
+	FooterText    string
 	filter        string
 	selectedIndex int
 	useDefault    bool
@@ -174,7 +175,7 @@ func (s *Select) OnChange(key rune, config *PromptConfig) bool {
 
 	// TODO if we have started filtering and were looking at the end of a list
 	// and we have modified the filter then we should move the page back!
-	opts, idx := paginate(pageSize, options, s.selectedIndex)
+	opts, idx := paginateWithFooter(pageSize, options, s.selectedIndex, s.FooterText)
 
 	tmplData := SelectTemplateData{
 		Select:        *s,
@@ -256,7 +257,7 @@ func (s *Select) Prompt(config *PromptConfig) (interface{}, error) {
 	}
 
 	// figure out the options and index to render
-	opts, idx := paginate(pageSize, core.OptionAnswerList(s.Options), sel)
+	opts, idx := paginateWithFooter(pageSize, core.OptionAnswerList(s.Options), sel, s.FooterText)
 
 	cursor := s.NewCursor()
 	cursor.Save()          // for proper cursor placement during selection
