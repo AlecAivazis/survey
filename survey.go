@@ -378,7 +378,7 @@ func paginate(pageSize int, choices []core.OptionAnswer, sel int) ([]core.Option
 // for example, use it to provide a hint to users about there are more items below.
 func paginateWithFooter(pageSize int, choices []core.OptionAnswer, sel int, nonLastPageFooter string) ([]core.OptionAnswer, int) {
 	var start, end, cursor int
-	showExtraRow := false
+	showFooter := false
 
 	if len(choices) < pageSize {
 		// if we dont have enough options to fill a page
@@ -391,7 +391,7 @@ func paginateWithFooter(pageSize int, choices []core.OptionAnswer, sel int, nonL
 		start = 0
 		end = pageSize
 		cursor = sel
-		showExtraRow = true
+		showFooter = true
 
 	} else if len(choices)-sel-1 < pageSize/2 {
 		// if we are in the last half page
@@ -407,12 +407,12 @@ func paginateWithFooter(pageSize int, choices []core.OptionAnswer, sel int, nonL
 		cursor = pageSize / 2
 		start = sel - above
 		end = sel + below
-		showExtraRow = true
+		showFooter = true
 	}
 
 	// return the subset we care about and the index
 	result := choices[start:end]
-	if showExtraRow {
+	if showFooter && nonLastPageFooter != "" {
 		result = append(result, core.OptionAnswer{Value: nonLastPageFooter})
 	}
 	return result, cursor
