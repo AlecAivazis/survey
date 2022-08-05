@@ -58,6 +58,7 @@ func defaultAskOptions() *AskOptions {
 			},
 			KeepFilter: false,
 			ShowCursor: false,
+			RemoveSelectAll: false,
 		},
 	}
 }
@@ -118,6 +119,8 @@ type PromptConfig struct {
 	Filter       func(filter string, option string, index int) bool
 	KeepFilter   bool
 	ShowCursor   bool
+	RemoveSelectAll bool
+
 }
 
 // Prompt is the primary interface for the objects that can take user input
@@ -171,6 +174,14 @@ func WithKeepFilter(KeepFilter bool) AskOpt {
 		options.PromptConfig.KeepFilter = KeepFilter
 
 		// nothing went wrong
+		return nil
+	}
+}
+
+// WithRemoveSelectAll remove the select all option in Multiselect
+func WithRemoveSelectAll(RemoveSelectAll bool) AskOpt {
+	return func(options *AskOptions) error {
+		options.PromptConfig.RemoveSelectAll = RemoveSelectAll
 		return nil
 	}
 }

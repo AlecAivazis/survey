@@ -357,6 +357,24 @@ All of the prompts have a `Help` field which can be defined to provide more info
 }
 ```
 
+## Removing the "Select All" option
+
+By default, users can select all of the multi-select options using the right arrow key. To prevent users from being able to do this (and remove the `<right> to all` message from the prompt), use the option `WithRemoveSelectAll`:
+
+```golang
+import (
+    "github.com/AlecAivazis/survey/v2"
+)
+
+number := ""
+prompt := &survey.Input{
+    Message: "This question has the select all option removed",
+}
+
+survey.AskOne(prompt, &number, survey.WithRemoveSelectAll())
+```
+
+
 ### Changing the input rune
 
 In some situations, `?` is a perfectly valid response. To handle this, you can change the rune that survey
