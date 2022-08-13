@@ -179,18 +179,17 @@ func (rr *RuneReader) ReadLineWithDefault(mask rune, d []rune, onRunes ...OnRune
 					EraseLine(rr.stdio.Out, ERASE_LINE_END)
 
 					// Erase symbols which are left over from older print on the next line
-					if cursorCurrent.Y < terminalSize.Y {
-						// store the cursor position to compare it later
-						lastCursorLocation, _ := cursor.Location(rr.Buffer())
 
-						// this moves the cursor down or stays on the same line if no next line exists
-						cursor.NextLine(1)
+					// store the cursor position to compare it later
+					lastCursorLocation, _ := cursor.Location(rr.Buffer())
 
-						// only erase the line if the cursor actually moved down a line
-						newCursorLocation, _ := cursor.Location(rr.Buffer())
-						if lastCursorLocation.Y < newCursorLocation.Y {
-							EraseLine(rr.stdio.Out, ERASE_LINE_END)
-						}
+					// move the cursor down or stay on the same line if no next line exists
+					cursor.NextLine(1)
+
+					// only erase the line if the cursor actually moved down a line
+					newCursorLocation, _ := cursor.Location(rr.Buffer())
+					if lastCursorLocation.Y < newCursorLocation.Y {
+						EraseLine(rr.stdio.Out, ERASE_LINE_END)
 					}
 
 					// restore cursor
