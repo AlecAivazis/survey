@@ -169,14 +169,16 @@ func (rr *RuneReader) ReadLineWithDefault(mask rune, d []rune, onRunes ...OnRune
 
 					// print what comes after
 					for _, char := range line[index-1:] {
-						//Erase symbols which are left over from older print
-						EraseLine(rr.stdio.Out, ERASE_LINE_END)
 						// print characters to the new line appropriately
 						if err := rr.printChar(char, mask); err != nil {
 							return line, err
 						}
 					}
-					// erase what's left over from last print
+
+					// Erase symbols which are left over from older print on the line after ending printing
+					EraseLine(rr.stdio.Out, ERASE_LINE_END)
+
+					// Erase symbols which are left over from older print on the next line
 					if cursorCurrent.Y < terminalSize.Y {
 						// store the cursor position to compare it later
 						lastCursorLocation, _ := cursor.Location(rr.Buffer())
@@ -186,11 +188,11 @@ func (rr *RuneReader) ReadLineWithDefault(mask rune, d []rune, onRunes ...OnRune
 
 						// only erase the line if the cursor actually moved down a line
 						newCursorLocation, _ := cursor.Location(rr.Buffer())
-
 						if lastCursorLocation.Y < newCursorLocation.Y {
 							EraseLine(rr.stdio.Out, ERASE_LINE_END)
 						}
 					}
+
 					// restore cursor
 					cursor.Restore()
 					if cursorCurrent.CursorIsAtLineBegin() {
