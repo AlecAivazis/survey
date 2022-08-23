@@ -357,7 +357,7 @@ All of the prompts have a `Help` field which can be defined to provide more info
 }
 ```
 
-## Removing the "Select All" option
+## Removing the "Select All" and "Select None" options
 
 By default, users can select all of the multi-select options using the right arrow key. To prevent users from being able to do this (and remove the `<right> to all` message from the prompt), use the option `WithRemoveSelectAll`:
 
@@ -372,6 +372,21 @@ prompt := &survey.Input{
 }
 
 survey.AskOne(prompt, &number, survey.WithRemoveSelectAll())
+```
+
+Also by default, users can use the left arrow key to unselect all of the options. To prevent users from being able to do this (and remove the `<left> to none` message from the prompt), use the option `WithRemoveSelectNone`:
+
+```golang
+import (
+    "github.com/AlecAivazis/survey/v2"
+)
+
+number := ""
+prompt := &survey.Input{
+    Message: "This question has the select all option removed",
+}
+
+survey.AskOne(prompt, &number, survey.WithRemoveSelectNone())
 ```
 
 
