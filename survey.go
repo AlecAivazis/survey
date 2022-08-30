@@ -180,17 +180,17 @@ func WithKeepFilter(KeepFilter bool) AskOpt {
 }
 
 // WithRemoveSelectAll remove the select all option in Multiselect
-func WithRemoveSelectAll(RemoveSelectAll bool) AskOpt {
+func WithRemoveSelectAll() AskOpt {
 	return func(options *AskOptions) error {
-		options.PromptConfig.RemoveSelectAll = RemoveSelectAll
+		options.PromptConfig.RemoveSelectAll = true
 		return nil
 	}
 }
 
 // WithRemoveSelectNone remove the select none/unselect all in Multiselect
-func WithRemoveSelectNone(RemoveSelectNone bool) AskOpt {
+func WithRemoveSelectNone() AskOpt {
 	return func(options *AskOptions) error {
-		options.PromptConfig.RemoveSelectNone = RemoveSelectNone
+		options.PromptConfig.RemoveSelectNone = true
 		return nil
 	}
 }
