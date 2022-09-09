@@ -71,7 +71,7 @@ var MultiSelectQuestionTemplate = `
 {{- color "default+hb"}}{{ .Message }}{{ .FilterMessage }}{{color "reset"}}
 {{- if .ShowAnswer}}{{color "cyan"}} {{.Answer}}{{color "reset"}}{{"\n"}}
 {{- else }}
-	{{- "  "}}{{- color "cyan"}}[Use arrows to move, space to select, <right> to all, <left> to none, type to filter{{- if and .Help (not .ShowHelp)}}, {{ .Config.HelpInput }} for more help{{end}}]{{color "reset"}}
+	{{- "  "}}{{- color "cyan"}}[Use arrows to move, space to select,{{- if not .Config.RemoveSelectAll }} <right> to all,{{end}}{{- if not .Config.RemoveSelectNone }} <left> to none,{{end}} type to filter{{- if and .Help (not .ShowHelp)}}, {{ .Config.HelpInput }} for more help{{end}}]{{color "reset"}}
   {{- "\n"}}
   {{- range $ix, $option := .PageEntries}}
     {{- template "option" $.IterateOption $ix $option}}
@@ -134,14 +134,14 @@ func (m *MultiSelect) OnChange(key rune, config *PromptConfig) {
 	} else if key >= terminal.KeySpace {
 		m.filter += string(key)
 		m.VimMode = false
-	} else if key == terminal.KeyArrowRight {
+	} else if !config.RemoveSelectAll && key == terminal.KeyArrowRight {
 		for _, v := range options {
 			m.checked[v.Index] = true
 		}
 		if !config.KeepFilter {
 			m.filter = ""
 		}
-	} else if key == terminal.KeyArrowLeft {
+	} else if !config.RemoveSelectNone && key == terminal.KeyArrowLeft {
 		for _, v := range options {
 			m.checked[v.Index] = false
 		}

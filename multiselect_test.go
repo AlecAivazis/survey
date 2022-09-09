@@ -579,3 +579,69 @@ func TestMultiSelectPromptKeepFilter(t *testing.T) {
 		})
 	}
 }
+
+func TestMultiSelectPromptRemoveSelectAll(t *testing.T) {
+	tests := []PromptTest{
+		{
+			"multi select with remove select all option",
+			&MultiSelect{
+				Message: "What color do you prefer:",
+				Options: []string{"green", "red", "light-green", "blue", "black", "yellow", "purple"},
+			},
+			func(c expectConsole) {
+				c.ExpectString("What color do you prefer:  [Use arrows to move, space to select, <left> to none, type to filter]")
+				// Select the first option "green"
+				c.Send(" ")
+
+				// attempt to select all (this shouldn't do anything)
+				c.Send(string(terminal.KeyArrowRight))
+
+				// end the session
+				c.SendLine("")
+				c.ExpectEOF()
+			},
+			[]core.OptionAnswer{ // we should only have one option selected, not all of them
+				{Value: "green", Index: 0},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			RunPromptTestRemoveSelectAll(t, test)
+		})
+	}
+}
+
+func TestMultiSelectPromptRemoveSelectNone(t *testing.T) {
+	tests := []PromptTest{
+		{
+			"multi select with remove select none option",
+			&MultiSelect{
+				Message: "What color do you prefer:",
+				Options: []string{"green", "red", "light-green", "blue", "black", "yellow", "purple"},
+			},
+			func(c expectConsole) {
+				c.ExpectString("What color do you prefer:  [Use arrows to move, space to select, <right> to all, type to filter]")
+				// Select the first option "green"
+				c.Send(" ")
+
+				// attempt to unselect all (this shouldn't do anything)
+				c.Send(string(terminal.KeyArrowLeft))
+
+				// end the session
+				c.SendLine("")
+				c.ExpectEOF()
+			},
+			[]core.OptionAnswer{ // we should only have one option selected, not all of them
+				{Value: "green", Index: 0},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			RunPromptTestRemoveSelectNone(t, test)
+		})
+	}
+}

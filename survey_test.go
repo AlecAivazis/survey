@@ -97,6 +97,38 @@ func RunPromptTestKeepFilter(t *testing.T, test PromptTest) {
 	require.Equal(t, test.expected, answer)
 }
 
+func RunPromptTestRemoveSelectAll(t *testing.T, test PromptTest) {
+	t.Helper()
+	var answer interface{}
+	RunTest(t, test.procedure, func(stdio terminal.Stdio) error {
+		var err error
+		if p, ok := test.prompt.(wantsStdio); ok {
+			p.WithStdio(stdio)
+		}
+		config := defaultPromptConfig()
+		config.RemoveSelectAll = true
+		answer, err = test.prompt.Prompt(config)
+		return err
+	})
+	require.Equal(t, test.expected, answer)
+}
+
+func RunPromptTestRemoveSelectNone(t *testing.T, test PromptTest) {
+	t.Helper()
+	var answer interface{}
+	RunTest(t, test.procedure, func(stdio terminal.Stdio) error {
+		var err error
+		if p, ok := test.prompt.(wantsStdio); ok {
+			p.WithStdio(stdio)
+		}
+		config := defaultPromptConfig()
+		config.RemoveSelectNone = true
+		answer, err = test.prompt.Prompt(config)
+		return err
+	})
+	require.Equal(t, test.expected, answer)
+}
+
 func TestPagination_tooFew(t *testing.T) {
 	// a small list of options
 	choices := core.OptionAnswerList([]string{"choice1", "choice2", "choice3"})
