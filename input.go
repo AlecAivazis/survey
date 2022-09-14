@@ -208,7 +208,7 @@ func (i *Input) Prompt(config *PromptConfig) (interface{}, error) {
 
 func (i *Input) Cleanup(config *PromptConfig, val interface{}) error {
 	// use the default answer when cleaning up the prompt if necessary
-	ans := i.answer
+	ans := val.(string)
 	if ans == "" && i.Default != "" {
 		ans = i.Default
 	}

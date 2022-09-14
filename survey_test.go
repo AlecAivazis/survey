@@ -10,6 +10,7 @@ import (
 	"github.com/AlecAivazis/survey/v2/core"
 	"github.com/AlecAivazis/survey/v2/terminal"
 	expect "github.com/Netflix/go-expect"
+	"github.com/hinshun/vt10x"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -20,6 +21,7 @@ func init() {
 }
 
 type expectConsole interface {
+	TerminalContains(string)
 	ExpectString(string)
 	ExpectEOF()
 	SendLine(string)
@@ -29,6 +31,12 @@ type expectConsole interface {
 type consoleWithErrorHandling struct {
 	console *expect.Console
 	t       *testing.T
+	vt      vt10x.Terminal
+}
+
+func (c *consoleWithErrorHandling) TerminalContains(s string) {
+	c.t.Helper()
+	require.Contains(c.t, c.vt.String(), s)
 }
 
 func (c *consoleWithErrorHandling) ExpectString(s string) {
@@ -381,6 +389,7 @@ func TestAsk(t *testing.T) {
 				c.ExpectString("What is your name?")
 				c.SendLine("Johnny Appleseed")
 				c.ExpectEOF()
+				c.TerminalContains("What is your name? johnny appleseed")
 			},
 			map[string]interface{}{
 				"name": "johnny appleseed",
