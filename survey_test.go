@@ -380,6 +380,7 @@ func TestAsk(t *testing.T) {
 			func(c expectConsole) {
 				c.ExpectString("What is your name?")
 				c.SendLine("Johnny Appleseed")
+				c.ExpectString("What is your name? johnny appleseed")
 				c.ExpectEOF()
 			},
 			map[string]interface{}{
