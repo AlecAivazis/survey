@@ -31,7 +31,7 @@ func RunTest(t *testing.T, procedure func(expectConsole), test func(terminal.Std
 	donec := make(chan struct{})
 	go func() {
 		defer close(donec)
-		procedure(&consoleWithErrorHandling{console: c, t: t, vt: term})
+		procedure(&consoleWithErrorHandling{console: c, t: t})
 	}()
 
 	stdio := terminal.Stdio{In: c.Tty(), Out: c.Tty(), Err: c.Tty()}
