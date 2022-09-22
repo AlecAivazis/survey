@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/AlecAivazis/survey/v2"
-	"github.com/AlecAivazis/survey/v2/tests/util"
+	TestUtil "github.com/AlecAivazis/survey/v2/tests/util"
 )
 
 var answer = []string{}
@@ -40,6 +42,16 @@ var table = []TestUtil.TestTableEntry{
 			Message: "What days do you prefer:",
 			Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
 			Default: []string{"Sundayaa"},
+		}, &answer, nil,
+	},
+	{
+		"descriptions", &survey.MultiSelect{
+			Message: "What days do you prefer:",
+			Options: []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
+			Description: func(value string, index int) string {
+				return value + fmt.Sprint(index)
+
+			},
 		}, &answer, nil,
 	},
 }
