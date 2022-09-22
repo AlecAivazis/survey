@@ -27,6 +27,8 @@ func TestMultiSelectRender(t *testing.T) {
 		Default: []string{"bar", "buz"},
 	}
 
+	descriptions := []string{"oof", "rab", "zab", "zub"}
+
 	helpfulPrompt := prompt
 	helpfulPrompt.Help = "This is helpful"
 
@@ -123,6 +125,121 @@ func TestMultiSelectRender(t *testing.T) {
 					fmt.Sprintf("%s Pick your words:  [Use arrows to move, space to select, <right> to all, <left> to none, type to filter]", defaultIcons().Question.Text),
 					fmt.Sprintf("%s %s  bar", defaultIcons().SelectFocus.Text, defaultIcons().UnmarkedOption.Text),
 					fmt.Sprintf("  %s  baz", defaultIcons().UnmarkedOption.Text),
+				},
+				"\n",
+			),
+		},
+		{
+			"description all",
+			prompt,
+			MultiSelectTemplateData{
+				SelectedIndex: 2,
+				PageEntries:   core.OptionAnswerList(prompt.Options),
+				Checked:       map[int]bool{1: true, 3: true},
+				Description: func(value string, index int) string {
+					return descriptions[index]
+				},
+			},
+			strings.Join(
+				[]string{
+					fmt.Sprintf("%s Pick your words:  [Use arrows to move, space to select, <right> to all, <left> to none, type to filter]", defaultIcons().Question.Text),
+					fmt.Sprintf("  %s  foo - oof", defaultIcons().UnmarkedOption.Text),
+					fmt.Sprintf("  %s  bar - rab", defaultIcons().MarkedOption.Text),
+					fmt.Sprintf("%s %s  baz - zab", defaultIcons().SelectFocus.Text, defaultIcons().UnmarkedOption.Text),
+					fmt.Sprintf("  %s  buz - zub\n", defaultIcons().MarkedOption.Text),
+				},
+				"\n",
+			),
+		},
+		{
+			"description even",
+			prompt,
+			MultiSelectTemplateData{
+				SelectedIndex: 2,
+				PageEntries:   core.OptionAnswerList(prompt.Options),
+				Checked:       map[int]bool{1: true, 3: true},
+				Description: func(value string, index int) string {
+
+					if index%2 == 0 {
+						return descriptions[index]
+					}
+
+					return ""
+				},
+			},
+			strings.Join(
+				[]string{
+					fmt.Sprintf("%s Pick your words:  [Use arrows to move, space to select, <right> to all, <left> to none, type to filter]", defaultIcons().Question.Text),
+					fmt.Sprintf("  %s  foo - oof", defaultIcons().UnmarkedOption.Text),
+					fmt.Sprintf("  %s  bar", defaultIcons().MarkedOption.Text),
+					fmt.Sprintf("%s %s  baz - zab", defaultIcons().SelectFocus.Text, defaultIcons().UnmarkedOption.Text),
+					fmt.Sprintf("  %s  buz\n", defaultIcons().MarkedOption.Text),
+				},
+				"\n",
+			),
+		},
+		{
+			"description never",
+			prompt,
+			MultiSelectTemplateData{
+				SelectedIndex: 2,
+				PageEntries:   core.OptionAnswerList(prompt.Options),
+				Checked:       map[int]bool{1: true, 3: true},
+				Description: func(value string, index int) string {
+					return ""
+				},
+			},
+			strings.Join(
+				[]string{
+					fmt.Sprintf("%s Pick your words:  [Use arrows to move, space to select, <right> to all, <left> to none, type to filter]", defaultIcons().Question.Text),
+					fmt.Sprintf("  %s  foo", defaultIcons().UnmarkedOption.Text),
+					fmt.Sprintf("  %s  bar", defaultIcons().MarkedOption.Text),
+					fmt.Sprintf("%s %s  baz", defaultIcons().SelectFocus.Text, defaultIcons().UnmarkedOption.Text),
+					fmt.Sprintf("  %s  buz\n", defaultIcons().MarkedOption.Text),
+				},
+				"\n",
+			),
+		},
+		{
+			"description repeat value",
+			prompt,
+			MultiSelectTemplateData{
+				SelectedIndex: 2,
+				PageEntries:   core.OptionAnswerList(prompt.Options),
+				Checked:       map[int]bool{1: true, 3: true},
+				Description: func(value string, index int) string {
+					return value
+				},
+			},
+			strings.Join(
+				[]string{
+					fmt.Sprintf("%s Pick your words:  [Use arrows to move, space to select, <right> to all, <left> to none, type to filter]", defaultIcons().Question.Text),
+					fmt.Sprintf("  %s  foo - foo", defaultIcons().UnmarkedOption.Text),
+					fmt.Sprintf("  %s  bar - bar", defaultIcons().MarkedOption.Text),
+					fmt.Sprintf("%s %s  baz - baz", defaultIcons().SelectFocus.Text, defaultIcons().UnmarkedOption.Text),
+					fmt.Sprintf("  %s  buz - buz\n", defaultIcons().MarkedOption.Text),
+				},
+				"\n",
+			),
+		},
+		{
+			"description print index",
+			prompt,
+			MultiSelectTemplateData{
+				SelectedIndex: 2,
+				PageEntries:   core.OptionAnswerList(prompt.Options),
+				Checked:       map[int]bool{1: true, 3: true},
+				Description: func(value string, index int) string {
+					return fmt.Sprint(index)
+				},
+			},
+			strings.Join(
+				[]string{
+					fmt.Sprintf("%s Pick your words:  [Use arrows to move, space to select, <right> to all, <left> to none, type to filter]", defaultIcons().Question.Text),
+					fmt.Sprintf("  %s  foo - 0", defaultIcons().UnmarkedOption.Text),
+					fmt.Sprintf("  %s  bar - 1", defaultIcons().MarkedOption.Text),
+					fmt.Sprintf("%s %s  baz - 2", defaultIcons().SelectFocus.Text, defaultIcons().UnmarkedOption.Text),
+					fmt.Sprintf("  %s  buz - 3\n", defaultIcons().MarkedOption.Text),
 				},
 				"\n",
 			),
@@ -576,6 +693,72 @@ func TestMultiSelectPromptKeepFilter(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			RunPromptTestKeepFilter(t, test)
+		})
+	}
+}
+
+func TestMultiSelectPromptRemoveSelectAll(t *testing.T) {
+	tests := []PromptTest{
+		{
+			"multi select with remove select all option",
+			&MultiSelect{
+				Message: "What color do you prefer:",
+				Options: []string{"green", "red", "light-green", "blue", "black", "yellow", "purple"},
+			},
+			func(c expectConsole) {
+				c.ExpectString("What color do you prefer:  [Use arrows to move, space to select, <left> to none, type to filter]")
+				// Select the first option "green"
+				c.Send(" ")
+
+				// attempt to select all (this shouldn't do anything)
+				c.Send(string(terminal.KeyArrowRight))
+
+				// end the session
+				c.SendLine("")
+				c.ExpectEOF()
+			},
+			[]core.OptionAnswer{ // we should only have one option selected, not all of them
+				{Value: "green", Index: 0},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			RunPromptTestRemoveSelectAll(t, test)
+		})
+	}
+}
+
+func TestMultiSelectPromptRemoveSelectNone(t *testing.T) {
+	tests := []PromptTest{
+		{
+			"multi select with remove select none option",
+			&MultiSelect{
+				Message: "What color do you prefer:",
+				Options: []string{"green", "red", "light-green", "blue", "black", "yellow", "purple"},
+			},
+			func(c expectConsole) {
+				c.ExpectString("What color do you prefer:  [Use arrows to move, space to select, <right> to all, type to filter]")
+				// Select the first option "green"
+				c.Send(" ")
+
+				// attempt to unselect all (this shouldn't do anything)
+				c.Send(string(terminal.KeyArrowLeft))
+
+				// end the session
+				c.SendLine("")
+				c.ExpectEOF()
+			},
+			[]core.OptionAnswer{ // we should only have one option selected, not all of them
+				{Value: "green", Index: 0},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			RunPromptTestRemoveSelectNone(t, test)
 		})
 	}
 }

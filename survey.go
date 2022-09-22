@@ -56,9 +56,11 @@ func defaultAskOptions() *AskOptions {
 				// include this option if it matches
 				return strings.Contains(strings.ToLower(value), filter)
 			},
-			KeepFilter:    false,
-			ShowCursor:    false,
-			HideCharacter: '*',
+			KeepFilter:       false,
+			ShowCursor:       false,
+			RemoveSelectAll:  false,
+			RemoveSelectNone: false,
+			HideCharacter:    '*',
 		},
 	}
 }
@@ -112,14 +114,16 @@ type Question struct {
 
 // PromptConfig holds the global configuration for a prompt
 type PromptConfig struct {
-	PageSize      int
-	Icons         IconSet
-	HelpInput     string
-	SuggestInput  string
-	Filter        func(filter string, option string, index int) bool
-	KeepFilter    bool
-	ShowCursor    bool
-	HideCharacter rune
+	PageSize         int
+	Icons            IconSet
+	HelpInput        string
+	SuggestInput     string
+	Filter           func(filter string, option string, index int) bool
+	KeepFilter       bool
+	ShowCursor       bool
+	RemoveSelectAll  bool
+	RemoveSelectNone bool
+	HideCharacter    rune
 }
 
 // Prompt is the primary interface for the objects that can take user input
@@ -173,6 +177,22 @@ func WithKeepFilter(KeepFilter bool) AskOpt {
 		options.PromptConfig.KeepFilter = KeepFilter
 
 		// nothing went wrong
+		return nil
+	}
+}
+
+// WithRemoveSelectAll remove the select all option in Multiselect
+func WithRemoveSelectAll() AskOpt {
+	return func(options *AskOptions) error {
+		options.PromptConfig.RemoveSelectAll = true
+		return nil
+	}
+}
+
+// WithRemoveSelectNone remove the select none/unselect all in Multiselect
+func WithRemoveSelectNone() AskOpt {
+	return func(options *AskOptions) error {
+		options.PromptConfig.RemoveSelectNone = true
 		return nil
 	}
 }
