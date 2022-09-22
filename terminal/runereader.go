@@ -384,3 +384,12 @@ func runeWidth(r rune) int {
 	}
 	return 1
 }
+
+func StringWidth(str string) int {
+	w := 0
+	rs := []rune(str)
+	for _, r := range rs {
+		w += runeWidth(r)
+	}
+	return w
+}
