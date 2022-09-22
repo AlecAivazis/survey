@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/AlecAivazis/survey/v2"
-	"github.com/AlecAivazis/survey/v2/tests/util"
+	TestUtil "github.com/AlecAivazis/survey/v2/tests/util"
 )
 
 var val = ""
@@ -23,6 +23,8 @@ var table = []TestUtil.TestTableEntry{
 		"Delete and forward delete test at random location (test if screen overflows)", &survey.Input{Message: "Hello world"}, &val, nil,
 	}, {
 		"Moving around lines with left & right arrow keys", &survey.Input{Message: "Hello world"}, &val, nil,
+	}, {
+		"Runes with width > 1. Enter 一 you get to the next line", &survey.Input{Message: "Hello world"}, &val, nil,
 	},
 }
 
