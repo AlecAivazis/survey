@@ -1,7 +1,6 @@
 package terminal
 
 import (
-	"fmt"
 	"syscall"
 	"unsafe"
 )
