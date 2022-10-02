@@ -1,9 +1,15 @@
 package terminal
 
 import (
+	"bufio"
 	"bytes"
+	"fmt"
+	"os/exec"
+	"strings"
 	"syscall"
 	"unsafe"
+
+	"github.com/cli/safeexec"
 )
 
 var (
@@ -51,26 +57,83 @@ type keyEventRecord struct {
 
 type runeReaderState struct {
 	term uint32
+	err  error
+	// when sttyExe is set, we're controlling the terminal by shelling out to that instead of syscalls
+	sttyExe   string
+	sttyState string
+	reader    *bufio.Reader
+	buf       *bytes.Buffer
 }
 
 func newRuneReaderState(input FileReader) runeReaderState {
-	return runeReaderState{}
+	s := runeReaderState{}
+
+	r, _, err := getConsoleMode.Call(uintptr(input.Fd()), uintptr(unsafe.Pointer(&s.term)))
+	if r == 0 {
+		// This typically fails in mintty (used by Git Bash). As a fallback, detect if `stty` is available
+		// and use that to put the terminal into raw mode:
+		if stty, state, sttyErr := sttyGetState(input); sttyErr == nil {
+			s.sttyExe = stty
+			s.sttyState = state
+			s.buf = &bytes.Buffer{}
+			s.reader = bufio.NewReader(&BufferedReader{
+				In:     input,
+				Buffer: s.buf,
+			})
+		} else {
+			s.err = err
+		}
+	}
+
+	return s
+}
+
+func sttyGetState(input FileReader) (string, string, error) {
+	stty, err := safeexec.LookPath("stty")
+	if err != nil {
+		return "", "", err
+	}
+	c := exec.Command(stty, "-F", "/dev/tty", "-g")
+	c.Stdin = input
+	out, err := c.Output()
+	return stty, strings.TrimSpace(string(out)), err
+}
+
+func sttySetMode(input FileReader, stty string) error {
+	c := exec.Command(stty, "-F", "/dev/tty", "cbreak", "min", "1")
+	c.Stdin = input
+	if err := c.Run(); err != nil {
+		return err
+	}
+
+	c = exec.Command(stty, "-F", "/dev/tty", "-echo", "-isig", "-icanon")
+	c.Stdin = input
+	return c.Run()
+}
+
+func sttyRestore(input FileReader, stty string, state string) error {
+	c := exec.Command(stty, "-F", "/dev/tty", state)
+	c.Stdin = input
+	return c.Run()
 }
 
 func (rr *RuneReader) Buffer() *bytes.Buffer {
-	return nil
+	return rr.state.buf
 }
 
 func (rr *RuneReader) SetTermMode() error {
-	r, _, err := getConsoleMode.Call(uintptr(rr.stdio.In.Fd()), uintptr(unsafe.Pointer(&rr.state.term)))
-	// windows return 0 on error
-	if r == 0 {
-		return err
+	if rr.state.sttyExe != "" {
+		if err := sttySetMode(rr.stdio.In, rr.state.sttyExe); err != nil {
+			return fmt.Errorf("stty: %w", err)
+		}
+		return nil
+	} else if rr.state.err != nil {
+		return rr.state.err
 	}
 
 	newState := rr.state.term
 	newState &^= ENABLE_ECHO_INPUT | ENABLE_LINE_INPUT | ENABLE_PROCESSED_INPUT
-	r, _, err = setConsoleMode.Call(uintptr(rr.stdio.In.Fd()), uintptr(newState))
+	r, _, err := setConsoleMode.Call(uintptr(rr.stdio.In.Fd()), uintptr(newState))
 	// windows return 0 on error
 	if r == 0 {
 		return err
@@ -79,6 +142,13 @@ func (rr *RuneReader) SetTermMode() error {
 }
 
 func (rr *RuneReader) RestoreTermMode() error {
+	if rr.state.sttyExe != "" {
+		if err := sttyRestore(rr.stdio.In, rr.state.sttyExe, rr.state.sttyState); err != nil {
+			return fmt.Errorf("stty: %w", err)
+		}
+		return nil
+	}
+
 	r, _, err := setConsoleMode.Call(uintptr(rr.stdio.In.Fd()), uintptr(rr.state.term))
 	// windows return 0 on error
 	if r == 0 {
@@ -88,13 +158,17 @@ func (rr *RuneReader) RestoreTermMode() error {
 }
 
 func (rr *RuneReader) ReadRune() (rune, int, error) {
+	if rr.state.sttyExe != "" {
+		return readRunePosix(rr.state.reader, false)
+	}
+
 	ir := &inputRecord{}
 	bytesRead := 0
 	for {
 		rv, _, e := readConsoleInput.Call(rr.stdio.In.Fd(), uintptr(unsafe.Pointer(ir)), 1, uintptr(unsafe.Pointer(&bytesRead)))
 		// windows returns non-zero to indicate success
 		if rv == 0 && e != nil {
-			return 0, 0, e
+			return 0, 0, fmt.Errorf("readConsoleInput: %#v", e)
 		}
 
 		if ir.eventType != EVENT_KEY {
