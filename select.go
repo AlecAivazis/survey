@@ -280,7 +280,9 @@ func (s *Select) Prompt(config *PromptConfig) (interface{}, error) {
 	}
 
 	rr := s.NewRuneReader()
-	_ = rr.SetTermMode()
+	if err := rr.SetTermMode(); err != nil {
+		return "", fmt.Errorf("SetTermMode: %w", err)
+	}
 	defer func() {
 		_ = rr.RestoreTermMode()
 	}()

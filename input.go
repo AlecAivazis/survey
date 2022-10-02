@@ -2,6 +2,7 @@ package survey
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/AlecAivazis/survey/v2/core"
 	"github.com/AlecAivazis/survey/v2/terminal"
@@ -152,10 +153,13 @@ func (i *Input) Prompt(config *PromptConfig) (interface{}, error) {
 
 	// start reading runes from the standard in
 	rr := i.NewRuneReader()
-	_ = rr.SetTermMode()
+	if err := rr.SetTermMode(); err != nil {
+		return "", fmt.Errorf("SetTermMode: %w", err)
+	}
 	defer func() {
 		_ = rr.RestoreTermMode()
 	}()
+
 	cursor := i.NewCursor()
 	if !config.ShowCursor {
 		cursor.Hide()       // hide the cursor

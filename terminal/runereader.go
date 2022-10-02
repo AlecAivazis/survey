@@ -1,6 +1,7 @@
 package terminal
 
 import (
+	"bufio"
 	"fmt"
 	"unicode"
 
@@ -375,6 +376,76 @@ func (rr *RuneReader) ReadLineWithDefault(mask rune, d []rune, onRunes ...OnRune
 
 		}
 	}
+}
+
+const (
+	normalKeypad      = '['
+	applicationKeypad = 'O'
+)
+
+// readRunePOSIX parses escape sequences such as ESC [ A for arrow keys.
+//
+// See https://vt100.net/docs/vt102-ug/appendixc.html
+func readRunePOSIX(reader *bufio.Reader, discardNext bool) (rune, int, error) {
+	r, size, err := reader.ReadRune()
+	if err != nil {
+		return r, size, err
+	}
+
+	if r != KeyEscape {
+		return r, size, err
+	}
+
+	if reader.Buffered() == 0 {
+		// no more characters so must be `Esc` key
+		return KeyEscape, 1, nil
+	}
+
+	r, size, err = reader.ReadRune()
+	if err != nil {
+		return r, size, err
+	}
+
+	// ESC O ... or ESC [ ...?
+	if r != normalKeypad && r != applicationKeypad {
+		return r, size, fmt.Errorf("unexpected escape sequence from terminal: %q", []rune{KeyEscape, r})
+	}
+
+	keypad := r
+
+	r, size, err = reader.ReadRune()
+	if err != nil {
+		return r, size, err
+	}
+
+	switch r {
+	case 'A': // ESC [ A or ESC O A
+		return KeyArrowUp, 1, nil
+	case 'B': // ESC [ B or ESC O B
+		return KeyArrowDown, 1, nil
+	case 'C': // ESC [ C or ESC O C
+		return KeyArrowRight, 1, nil
+	case 'D': // ESC [ D or ESC O D
+		return KeyArrowLeft, 1, nil
+	case 'F': // ESC [ F or ESC O F
+		return SpecialKeyEnd, 1, nil
+	case 'H': // ESC [ H or ESC O H
+		return SpecialKeyHome, 1, nil
+	case '3': // ESC [ 3
+		if keypad == normalKeypad {
+			if discardNext {
+				// discard the following '~' key from buffer
+				_, _ = reader.Discard(1)
+			}
+			return SpecialKeyDelete, 1, nil
+		}
+	}
+
+	if discardNext {
+		// discard the following '~' key from buffer
+		_, _ = reader.Discard(1)
+	}
+	return IgnoreKey, 1, nil
 }
 
 func runeWidth(r rune) int {
