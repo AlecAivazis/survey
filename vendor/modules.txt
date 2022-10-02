@@ -1,5 +1,7 @@
 # github.com/Netflix/go-expect v0.0.0-20220104043353-73e0943537d2
 github.com/Netflix/go-expect
+# github.com/cli/safeexec v1.0.0
+github.com/cli/safeexec
 # github.com/creack/pty v1.1.17
 github.com/creack/pty
 # github.com/davecgh/go-spew v1.1.1
