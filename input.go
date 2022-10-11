@@ -200,8 +200,6 @@ func (i *Input) Prompt(config *PromptConfig) (interface{}, error) {
 
 	lineStr := i.answer
 
-	i.AppendRenderedText(lineStr)
-
 	// we're done
 	return lineStr, err
 }
