@@ -2,6 +2,7 @@ package survey
 
 import (
 	"reflect"
+	"strconv"
 	"strings"
 )
 
@@ -36,6 +37,22 @@ func TransformString(f func(s string) string) Transformer {
 		}
 
 		return f(s)
+	}
+}
+
+func TransformInteger() Transformer {
+	return func(ans interface{}) interface{} {
+		strValue, ok := ans.(string)
+		if !ok {
+			return 0
+		}
+
+		intValue, err := strconv.Atoi(strValue)
+		if err != nil {
+			return 0
+		}
+
+		return intValue
 	}
 }
 
