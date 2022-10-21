@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"regexp"
 
 	"github.com/AlecAivazis/survey/v2/core"
 )
@@ -94,6 +95,21 @@ func MinItems(numberItems int) Validator {
 			return fmt.Errorf("cannot impose the length on something other than a list of answers")
 		}
 		// the input is fine
+		return nil
+	}
+}
+
+// MatchRegexp requires that the string matches the specified regular expression.
+func MatchRegexp(pattern *regexp.Regexp) Validator {
+	return func(v interface{}) error {
+		if s, ok := v.(string); ok {
+			if !pattern.MatchString(s) {
+				return fmt.Errorf("value doesn't match regexp %q", pattern.String())
+			}
+		} else {
+			return fmt.Errorf("cannot match regexp on response of type %v", reflect.TypeOf(v).Name())
+		}
+
 		return nil
 	}
 }

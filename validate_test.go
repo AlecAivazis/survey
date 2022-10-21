@@ -2,6 +2,7 @@ package survey
 
 import (
 	"math/rand"
+	"regexp"
 	"testing"
 
 	"github.com/AlecAivazis/survey/v2/core"
@@ -163,6 +164,27 @@ func TestMaxLength_onInt(t *testing.T) {
 	// validate the string
 	if err := MaxLength(12)(1); err == nil {
 		t.Error("No error returned when enforcing length on int.")
+	}
+}
+
+func TestMatchRegex(t *testing.T) {
+	pattern := regexp.MustCompile(`^[a-z]+$`)
+	if err := MatchRegexp(pattern)("foo"); err != nil {
+		t.Errorf("Error returned on valid value: %v.", err)
+	}
+}
+
+func TestMatchRegex_invalid(t *testing.T) {
+	pattern := regexp.MustCompile(`^\d+$`)
+	if err := MatchRegexp(pattern)("bar"); err == nil {
+		t.Error("No error returned on invalid value.")
+	}
+}
+
+func TestMatchRegex_onInt(t *testing.T) {
+	pattern := regexp.MustCompile(`^\d+$`)
+	if err := MatchRegexp(pattern)(42); err == nil {
+		t.Error("No error returned when matching regexp on int.")
 	}
 }
 
