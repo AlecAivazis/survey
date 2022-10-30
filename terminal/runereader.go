@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"unicode"
 
+	"github.com/acarl005/stripansi"
 	"golang.org/x/text/width"
 )
 
@@ -377,17 +378,24 @@ func (rr *RuneReader) ReadLineWithDefault(mask rune, d []rune, onRunes ...OnRune
 	}
 }
 
+// runeWidth returns the number of columns spanned by a rune when printed to the terminal
 func runeWidth(r rune) int {
 	switch width.LookupRune(r).Kind() {
 	case width.EastAsianWide, width.EastAsianFullwidth:
 		return 2
 	}
+
+	if !unicode.IsPrint(r) {
+		return 0
+	}
 	return 1
 }
 
+// StringWidth returns the visible width of a string when printed to the terminal
 func StringWidth(str string) int {
 	w := 0
-	rs := []rune(str)
+	cleanedStr := stripansi.Strip(str)
+	rs := []rune(cleanedStr)
 	for _, r := range rs {
 		w += runeWidth(r)
 	}
