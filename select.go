@@ -29,6 +29,7 @@ type Select struct {
 	VimMode       bool
 	FilterMessage string
 	Filter        func(filter string, value string, index int) bool
+	HideFilter    bool
 	Description   func(value string, index int) string
 	filter        string
 	selectedIndex int
@@ -43,6 +44,7 @@ type SelectTemplateData struct {
 	Answer        string
 	ShowAnswer    bool
 	ShowHelp      bool
+	HideFilter    bool
 	Description   func(value string, index int) string
 	Config        *PromptConfig
 
@@ -74,10 +76,10 @@ var SelectQuestionTemplate = `
 {{end}}
 {{- if .ShowHelp }}{{- color .Config.Icons.Help.Format }}{{ .Config.Icons.Help.Text }} {{ .Help }}{{color "reset"}}{{"\n"}}{{end}}
 {{- color .Config.Icons.Question.Format }}{{ .Config.Icons.Question.Text }} {{color "reset"}}
-{{- color "default+hb"}}{{ .Message }}{{ .FilterMessage }}{{color "reset"}}
+{{- color "default+hb"}}{{ .Message }}{{- if not .HideFilter }}{{ .FilterMessage }}{{end}}{{color "reset"}}
 {{- if .ShowAnswer}}{{color "cyan"}} {{.Answer}}{{color "reset"}}{{"\n"}}
 {{- else}}
-  {{- "  "}}{{- color "cyan"}}[Use arrows to move, type to filter{{- if and .Help (not .ShowHelp)}}, {{ .Config.HelpInput }} for more help{{end}}]{{color "reset"}}
+  {{- "  "}}{{- color "cyan"}}[Use arrows to move{{- if not .HideFilter }}, type to filter{{end}}{{- if and .Help (not .ShowHelp)}}, {{ .Config.HelpInput }} for more help{{end}}]{{color "reset"}}
   {{- "\n"}}
   {{- range $ix, $option := .PageEntries}}
     {{- template "option" $.IterateOption $ix $option}}
@@ -140,7 +142,7 @@ func (s *Select) OnChange(key rune, config *PromptConfig) bool {
 			s.filter = string(runeFilter[0 : len(runeFilter)-1])
 			// we removed the last value in the filter
 		}
-	} else if key >= terminal.KeySpace {
+	} else if key >= terminal.KeySpace && !s.HideFilter { // todo config
 		s.filter += string(key)
 		// make sure vim mode is disabled
 		s.VimMode = false
@@ -175,6 +177,7 @@ func (s *Select) OnChange(key rune, config *PromptConfig) bool {
 		Select:        *s,
 		SelectedIndex: idx,
 		ShowHelp:      s.showingHelp,
+		HideFilter:    s.HideFilter,
 		Description:   s.Description,
 		PageEntries:   opts,
 		Config:        config,
@@ -267,8 +270,9 @@ func (s *Select) Prompt(config *PromptConfig) (interface{}, error) {
 	tmplData := SelectTemplateData{
 		Select:        *s,
 		SelectedIndex: idx,
-		Description:   s.Description,
 		ShowHelp:      s.showingHelp,
+		HideFilter:    s.HideFilter,
+		Description:   s.Description,
 		PageEntries:   opts,
 		Config:        config,
 	}
