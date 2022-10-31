@@ -770,6 +770,33 @@ func TestMultiSelectPromptHideFilter(t *testing.T) {
 				{Value: "yellow", Index: 3},
 			},
 		},
+		{
+			"verify that help text is shown when requested, even if the filter is hidden",
+			&MultiSelect{
+				Message:    "What color do you prefer:",
+				Options:    []string{"green", "red", "blue", "yellow"},
+				Help:       "We all have a favorite :)",
+				HideFilter: true,
+			},
+			func(c expectConsole) {
+				c.ExpectString("What color do you prefer:  [Use arrows to move, space to select, <right> to all, <left> to none, ? for more help]")
+				// Display help message
+				c.Send("?")
+				c.ExpectString("We all have a favorite :)")
+				// Select "green"
+				c.Send(" ")
+				// Select "blue"
+				c.Send(string(terminal.KeyArrowDown))
+				c.Send(string(terminal.KeyArrowDown))
+				c.Send(" ")
+				c.SendLine("")
+				c.ExpectEOF()
+			},
+			[]core.OptionAnswer{
+				{Value: "green", Index: 0},
+				{Value: "blue", Index: 2},
+			},
+		},
 	}
 
 	for _, test := range tests {

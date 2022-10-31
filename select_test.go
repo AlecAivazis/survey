@@ -433,6 +433,28 @@ func TestSelectPromptHideFilter(t *testing.T) {
 				Value: "blue", Index: 2,
 			},
 		},
+		{
+			"verify that help text is shown when requested, even if the filter is hidden",
+			&Select{
+				Message:    "What color do you prefer:",
+				Options:    []string{"green", "red", "blue"},
+				Help:       "We all have a favorite :)",
+				HideFilter: true,
+			},
+			func(c expectConsole) {
+				c.ExpectString("What color do you prefer:  [Use arrows to move, ? for more help]")
+				// Display help message
+				c.Send("?")
+				c.ExpectString("We all have a favorite :)")
+				// Select "green"
+				c.Send(" ")
+				c.SendLine("")
+				c.ExpectEOF()
+			},
+			core.OptionAnswer{
+				Value: "green", Index: 0,
+			},
+		},
 	}
 
 	for _, test := range tests {
