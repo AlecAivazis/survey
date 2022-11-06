@@ -397,7 +397,7 @@ func isAnsiMarker(r rune) bool {
 
 // isAnsiTerminator returns if a rune denotes the end of an ANSI sequence
 func isAnsiTerminator(r rune) bool {
-	return (r >= 0x40 && r <= 0x5a) || (r >= 0x61 && r <= 0x7a)
+	return (r >= 0x40 && r <= 0x5a) || (r == 0x5e) || (r >= 0x60 && r <= 0x7e)
 }
 
 // StringWidth returns the visible width of a string when printed to the terminal
