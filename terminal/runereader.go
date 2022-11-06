@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"unicode"
 
-	"github.com/acarl005/stripansi"
 	"golang.org/x/text/width"
 )
 
@@ -391,13 +390,29 @@ func runeWidth(r rune) int {
 	return 1
 }
 
+// isAnsiMarker returns if a rune denotes the start of an ANSI sequence
+func isAnsiMarker(r rune) bool {
+	return r == '\x1B'
+}
+
+// isAnsiTerminator returns if a rune denotes the end of an ANSI sequence
+func isAnsiTerminator(r rune) bool {
+	return (r >= 0x40 && r <= 0x5a) || (r >= 0x61 && r <= 0x7a)
+}
+
 // StringWidth returns the visible width of a string when printed to the terminal
 func StringWidth(str string) int {
 	w := 0
-	cleanedStr := stripansi.Strip(str)
-	rs := []rune(cleanedStr)
+	ansi := false
+
+	rs := []rune(str)
 	for _, r := range rs {
-		w += runeWidth(r)
+		// increase width only when outside of ANSI escape sequences
+		if ansi || isAnsiMarker(r) {
+			ansi = !isAnsiTerminator(r)
+		} else {
+			w += runeWidth(r)
+		}
 	}
 	return w
 }

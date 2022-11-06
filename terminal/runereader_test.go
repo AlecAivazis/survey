@@ -56,4 +56,11 @@ func TestStringWidthFormat(t *testing.T) {
 	if actual != expected {
 		t.Errorf("Expected '%s' to have width %d, found %d", example, expected, actual)
 	}
+
+	example = "\033[1;34mbold\033[21mblue\033[0m"
+	expected = 8
+	actual = StringWidth(example)
+	if actual != expected {
+		t.Errorf("Expected '%s' to have width %d, found %d", example, expected, actual)
+	}
 }
