@@ -11,7 +11,7 @@ package main
 
 import (
     "fmt"
-    "github.com/AlecAivazis/survey/v2"
+    "github.com/go-survey/survey/v2"
 )
 
 // the questions to ask
@@ -363,7 +363,7 @@ By default, users can select all of the multi-select options using the right arr
 
 ```golang
 import (
-    "github.com/AlecAivazis/survey/v2"
+    "github.com/go-survey/survey/v2"
 )
 
 number := ""
@@ -378,7 +378,7 @@ Also by default, users can use the left arrow key to unselect all of the options
 
 ```golang
 import (
-    "github.com/AlecAivazis/survey/v2"
+    "github.com/go-survey/survey/v2"
 )
 
 number := ""
@@ -397,7 +397,7 @@ looks for with `WithHelpInput`:
 
 ```golang
 import (
-    "github.com/AlecAivazis/survey/v2"
+    "github.com/go-survey/survey/v2"
 )
 
 number := ""
@@ -416,7 +416,7 @@ follows the patterns outlined [here](https://github.com/mgutz/ansi#style-format)
 
 ```golang
 import (
-    "github.com/AlecAivazis/survey/v2"
+    "github.com/go-survey/survey/v2"
 )
 
 number := ""
