@@ -127,14 +127,14 @@ func (i *Input) onRune(config *PromptConfig) terminal.OnRuneFn {
 		)
 
 		if err == nil {
-			err = readLineAgain
+			err = errReadLineAgain
 		}
 
 		return []rune(i.typedAnswer), true, err
 	})
 }
 
-var readLineAgain = errors.New("read line again")
+var errReadLineAgain = errors.New("read line again")
 
 func (i *Input) Prompt(config *PromptConfig) (interface{}, error) {
 	// render the template
@@ -170,7 +170,7 @@ func (i *Input) Prompt(config *PromptConfig) (interface{}, error) {
 		}
 
 		line, err = rr.ReadLineWithDefault(0, line, i.onRune(config))
-		if err == readLineAgain {
+		if err == errReadLineAgain {
 			continue
 		}
 
