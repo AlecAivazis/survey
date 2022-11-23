@@ -301,6 +301,7 @@ func copy(t reflect.Value, v reflect.Value) (err error) {
 		case reflect.Float64:
 			castVal, casterr = strconv.ParseFloat(vString, 64)
 		default:
+			//lint:ignore ST1005 allow this error message to be capitalized
 			return fmt.Errorf("Unable to convert from string to type %s", t.Kind())
 		}
 
@@ -335,6 +336,7 @@ func copy(t reflect.Value, v reflect.Value) (err error) {
 		}
 
 		// we're copying an option answer to an incorrect type
+		//lint:ignore ST1005 allow this error message to be capitalized
 		return fmt.Errorf("Unable to convert from OptionAnswer to type %s", t.Kind())
 	}
 
