@@ -3,7 +3,9 @@ package survey
 import (
 	"bytes"
 	"fmt"
+
 	"github.com/AlecAivazis/survey/v2/core"
+	"github.com/AlecAivazis/survey/v2/log"
 	"github.com/AlecAivazis/survey/v2/terminal"
 	"golang.org/x/term"
 )
@@ -120,6 +122,7 @@ func (r *Renderer) RenderWithCursorOffset(tmpl string, data IterableOpts, opts [
 // which is used to track what has been printed. It is not exported
 // as errors should only be displayed via Error(config, error).
 func (r *Renderer) appendRenderedError(text string) {
+	log.Printf("appendRenderedError: %q", text)
 	r.renderedErrors.WriteString(text)
 }
 
@@ -127,6 +130,7 @@ func (r *Renderer) appendRenderedError(text string) {
 // which is used to track of what has been printed. The buffer is used
 // to calculate how many lines to erase before updating the prompt.
 func (r *Renderer) AppendRenderedText(text string) {
+	log.Printf("AppendRenderedText: %q", text)
 	r.renderedText.WriteString(text)
 }
 
@@ -134,9 +138,11 @@ func (r *Renderer) resetPrompt(lines int) {
 	// clean out current line in case tmpl didnt end in newline
 	cursor := r.NewCursor()
 	cursor.HorizontalAbsolute(0)
+	log.Print("resetPrompt: erasing current line")
 	terminal.EraseLine(r.stdio.Out, terminal.ERASE_LINE_ALL)
 	// clean up what we left behind last time
 	for i := 0; i < lines; i++ {
+		log.Print("resetPrompt: moving one line up and erasing line")
 		cursor.PreviousLine(1)
 		terminal.EraseLine(r.stdio.Out, terminal.ERASE_LINE_ALL)
 	}
