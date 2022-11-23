@@ -142,12 +142,12 @@ func (err errFieldNotMatch) Is(target error) bool { // implements the dynamic er
 // It returns the Question.Name that couldn't be matched with a destination field.
 //
 // Usage:
-// err := survey.Ask(qs, &v);
-// if err != nil {
-// 	if name, ok := core.IsFieldNotMatch(err); ok {
-//		[...name is the not matched question name]
-// 	}
-// }
+//
+//	if err := survey.Ask(qs, &v); err != nil {
+//		if name, ok := core.IsFieldNotMatch(err); ok {
+//			// name is the question name that did not match a field
+//		}
+//	}
 func IsFieldNotMatch(err error) (string, bool) {
 	if err != nil {
 		if v, ok := err.(errFieldNotMatch); ok {
