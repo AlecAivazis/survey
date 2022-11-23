@@ -405,8 +405,7 @@ func StringWidth(str string) int {
 	w := 0
 	ansi := false
 
-	rs := []rune(str)
-	for _, r := range rs {
+	for _, r := range str {
 		// increase width only when outside of ANSI escape sequences
 		if ansi || isAnsiMarker(r) {
 			ansi = !isAnsiTerminator(r)
