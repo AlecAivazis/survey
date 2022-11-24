@@ -3,6 +3,7 @@ package log
 import (
 	"log"
 	"os"
+	"strings"
 )
 
 func init() {
@@ -11,6 +12,7 @@ func init() {
 		panic(err)
 	}
 	log.SetOutput(w)
+	log.Print(strings.Repeat("=", 80))
 }
 
 func Print(s string) {

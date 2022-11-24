@@ -60,6 +60,7 @@ func (r *Renderer) Error(config *PromptConfig, invalid error) error {
 		return err
 	}
 
+	log.Printf("Error() %q", userOut)
 	// send the message to the user
 	if _, err := fmt.Fprint(terminal.NewAnsiStdout(r.stdio.Out), userOut); err != nil {
 		return err
@@ -91,6 +92,7 @@ func (r *Renderer) Render(tmpl string, data interface{}) error {
 		return err
 	}
 
+	log.Printf("Render() %q", userOut)
 	// print the summary
 	if _, err := fmt.Fprint(terminal.NewAnsiStdout(r.stdio.Out), userOut); err != nil {
 		return err
