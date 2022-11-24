@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/AlecAivazis/survey/v2/core"
-	"github.com/AlecAivazis/survey/v2/terminal"
 )
 
 /*
@@ -48,7 +47,7 @@ func (p *Password) Prompt(config *PromptConfig) (interface{}, error) {
 		return "", err
 	}
 
-	if _, err := fmt.Fprint(terminal.NewAnsiStdout(p.Stdio().Out), userOut); err != nil {
+	if _, err := fmt.Fprint(p.Stdio().Out, userOut); err != nil {
 		return "", err
 	}
 

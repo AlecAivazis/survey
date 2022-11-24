@@ -10,16 +10,12 @@ import (
 
 	"github.com/AlecAivazis/survey/v2/core"
 	"github.com/AlecAivazis/survey/v2/terminal"
+	"github.com/mattn/go-colorable"
 )
 
 // DefaultAskOptions is the default options on ask, using the OS stdio.
 func defaultAskOptions() *AskOptions {
 	return &AskOptions{
-		Stdio: terminal.Stdio{
-			In:  os.Stdin,
-			Out: os.Stdout,
-			Err: os.Stderr,
-		},
 		PromptConfig: PromptConfig{
 			PageSize:     7,
 			HelpInput:    "?",
@@ -154,7 +150,7 @@ type AskOptions struct {
 func WithStdio(in terminal.FileReader, out terminal.FileWriter, err io.Writer) AskOpt {
 	return func(options *AskOptions) error {
 		options.Stdio.In = in
-		options.Stdio.Out = out
+		options.Stdio.Out = colorableOut(out)
 		options.Stdio.Err = err
 		return nil
 	}
@@ -323,6 +319,17 @@ func Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
 		}
 	}
 
+	// fallback values in case [WithStdio] was not used
+	if options.Stdio.In == nil {
+		options.Stdio.In = os.Stdin
+	}
+	if options.Stdio.Out == nil {
+		options.Stdio.Out = colorableOut(os.Stdout)
+	}
+	if options.Stdio.Err == nil {
+		options.Stdio.Err = os.Stderr
+	}
+
 	// if we weren't passed a place to record the answers
 	if response == nil {
 		// we can't go any further
@@ -471,4 +478,35 @@ func computeCursorOffset(tmpl string, data IterableOpts, opts []core.OptionAnswe
 	}
 
 	return offset
+}
+
+// colorableOut transforms a file writer into one where it is safe to write ANSI escape codes to.
+func colorableOut(w terminal.FileWriter) terminal.FileWriter {
+	if f, ok := w.(*os.File); ok {
+		out := colorable.NewColorable(f)
+		if f, ok := out.(*os.File); ok {
+			// Most cases will end up here: the writer is either
+			// 1. the original os.Stdout; or
+			// 2. the original os.Stdout with virtual terminal processing enabled on Windows.
+			return f
+		}
+		// If we have reached this point, the resulting writer is a Windows-specific writer that
+		// converts ANSI escape codes to Console API calls, and we need to wrap it in an extra
+		// type to preserve the original file descriptor.
+		return &writerWithFd{
+			Writer: out,
+			orig:   f,
+		}
+	}
+	return w
+}
+
+// writerWithFd implements a [terminal.FileWriter]
+type writerWithFd struct {
+	io.Writer
+	orig *os.File
+}
+
+func (w writerWithFd) Fd() uintptr {
+	return w.orig.Fd()
 }
