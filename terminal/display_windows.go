@@ -4,7 +4,7 @@ import (
 	"syscall"
 	"unsafe"
 
-	"github.com/AlecAivazis/survey/v2/log"
+	"github.com/AlecAivazis/survey/v2/internal/log"
 )
 
 func EraseLine(out FileWriter, mode EraseLineMode) error {

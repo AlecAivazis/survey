@@ -9,7 +9,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/AlecAivazis/survey/v2/core"
-	"github.com/AlecAivazis/survey/v2/log"
+	"github.com/AlecAivazis/survey/v2/internal/log"
 	"github.com/AlecAivazis/survey/v2/terminal"
 )
 

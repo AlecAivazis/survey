@@ -6,7 +6,7 @@ import (
 	"syscall"
 	"unsafe"
 
-	"github.com/AlecAivazis/survey/v2/log"
+	"github.com/AlecAivazis/survey/v2/internal/log"
 )
 
 var COORDINATE_SYSTEM_BEGIN Short = 0
