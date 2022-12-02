@@ -2,6 +2,7 @@ package core
 
 import (
 	"bytes"
+	"os"
 	"sync"
 	"text/template"
 
@@ -74,7 +75,7 @@ func GetTemplatePair(tmpl string) ([2]*template.Template, error) {
 
 	templatePair[1] = templateNoColor
 
-	if DisableColor {
+	if DisableColor || os.Getenv("NO_COLOR") != "" {
 		templatePair[0] = templatePair[1]
 	} else {
 		templateWithColor, err := template.New("prompt").Funcs(TemplateFuncsWithColor).Parse(tmpl)
