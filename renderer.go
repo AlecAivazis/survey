@@ -42,14 +42,7 @@ func (r *Renderer) NewCursor() *terminal.Cursor {
 }
 
 func (r *Renderer) Error(config *PromptConfig, invalid error) error {
-	// cleanup the currently rendered errors
-	r.resetPrompt(r.countLines(r.renderedErrors))
-	r.renderedErrors.Reset()
-
-	// cleanup the rest of the prompt
-	r.resetPrompt(r.countLines(r.renderedText))
-	r.renderedText.Reset()
-
+	// create a formatted and plain error template with data
 	userOut, layoutOut, err := core.RunTemplate(ErrorTemplate, &ErrorTemplateData{
 		Error: invalid,
 		Icon:  config.Icons.Error,
@@ -58,7 +51,14 @@ func (r *Renderer) Error(config *PromptConfig, invalid error) error {
 		return err
 	}
 
-	// send the message to the user
+	// erase the currently rendered error and prompt
+	r.resetPrompt(r.countLines(r.renderedErrors))
+	r.renderedErrors.Reset()
+
+	r.resetPrompt(r.countLines(r.renderedText))
+	r.renderedText.Reset()
+
+	// print the formatted prompt
 	if _, err := fmt.Fprint(terminal.NewAnsiStdout(r.stdio.Out), userOut); err != nil {
 		return err
 	}
@@ -78,18 +78,17 @@ func (r *Renderer) OffsetCursor(offset int) {
 }
 
 func (r *Renderer) Render(tmpl string, data interface{}) error {
-	// cleanup the currently rendered text
-	lineCount := r.countLines(r.renderedText)
-	r.resetPrompt(lineCount)
-	r.renderedText.Reset()
-
-	// render the template summarizing the current state
+	// create a formatted and plain template with data
 	userOut, layoutOut, err := core.RunTemplate(tmpl, data)
 	if err != nil {
 		return err
 	}
 
-	// print the summary
+	// erase the currently rendered prompt
+	r.resetPrompt(r.countLines(r.renderedText))
+	r.renderedText.Reset()
+
+	// print the formatted prompt
 	if _, err := fmt.Fprint(terminal.NewAnsiStdout(r.stdio.Out), userOut); err != nil {
 		return err
 	}
