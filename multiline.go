@@ -2,8 +2,6 @@ package survey
 
 import (
 	"strings"
-
-	"github.com/AlecAivazis/survey/v2/terminal"
 )
 
 type Multiline struct {
@@ -28,12 +26,12 @@ var MultilineQuestionTemplate = `
 {{- color .Config.Icons.Question.Format }}{{ .Config.Icons.Question.Text }} {{color "reset"}}
 {{- color "default+hb"}}{{ .Message }} {{color "reset"}}
 {{- if .ShowAnswer}}
-  {{- "\n"}}{{color "cyan"}}{{.Answer}}{{color "reset"}}
-  {{- if .Answer }}{{ "\n" }}{{ end }}
+  {{- if .Answer}}{{"\n"}}{{color "cyan"}}{{.Answer}}{{color "reset"}}{{end}}
 {{- else }}
   {{- if .Default}}{{color "white"}}({{.Default}}) {{color "reset"}}{{end}}
   {{- color "cyan"}}[Enter 2 empty lines to finish]{{color "reset"}}
-{{- end}}`
+{{- end}}
+`
 
 func (i *Multiline) Prompt(config *PromptConfig) (interface{}, error) {
 	// render the template
@@ -70,13 +68,6 @@ func (i *Multiline) Prompt(config *PromptConfig) (interface{}, error) {
 
 		if string(line) == "" {
 			if emptyOnce {
-				numLines := len(multiline) + 2
-				cursor.PreviousLine(numLines)
-				for j := 0; j < numLines; j++ {
-					terminal.EraseLine(i.Stdio().Out, terminal.ERASE_LINE_ALL)
-					cursor.NextLine(1)
-				}
-				cursor.PreviousLine(numLines)
 				break
 			}
 			emptyOnce = true
@@ -85,6 +76,15 @@ func (i *Multiline) Prompt(config *PromptConfig) (interface{}, error) {
 		}
 		multiline = append(multiline, string(line))
 	}
+
+	// position the cursor on last line of input
+	cursorPadding := 3
+
+	// ignore the empty line in an empty answer
+	if len(multiline) == 1 && multiline[0] == "" {
+		cursorPadding = 2
+	}
+	cursor.PreviousLine(cursorPadding)
 
 	// remove the trailing newline
 	multiline = multiline[:len(multiline)-1]
