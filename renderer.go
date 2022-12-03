@@ -129,16 +129,11 @@ func (r *Renderer) AppendRenderedText(text string) {
 	r.renderedText.WriteString(text)
 }
 
+// resetPrompt clears the previous lines of the past prompt
 func (r *Renderer) resetPrompt(lines int) {
-	// clean out current line in case tmpl didnt end in newline
 	cursor := r.NewCursor()
-	cursor.HorizontalAbsolute(0)
-	terminal.EraseLine(r.stdio.Out, terminal.ERASE_LINE_ALL)
-	// clean up what we left behind last time
-	for i := 0; i < lines; i++ {
-		cursor.PreviousLine(1)
-		terminal.EraseLine(r.stdio.Out, terminal.ERASE_LINE_ALL)
-	}
+	cursor.PreviousLine(lines)
+	terminal.EraseScreen(r.stdio.Out, terminal.ERASE_SCREEN_END)
 }
 
 func (r *Renderer) termWidth() (int, error) {
