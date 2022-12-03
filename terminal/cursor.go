@@ -47,18 +47,24 @@ func (c *Cursor) Back(n int) error {
 
 // NextLine moves cursor to beginning of the line n lines down.
 func (c *Cursor) NextLine(n int) error {
-	if err := c.Down(1); err != nil {
+	if err := c.HorizontalAbsolute(0); err != nil {
 		return err
 	}
-	return c.HorizontalAbsolute(0)
+	if n == 0 {
+		return nil
+	}
+	return c.Down(n)
 }
 
 // PreviousLine moves cursor to beginning of the line n lines up.
 func (c *Cursor) PreviousLine(n int) error {
-	if err := c.Up(1); err != nil {
+	if err := c.HorizontalAbsolute(0); err != nil {
 		return err
 	}
-	return c.HorizontalAbsolute(0)
+	if n == 0 {
+		return nil
+	}
+	return c.Up(n)
 }
 
 // HorizontalAbsolute moves cursor horizontally to x.
