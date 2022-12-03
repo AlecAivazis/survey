@@ -86,12 +86,12 @@ func (i *Multiline) Prompt(config *PromptConfig) (interface{}, error) {
 		multiline = append(multiline, string(line))
 	}
 
+	// remove the trailing newline
+	multiline = multiline[:len(multiline)-1]
 	val := strings.Join(multiline, "\n")
-	val = strings.TrimSpace(val)
 
-	// if the line is empty
+	// use the default value if the line is empty
 	if len(val) == 0 {
-		// use the default value
 		return i.Default, err
 	}
 
