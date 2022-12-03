@@ -160,8 +160,7 @@ func (r *Renderer) termWidthSafe() int {
 // countLines will return the count of `\n` with the addition of any
 // lines that have wrapped due to narrow terminal width
 func (r *Renderer) countLines(buf bytes.Buffer) int {
-	w := r.termWidthSafe()
-
+	termWidth := r.termWidthSafe()
 	bufBytes := buf.Bytes()
 
 	count := 0
@@ -178,10 +177,11 @@ func (r *Renderer) countLines(buf bytes.Buffer) int {
 		}
 
 		str := string(bufBytes[curr:delim])
-		if lineWidth := terminal.StringWidth(str); lineWidth > w {
+		lineWidth := terminal.StringWidth(str)
+		if lineWidth > termWidth {
 			// account for word wrapping
-			count += lineWidth / w
-			if (lineWidth % w) == 0 {
+			count += lineWidth / termWidth
+			if (lineWidth % termWidth) == 0 {
 				// content whose width is exactly a multiplier of available width should not
 				// count as having wrapped on the last line
 				count -= 1
