@@ -77,26 +77,19 @@ func (i *Multiline) Prompt(config *PromptConfig) (interface{}, error) {
 		multiline = append(multiline, string(line))
 	}
 
-	// position the cursor on last line of input
-	cursorPadding := 3
+	// adjust for terminating newlines
+	cursor.PreviousLine(2)
 
-	// ignore the empty line in an empty answer
-	if len(multiline) == 1 && multiline[0] == "" {
-		cursorPadding = 2
-	}
-	cursor.PreviousLine(cursorPadding)
-
-	// remove the trailing newline
-	multiline = multiline[:len(multiline)-1]
+	// render the displayed value or use the default
 	val := strings.Join(multiline, "\n")
-
-	// use the default value if the line is empty
 	if len(val) == 0 {
 		return i.Default, err
 	}
-
 	i.AppendRenderedText(val)
-	return val, err
+
+	// remove the extra newline from the answer
+	ans := strings.TrimSuffix(val, "\n")
+	return ans, err
 }
 
 func (i *Multiline) Cleanup(config *PromptConfig, val interface{}) error {
