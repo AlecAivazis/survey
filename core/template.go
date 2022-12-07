@@ -24,6 +24,17 @@ var TemplateFuncsNoColor = map[string]interface{}{
 	},
 }
 
+// envColorDisabled returns if output colors are forbid by environment variables
+func envColorDisabled() bool {
+	return os.Getenv("NO_COLOR") != "" || os.Getenv("CLICOLOR") == "0"
+}
+
+// envColorForced returns if output colors are forced from environment variables
+func envColorForced() bool {
+	val, ok := os.LookupEnv("CLICOLOR_FORCE")
+	return ok && val != "0"
+}
+
 // RunTemplate returns two formatted strings given a template and
 // the data it requires. The first string returned is generated for
 // user-facing output and may or may not contain ANSI escape codes
@@ -75,7 +86,8 @@ func GetTemplatePair(tmpl string) ([2]*template.Template, error) {
 
 	templatePair[1] = templateNoColor
 
-	if DisableColor || os.Getenv("NO_COLOR") != "" {
+	envColorHide := envColorDisabled() && !envColorForced()
+	if DisableColor || envColorHide {
 		templatePair[0] = templatePair[1]
 	} else {
 		templateWithColor, err := template.New("prompt").Funcs(TemplateFuncsWithColor).Parse(tmpl)
