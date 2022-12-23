@@ -39,9 +39,12 @@ func EraseScreen(out FileWriter, mode EraseScreenMode) error {
 	}
 
 	var w uint32
-	termSize := uint32(csbi.size.X) * uint32(csbi.size.Y)
 	cursor := csbi.cursorPosition
 
-	_, _, err := procFillConsoleOutputCharacter.Call(uintptr(handle), uintptr(' '), uintptr(termSize), uintptr(*(*int32)(unsafe.Pointer(&cursor))), uintptr(unsafe.Pointer(&w)))
-	return err
+	lineCount := csbi.window.bottom - csbi.cursorPosition.Y
+	termWidth := csbi.size.X
+	screenSize := lineCount * termWidth
+
+	_, _, err := procFillConsoleOutputCharacter.Call(uintptr(handle), uintptr(' '), uintptr(screenSize), uintptr(*(*int32)(unsafe.Pointer(&cursor))), uintptr(unsafe.Pointer(&w)))
+	return normalizeError(err)
 }
