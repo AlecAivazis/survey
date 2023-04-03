@@ -26,6 +26,10 @@ func (rr *RuneReader) printChar(char rune, mask rune) error {
 		_, err := fmt.Fprintf(rr.stdio.Out, "%c", char)
 		return err
 	}
+	// if the mask is a space, don't print anything
+	if mask == ' ' {
+		return nil
+	}
 	// otherwise print the mask we were given
 	_, err := fmt.Fprintf(rr.stdio.Out, "%c", mask)
 	return err
