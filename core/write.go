@@ -268,7 +268,7 @@ func copy(t reflect.Value, v reflect.Value) (err error) {
 			}
 		case reflect.Uint:
 			var val64 uint64
-			val64, casterr = strconv.ParseUint(vString, 10, 8)
+			val64, casterr = strconv.ParseUint(vString, 10, 0)
 			if casterr == nil {
 				castVal = uint(val64)
 			}
