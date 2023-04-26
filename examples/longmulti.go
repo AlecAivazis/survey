@@ -1,4 +1,5 @@
 //go:build ignore
+// +build ignore
 
 package main
 
@@ -6,7 +7,7 @@ import (
 	"fmt"
 	"strings"
 
-	survey "github.com/AlecAivazis/survey/v2"
+	survey "github.com/go-survey/survey/v2"
 )
 
 // the questions to ask

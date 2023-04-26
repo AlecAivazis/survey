@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/AlecAivazis/survey/v2/core"
-	"github.com/AlecAivazis/survey/v2/terminal"
+	"github.com/go-survey/survey/v2/core"
+	"github.com/go-survey/survey/v2/terminal"
 )
 
 /*

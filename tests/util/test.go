@@ -3,8 +3,6 @@ package TestUtil
 import (
 	"fmt"
 	"reflect"
-
-	"github.com/AlecAivazis/survey/v2"
 )
 
 type TestTableEntry struct {
