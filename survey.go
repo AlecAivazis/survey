@@ -256,7 +256,8 @@ func WithShowCursor(ShowCursor bool) AskOpt {
 	}
 }
 
-// WithHideCharacter sets the default character shown instead of the password for password inputs
+// WithHideCharacter sets the default character shown instead of the password for password inputs.
+// A space can be used to hide the password length by not printing anything.
 func WithHideCharacter(char rune) AskOpt {
 	return func(options *AskOptions) error {
 		// set the hide character
