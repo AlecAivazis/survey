@@ -4,7 +4,15 @@
 
 A library for building interactive and accessible prompts on terminals supporting ANSI escape sequences.
 
+⚠️ This project is no longer maintained. For an alternative, please check out: https://github.com/charmbracelet/bubbletea ⚠️
+
+Hey everyone! I finally came to terms with the fact that I can no longer dedicate enough time to keep this library alive. 
+This project outgrew my wildest expectations and was such a great experience. If someone else wants to take over maintainence,
+please reach out
+
+
 <img width="550" src="https://thumbs.gfycat.com/VillainousGraciousKouprey-size_restricted.gif"/>
+
 
 ```go
 package main
