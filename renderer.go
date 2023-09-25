@@ -42,14 +42,7 @@ func (r *Renderer) NewCursor() *terminal.Cursor {
 }
 
 func (r *Renderer) Error(config *PromptConfig, invalid error) error {
-	// cleanup the currently rendered errors
-	r.resetPrompt(r.countLines(r.renderedErrors))
-	r.renderedErrors.Reset()
-
-	// cleanup the rest of the prompt
-	r.resetPrompt(r.countLines(r.renderedText))
-	r.renderedText.Reset()
-
+	// create a formatted and plain error template with data
 	userOut, layoutOut, err := core.RunTemplate(ErrorTemplate, &ErrorTemplateData{
 		Error: invalid,
 		Icon:  config.Icons.Error,
@@ -58,7 +51,14 @@ func (r *Renderer) Error(config *PromptConfig, invalid error) error {
 		return err
 	}
 
-	// send the message to the user
+	// erase the currently rendered error and prompt
+	r.resetPrompt(r.countLines(r.renderedErrors))
+	r.renderedErrors.Reset()
+
+	r.resetPrompt(r.countLines(r.renderedText))
+	r.renderedText.Reset()
+
+	// print the formatted prompt
 	if _, err := fmt.Fprint(terminal.NewAnsiStdout(r.stdio.Out), userOut); err != nil {
 		return err
 	}
@@ -78,18 +78,17 @@ func (r *Renderer) OffsetCursor(offset int) {
 }
 
 func (r *Renderer) Render(tmpl string, data interface{}) error {
-	// cleanup the currently rendered text
-	lineCount := r.countLines(r.renderedText)
-	r.resetPrompt(lineCount)
-	r.renderedText.Reset()
-
-	// render the template summarizing the current state
+	// create a formatted and plain template with data
 	userOut, layoutOut, err := core.RunTemplate(tmpl, data)
 	if err != nil {
 		return err
 	}
 
-	// print the summary
+	// erase the currently rendered prompt
+	r.resetPrompt(r.countLines(r.renderedText))
+	r.renderedText.Reset()
+
+	// print the formatted prompt
 	if _, err := fmt.Fprint(terminal.NewAnsiStdout(r.stdio.Out), userOut); err != nil {
 		return err
 	}
@@ -130,16 +129,11 @@ func (r *Renderer) AppendRenderedText(text string) {
 	r.renderedText.WriteString(text)
 }
 
+// resetPrompt clears the previous lines of the past prompt
 func (r *Renderer) resetPrompt(lines int) {
-	// clean out current line in case tmpl didnt end in newline
 	cursor := r.NewCursor()
-	cursor.HorizontalAbsolute(0)
-	terminal.EraseLine(r.stdio.Out, terminal.ERASE_LINE_ALL)
-	// clean up what we left behind last time
-	for i := 0; i < lines; i++ {
-		cursor.PreviousLine(1)
-		terminal.EraseLine(r.stdio.Out, terminal.ERASE_LINE_ALL)
-	}
+	cursor.PreviousLine(lines)
+	terminal.EraseScreen(r.stdio.Out, terminal.ERASE_SCREEN_END)
 }
 
 func (r *Renderer) termWidth() (int, error) {
@@ -161,8 +155,7 @@ func (r *Renderer) termWidthSafe() int {
 // countLines will return the count of `\n` with the addition of any
 // lines that have wrapped due to narrow terminal width
 func (r *Renderer) countLines(buf bytes.Buffer) int {
-	w := r.termWidthSafe()
-
+	termWidth := r.termWidthSafe()
 	bufBytes := buf.Bytes()
 
 	count := 0
@@ -179,10 +172,11 @@ func (r *Renderer) countLines(buf bytes.Buffer) int {
 		}
 
 		str := string(bufBytes[curr:delim])
-		if lineWidth := terminal.StringWidth(str); lineWidth > w {
+		lineWidth := terminal.StringWidth(str)
+		if lineWidth > termWidth {
 			// account for word wrapping
-			count += lineWidth / w
-			if (lineWidth % w) == 0 {
+			count += lineWidth / termWidth
+			if (lineWidth % termWidth) == 0 {
 				// content whose width is exactly a multiplier of available width should not
 				// count as having wrapped on the last line
 				count -= 1
