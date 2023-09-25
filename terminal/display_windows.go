@@ -3,6 +3,8 @@ package terminal
 import (
 	"syscall"
 	"unsafe"
+
+	"github.com/AlecAivazis/survey/v2/internal/log"
 )
 
 func EraseLine(out FileWriter, mode EraseLineMode) error {
@@ -19,11 +21,14 @@ func EraseLine(out FileWriter, mode EraseLineMode) error {
 	switch mode {
 	case ERASE_LINE_END:
 		x = csbi.size.X
+		log.Printf("EraseLine() END: %d", x)
 	case ERASE_LINE_START:
 		x = 0
+		log.Printf("EraseLine() START: %d", x)
 	case ERASE_LINE_ALL:
 		cursor.X = 0
 		x = csbi.size.X
+		log.Printf("EraseLine() ALL: %d-%d", 0, x)
 	}
 
 	_, _, err := procFillConsoleOutputCharacter.Call(uintptr(handle), uintptr(' '), uintptr(x), uintptr(*(*int32)(unsafe.Pointer(&cursor))), uintptr(unsafe.Pointer(&w)))
