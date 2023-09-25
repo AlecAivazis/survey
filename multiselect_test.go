@@ -697,6 +697,115 @@ func TestMultiSelectPromptKeepFilter(t *testing.T) {
 	}
 }
 
+func TestMultiSelectPromptHideFilter(t *testing.T) {
+	tests := []PromptTest{
+		{
+			"attempt to filter and select end options when the filter is hidden",
+			&MultiSelect{
+				Message:    "What color do you prefer:",
+				Options:    []string{"green", "red", "blue", "yellow"},
+				HideFilter: true,
+			},
+			func(c expectConsole) {
+				c.ExpectString("What color do you prefer:  [Use arrows to move, space to select, <right> to all, <left> to none]")
+				// Attempt to filter "blue" and "yellow"
+				c.Send("l")
+				// Select "green"
+				c.Send(" ")
+				// Select "red"
+				c.Send(string(terminal.KeyArrowDown))
+				c.Send(" ")
+				c.SendLine("")
+				c.ExpectEOF()
+			},
+			[]core.OptionAnswer{
+				{Value: "green", Index: 0},
+				{Value: "red", Index: 1},
+			},
+		},
+		{
+			"filter and select end options when the filter is clearly not hidden",
+			&MultiSelect{
+				Message:    "What color do you prefer:",
+				Options:    []string{"green", "red", "blue", "yellow"},
+				HideFilter: false,
+			},
+			func(c expectConsole) {
+				c.ExpectString("What color do you prefer:  [Use arrows to move, space to select, <right> to all, <left> to none, type to filter]")
+				// Filter "blue" and "yellow"
+				c.Send("l")
+				// Select "blue"
+				c.Send(" ")
+				// Select "yellow"
+				c.Send(string(terminal.KeyArrowDown))
+				c.Send(" ")
+				c.SendLine("")
+				c.ExpectEOF()
+			},
+			[]core.OptionAnswer{
+				{Value: "blue", Index: 2},
+				{Value: "yellow", Index: 3},
+			},
+		},
+		{
+			"filter and select end options using the default filter behavior",
+			&MultiSelect{
+				Message: "What color do you prefer:",
+				Options: []string{"green", "red", "blue", "yellow"},
+			},
+			func(c expectConsole) {
+				c.ExpectString("What color do you prefer:  [Use arrows to move, space to select, <right> to all, <left> to none, type to filter]")
+				// Filter "blue" and "yellow"
+				c.Send("l")
+				// Select "blue"
+				c.Send(" ")
+				// Select "yellow"
+				c.Send(string(terminal.KeyArrowDown))
+				c.Send(" ")
+				c.SendLine("")
+				c.ExpectEOF()
+			},
+			[]core.OptionAnswer{
+				{Value: "blue", Index: 2},
+				{Value: "yellow", Index: 3},
+			},
+		},
+		{
+			"verify that help text is shown when requested, even if the filter is hidden",
+			&MultiSelect{
+				Message:    "What color do you prefer:",
+				Options:    []string{"green", "red", "blue", "yellow"},
+				Help:       "We all have a favorite :)",
+				HideFilter: true,
+			},
+			func(c expectConsole) {
+				c.ExpectString("What color do you prefer:  [Use arrows to move, space to select, <right> to all, <left> to none, ? for more help]")
+				// Display help message
+				c.Send("?")
+				c.ExpectString("We all have a favorite :)")
+				// Select "green"
+				c.Send(" ")
+				// Select "blue"
+				c.Send(string(terminal.KeyArrowDown))
+				c.Send(string(terminal.KeyArrowDown))
+				c.Send(" ")
+				c.SendLine("")
+				c.ExpectEOF()
+			},
+			[]core.OptionAnswer{
+				{Value: "green", Index: 0},
+				{Value: "blue", Index: 2},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			RunPromptTestKeepFilter(t, test)
+		})
+	}
+}
+
 func TestMultiSelectPromptRemoveSelectAll(t *testing.T) {
 	tests := []PromptTest{
 		{

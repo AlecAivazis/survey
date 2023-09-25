@@ -276,6 +276,8 @@ survey.AskOne(prompt, &content)
 By default, the user can filter for options in Select and MultiSelects by typing while the prompt
 is active. This will filter out all options that don't contain the typed string anywhere in their name, ignoring case.
 
+### Defining a custom filter
+
 A custom filter function can also be provided to change this behavior:
 
 ```golang
@@ -295,7 +297,7 @@ func myFilter(filterValue string, optValue string, optIndex int) bool {
 survey.AskOne(prompt, &color, survey.WithFilter(myFilter))
 ```
 
-## Keeping the filter active
+### Keeping the filter active
 
 By default the filter will disappear if the user selects one of the filtered elements. Once the user selects one element the filter setting is gone.
 
@@ -311,6 +313,20 @@ However the user can prevent this from happening and keep the filter active for 
 
 // or define a default for all of the questions
 survey.AskOne(prompt, &color, survey.WithKeepFilter(true))
+```
+
+### Removing filters
+
+Filtering can be removed from a prompt with the `HideFilter` option, restricting selection movements to only the arrow keys, as follows:
+
+```golang
+prompt := &survey.Select{
+    Message: "Choose a color:",
+    Options: []string{"red", "blue", "green"},
+    HideFilter: true,
+}
+
+survey.AskOne(prompt, &color)
 ```
 
 ## Validation

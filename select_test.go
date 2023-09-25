@@ -374,3 +374,92 @@ func TestSelectPrompt(t *testing.T) {
 		})
 	}
 }
+
+func TestSelectPromptHideFilter(t *testing.T) {
+	tests := []PromptTest{
+		{
+			"attempt to filter and select the end option when the filter is hidden",
+			&Select{
+				Message:    "What color do you prefer:",
+				Options:    []string{"green", "red", "blue"},
+				HideFilter: true,
+			},
+			func(c expectConsole) {
+				c.ExpectString("What color do you prefer:  [Use arrows to move]")
+				// Attempt to filter "blue"
+				c.Send("b")
+				// Select "green"
+				c.SendLine("")
+				c.ExpectEOF()
+			},
+			core.OptionAnswer{
+				Value: "green", Index: 0,
+			},
+		},
+		{
+			"filter and select the end option when the filter is clearly not hidden",
+			&Select{
+				Message:    "What color do you prefer:",
+				Options:    []string{"green", "red", "blue"},
+				HideFilter: false,
+			},
+			func(c expectConsole) {
+				c.ExpectString("What color do you prefer:  [Use arrows to move, type to filter]")
+				// Filter "blue"
+				c.Send("b")
+				// Select "blue"
+				c.SendLine("")
+				c.ExpectEOF()
+			},
+			core.OptionAnswer{
+				Value: "blue", Index: 2,
+			},
+		},
+		{
+			"filter and select the end option using the default filter behavior",
+			&Select{
+				Message: "What color do you prefer:",
+				Options: []string{"green", "red", "blue"},
+			},
+			func(c expectConsole) {
+				c.ExpectString("What color do you prefer:  [Use arrows to move, type to filter]")
+				// Filter "blue"
+				c.Send("l")
+				// Select "blue"
+				c.SendLine("")
+				c.ExpectEOF()
+			},
+			core.OptionAnswer{
+				Value: "blue", Index: 2,
+			},
+		},
+		{
+			"verify that help text is shown when requested, even if the filter is hidden",
+			&Select{
+				Message:    "What color do you prefer:",
+				Options:    []string{"green", "red", "blue"},
+				Help:       "We all have a favorite :)",
+				HideFilter: true,
+			},
+			func(c expectConsole) {
+				c.ExpectString("What color do you prefer:  [Use arrows to move, ? for more help]")
+				// Display help message
+				c.Send("?")
+				c.ExpectString("We all have a favorite :)")
+				// Select "green"
+				c.Send(" ")
+				c.SendLine("")
+				c.ExpectEOF()
+			},
+			core.OptionAnswer{
+				Value: "green", Index: 0,
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			RunPromptTestKeepFilter(t, test)
+		})
+	}
+}
