@@ -12,6 +12,22 @@ import (
 	"github.com/AlecAivazis/survey/v2/terminal"
 )
 
+//SurveyorInterface includes all the functions a normal user uses when using survey
+type SurveyorInterface interface {
+	AskOne(p Prompt, response interface{}, opts ...AskOpt) error
+	Ask(qs []*Question, response interface{}, opts ...AskOpt) error
+}
+
+type Surveyor struct{}
+
+//the following two functions are just passthroughs to the actual functions, but they make sure that the surveyor struct is backwards compatible to calling the functions directly
+func (surveyor Surveyor) AskOne(p Prompt, response interface{}, opts ...AskOpt) error {
+	return AskOne(p, response, opts...)
+}
+func (surveyor Surveyor) Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
+	return Ask(qs, response, opts...)
+}
+
 // DefaultAskOptions is the default options on ask, using the OS stdio.
 func defaultAskOptions() *AskOptions {
 	return &AskOptions{

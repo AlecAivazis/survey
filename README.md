@@ -483,6 +483,10 @@ survey.AskOne(
 
 ## Testing
 
+There are two ways to test a program using survey:
+
+### Using a simulated terminal
+
 You can test your program's interactive prompts using [go-expect](https://github.com/Netflix/go-expect). The library
 can be used to expect a match on stdout and respond on stdin. Since `os.Stdout` in a `go test` process is not a TTY,
 if you are manipulating the cursor or using `survey`, you will need a way to interpret terminal / ANSI escape sequences
@@ -490,6 +494,70 @@ for things like `CursorLocation`. `vt10x.NewVT10XConsole` will create a `go-expe
 stdio to an in-memory [virtual terminal](https://github.com/hinshun/vt10x).
 
 For some examples, you can see any of the tests in this repo.
+
+### Using a mock (unstable API)
+
+>**Warning:** 
+> The Mock API is currently still unstable and subject to change. 
+> Once it's done, it will be the recommended way to test survey. 
+> If you are unsure what to use right now, use a simulated terminal.
+
+Instead of calling the survey functions directly, you can create a survey struct and call the functions from there.
+
+```golang
+
+survey := survey.Survey{}
+
+response := false
+prompt := &survey.Confirm{
+    Message: "Do you like pie?",
+}
+survey.AskOne(prompt, &response)
+
+```
+
+If you create only one survey struct at the top level of your program and pass it to all functions, you can test those functions by replacing the struct with a mock provided by survey.
+
+#### main
+
+```golang
+func main() {
+    surveyor := survey.Surveyor{}
+
+    AskForPie(surveyor)
+}
+
+func AskForPie(surveyor survey.SurveyInterface) bool {
+    response := false
+    prompt := &survey.Confirm{
+        Message: "Do you like pie?",
+    }
+    surveyor.AskOne(prompt, &response)
+
+    return response
+}
+
+```
+
+#### Test
+
+```golang
+func TestAskForPie(t *testing.T) {
+    
+    //create mock
+    mock := survey.SurveyorMock{} 
+    //set the response the "user" should select 
+    mock.setResponse(true)
+
+    result := AskForPie(mock)
+    
+    //check output of the function
+    if !result {
+        t.Fatal("AskForPie returned false, but it should have returned true")
+    }
+}
+
+```
 
 ## FAQ
 
