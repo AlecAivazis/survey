@@ -1,6 +1,7 @@
 package terminal
 
 import (
+	"bufio"
 	"bytes"
 	"syscall"
 	"unsafe"
@@ -50,15 +51,24 @@ type keyEventRecord struct {
 }
 
 type runeReaderState struct {
-	term uint32
+	term   uint32
+	reader *bufio.Reader
+	buf    *bytes.Buffer
 }
 
 func newRuneReaderState(input FileReader) runeReaderState {
-	return runeReaderState{}
+	buf := new(bytes.Buffer)
+	return runeReaderState{
+		reader: bufio.NewReader(&BufferedReader{
+			In:     input,
+			Buffer: buf,
+		}),
+		buf: buf,
+	}
 }
 
 func (rr *RuneReader) Buffer() *bytes.Buffer {
-	return nil
+	return rr.state.buf
 }
 
 func (rr *RuneReader) SetTermMode() error {

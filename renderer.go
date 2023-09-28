@@ -3,6 +3,7 @@ package survey
 import (
 	"bytes"
 	"fmt"
+
 	"github.com/AlecAivazis/survey/v2/core"
 	"github.com/AlecAivazis/survey/v2/terminal"
 	"golang.org/x/term"
@@ -59,7 +60,7 @@ func (r *Renderer) Error(config *PromptConfig, invalid error) error {
 	}
 
 	// send the message to the user
-	if _, err := fmt.Fprint(terminal.NewAnsiStdout(r.stdio.Out), userOut); err != nil {
+	if _, err := fmt.Fprint(r.stdio.Out, userOut); err != nil {
 		return err
 	}
 
@@ -90,7 +91,7 @@ func (r *Renderer) Render(tmpl string, data interface{}) error {
 	}
 
 	// print the summary
-	if _, err := fmt.Fprint(terminal.NewAnsiStdout(r.stdio.Out), userOut); err != nil {
+	if _, err := fmt.Fprint(r.stdio.Out, userOut); err != nil {
 		return err
 	}
 
